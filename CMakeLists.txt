@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 2.8.12)
+project(MSMRD2)
+
+#include_directories(include)
+set(SOURCE_FILES include/quaternion.h include/vec3.h src/binding.cpp)
+include_directories(include)
+add_subdirectory(libraries/pybind11)
+set(bindings_python_version 3.6)
+add_library(msmrd2core SHARED src/simulation.cpp src/integrator.cpp include/quaternion.h include/vec3.h include/particle.h include/simulation.h include/integrator.h)
+pybind11_add_module(msmrd2binding src/binding.cpp include/quaternion.h include/vec3.h include/particle.h include/simulation.h include/integrator.h)
+target_link_libraries(msmrd2binding PUBLIC msmrd2core)
+
+add_library(catch2 INTERFACE)
+target_include_directories(catch2 INTERFACE "libraries/Catch2/single_include")
+add_subdirectory(tests/cpp)
