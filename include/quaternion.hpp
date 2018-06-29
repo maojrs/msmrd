@@ -7,7 +7,7 @@
 #include <type_traits>
 #include <sstream>
 #include <ostream>
-#include "vec3.h"
+#include "vec3.hpp"
 
 template<typename scalar=double>
 class quaternion {

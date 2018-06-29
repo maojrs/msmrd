@@ -2,8 +2,8 @@
 // Created by dibakma on 22.06.18.
 //
 
-#include <random>
-#include "simulation.h"
+//#include <random>
+#include "simulation.hpp"
 
 template<typename rng>
 int something() {
@@ -13,10 +13,10 @@ int something() {
     distribution(generator);
 }
 
-void simulation::run(const double timestep, const int Nsteps) {
-    for (int step; step<Nsteps; step++) {
-        for (int i; i<Nparticles; i++) {
-            particles.at(i).position += 1;
-        }
-    }
-}
+//void simulation::run(const double timestep, const int Nsteps) {
+//    for (int step; step<Nsteps; step++) {
+//        for (int i; i<Nparticles; i++) {
+//            particles.at(i).position += 1;
+//        }
+//    }
+//}

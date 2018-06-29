@@ -1,4 +1,4 @@
-import MSMRD2 as m
+import msmrd2 as m
 import numpy as np
 
 assert m.__version__ == '0.0.1'

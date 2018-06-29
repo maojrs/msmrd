@@ -3,9 +3,9 @@
 //
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include <catch2/catch.hpp>
-#include "simulation.h"
-#include "vec3.h"
-#include "particle.h"
+#include "simulation.hpp"
+#include "vec3.hpp"
+#include "particle.hpp"
 
 unsigned int Factorial( unsigned int number ) {
     return number <= 1 ? number : Factorial(number-1)*number;

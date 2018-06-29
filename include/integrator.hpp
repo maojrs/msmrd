@@ -5,7 +5,7 @@
 #pragma once
 #include <random>
 #include <array>
-#include "particle.h"
+#include "particle.hpp"
 
 ///**
 // * Base class for integrators

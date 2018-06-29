@@ -3,8 +3,8 @@
 //
 
 #pragma once
-#include "quaternion.h"
-#include "vec3.h"
+#include "quaternion.hpp"
+#include "vec3.hpp"
 
 /**
  * Declaration of the base class for particles

@@ -4,8 +4,8 @@
 #pragma once
 
 #include <array>
-#include "particle.h"
-#include "integrator.h"
+#include "particle.hpp"
+#include "integrator.hpp"
 
 class simulation {
 public:

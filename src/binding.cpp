@@ -4,10 +4,10 @@
 #include <pybind11/stl.h>
 #include <iostream>
 #include <random>
-#include "vec3.h"
-#include "quaternion.h"
-#include "particle.h"
-#include "simulation.h"
+#include "vec3.hpp"
+#include "quaternion.hpp"
+#include "particle.hpp"
+#include "simulation.hpp"
 
 namespace py = pybind11;
 
@@ -58,12 +58,12 @@ int add(int i, int j) {
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(MSMRD2, m) {
+PYBIND11_MODULE(msmrd2, m) {
     m.doc() = R"pbdoc(
         Pybind11 example plugin
         -----------------------
 
-        .. currentmodule:: MSMRD2
+        .. currentmodule:: msmrd2
 
         .. autosummary::
            :toctree: _generate
@@ -107,9 +107,9 @@ PYBIND11_MODULE(MSMRD2, m) {
     py::class_<particle<double>>(m, "particle")
             .def(py::init<int&, int&, double&, double&, std::vector<double>&, std::vector<double>&>());
 
-    py::class_<simulation>(m, "simulation")
-            .def(py::init<std::vector<particle<double>>>())
-            .def("run", &simulation::run);
+//    py::class_<simulation>(m, "simulation")
+//            .def(py::init<std::vector<particle<double>>>())
+//            .def("run", &simulation::run);
 
 
 
