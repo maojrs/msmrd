@@ -56,17 +56,27 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
+    # setup(...,
+    #       ext_package='pkg',
+    #       ext_modules=[Extension('foo', ['foo.c']),
+    #                    Extension('subpkg.bar', ['bar.c'])],
+    #       )
+
 setup(
     name='msmrd2',
     description='An implementation of the MSMRD model',
     version='0.0.1',
-    author='Manuel Dibak',
-    author_email='manuel.dibak@fu-berlin.de',
+    author='Manuel Dibak & Mauricio J. del Razo',
+    author_email='manuel.dibak@fu-berlin.de, m.delrazo@fu-berlin.de',
     url='https://github.com/markovmodel/msmrd2',
     ext_modules=[CMakeExtension('msmrd2')],
     cmdclass=dict(build_ext=CMakeBuild),
     install_requires=[
         'numpy',
+    ],
+    packages=[
+        'msmrd_py.tools',
+        'msmrd_py.visualization'
     ],
     zip_safe=False,
 )

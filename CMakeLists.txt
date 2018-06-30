@@ -32,12 +32,10 @@ set(PY_SOURCES
 )
 
 add_library(msmrd2core SHARED ${SOURCES})
-pybind11_add_module(msmrd2 ${PY_SOURCES})
-#target_link_libraries(msmrd2pybind PRIVATE MSMRD2)
+pybind11_add_module(msmrd2 MODULE ${PY_SOURCES})
 target_link_libraries(msmrd2 PUBLIC msmrd2core)
 
 #EXECUTE_PROCESS(COMMAND git submodule update --init WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-
 add_library(catch2 INTERFACE)
 target_include_directories(catch2 INTERFACE "libraries/Catch2/single_include")
 add_subdirectory(tests/cpp)
