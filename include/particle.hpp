@@ -6,35 +6,40 @@
 #include "quaternion.hpp"
 #include "vec3.hpp"
 
+
 /**
  * Declaration of the base class for particles
- * @tparam scalar underlying data type of the position and orientation
  */
 
-template<typename scalar>
 class particle {
 public:
     int pid;
     int type;
-    quaternion<scalar> orientation;
-    vec3<scalar> position;
-    scalar D;
-    scalar Drot;
-
-    particle(int pid, int type, scalar D, scalar Drot, quaternion<scalar> orientation, vec3<scalar> position):
-            pid(pid), type(type), D(D), Drot(Drot), orientation(orientation), position(position){};
-
+    double D;
+    double Drot;
+    vec3<double> position;
+    quaternion<double> orientation;
     /**
-     * Specific constructor for double type
+     * Constructors
      * @param pid ID of the particle
      * @param type particle type
      * @param D Diffusion constant
      * @param Drot rotational diffusion constant
-     * @param u normalized unit vector representing the initial orientation of the particle
      * @param position initial position of the particle
+     * @param u normalized unit vector representing the initial orientation of the particle
      */
-    particle(int pid, int type, scalar D, scalar Drot, std::vector<double> &u, std::vector<double> &position): pid(pid), type(type), D(D), Drot(Drot), position(position) {
+    particle(int pid, int type, double D, double Drot, vec3<double> position, quaternion<double> orientation):
+            pid(pid), type(type), D(D), Drot(Drot), orientation(orientation), position(position){};
+
+    particle(int pid, int type, double D, double Drot, std::vector<double> &position, std::vector<double> &u): pid(pid), type(type), D(D), Drot(Drot), position(position) {
         quaternion<double> q(0, u[0], u[1], u[2]);
         orientation = q;
     }
+
+    int getID() { return  pid; }
+    int getType() { return  type; }
+    int getD() { return  D; }
+    int getDrot() { return  Drot; }
+    vec3<double> getPosition() { return  position; }
+    quaternion<double> getOrientation() { return  orientation; }
 };

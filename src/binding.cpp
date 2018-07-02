@@ -42,14 +42,13 @@ py::array_t<double> normal_array(const py::ssize_t size) {
 int main() {
     auto q1 = quaternion<double>(1,1,3,1);
     auto q2 = quaternion<double>(3,4,5,6);
-    std::cout << q1+q2;
-    std::cout << q1-q2;
-    std::cout << q1;
-    std::cout << q1*q2;
-    std::cout << q1;
-    std::cout << q1.conj();
-    std::cout << q1*q1.conj();
-//    std::cout << q1.;//std::cout << "something" << "\n";
+    std::cout << q1+q2 << '\n';
+    std::cout << q1-q2 << '\n';
+    std::cout << q1 << '\n';
+    std::cout << q1*q2 << '\n';
+    std::cout << q1 << '\n';
+    std::cout << q1.conj() << '\n';
+    std::cout << q1*q1.conj() << '\n';
 }
 
 int add(int i, int j) {
@@ -104,9 +103,14 @@ PYBIND11_MODULE(msmrd2, m) {
 
     m.def("print_list", &print_list);
 
-    py::class_<particle<double>>(m, "particle")
-            .def(py::init<int&, int&, double&, double&, std::vector<double>&, std::vector<double>&>());
-
+    py::class_<particle>(m, "particle")
+            .def(py::init<int&, int&, double&, double&, std::vector<double>&, std::vector<double>&>())
+            .def("getID", &particle::getID)
+            .def("getType", &particle::getType)
+            .def("getD", &particle::getD)
+            .def("getDrot", &particle::getDrot)
+            .def("getPosition", &particle::getPosition)
+            .def("getOrientation", &particle::getOrientation);
 //    py::class_<simulation>(m, "simulation")
 //            .def(py::init<std::vector<particle<double>>>())
 //            .def("run", &simulation::run);

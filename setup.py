@@ -56,12 +56,6 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
-    # setup(...,
-    #       ext_package='pkg',
-    #       ext_modules=[Extension('foo', ['foo.c']),
-    #                    Extension('subpkg.bar', ['bar.c'])],
-    #       )
-
 setup(
     name='msmrd2',
     description='An implementation of the MSMRD model',

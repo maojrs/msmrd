@@ -9,8 +9,8 @@
 
 class simulation {
 public:
-    std::vector<particle<double>> &particles;
+    std::vector<particle> &particles;
     const int Nparticles;
-    simulation(std::vector<particle<double>> particles): particles(particles), Nparticles(particles.size()) {};
+    simulation(std::vector<particle> particles): particles(particles), Nparticles(particles.size()) {};
     void run(const double timestep, const int steps);
 };
