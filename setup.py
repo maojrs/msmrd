@@ -4,9 +4,10 @@ import sys
 import platform
 import subprocess
 
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
+
 
 
 class CMakeExtension(Extension):
@@ -33,6 +34,7 @@ class CMakeBuild(build_ext):
 
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        #extdir =
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
@@ -63,14 +65,8 @@ setup(
     author='Manuel Dibak & Mauricio J. del Razo',
     author_email='manuel.dibak@fu-berlin.de, m.delrazo@fu-berlin.de',
     url='https://github.com/markovmodel/msmrd2',
-    ext_modules=[CMakeExtension('msmrd2')],
+    ext_modules=[CMakeExtension('msmrd2._internal.msmrd2binding')],
     cmdclass=dict(build_ext=CMakeBuild),
-    install_requires=[
-        'numpy',
-    ],
-    packages=[
-        'msmrd_py.tools',
-        'msmrd_py.visualization'
-    ],
+    packages=["msmrd2"],
     zip_safe=False,
 )

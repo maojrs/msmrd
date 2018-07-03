@@ -55,9 +55,15 @@ int add(int i, int j) {
     return i + j;
 }
 
+py::array_t<double> returnsasnp(vec3<double> vector) {
+    //return py::array(3, vector.data);
+    return {};
+}
+
+
 namespace py = pybind11;
 
-PYBIND11_MODULE(msmrd2, m) {
+PYBIND11_MODULE(msmrd2binding, m) {
     m.doc() = R"pbdoc(
         Pybind11 example plugin
         -----------------------
@@ -109,8 +115,9 @@ PYBIND11_MODULE(msmrd2, m) {
             .def("getType", &particle::getType)
             .def("getD", &particle::getD)
             .def("getDrot", &particle::getDrot)
-            .def("getPosition", &particle::getPosition)
-            .def("getOrientation", &particle::getOrientation);
+            .def("getPosition", &particle::getPosition);
+            //.def("getOrientation", returnasnp(particle.orientation));
+
 //    py::class_<simulation>(m, "simulation")
 //            .def(py::init<std::vector<particle<double>>>())
 //            .def("run", &simulation::run);

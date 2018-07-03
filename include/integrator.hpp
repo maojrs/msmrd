@@ -7,16 +7,17 @@
 #include <array>
 #include "particle.hpp"
 
-///**
-// * Base class for integrators
-// */
-//class integrator {
-//protected:
-//    std::vector<particle>& particles;
-//    integrator();
-//    void integrate(double);
-//};
-//
+
+/**
+ * Base class for integrators
+ */
+class integrator {
+protected:
+    std::vector<particle>& particles;
+    integrator();
+    void integrate(double);
+};
+
 ///**
 // * Standard Brownian motion
 // */
