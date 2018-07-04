@@ -4,6 +4,7 @@
 #include <pybind11/stl.h>
 #include <iostream>
 #include <random>
+#include <msm.hpp>
 #include "vec3.hpp"
 #include "quaternion.hpp"
 #include "particle.hpp"
@@ -55,6 +56,7 @@ int add(int i, int j) {
     return i + j;
 }
 
+/* Convert c++ vectors/arrays to numpy arrays for pybind */
 template <typename ndvec>
 py::array_t<double> vec2numpy(int size, ndvec v) {
     auto result = py::array_t<double>(size);
@@ -126,6 +128,7 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def_property("orientation", [](const particle &part) {
                 return vec2numpy(4,part.orientation);
             }, nullptr);
+
 
 //    py::class_<simulation>(m, "simulation")
 //            .def(py::init<std::vector<particle<double>>>())

@@ -18,12 +18,7 @@ set(bindings_python_version 3.6)
 set(SOURCES
         src/simulation.cpp
         src/integrator.cpp
-#        include/quaternion.hpp
-#        include/vec3.hpp
-#        include/particle.hpp
-#        include/simulation.hpp
-#        include/integrator.hpp
-        )
+        src/msm.cpp)
 
 set(PY_SOURCES
         src/binding.cpp
@@ -32,6 +27,7 @@ set(PY_SOURCES
         include/particle.hpp
         include/simulation.hpp
         include/integrator.hpp
+        include/msm.hpp
 )
 
 add_library(msmrd2core SHARED ${SOURCES})

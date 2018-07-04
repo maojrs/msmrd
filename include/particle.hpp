@@ -39,6 +39,7 @@ public:
         orientation = q;
     }
 
+    /** Get properties functions for pybinding **/
     int getID() { return  pid; }
     int getType() { return  type; }
     int getD() { return  D; }

@@ -1,5 +1,6 @@
-#pragma once
+//Based on ReaDDy vec3 class
 
+#pragma once
 #include <array>
 #include <vector>
 #include <cmath>
