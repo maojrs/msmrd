@@ -18,8 +18,7 @@ public:
     double lagtime;
     std::array<double, N * N> tmatrix;
 
-    msm(int type, int nstates, std::array<double, N * N> tmatrix, double lagtime)
-            : nstates(nstates), tmatrix(tmatrix), lagtime(lagtime) {};
+    msm(int type, int nstates, std::array<double, N * N> tmatrix, double lagtime);
 
     /** Get properties functions for pybinding **/
     int getType() { return  type; }
@@ -33,15 +32,15 @@ class ctmsm {
 public:
     int type;
     int nstates = N;
-    std::array<double, N * N> ratematrix;
     double lagtime;
+    std::array<double, N * N> ratematrix;
 
-    ctmsm(int type, int nstates, std::array<double, N * N> ratematrix, double lagtime)
-            : nstates(nstates), ratematrix(ratematrix), lagtime(lagtime) {};
+    ctmsm(int type, int nstates, std::array<double, N * N> tmatrix, double lagtime);
 
     /** Get properties functions for pybinding **/
     int getType() { return  type; }
     int getNstates() { return  nstates; }
     double getLagtime() {return lagtime; }
-    std::array<double, N * N> getRateMatrix() { return  ratematrix; }
+    std::array<double, N * N> getRatematrix() { return  ratematrix; }
 };
+
