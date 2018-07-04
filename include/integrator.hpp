@@ -18,12 +18,12 @@ protected:
     void integrate(double);
 };
 
-///**
-// * Standard Brownian motion
-// */
-//class brownianDynamics : integrator {
-//    const int nparticles;
-//    std::mt19937 generator;
-//    brownianDynamics(std::vector<particle>&, int);
-//    void integrate(double);
-//};
+/**
+ * Standard Brownian motion
+ */
+class brownianDynamics : integrator {
+    const int nparticles;
+    std::mt19937 generator;
+    brownianDynamics(std::vector<particle>&, int);
+    void integrate(double);
+};

@@ -55,9 +55,14 @@ int add(int i, int j) {
     return i + j;
 }
 
-py::array_t<double> returnsasnp(vec3<double> vector) {
-    //return py::array(3, vector.data);
-    return {};
+template <typename ndvec>
+py::array_t<double> vec2numpy(int size, ndvec v) {
+    auto result = py::array_t<double>(size);
+    py::buffer_info buf = result.request();
+    double *ptr = (double *) buf.ptr;
+    for (size_t idx=0; idx<size; idx++)
+        ptr[idx] = v[idx];
+    return result;
 }
 
 
@@ -111,12 +116,16 @@ PYBIND11_MODULE(msmrd2binding, m) {
 
     py::class_<particle>(m, "particle")
             .def(py::init<int&, int&, double&, double&, std::vector<double>&, std::vector<double>&>())
-            .def("getID", &particle::getID)
-            .def("getType", &particle::getType)
-            .def("getD", &particle::getD)
-            .def("getDrot", &particle::getDrot)
-            .def("getPosition", &particle::getPosition);
-            //.def("getOrientation", returnasnp(particle.orientation));
+            .def_property("ID", &particle::getID, nullptr)
+            .def_property("type", &particle::getType, nullptr)
+            .def_property("D", &particle::getD, nullptr)
+            .def_property("Drot", &particle::getDrot, nullptr)
+            .def_property("position", [](const particle &part) {
+                return vec2numpy(3,part.position);
+            }, nullptr)
+            .def_property("orientation", [](const particle &part) {
+                return vec2numpy(4,part.orientation);
+            }, nullptr);
 
 //    py::class_<simulation>(m, "simulation")
 //            .def(py::init<std::vector<particle<double>>>())
