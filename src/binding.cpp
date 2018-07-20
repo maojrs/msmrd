@@ -2,6 +2,7 @@
 #include <numeric>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
+#include <pybind11/cast.h>
 #include <iostream>
 #include <random>
 #include <msm.hpp>
@@ -10,6 +11,8 @@
 #include "particle.hpp"
 #include "simulation.hpp"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 namespace py = pybind11;
 
 double arr_mean(const py::array_t<double> &arr) {
@@ -67,10 +70,32 @@ py::array_t<double> vec2numpy(int size, ndvec v) {
     return result;
 }
 
+// Template declarations for pybinding template classes
+//namespace {
+//    template<unsigned int N>
+//    static void declare_msm(py::module &mod, std::string const &suffix) {
+//        using Class = msm<N>;
+//        using PyClass = py::class_<Class, std::shared_ptr<Class>>;
+//
+//        PyClass cls(mod, ("msm" + suffix).c_str());
+//
+//        cls.def(py::init<int&, std::vector<std::vector<double>>&, double&>());
+//        cls.def_property("ID", &Class::getID, nullptr);
+//        cls.def_property("nstates", &Class::getNstates, nullptr);
+//        cls.def_property("lagtime", &Class::getLagtime, nullptr);
+//        cls.def_property("getTmatrix", &Class::getTmatrix,  nullptr);
+//
+////        //Alternative method:
+////        std::string pyclass_name = std::string("msm") + suffix;
+////        py::class_<Class>(mod, pyclass_name.c_str(), py::buffer_protocol(), py::dynamic_attr())
+////                .def(py::init<int&, double&>());
+//    }
+//}
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(msmrd2binding, m) {
+
     m.doc() = R"pbdoc(
         Pybind11 example plugin
         -----------------------
@@ -116,6 +141,9 @@ PYBIND11_MODULE(msmrd2binding, m) {
 
     m.def("print_list", &print_list);
 
+    /*
+     * pyBinders for all the relevant c++ classes
+     */
     py::class_<particle>(m, "particle")
             .def(py::init<int&, int&, double&, double&, std::vector<double>&, std::vector<double>&>())
             .def_property("ID", &particle::getID, nullptr)
@@ -129,12 +157,30 @@ PYBIND11_MODULE(msmrd2binding, m) {
                 return vec2numpy(4,part.orientation);
             }, nullptr);
 
+    py::class_<msm>(m, "msm")
+            .def(py::init<int&, std::vector<std::vector<double>>&, double&>())
+            .def_property("ID", &msm::getID, nullptr)
+            .def_property("nstates", &msm::getNstates, nullptr)
+            .def_property("lagtime", &msm::getLagtime, nullptr)
+            .def_property("Tmatrix", &msm::getTmatrix,  nullptr)
+            .def_property("D", [](const msm &currentmsm) {
+                return vec2numpy(currentmsm.nstates,currentmsm.Dlist);
+            }, nullptr)
+            .def_property("Drot", [](const msm &currentmsm) {
+                return vec2numpy(currentmsm.nstates,currentmsm.Drotlist);
+            }, nullptr)
+            .def("setD", &msm::setD)
+            .def("setDrot", &msm::setDrot)
+            .def("propagate", &msm::propagate);
+
+
+//    const unsigned int N = 2;
+//    declare_msm<N>(m, std::to_string(N));
+
 
 //    py::class_<simulation>(m, "simulation")
 //            .def(py::init<std::vector<particle<double>>>())
 //            .def("run", &simulation::run);
-
-
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
@@ -142,3 +188,4 @@ PYBIND11_MODULE(msmrd2binding, m) {
     m.attr("__version__") = "dev";
 #endif
 }
+#pragma clang diagnostic pop

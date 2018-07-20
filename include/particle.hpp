@@ -25,7 +25,7 @@ public:
     /**
      * Constructors
      * @param pid ID of the particle
-     * @param type particle type
+     * @param type particle type, corresponds to msmid
      * @param D Diffusion constant
      * @param Drot rotational diffusion constant
      * @param position initial position of the particle
@@ -44,6 +44,6 @@ public:
     int getType() { return  type; }
     int getD() { return  D; }
     int getDrot() { return  Drot; }
-    vec3<double> getPosition() { return  position; }
-    quaternion<double> getOrientation() { return  orientation; }
+//    vec3<double> getPosition() { return  position; }
+//    quaternion<double> getOrientation() { return  orientation; }
 };
