@@ -5,9 +5,6 @@
 #pragma once
 #include "quaternion.hpp"
 #include "vec3.hpp"
-//#include <pybind11/pybind11.h>
-//#include <pybind11/numpy.h>
-//#include <pybind11/stl.h>
 
 
 /**
@@ -18,6 +15,7 @@ class particle {
 public:
     int pid;
     int type;
+    int state;
     double D;
     double Drot;
     vec3<double> position;
@@ -26,24 +24,23 @@ public:
      * Constructors
      * @param pid ID of the particle
      * @param type particle type, corresponds to msmid
+     * @param state particle state given and changed by the msm
      * @param D Diffusion constant
      * @param Drot rotational diffusion constant
      * @param position initial position of the particle
-     * @param u normalized unit vector representing the initial orientation of the particle
+     * @param orientation normalized quaternion representing the initial orientation of the particle
      */
-    particle(int pid, int type, double D, double Drot, vec3<double> position, quaternion<double> orientation):
-            pid(pid), type(type), D(D), Drot(Drot), orientation(orientation), position(position){};
+    // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
+    particle(int pid, int type, int state, double D, double Drot, vec3<double> position, quaternion<double> orientation):
+            pid(pid), type(type), state(state), D(D), Drot(Drot), orientation(orientation), position(position){};
 
-    particle(int pid, int type, double D, double Drot, std::vector<double> &position, std::vector<double> &u): pid(pid), type(type), D(D), Drot(Drot), position(position) {
-        quaternion<double> q(0, u[0], u[1], u[2]);
-        orientation = q;
-    }
+    particle(int pid, int type, int state, double D, double Drot, std::vector<double> &position, std::vector<double> &orientation)
+            : pid(pid), type(type), state(state), D(D), Drot(Drot), position(position), orientation(orientation) {};
 
     /** Get properties functions for pybinding **/
     int getID() { return  pid; }
     int getType() { return  type; }
+    int getState() { return  state; }
     int getD() { return  D; }
     int getDrot() { return  Drot; }
-//    vec3<double> getPosition() { return  position; }
-//    quaternion<double> getOrientation() { return  orientation; }
 };

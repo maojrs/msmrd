@@ -22,7 +22,6 @@ set(SOURCES
 )
 
 set(PY_SOURCES
-        src/msm.cpp
         src/binding.cpp
         include/quaternion.hpp
         include/vec3.hpp

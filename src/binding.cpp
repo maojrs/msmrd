@@ -64,7 +64,7 @@ template <typename ndvec>
 py::array_t<double> vec2numpy(int size, ndvec v) {
     auto result = py::array_t<double>(size);
     py::buffer_info buf = result.request();
-    double *ptr = (double *) buf.ptr;
+    auto *ptr = (double *) buf.ptr;
     for (size_t idx=0; idx<size; idx++)
         ptr[idx] = v[idx];
     return result;
@@ -105,12 +105,13 @@ PYBIND11_MODULE(msmrd2binding, m) {
         .. autosummary::
            :toctree: _generate
 
-           add
-           subtract
+           particle
+           msm
+           ctmsm
     )pbdoc";
 
     m.def("add", &add, R"pbdoc(
-        Add two numbers
+        Defines particle
 
         Some other explanation about the add function.
     )pbdoc");
@@ -145,9 +146,10 @@ PYBIND11_MODULE(msmrd2binding, m) {
      * pyBinders for all the relevant c++ classes
      */
     py::class_<particle>(m, "particle")
-            .def(py::init<int&, int&, double&, double&, std::vector<double>&, std::vector<double>&>())
+            .def(py::init<int&, int&, int&, double&, double&, std::vector<double>&, std::vector<double>&>())
             .def_property("ID", &particle::getID, nullptr)
             .def_property("type", &particle::getType, nullptr)
+            .def_property("state", &particle::getState, nullptr)
             .def_property("D", &particle::getD, nullptr)
             .def_property("Drot", &particle::getDrot, nullptr)
             .def_property("position", [](const particle &part) {
@@ -173,14 +175,27 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("setDrot", &msm::setDrot)
             .def("propagate", &msm::propagate);
 
+    py::class_<ctmsm>(m, "ctmsm")
+            .def(py::init<int&, std::vector<std::vector<double>>&, double&>())
+            .def_property("ID", &ctmsm::getID, nullptr)
+            .def_property("nstates", &ctmsm::getNstates, nullptr)
+            .def_property("lagtime", &ctmsm::getLagtime, nullptr)
+            .def_property("Tmatrix", &ctmsm::getTmatrix,  nullptr)
+            .def_property("D", [](const ctmsm &currentmsm) {
+                return vec2numpy(currentmsm.nstates,currentmsm.Dlist);
+            }, nullptr)
+            .def_property("Drot", [](const msm &currentmsm) {
+                return vec2numpy(currentmsm.nstates,currentmsm.Drotlist);
+            }, nullptr)
+            .def("setD", &ctmsm::setD)
+            .def("setDrot", &ctmsm::setDrot)
+            .def("propagate", &ctmsm::propagate);
+
+
 
 //    const unsigned int N = 2;
 //    declare_msm<N>(m, std::to_string(N));
 
-
-//    py::class_<simulation>(m, "simulation")
-//            .def(py::init<std::vector<particle<double>>>())
-//            .def("run", &simulation::run);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;

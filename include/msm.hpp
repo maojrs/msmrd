@@ -6,6 +6,7 @@
 #include <random>
 #include <array>
 #include <algorithm>
+#include <chrono>
 #include "particle.hpp"
 
 /**
@@ -19,6 +20,7 @@ public:
     unsigned int nstates;
     std::vector<double> Dlist;
     std::vector<double> Drotlist;
+//    long seed;
     /**
      * Constructors
      * @param msmid ID of the msm, corresponds to the particle type
@@ -28,6 +30,8 @@ public:
      * Additional variables
      * @param Dlist list of diffusion coefficients for each state
      * @param Drotlist list of rotational diffusion coefficients for each state
+//     * @param seed variable for random number generation;
+
      */
     // Main constructor, can receive std::vectior matrix or numpy array matrix (through pybind)
     msmbase(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime)
@@ -40,10 +44,15 @@ public:
             tmatrix[i].resize(nstates);
             std::copy_n(tempmatrix[i].begin(), nstates, tmatrix[i].begin());
         }
+//        // Initializes random number generator with time based seed and from 0 to 1
+//        seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+//        auto mt_rand = std::bind(std::uniform_real_distribution<double>(0,1), std::mt19937.seed(seed));
+
     };
 
     // Main functions definitions (=0 for abstract class)
-    virtual void propagate(particle part) = 0;
+    virtual int propagate(particle part, int ksteps) = 0;
+
     void setD(std::vector<double> &D){
         Dlist.resize(nstates);
         Dlist=D;
@@ -53,7 +62,7 @@ public:
         Drotlist=Drot;
     }
 
-    // Get properties functions for pybinding
+    // Get property functions for pybinding
     int getID() { return  msmid; }
     int getNstates() { return  nstates; }
     double getLagtime() {return lagtime; }
@@ -67,15 +76,22 @@ public:
 
 class msm: public msmbase {
 public:
-    using msmbase::msmbase; // constructors inheritance
-    virtual void propagate(particle part) override;
+    using msmbase::msmbase; // constructor inheritance
+    int propagate(particle part, int ksteps) override;
 };
 
 
 class ctmsm: public msmbase {
 public:
-    using msmbase::msmbase; // constructors inheritance
-    virtual void propagate(particle part) override;
+    using msmbase::msmbase; // constructor inheritance
+    int propagate(particle part, int ksteps) override;
+
+protected:
+    bool _paramsCalculated = false;
+    std::vector<double> _lambda0;
+    std::vector<std::vector<double>> _ratescumsum;
+
+    void calculateParameters();
 };
 
 
