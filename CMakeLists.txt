@@ -18,9 +18,11 @@ set(bindings_python_version 3.6)
 set(SOURCES
         src/simulation.cpp
         src/integrator.cpp
-        src/msm.cpp)
+        src/msm.cpp
+)
 
 set(PY_SOURCES
+        src/msm.cpp
         src/binding.cpp
         include/quaternion.hpp
         include/vec3.hpp

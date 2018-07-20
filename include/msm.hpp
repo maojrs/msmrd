@@ -5,42 +5,65 @@
 #pragma once
 #include <random>
 #include <array>
+#include <algorithm>
 
 /**
- * Base classes for discrete-time and continuous-time Markov state models
+ * Abstract base class for Markov state models
+ */
+template<unsigned int N>
+class msmbase {
+public:
+    int msmid;
+    int nstates = N;
+    double lagtime;
+    std::array<std::array<double, N>, N> tmatrix;
+    //std::array<double, N * N> tmatrix;
+
+    // Main constructor
+    msmbase(int msmid,  std::array<std::array<double, N>, N> tmatrix, double lagtime)
+            : msmid(msmid), tmatrix(tmatrix), lagtime(lagtime) {};
+
+    // Constructor capable of receiving python numpy arrays as input
+    msmbase(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime)
+            : msmid(msmid), lagtime(lagtime) {
+        for (int i=0; i<N; i++) {
+            std::copy_n(tempmatrix[i].begin(), N, tmatrix[i].begin());
+        }
+    };
+
+    // Main functions definitions (=0 for abtract class)
+    virtual void propagate() = 0;
+
+
+    /** Get properties functions for pybinding **/
+    int getID() { return  msmid; }
+    int getNstates() { return  nstates; }
+    double getLagtime() {return lagtime; }
+    std::array<std::array<double, N>, N> getTmatrix() { return  tmatrix; }
+    //std::array<double, N * N> getTmatrix() { return  tmatrix; }
+};
+
+
+/**
+ * Child classes of msmbase, discrete-time (msm) and continuous-time (ctmsm)
  */
 
 template<unsigned int N>
-class msm {
+class msm: public msmbase<N> {
 public:
-    int type;
-    int nstates = N;
-    double lagtime;
-    std::array<double, N * N> tmatrix;
+    using msmbase<N>::msmbase; // constructors inheritance
+    virtual void propagate() override;
 
-    msm(int type, int nstates, std::array<double, N * N> tmatrix, double lagtime);
-
-    /** Get properties functions for pybinding **/
-    int getType() { return  type; }
-    int getNstates() { return  nstates; }
-    double getLagtime() {return lagtime; }
-    std::array<double, N * N> getTmatrix() { return  tmatrix; }
 };
 
 template<unsigned int N>
-class ctmsm {
+class ctmsm: public msmbase<N> {
 public:
-    int type;
-    int nstates = N;
-    double lagtime;
-    std::array<double, N * N> ratematrix;
-
-    ctmsm(int type, int nstates, std::array<double, N * N> tmatrix, double lagtime);
-
-    /** Get properties functions for pybinding **/
-    int getType() { return  type; }
-    int getNstates() { return  nstates; }
-    double getLagtime() {return lagtime; }
-    std::array<double, N * N> getRatematrix() { return  ratematrix; }
+    using msmbase<N>::msmbase; // constructors inheritance
 };
+
+
+
+
+
 

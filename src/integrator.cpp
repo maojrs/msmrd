@@ -4,7 +4,7 @@
 
 #include "integrator.hpp"
 
-//brownianDynamics::brownianDynamics(std::vector<particle> &particles, int seed=-1): particles(particles), nparticles(particles.size()) {
+//brownianDynamics::brownianDynamics(std::vector<particle> &particles, int seed=-1): integrator(particles), nparticles(particles.size()) {
 //    if (seed>0) {
 //        generator.seed(seed);
 //    } else {

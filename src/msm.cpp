@@ -3,14 +3,16 @@
 //
 
 #include "msm.hpp"
+//
+//template<unsigned int N>
+//msm<N>::msm(int msmid, int nstates, std::array<double, N * N> tmatrix, double lagtime)
+//        : msmid(msmid), nstates(nstates), tmatrix(tmatrix), lagtime(lagtime) {}
+
 
 template<unsigned int N>
-msm<N>::msm(int type, int nstates, std::array<double, N * N> tmatrix, double lagtime)
-        : type(type), nstates(nstates), tmatrix(tmatrix), lagtime(lagtime) {}
+void msm<N>::propagate(){
 
-template<unsigned int N>
-ctmsm<N>::ctmsm(int type, int nstates, std::array<double, N * N> ratematrix, double lagtime)
-        : type(type), nstates(nstates), ratematrix(ratematrix), lagtime(lagtime) {};
+};
 
-//void msm::propagate(){
-//};
+//template <typename T>
+//ExampleThree<T>::ExampleThree(T value) : _value(value) {};
