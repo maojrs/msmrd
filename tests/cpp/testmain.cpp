@@ -43,3 +43,8 @@ TEST_CASE("Basic quaternion arithmetic", "[quaternions]") {
     REQUIRE( q1p+v1 == v3 );
     REQUIRE( q1*q2 == v4 );
 }
+
+//TEST_CASE("MSM functionality", "[msm]") {
+//    std::vector<std::vector<double>> tmatrix ={ {-5, 2, 3,}, {3, -4, 1}, {2, 2, -4} };
+//
+//}

@@ -12,8 +12,9 @@
  */
 
 class particle {
-public:
+private:
     int pid;
+public:
     int type;
     int state;
     double D;
@@ -37,10 +38,11 @@ public:
     particle(int pid, int type, int state, double D, double Drot, std::vector<double> &position, std::vector<double> &orientation)
             : pid(pid), type(type), state(state), D(D), Drot(Drot), position(position), orientation(orientation) {};
 
-    /** Get properties functions for pybinding **/
+    /** Get and set functions (**some needed for pybindinng) **/
     int getID() { return  pid; }
     int getType() { return  type; }
     int getState() { return  state; }
     int getD() { return  D; }
     int getDrot() { return  Drot; }
+    void setState(int newstate) { state = newstate; }
 };

@@ -157,14 +157,15 @@ PYBIND11_MODULE(msmrd2binding, m) {
             }, nullptr)
             .def_property("orientation", [](const particle &part) {
                 return vec2numpy(4,part.orientation);
-            }, nullptr);
+            }, nullptr)
+            .def("setState", &particle::setState);
 
     py::class_<msm>(m, "msm")
             .def(py::init<int&, std::vector<std::vector<double>>&, double&>())
             .def_property("ID", &msm::getID, nullptr)
             .def_property("nstates", &msm::getNstates, nullptr)
             .def_property("lagtime", &msm::getLagtime, nullptr)
-            .def_property("Tmatrix", &msm::getTmatrix,  nullptr)
+            .def_property("tmatrix", &msm::getTmatrix,  nullptr)
             .def_property("D", [](const msm &currentmsm) {
                 return vec2numpy(currentmsm.nstates,currentmsm.Dlist);
             }, nullptr)
@@ -180,7 +181,7 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def_property("ID", &ctmsm::getID, nullptr)
             .def_property("nstates", &ctmsm::getNstates, nullptr)
             .def_property("lagtime", &ctmsm::getLagtime, nullptr)
-            .def_property("Tmatrix", &ctmsm::getTmatrix,  nullptr)
+            .def_property("tmatrix", &ctmsm::getTmatrix,  nullptr)
             .def_property("D", [](const ctmsm &currentmsm) {
                 return vec2numpy(currentmsm.nstates,currentmsm.Dlist);
             }, nullptr)
