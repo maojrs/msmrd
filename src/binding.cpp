@@ -195,7 +195,7 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("propagate", &ctmsm::propagate);
 
 
-    py::class_<odLangevin>(m, "odLangevin")
+    py::class_<odLangevin, std::shared_ptr<odLangevin>>(m, "odLangevin")
             .def(py::init<double&, long&>())
             .def("integrate", &odLangevin::integrate)
             .def("test", &odLangevin::test);
