@@ -11,10 +11,10 @@ python setup.py install
 
 ## To do:
 
-- [ ] Test sample overdamped Lanegvin integrator with pybindings.
+- [x] Test sample overdamped Lanegvin integrator with pybindings.
 
 - [ ] Create header file for potentials.
 
-- [ ] Rewrite module for MSM and CTMSM in c++.
+- [x] Rewrite module for MSM and CTMSM in c++.
 
 - [ ] Rewrite previous code for diffusion with rotation and Markovian switch. 
