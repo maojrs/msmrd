@@ -158,10 +158,12 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def_property("orientation", [](const particle &part) {
                 return vec2numpy(4,part.orientation);
             }, nullptr)
-            .def("setState", &particle::setState);
+            .def("setState", &particle::setState)
+            .def("setPosition", &particle::setPosition);
+
 
     py::class_<msm>(m, "msm")
-            .def(py::init<int&, std::vector<std::vector<double>>&, double&>())
+            .def(py::init<int&, std::vector<std::vector<double>>&, double&, long&>())
             .def_property("ID", &msm::getID, nullptr)
             .def_property("nstates", &msm::getNstates, nullptr)
             .def_property("lagtime", &msm::getLagtime, nullptr)
@@ -177,7 +179,7 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("propagate", &msm::propagate);
 
     py::class_<ctmsm>(m, "ctmsm")
-            .def(py::init<int&, std::vector<std::vector<double>>&, double&>())
+            .def(py::init<int&, std::vector<std::vector<double>>&, double&, long&>())
             .def_property("ID", &ctmsm::getID, nullptr)
             .def_property("nstates", &ctmsm::getNstates, nullptr)
             .def_property("lagtime", &ctmsm::getLagtime, nullptr)
@@ -191,6 +193,12 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("setD", &ctmsm::setD)
             .def("setDrot", &ctmsm::setDrot)
             .def("propagate", &ctmsm::propagate);
+
+
+    py::class_<odLangevin>(m, "odLangevin")
+            .def(py::init<double&, long&>())
+            .def("integrate", &odLangevin::integrate)
+            .def("test", &odLangevin::test);
 
 
 

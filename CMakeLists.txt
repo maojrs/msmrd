@@ -11,7 +11,6 @@ use_cxx14()
 
 FIND_PROGRAM(PYTHON "python")
 
-#include_directories(include)
 include_directories(include)
 add_subdirectory(libraries/pybind11)
 set(bindings_python_version 3.6)
@@ -19,7 +18,8 @@ set(SOURCES
         src/simulation.cpp
         src/integrator.cpp
         src/msm.cpp
-)
+        src/randomgen.cpp
+        )
 
 set(PY_SOURCES
         src/binding.cpp
@@ -29,7 +29,8 @@ set(PY_SOURCES
         include/simulation.hpp
         include/integrator.hpp
         include/msm.hpp
-)
+        include/randomgen.hpp
+        )
 
 add_library(msmrd2core SHARED ${SOURCES})
 #target_include_directories(msmrd2core PUBLIC include libraries/pybind11/include)

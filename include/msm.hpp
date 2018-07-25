@@ -3,11 +3,11 @@
 //
 
 #pragma once
-#include <random>
 #include <array>
 #include <algorithm>
-#include <chrono>
 #include "particle.hpp"
+#include "randomgen.hpp"
+
 
 /**
  * Abstract base class for Markov state models
@@ -15,6 +15,8 @@
 class msmbase {
 protected:
     const long double tolerance = 1*pow(10.0L,-10);
+    long seed;
+    randomgen randg;
 public:
     int msmid;
     double lagtime;
@@ -22,7 +24,6 @@ public:
     unsigned int nstates;
     std::vector<double> Dlist;
     std::vector<double> Drotlist;
-//    long seed;
     /**
      * Constructors
      * @param msmid ID of the msm, corresponds to the particle type
@@ -32,41 +33,37 @@ public:
      * Additional variables
      * @param Dlist list of diffusion coefficients for each state
      * @param Drotlist list of rotational diffusion coefficients for each state
-//     * @param seed variable for random number generation;
-
+     * @param tolerance tolerance limit for MSM integrity check
+     * @param seed variable for random number generation; seed = -1 corresponds to random_device;
+     * @param randg random number generator class based on mt19937
      */
 
     // Base constructor, can receive std::vectior matrix or numpy array matrix (through pybind)
-    msmbase(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime)
-            : msmid(msmid), lagtime(lagtime) {
+    msmbase(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
+            : msmid(msmid), lagtime(lagtime), seed(seed){
 
-        // Resize vectors by input matrix size
+        // Resize vectors by input matrix size and set seed of random number generator
         nstates = static_cast<int>(tempmatrix.size());
         Dlist.resize(nstates);
         Drotlist.resize(nstates);
         tmatrix.resize(nstates);
+        randg.setSeed(seed);
 
-        // Verify the input 2D vector is a square matrix
+        // Verify input 2D vector is a square matrix and fill tmatrix
         for (const auto& row : tempmatrix) {
             if (tempmatrix.size() != row.size()) {
                 throw std::range_error("MSM matrix must be a square matrix");
             }
         }
-
-        // Fills tmatrix and constructs random number generator with unique seed
         for (int i=0; i<nstates; i++) {
             tmatrix[i].resize(nstates);
             std::copy_n(tempmatrix[i].begin(), nstates, tmatrix[i].begin());
         }
-//        seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-//        auto mt_rand = std::bind(std::uniform_real_distribution<double>(0,1), std::mt19937.seed(seed));
-
     };
 
     // Main functions definitions (=0 for abstract class)
     virtual void propagate(particle &part, int ksteps) = 0;
-
-    /** Get and set functions (**some needed for pybindinng) **/
+    // Get and set functions (**some needed for pybindinng)
     int getID() { return  msmid; }
     int getNstates() { return  nstates; }
     double getLagtime() {return lagtime; }
@@ -88,7 +85,7 @@ public:
 
 class msm: public msmbase {
 public:
-    msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime);
+    msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed);
     void propagate(particle &part, int ksteps) override;
 };
 
@@ -99,9 +96,8 @@ private:
     std::vector<std::vector<double>> ratescumsum;
     void calculateParameters();
 public:
-    ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime);
+    ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed);
     void propagate(particle &part, int ksteps) override;
-
 };
 
 

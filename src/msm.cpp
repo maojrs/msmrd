@@ -1,14 +1,11 @@
 //
 // Created by maojrs on 7/4/18.
 //
-#include <functional>
-#include "particle.hpp"
-#include "msm.hpp"
 #include <iostream>
-
-
 #include <cstdlib>
 #include <ctime>
+#include "particle.hpp"
+#include "msm.hpp"
 
 /**
  * Implementation of functions for discrete-time msm (msm) and
@@ -18,8 +15,8 @@
 /**
 * Discrete-time msm (msm)
 */
-msm::msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime)
-        : msmbase(msmid,  tempmatrix, lagtime) {
+msm::msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
+        : msmbase(msmid,  tempmatrix, lagtime, seed) {
     // Verify MSM transition matrix rows sum to 1 and components between 0 and 1
     double rowsum;
     for (const auto& row : tempmatrix) {
@@ -44,8 +41,8 @@ void msm::propagate(particle &part, int ksteps) {
 /**
 * Continuous-time msm (ctmsm)
 */
-ctmsm::ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime)
-        : msmbase(msmid,  tempmatrix, lagtime) {
+ctmsm::ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
+        : msmbase(msmid,  tempmatrix, lagtime, seed) {
     // Verify CTMSM transition rate matrix rows sum to 0
     double long rowsum;
     for (const auto& row : tempmatrix) {
@@ -64,7 +61,7 @@ void ctmsm::calculateParameters() {
     int index;
     lambda0.resize(nstates);
     ratescumsum.resize(nstates);
-    // Calculates lambda0, sum of outgoing rates, for each state
+    // Calculates lambda0 (sum of outgoing rates), for each state
     for (int row = 0; row < nstates; row++) {
         index = 0;
         for (int col = 0; col < nstates; col++) {
@@ -75,7 +72,7 @@ void ctmsm::calculateParameters() {
         }
         lambda0[row] = 0;
         for (auto& n : ratevector){ lambda0[row] += n; }
-        // Calculates rates cumulative sum for current row
+        // Calculates ratescumsum (rate cumulative sum for current row)
         ratescumsum[row].resize(nstates-1);
         std::copy_n(ratevector.begin(), nstates, ratescumsum[row].begin());
         for (int col = 1; col < nstates-1; col++) {
@@ -91,8 +88,8 @@ void ctmsm::propagate(particle &part,int ksteps) {
     int state = 0;
     for (int m = 0; m < ksteps; m++) {
         // Begins Gillespie algorithm, calculates which transition and when will it occur.
-        r1 = 1.0*std::rand()/RAND_MAX; //mt_rand();
-        r2 = 1.0*std::rand()/RAND_MAX; //mt_rand();
+        r1 = randg.uniformRange(0,1);
+        r2 = randg.uniformRange(0,1);
         lagtime += std::log(1.0 / r1) / lambda0[part.state];
         for (int col = 0; col < nstates; col++) {
             if (r2 * lambda0[part.state] <= ratescumsum[part.state][col]){
@@ -104,9 +101,7 @@ void ctmsm::propagate(particle &part,int ksteps) {
                 break;
             }
         }
+        part.setState(state);
     }
-    part.setState(state);
 };
 
-//template <typename T>
-//ExampleThree<T>::ExampleThree(T value) : _value(value) {};

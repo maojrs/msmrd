@@ -6,7 +6,6 @@
 #include "quaternion.hpp"
 #include "vec3.hpp"
 
-
 /**
  * Declaration of the base class for particles
  */
@@ -45,4 +44,6 @@ public:
     int getD() { return  D; }
     int getDrot() { return  Drot; }
     void setState(int newstate) { state = newstate; }
+    void setPosition(vec3<double> newposition) { position = newposition; }
+
 };
