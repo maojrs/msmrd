@@ -1,11 +1,15 @@
 #include <pybind11/pybind11.h>
-#include <numeric>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 #include <pybind11/cast.h>
+#include <pybind11/complex.h>
+#include <pybind11/functional.h>
+#include <pybind11/chrono.h>
+#include <numeric>
 #include <iostream>
 #include <random>
-#include <msm.hpp>
+#include "msm.hpp"
 #include "vec3.hpp"
 #include "quaternion.hpp"
 #include "particle.hpp"
@@ -13,6 +17,10 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
+// Needed to connect lists/arrays of particles in python with c methods
+PYBIND11_MAKE_OPAQUE(std::vector<particle>);
+
 namespace py = pybind11;
 
 double arr_mean(const py::array_t<double> &arr) {
@@ -145,6 +153,7 @@ PYBIND11_MODULE(msmrd2binding, m) {
     /*
      * pyBinders for all the relevant c++ classes
      */
+
     py::class_<particle>(m, "particle")
             .def(py::init<int&, int&, int&, double&, double&, std::vector<double>&, std::vector<double>&>())
             .def_property("ID", &particle::getID, nullptr)
@@ -160,7 +169,6 @@ PYBIND11_MODULE(msmrd2binding, m) {
             }, nullptr)
             .def("setState", &particle::setState)
             .def("setPosition", &particle::setPosition);
-
 
     py::class_<msm>(m, "msm")
             .def(py::init<int&, std::vector<std::vector<double>>&, double&, long&>())
@@ -179,7 +187,7 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("propagate", &msm::propagate);
 
     py::class_<ctmsm>(m, "ctmsm")
-            .def(py::init<int&, std::vector<std::vector<double>>&, double&, long&>())
+            .def(py::init<int&, std::vector<std::vector<double>>&, long&>())
             .def_property("ID", &ctmsm::getID, nullptr)
             .def_property("nstates", &ctmsm::getNstates, nullptr)
             .def_property("lagtime", &ctmsm::getLagtime, nullptr)
@@ -195,15 +203,16 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("propagate", &ctmsm::propagate);
 
 
-    py::class_<odLangevin, std::shared_ptr<odLangevin>>(m, "odLangevin")
+    py::class_<odLangevin>(m, "odLangevin")
             .def(py::init<double&, long&>())
             .def("integrate", &odLangevin::integrate)
             .def("test", &odLangevin::test);
 
 
+    // Created c++ compatible particle list/vector/array of particles in python
+    py::bind_vector<std::vector<particle>>(m, "particleList");
 
-//    const unsigned int N = 2;
-//    declare_msm<N>(m, std::to_string(N));
+
 
 
 #ifdef VERSION_INFO

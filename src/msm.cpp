@@ -41,8 +41,8 @@ void msm::propagate(particle &part, int ksteps) {
 /**
 * Continuous-time msm (ctmsm)
 */
-ctmsm::ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
-        : msmbase(msmid,  tempmatrix, lagtime, seed) {
+ctmsm::ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, long seed)
+        : msmbase(msmid,  tempmatrix, 0.0, seed) {
     // Verify CTMSM transition rate matrix rows sum to 0
     double long rowsum;
     for (const auto& row : tempmatrix) {

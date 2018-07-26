@@ -30,7 +30,7 @@ protected:
     };
 
     // Main functions definitions (=0 for abstract class)
-    virtual void integrate(std::vector<std::shared_ptr<particle>> parts) = 0;
+    virtual void integrate(std::vector<particle> &parts) = 0;
 };
 
 /**
@@ -40,6 +40,6 @@ protected:
 class odLangevin: public integrator {
 public:
     odLangevin(double dt, long seed);
-    void integrate(std::vector<std::shared_ptr<particle>> parts) override;
-    double test();
+    void integrate(std::vector<particle> &parts) override;
+    void test(std::vector<int> &intlist);
 };

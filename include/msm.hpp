@@ -96,7 +96,7 @@ private:
     std::vector<std::vector<double>> ratescumsum;
     void calculateParameters();
 public:
-    ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed);
+    ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, long seed);
     void propagate(particle &part, int ksteps) override;
 };
 

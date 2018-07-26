@@ -9,19 +9,20 @@
 
 odLangevin::odLangevin(double dt, long seed) : integrator(dt,seed) {};
 
-void odLangevin::integrate(std::vector<std::shared_ptr<particle>> parts) {
+void odLangevin::integrate(std::vector<particle> &parts) {
     vec3<double> dr;
     double coeff;
     for (int i=0; i<parts.size(); i++) {
-        coeff = std::sqrt(2*dt*parts[i]->D);
+        coeff = std::sqrt(2*dt*parts[i].D);
         dr[0] = coeff*randg.normal(0,1);
         dr[1] = coeff*randg.normal(0,1);
         dr[2] = coeff*randg.normal(0,1);
-        parts[i]->position += dr;
+        parts[i].setPosition(parts[i].position + dr);
     }
 };
 
-double odLangevin::test(){
-    return randg.normal(0,1);
+void odLangevin::test(std::vector<int> &intlist){
+    intlist[0] = 666;
+    //return randg.normal(0,1);
 }
 

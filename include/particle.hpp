@@ -47,3 +47,15 @@ public:
     void setPosition(vec3<double> newposition) { position = newposition; }
 
 };
+
+//class particleList {
+//public:
+//    int nparticles;
+//    std::vector<particle> parlist;
+//    particleList(std::vector<particle> &parlist) : parlist(parlist) {
+//        nparticles = parlist.size();
+//    };
+//
+//    int getNparticles() { return nparticles; }
+//    vec3<double> getPosition() {return parlist[0].position; }
+//};
