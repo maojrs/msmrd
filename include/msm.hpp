@@ -10,7 +10,7 @@
 
 
 /**
- * Abstract base class for Markov state models
+ * Abstract base class for Markov state models of particles
  */
 class msmbase {
 protected:
@@ -83,6 +83,7 @@ public:
  * Child classes of msmbase definitions: discrete-time (msm) and continuous-time (ctmsm)
  */
 
+// Discrete time Markov state model class
 class msm: public msmbase {
 public:
     msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed);
@@ -90,6 +91,7 @@ public:
 };
 
 
+// Continuous time Markov state model class
 class ctmsm: public msmbase {
 private:
     std::vector<double> lambda0;

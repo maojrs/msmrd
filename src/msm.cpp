@@ -12,9 +12,7 @@
  * continuous-time msm (ctmsm) classes.
  */
 
-/**
-* Discrete-time msm (msm)
-*/
+//Discrete-time msm (msm)
 msm::msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
         : msmbase(msmid,  tempmatrix, lagtime, seed) {
     // Verify MSM transition matrix rows sum to 1 and components between 0 and 1
@@ -38,9 +36,7 @@ void msm::propagate(particle &part, int ksteps) {
 };
 
 
-/**
-* Continuous-time msm (ctmsm)
-*/
+//Continuous-time msm (ctmsm)
 ctmsm::ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, long seed)
         : msmbase(msmid,  tempmatrix, 0.0, seed) {
     // Verify CTMSM transition rate matrix rows sum to 0

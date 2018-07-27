@@ -8,6 +8,7 @@
 #include <memory>
 #include "particle.hpp"
 #include "randomgen.hpp"
+#include "msm.hpp"
 
 
 /**
@@ -30,16 +31,29 @@ protected:
     };
 
     // Main functions definitions (=0 for abstract class)
-    virtual void integrate(std::vector<particle> &parts) = 0;
+    virtual void integrate(particle &part) = 0;
+public:
+    void integrateList(std::vector<particle> &parts);
 };
 
 /**
- * Over-damped Langevin (a.k.a. standard Brownian motion)
+ * Child classes of integrator
  */
 
+// Over-damped Langevin (a.k.a. standard Brownian motion)
 class odLangevin: public integrator {
 public:
     odLangevin(double dt, long seed);
-    void integrate(std::vector<particle> &parts) override;
+    void integrate(particle &part) override;
+
     void test(std::vector<int> &intlist);
+};
+
+
+// Over-damped Langevin with Markovian Switch
+class odLangevinMarkovSwitch: public integrator {
+public:
+    std::vector<ctmsm> &msmlist;
+    odLangevinMarkovSwitch(std::vector<ctmsm> &msmlist, double dt, long seed);
+    void integrate(particle &part) override;
 };

@@ -3,6 +3,10 @@
 //
 #include "randomgen.hpp"
 
+/**
+ * Functions of randomgen class
+ */
+
 // Sets seed for random generator mt19937_64
 void randomgen::setSeed(long newseed){
     if (newseed == -1){

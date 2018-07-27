@@ -206,6 +206,7 @@ PYBIND11_MODULE(msmrd2binding, m) {
     py::class_<odLangevin>(m, "odLangevin")
             .def(py::init<double&, long&>())
             .def("integrate", &odLangevin::integrate)
+            .def("integrateList", &odLangevin::integrateList)
             .def("test", &odLangevin::test);
 
 
