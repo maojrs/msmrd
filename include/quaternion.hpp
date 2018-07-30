@@ -9,6 +9,7 @@
 #include <ostream>
 #include "vec3.hpp"
 
+// Quaternion class with operator overloading
 template<typename scalar=double>
 class quaternion {
 public:
@@ -37,6 +38,8 @@ public:
 
     quaternion(vec3<scalar> im): re(0), im(im) {};
 
+    quaternion(std::vector<double> &v): a(v[0]), b(v[1]), c(v[2]), d(v[3]) {};
+
     //explicit quaternion(const data_arr &abcd) : data(abcd) {};
 
     quaternion &operator+=(const quaternion &rhs) {
@@ -48,11 +51,6 @@ public:
         std::transform(data.begin(), data.end(), rhs.data.begin(), data.begin(), std::minus<scalar>());
         return *this;
     };
-
-//    quaternion &operator*(const quaternion &rhs) {
-//        std::transform(data.begin(), data.end(), rhs.data.begin(), data.begin(), std::minus<scalar>());
-//        return *this;
-//    };
 
     quaternion operator*(const quaternion &other) const {
         return {
@@ -183,4 +181,19 @@ public:
         return lhs;
     }
 
+};
+
+// Othe useful quaternion functions
+template<typename scalar=double>
+quaternion<scalar> angle2quaternion(const vec3<double> &phi) {
+    double phinorm = phi.norm();
+    if (phinorm != 0) {
+        vec3<double> phiunit = phi / phinorm;
+        double s = cos(0.5 * phinorm);
+        double p = sin(0.5 * phinorm);
+        return {s, p * phiunit[0], p * phiunit[1], p * phiunit[2]};
+    } else {
+        //returns unit quaternion (no rotation)
+        return {1, 0, 0, 0};
+    }
 };

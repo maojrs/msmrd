@@ -32,12 +32,15 @@ public:
      */
     // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
     particle(int pid, int type, int state, double D, double Drot, vec3<double> position, quaternion<double> orientation):
-            pid(pid), type(type), state(state), D(D), Drot(Drot), orientation(orientation), position(position){};
+            pid(pid), type(type), state(state), D(D), Drot(Drot), position(position), orientation(orientation){};
 
     particle(int pid, int type, int state, double D, double Drot, std::vector<double> &position, std::vector<double> &orientation)
             : pid(pid), type(type), state(state), D(D), Drot(Drot), position(position), orientation(orientation) {};
 
-    /** Get and set functions (**some needed for pybindinng) **/
+    /**
+     * Get and set functions. Some used by c++ and python,
+     * some only to be used by pyhon with python bindings.
+     **/
     int getID() { return  pid; }
     int getType() { return  type; }
     int getState() { return  state; }
@@ -45,7 +48,12 @@ public:
     int getDrot() { return  Drot; }
     void setState(int newstate) { state = newstate; }
     void setPosition(vec3<double> newposition) { position = newposition; }
-
+    void setPositionPybind(std::vector<double> newposition) { position = newposition; }
+    void setOrientation(quaternion<double> neworientation) { orientation = neworientation; }
+    void setOrientationPybind(std::vector<double> neworientation) {
+        quaternion<double> quat(neworientation);
+        orientation = quat;
+    }
 };
 
 //class particleList {

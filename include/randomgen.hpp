@@ -3,6 +3,7 @@
 //
 #pragma once
 #include <random>
+#include "vec3.hpp"
 
 #ifndef MSMRD2_RANDOMGEN_HPP
 #define MSMRD2_RANDOMGEN_HPP
@@ -24,4 +25,5 @@ public:
     void setSeed(long newseed);
     double uniformRange(double rmin, double rmax);
     double normal(double mean, double stddev);
+    vec3<double> normal3D(double mean, double stddev);
 };

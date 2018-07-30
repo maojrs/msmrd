@@ -168,7 +168,9 @@ PYBIND11_MODULE(msmrd2binding, m) {
                 return vec2numpy(4,part.orientation);
             }, nullptr)
             .def("setState", &particle::setState)
-            .def("setPosition", &particle::setPosition);
+            .def("setPosition", &particle::setPositionPybind)
+            .def("setOrientation", &particle::setOrientationPybind);
+
 
     py::class_<msm>(m, "msm")
             .def(py::init<int&, std::vector<std::vector<double>>&, double&, long&>())
@@ -208,6 +210,7 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("integrate", &odLangevin::integrate)
             .def("integrateList", &odLangevin::integrateList)
             .def("test", &odLangevin::test);
+
 
 
     // Created c++ compatible particle list/vector/array of particles in python
