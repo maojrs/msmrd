@@ -31,7 +31,7 @@ msm::msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtim
     }
 };
 
-void msm::propagate(particle &part, int ksteps) {
+void msm::propagate(particleMS &part, int ksteps) {
 
 };
 
@@ -78,7 +78,7 @@ void ctmsm::calculateParameters() {
 };
 
 // Propagates CTMSM using the Gillespie algorithm
-void ctmsm::propagate(particle &part,int ksteps) {
+void ctmsm::propagate(particleMS &part,int ksteps) {
     lagtime = 0;
     double r1, r2;
     int state = 0;

@@ -62,7 +62,7 @@ public:
     };
 
     // Main functions definitions (=0 for abstract class)
-    virtual void propagate(particle &part, int ksteps) = 0;
+    virtual void propagate(particleMS &part, int ksteps) = 0;
     // Get and set functions (**some needed for pybindinng)
     int getID() { return  msmid; }
     int getNstates() { return  nstates; }
@@ -87,7 +87,7 @@ public:
 class msm: public msmbase {
 public:
     msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed);
-    void propagate(particle &part, int ksteps) override;
+    void propagate(particleMS &part, int ksteps) override;
 };
 
 
@@ -99,7 +99,7 @@ private:
     void calculateParameters();
 public:
     ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, long seed);
-    void propagate(particle &part, int ksteps) override;
+    void propagate(particleMS &part, int ksteps) override;
 };
 
 

@@ -155,10 +155,8 @@ PYBIND11_MODULE(msmrd2binding, m) {
      */
 
     py::class_<particle>(m, "particle")
-            .def(py::init<int&, int&, int&, double&, double&, std::vector<double>&, std::vector<double>&>())
+            .def(py::init<double&, double&, std::vector<double>&, std::vector<double>& >())
             .def_property("ID", &particle::getID, nullptr)
-            .def_property("type", &particle::getType, nullptr)
-            .def_property("state", &particle::getState, nullptr)
             .def_property("D", &particle::getD, nullptr)
             .def_property("Drot", &particle::getDrot, nullptr)
             .def_property("position", [](const particle &part) {
@@ -167,9 +165,26 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def_property("orientation", [](const particle &part) {
                 return vec2numpy(4,part.orientation);
             }, nullptr)
-            .def("setState", &particle::setState)
             .def("setPosition", &particle::setPositionPybind)
             .def("setOrientation", &particle::setOrientationPybind);
+
+    py::class_<particleMS>(m, "particleMS")
+            .def(py::init<int&, int&, double&, double&, std::vector<double>&, std::vector<double>& >())
+            .def_property("ID", &particleMS::getID, nullptr)
+            .def_property("type", &particleMS::getType, nullptr)
+            .def_property("state", &particleMS::getState, nullptr)
+            .def_property("D", &particleMS::getD, nullptr)
+            .def_property("Drot", &particleMS::getDrot, nullptr)
+            .def_property("position", [](const particleMS &part) {
+                return vec2numpy(3,part.position);
+            }, nullptr)
+            .def_property("orientation", [](const particleMS &part) {
+                return vec2numpy(4,part.orientation);
+            }, nullptr)
+            .def("setState", &particleMS::setState)
+            .def("setType", &particleMS::setType)
+            .def("setPosition", &particleMS::setPositionPybind)
+            .def("setOrientation", &particleMS::setOrientationPybind);
 
 
     py::class_<msm>(m, "msm")
@@ -206,10 +221,9 @@ PYBIND11_MODULE(msmrd2binding, m) {
 
 
     py::class_<odLangevin>(m, "odLangevin")
-            .def(py::init<double&, long&>())
+            .def(py::init<double&, long&, bool&>())
             .def("integrate", &odLangevin::integrate)
-            .def("integrateList", &odLangevin::integrateList)
-            .def("test", &odLangevin::test);
+            .def("integrateList", &odLangevin::integrateList);
 
 
 

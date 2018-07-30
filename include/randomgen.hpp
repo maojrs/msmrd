@@ -5,9 +5,6 @@
 #include <random>
 #include "vec3.hpp"
 
-#ifndef MSMRD2_RANDOMGEN_HPP
-#define MSMRD2_RANDOMGEN_HPP
-#endif //MSMRD2_RANDOMGEN_HPP
 
 /**
  * Class to generate good random numbers (mt_19937_64 generator)

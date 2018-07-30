@@ -183,7 +183,7 @@ public:
 
 };
 
-// Othe useful quaternion functions
+// Other useful quaternion functions
 template<typename scalar=double>
 quaternion<scalar> angle2quaternion(const vec3<double> &phi) {
     double phinorm = phi.norm();

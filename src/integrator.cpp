@@ -25,11 +25,13 @@ void integrator::integrateList(std::vector<particle> &parts) {
  */
 
 // Over-damped Lanegvin dynamics integrator
-odLangevin::odLangevin(double dt, long seed) : integrator(dt,seed) {};
+odLangevin::odLangevin(double dt, long seed, bool rotation) : integrator(dt,seed), rotation(rotation) {};
 
 void odLangevin::integrate(particle &part) {
     translate(part,dt);
-    rotate(part,dt);
+    if (rotation) {
+        rotate(part, dt);
+    }
 }
 
 void odLangevin::translate(particle &part, double dt0){
@@ -43,36 +45,24 @@ void odLangevin::rotate(particle &part, double dt0){
     quaternion<double> dquat;
     dphi = std::sqrt(2*dt0*part.Drot)*randg.normal3D(0,1);
     dquat = angle2quaternion(dphi);
-    dquat = dquat * part.orientation;
-    part.setOrientation(dquat);
+    part.setOrientation(dquat * part.orientation);
 }
-
-double odLangevin::test(particle &part){
-    vec3<double> dphi;
-    quaternion<double> dquat;
-    dphi = std::sqrt(2*part.Drot)*randg.normal3D(0,1);
-    dquat = angle2quaternion(dphi);
-    //dquat = dquat * part.orientation;
-    part.setOrientation(dphi);
-    return dphi[1];
-}
-
 
 // Over-damped Langevin dynamics with Markovian switch integrator
-// Constructors to define template specializations for ctmsm and msm.
+// constructors define template specializations for ctmsm and msm.
 template<typename TMSM>
-odLangevinMarkovSwitch<TMSM>::odLangevinMarkovSwitch(msm &msm0, double dt, long seed)
-        : tmsm(msm0), odLangevin(dt,seed) {
+odLangevinMarkovSwitch<TMSM>::odLangevinMarkovSwitch(msm &msm0, double dt, long seed, bool rotation)
+        : tmsm(msm0), odLangevin(dt,seed,rotation) {
     msmtype = "discrete-time";
 };
 template<typename TMSM>
-odLangevinMarkovSwitch<TMSM>::odLangevinMarkovSwitch(ctmsm &ctmsm0, double dt, long seed)
-        : tmsm(ctmsm0), odLangevin(dt,seed) {
+odLangevinMarkovSwitch<TMSM>::odLangevinMarkovSwitch(ctmsm &ctmsm0, double dt, long seed, bool rotation)
+        : tmsm(ctmsm0), odLangevin(dt,seed,rotation) {
     msmtype = "continuous-time";
 };
 
 template<>
-void odLangevinMarkovSwitch<ctmsm>::integrate(particle &part) {
+void odLangevinMarkovSwitch<ctmsm>::integrate(particleMS &part) {
     translate(part, dt);
     rotate(part,dt);
 }

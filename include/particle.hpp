@@ -11,11 +11,10 @@
  */
 
 class particle {
-private:
-    int pid;
+protected:
+    int pid = 0;
+    bool active = true;
 public:
-    int type;
-    int state;
     double D;
     double Drot;
     vec3<double> position;
@@ -23,30 +22,25 @@ public:
     /**
      * Constructors
      * @param pid ID of the particle
-     * @param type particle type, corresponds to msmid
-     * @param state particle state given and changed by the msm
      * @param D Diffusion constant
      * @param Drot rotational diffusion constant
      * @param position initial position of the particle
      * @param orientation normalized quaternion representing the initial orientation of the particle
      */
     // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
-    particle(int pid, int type, int state, double D, double Drot, vec3<double> position, quaternion<double> orientation):
-            pid(pid), type(type), state(state), D(D), Drot(Drot), position(position), orientation(orientation){};
+    particle(double D, double Drot, vec3<double> position, quaternion<double> orientation)
+            : D(D), Drot(Drot), position(position), orientation(orientation){};
 
-    particle(int pid, int type, int state, double D, double Drot, std::vector<double> &position, std::vector<double> &orientation)
-            : pid(pid), type(type), state(state), D(D), Drot(Drot), position(position), orientation(orientation) {};
+    particle(double D, double Drot, std::vector<double> &position, std::vector<double> &orientation)
+            : D(D), Drot(Drot), position(position), orientation(orientation) {};
 
     /**
      * Get and set functions. Some used by c++ and python,
      * some only to be used by pyhon with python bindings.
      **/
     int getID() { return  pid; }
-    int getType() { return  type; }
-    int getState() { return  state; }
     int getD() { return  D; }
     int getDrot() { return  Drot; }
-    void setState(int newstate) { state = newstate; }
     void setPosition(vec3<double> newposition) { position = newposition; }
     void setPositionPybind(std::vector<double> newposition) { position = newposition; }
     void setOrientation(quaternion<double> neworientation) { orientation = neworientation; }
@@ -56,14 +50,22 @@ public:
     }
 };
 
-//class particleList {
-//public:
-//    int nparticles;
-//    std::vector<particle> parlist;
-//    particleList(std::vector<particle> &parlist) : parlist(parlist) {
-//        nparticles = parlist.size();
-//    };
-//
-//    int getNparticles() { return nparticles; }
-//    vec3<double> getPosition() {return parlist[0].position; }
-//};
+class particleMS: public particle {
+public:
+    int type; //particle type, corresponds to msmid
+    int state; //particle state given and changed by the msm
+
+    // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
+    particleMS(int type, int state, double D, double Drot, vec3<double> position, quaternion<double> orientation)
+            : type(type), state(state), particle(D, Drot, position, orientation){};
+
+    particleMS(int type, int state, double D, double Drot, std::vector<double> &position, std::vector<double> &orientation)
+            : type(type), state(state), particle(D, Drot, position, orientation) {};
+
+    int getType() { return  type; }
+    int getState() { return  state; }
+    void setState(int newstate) { state = newstate; }
+    void setType(int newtype) { type = newtype; }
+
+
+};

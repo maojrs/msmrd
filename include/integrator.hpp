@@ -45,12 +45,12 @@ public:
 // Over-damped Langevin (a.k.a. standard Brownian motion)
 class odLangevin: public integrator {
 protected:
+    bool rotation;
     void translate(particle &part, double dt) override;
     void rotate(particle &part, double dt) override;
 public:
-    odLangevin(double dt, long seed);
+    odLangevin(double dt, long seed, bool rotation);
     void integrate(particle &part) override;
-    double test(particle &part);
 };
 
 
@@ -61,7 +61,7 @@ private:
     std::string msmtype;
 public:
     TMSM tmsm;
-    odLangevinMarkovSwitch(msm &tmsm, double dt, long seed);
-    odLangevinMarkovSwitch(ctmsm &tmsm, double dt, long seed);
-    void integrate(particle &part) override;
+    odLangevinMarkovSwitch(msm &tmsm, double dt, long seed, bool rotation);
+    odLangevinMarkovSwitch(ctmsm &tmsm, double dt, long seed, bool rotation);
+    void integrate(particleMS &part);
 };
