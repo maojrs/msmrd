@@ -20,6 +20,8 @@
 
 // Needed to connect lists/arrays of particles in python with c methods
 PYBIND11_MAKE_OPAQUE(std::vector<particle>);
+PYBIND11_MAKE_OPAQUE(std::vector<particleMS>);
+
 
 namespace py = pybind11;
 
@@ -165,6 +167,8 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def_property("orientation", [](const particle &part) {
                 return vec2numpy(4,part.orientation);
             }, nullptr)
+            .def("setD", &particle::setD)
+            .def("setDrot", &particle::setDrot)
             .def("setPosition", &particle::setPositionPybind)
             .def("setOrientation", &particle::setOrientationPybind);
 
@@ -173,6 +177,7 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def_property("ID", &particleMS::getID, nullptr)
             .def_property("type", &particleMS::getType, nullptr)
             .def_property("state", &particleMS::getState, nullptr)
+            .def_property("lagtime", &particleMS::getLagtime, nullptr)
             .def_property("D", &particleMS::getD, nullptr)
             .def_property("Drot", &particleMS::getDrot, nullptr)
             .def_property("position", [](const particleMS &part) {
@@ -181,11 +186,13 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def_property("orientation", [](const particleMS &part) {
                 return vec2numpy(4,part.orientation);
             }, nullptr)
+            .def("setD", &particle::setD)
+            .def("setDrot", &particle::setDrot)
             .def("setState", &particleMS::setState)
             .def("setType", &particleMS::setType)
+            .def("setLagtime", &particleMS::setLagtime)
             .def("setPosition", &particleMS::setPositionPybind)
             .def("setOrientation", &particleMS::setOrientationPybind);
-
 
     py::class_<msm>(m, "msm")
             .def(py::init<int&, std::vector<std::vector<double>>&, double&, long&>())
@@ -219,16 +226,24 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("setDrot", &ctmsm::setDrot)
             .def("propagate", &ctmsm::propagate);
 
-
     py::class_<odLangevin>(m, "odLangevin")
             .def(py::init<double&, long&, bool&>())
+            .def_property("clock", &odLangevin::getClock, nullptr)
             .def("integrate", &odLangevin::integrate)
             .def("integrateList", &odLangevin::integrateList);
+
+    py::class_<odLangevinMarkovSwitch<ctmsm>>(m, "odLangevinMarkovSwitch")
+            .def(py::init<ctmsm&, double&, long&, bool&>())
+            .def_property("clock", &odLangevinMarkovSwitch<ctmsm>::getClock, nullptr)
+            .def("integrate", &odLangevinMarkovSwitch<ctmsm>::integrate)
+            .def("integrateList", &odLangevinMarkovSwitch<ctmsm>::integrateList);
 
 
 
     // Created c++ compatible particle list/vector/array of particles in python
     py::bind_vector<std::vector<particle>>(m, "particleList");
+    py::bind_vector<std::vector<particleMS>>(m, "particleMSList");
+
 
 
 

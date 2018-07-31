@@ -49,6 +49,7 @@ ctmsm::ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, long seed
         }
     }
     calculateParameters();
+    lagtime = 0;
 };
 
 // Calculates parameters often used by ctmsm::propagate from transition matrix
@@ -79,14 +80,14 @@ void ctmsm::calculateParameters() {
 
 // Propagates CTMSM using the Gillespie algorithm
 void ctmsm::propagate(particleMS &part,int ksteps) {
-    lagtime = 0;
+    double lagt = 0;
     double r1, r2;
     int state = 0;
     for (int m = 0; m < ksteps; m++) {
         // Begins Gillespie algorithm, calculates which transition and when will it occur.
         r1 = randg.uniformRange(0,1);
         r2 = randg.uniformRange(0,1);
-        lagtime += std::log(1.0 / r1) / lambda0[part.state];
+        lagt += std::log(1.0 / r1) / lambda0[part.state];
         for (int col = 0; col < nstates; col++) {
             if (r2 * lambda0[part.state] <= ratescumsum[part.state][col]){
                 if (col < part.state) {
@@ -98,6 +99,8 @@ void ctmsm::propagate(particleMS &part,int ksteps) {
             }
         }
         part.setState(state);
+        part.setLagtime(lagt);
+        lagtime = lagt;
     }
 };
 

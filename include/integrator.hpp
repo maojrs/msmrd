@@ -19,23 +19,37 @@ protected:
     double dt;
     long seed;
     randomgen randg;
+    bool rotation;
+
+    // Protected abstract functions
+    virtual void translate(particle &part, double dt) = 0;
+    virtual void rotate(particle &part, double dt) = 0;
+public:
+    double clock;
     /**
      * @param dt time step
      * @param seed variable for random number generation;
      * @param randg random number generator based in mt19937
+     * @param rotation boolean to indicate if rotation should be integrated
+     * @param clock keeps track of global time
      */
 
     // Base constructor, seed=-1 corresponds to random-device seed for random number generator
-    integrator(double dt, long seed): dt(dt), seed(seed) {
+    integrator(double dt, long seed, bool rotation)
+            : dt(dt), seed(seed), rotation(rotation) {
         randg.setSeed(seed);
+        clock = 0;
     };
 
     // Main functions definitions (=0 for abstract class)
     virtual void integrate(particle &part) = 0;
-    virtual void translate(particle &part, double dt) = 0;
-    virtual void rotate(particle &part, double dt) = 0;
-public:
     void integrateList(std::vector<particle> &parts);
+
+    /**
+    * Get and set functions. Some used by c++ and python,
+    * some only to be used by pyhon with python bindings.
+    **/
+    double getClock() { return clock; }
 };
 
 /**
@@ -45,7 +59,6 @@ public:
 // Over-damped Langevin (a.k.a. standard Brownian motion)
 class odLangevin: public integrator {
 protected:
-    bool rotation;
     void translate(particle &part, double dt) override;
     void rotate(particle &part, double dt) override;
 public:
@@ -54,14 +67,30 @@ public:
 };
 
 
-// Over-damped Langevin with Markovian Switch (TMSM can be an msm or a ctmsm)
+// Over-damped Langevin with Markovian Switch (TMSM template can be an msm or a ctmsm)
 template<typename TMSM>
 class odLangevinMarkovSwitch: public odLangevin {
 private:
     std::string msmtype;
 public:
     TMSM tmsm;
-    odLangevinMarkovSwitch(msm &tmsm, double dt, long seed, bool rotation);
-    odLangevinMarkovSwitch(ctmsm &tmsm, double dt, long seed, bool rotation);
+    /**
+     * @param msmtype string to distinguish between msm and ctmsm
+     * @param tmsm object variable, cn be either an msm or a ctmsm
+     */
+
+    // Constructors need to be defined in headers for template w/pybind
+    odLangevinMarkovSwitch(ctmsm &tmsm, double dt, long seed, bool rotation)
+            : tmsm(tmsm), odLangevin(dt,seed,rotation) {
+        msmtype = "continuous-time";
+    };
+
+    odLangevinMarkovSwitch(msm &tmsm, double dt, long seed, bool rotation)
+            : tmsm(tmsm), odLangevin(dt,seed,rotation) {
+        msmtype = "discrete-time";
+    };
+
     void integrate(particleMS &part);
+    void integrateList(std::vector<particleMS> &parts);
+
 };

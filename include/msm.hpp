@@ -25,17 +25,15 @@ public:
     std::vector<double> Dlist;
     std::vector<double> Drotlist;
     /**
-     * Constructors
+     * @param tolerance tolerance limit for MSM integrity check
+     * @param seed variable for random number generation; seed = -1 corresponds to random_device;
+     * @param randg random number generator class based on mt19937
      * @param msmid ID of the msm, corresponds to the particle type
      * @param lagtime msm lagtime (in ctmsm it is calculated after each propagation step)
      * @param tmatrix transition matrix (for ctmsm transition rate matrix)
      * @param nstates number of states in the msm (obtained directly from matrix size)
-     * Additional variables
      * @param Dlist list of diffusion coefficients for each state
      * @param Drotlist list of rotational diffusion coefficients for each state
-     * @param tolerance tolerance limit for MSM integrity check
-     * @param seed variable for random number generation; seed = -1 corresponds to random_device;
-     * @param randg random number generator class based on mt19937
      */
 
     // Base constructor, can receive std::vectior matrix or numpy array matrix (through pybind)
