@@ -17,7 +17,7 @@ python setup.py install
 
 - [x] Rewrite module for MSM and CTMSM in c++.
 
-- [ ] Rewrite previous code for diffusion with rotation and Markovian switch. 
+- [x] Rewrite previous code for diffusion with rotation and Markovian switch. 
 
 - [ ] Write tests for randgen, msm, ctmsm, odLangevin and odLangevinMarkovSwitch classes
 
