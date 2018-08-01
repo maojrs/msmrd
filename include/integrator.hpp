@@ -22,6 +22,7 @@ protected:
     bool rotation;
 
     // Protected abstract functions
+    virtual void integrateOne(particle &part) = 0;
     virtual void translate(particle &part, double dt) = 0;
     virtual void rotate(particle &part, double dt) = 0;
 public:
@@ -59,6 +60,7 @@ public:
 // Over-damped Langevin (a.k.a. standard Brownian motion)
 class odLangevin: public integrator {
 protected:
+    void integrateOne(particle &part) override;
     void translate(particle &part, double dt) override;
     void rotate(particle &part, double dt) override;
 public:
@@ -72,6 +74,7 @@ template<typename TMSM>
 class odLangevinMarkovSwitch: public odLangevin {
 private:
     std::string msmtype;
+    void integrateOne(particleMS &part);
 public:
     TMSM tmsm;
     /**

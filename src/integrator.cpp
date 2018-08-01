@@ -14,8 +14,9 @@
  // Integrate list of particles instead of single one (need to be overriden for interacting or MS particles)
 void integrator::integrateList(std::vector<particle> &parts) {
     for (int i=0; i<parts.size(); i++) {
-        integrate(parts[i]);
+        integrateOne(parts[i]);
     }
+    clock += dt;
 };
 
 /**
@@ -25,11 +26,16 @@ void integrator::integrateList(std::vector<particle> &parts) {
 // Over-damped Lanegvin dynamics integrator
 odLangevin::odLangevin(double dt, long seed, bool rotation) : integrator(dt,seed, rotation) {};
 
-void odLangevin::integrate(particle &part) {
+void odLangevin::integrateOne(particle &part) {
     translate(part,dt);
     if (rotation) {
         rotate(part, dt);
     }
+}
+
+void odLangevin::integrate(particle &part) {
+    integrateOne(part);
+    clock += dt;
 }
 
 void odLangevin::translate(particle &part, double dt0){
@@ -51,7 +57,7 @@ void odLangevin::rotate(particle &part, double dt0){
 
 // Integrates rotation/translation and Markovian switch together
 template<>
-void odLangevinMarkovSwitch<ctmsm>::integrate(particleMS &part) {
+void odLangevinMarkovSwitch<ctmsm>::integrateOne(particleMS &part) {
     double resdt;
     // propagate CTMSM/MSM when synchronized and update diffusion coefficients
     part.tcount = 0;
@@ -99,6 +105,11 @@ void odLangevinMarkovSwitch<ctmsm>::integrate(particleMS &part) {
             part.propagateTMSM = false;
         };
     };
+};
+
+template<>
+void odLangevinMarkovSwitch<ctmsm>::integrate(particleMS &part) {
+    integrateOne(part);
     clock += dt;
 };
 
@@ -108,8 +119,9 @@ void odLangevinMarkovSwitch<ctmsm>::integrate(particleMS &part) {
 template<>
 void odLangevinMarkovSwitch<ctmsm>::integrateList(std::vector<particleMS> &parts) {
     for (int i=0; i<parts.size(); i++) {
-        integrate(parts[i]);
+        integrateOne(parts[i]);
     }
+    clock += dt;
 };
 
 
