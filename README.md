@@ -13,7 +13,7 @@ python setup.py install
 
 - [x] Test sample overdamped Lanegvin integrator with pybindings.
 
-- [ ] Write header and source file for potentials.
+- [x] Write header and source file for potentials.
 
 - [x] Rewrite module for MSM and CTMSM in c++.
 
