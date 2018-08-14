@@ -19,7 +19,7 @@ set(SOURCES
         src/integrator.cpp
         src/msm.cpp
         src/randomgen.cpp
-        )
+        src/potentials.cpp)
 
 set(PY_SOURCES
         src/binding.cpp
@@ -30,6 +30,7 @@ set(PY_SOURCES
         include/integrator.hpp
         include/msm.hpp
         include/randomgen.hpp
+        include/potentials.hpp
         )
 
 add_library(msmrd2core SHARED ${SOURCES})
