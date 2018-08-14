@@ -81,6 +81,18 @@ TEST_CASE("Sampling from randomgen", "[randomgen]") {
         REQUIRE(trial2.norm() <= 2.0);
         REQUIRE(trial3.norm() <= 3.0);
     }
+    // Uniform Shell
+    for (int i=0; i<100; i++) {
+        trial1 = randg.uniformShell(1.0,2.0);
+        trial2 = randg.uniformShell(2.0,5.0);
+        trial3 = randg.uniformShell(3.0,6.0);
+        REQUIRE(trial1.norm() <= 2.0);
+        REQUIRE(trial1.norm() >= 1.0);
+        REQUIRE(trial2.norm() <= 5.0);
+        REQUIRE(trial2.norm() >= 2.0);
+        REQUIRE(trial3.norm() <= 6.0);
+        REQUIRE(trial3.norm() >= 3.0);
+    }
 }
 
 //TEST_CASE("MSM functionality", "[msm]") {
