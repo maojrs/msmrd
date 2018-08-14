@@ -45,9 +45,9 @@ public:
     void setD(double Dnew) { D = Dnew; }
     void setDrot(double Drotnew) { Drot = Drotnew; }
     void setPosition(vec3<double> newposition) { position = newposition; }
-    void setPositionPybind(std::vector<double> newposition) { position = newposition; }
+    void setPositionPyBind(std::vector<double> newposition) { position = newposition; }
     void setOrientation(quaternion<double> neworientation) { orientation = neworientation; }
-    void setOrientationPybind(std::vector<double> neworientation) {
+    void setOrientationPyBind(std::vector<double> neworientation) {
         quaternion<double> quat(neworientation);
         orientation = quat;
     }

@@ -11,9 +11,7 @@
 #include "msm.hpp"
 
 
-/**
- * Base class for integrators
- */
+// Abstract base class for integrators
 class integrator {
 protected:
     double dt;
@@ -53,9 +51,7 @@ public:
     double getClock() { return clock; }
 };
 
-/**
- * Child classes of integrator
- */
+
 
 // Over-damped Langevin (a.k.a. standard Brownian motion)
 class odLangevin: public integrator {

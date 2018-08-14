@@ -9,9 +9,7 @@
 #include "randomgen.hpp"
 
 
-/**
- * Abstract base class for Markov state models of particles
- */
+// Abstract base class for Markov state models of particles
 class msmbase {
 protected:
     const long double tolerance = 1*pow(10.0L,-10);
@@ -77,9 +75,7 @@ public:
 };
 
 
-/**
- * Child classes of msmbase definitions: discrete-time (msm) and continuous-time (ctmsm)
- */
+// Child classes of msmbase definitions: discrete-time (msm) and continuous-time (ctmsm)
 
 // Discrete time Markov state model class
 class msm: public msmbase {

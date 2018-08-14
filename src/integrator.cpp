@@ -11,6 +11,7 @@
 /**
  * Functions of parent class integrator
  */
+ 
  // Integrate list of particles instead of single one (need to be overriden for interacting or MS particles)
 void integrator::integrateList(std::vector<particle> &parts) {
     for (int i=0; i<parts.size(); i++) {
@@ -52,9 +53,12 @@ void odLangevin::rotate(particle &part, double dt0){
     part.setOrientation(dquat * part.orientation);
 }
 
-// Over-damped Langevin dynamics with Markovian switch integrator
-// constructors defined in headers since they use templates.
+/**
+* Over-damped Langevin dynamics with Markovian switch integrator
+* constructors defined in headers since they use templates.
+*/
 
+ 
 // Integrates rotation/translation and Markovian switch together
 template<>
 void odLangevinMarkovSwitch<ctmsm>::integrateOne(particleMS &part) {

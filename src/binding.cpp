@@ -14,6 +14,8 @@
 #include "quaternion.hpp"
 #include "particle.hpp"
 #include "simulation.hpp"
+#include "potentials.hpp"
+
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -169,8 +171,8 @@ PYBIND11_MODULE(msmrd2binding, m) {
             }, nullptr)
             .def("setD", &particle::setD)
             .def("setDrot", &particle::setDrot)
-            .def("setPosition", &particle::setPositionPybind)
-            .def("setOrientation", &particle::setOrientationPybind);
+            .def("setPosition", &particle::setPositionPyBind)
+            .def("setOrientation", &particle::setOrientationPyBind);
 
     py::class_<particleMS>(m, "particleMS")
             .def(py::init<int&, int&, double&, double&, std::vector<double>&, std::vector<double>& >())
@@ -191,8 +193,8 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("setState", &particleMS::setState)
             .def("setType", &particleMS::setType)
             .def("setLagtime", &particleMS::setLagtime)
-            .def("setPosition", &particleMS::setPositionPybind)
-            .def("setOrientation", &particleMS::setOrientationPybind);
+            .def("setPosition", &particleMS::setPositionPyBind)
+            .def("setOrientation", &particleMS::setOrientationPyBind);
 
     py::class_<msm>(m, "msm")
             .def(py::init<int&, std::vector<std::vector<double>>&, double&, long&>())
@@ -237,6 +239,12 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def_property("clock", &odLangevinMarkovSwitch<ctmsm>::getClock, nullptr)
             .def("integrate", &odLangevinMarkovSwitch<ctmsm>::integrate)
             .def("integrateList", &odLangevinMarkovSwitch<ctmsm>::integrateList);
+
+    py::class_<gaussians3D>(m, "gaussians3D")
+            .def(py::init<int&, double&, double&, long&>())
+            .def("evaluate", &gaussians3D::evaluatePyBind)
+            .def("force", &gaussians3D::forcePyBind);
+
 
 
 
