@@ -6,6 +6,8 @@
 #include "simulation.hpp"
 #include "vec3.hpp"
 #include "particle.hpp"
+#include "randomgen.hpp"
+
 
 unsigned int Factorial( unsigned int number ) {
     return number <= 1 ? number : Factorial(number-1)*number;
@@ -42,6 +44,43 @@ TEST_CASE("Basic quaternion arithmetic", "[quaternions]") {
     REQUIRE( q1+v1 == q3 );
     REQUIRE( q1p+v1 == v3 );
     REQUIRE( q1*q2 == v4 );
+}
+
+TEST_CASE("Sampling from randomgen", "[randomgen]") {
+    randomgen randg;
+    // Uniform Range
+    double rand1;
+    double rand2;
+    double rand3;
+    for (int i=0; i<100; i++) {
+        rand1 = randg.uniformRange(-5,5);
+        rand2 = randg.uniformRange(100,500);
+        rand3 = randg.uniformRange(-750,-450);
+        REQUIRE(rand1 >= -5);
+        REQUIRE(rand1 <= 5);
+        REQUIRE(rand2 >= 100);
+        REQUIRE(rand2 <= 500);
+        REQUIRE(rand3 >= -750);
+        REQUIRE(rand3 <= -450);
+    }
+    // Normal distirbution (might fail sporadically, maybe remove)
+    rand1 = 0;
+    for (int i=0; i<1000; i++) {
+        rand1 += randg.normal(0,1)/1000;
+    }
+    REQUIRE(rand1 <= 0.1);
+    // Uniform Sphere
+    vec3<double> trial1;
+    vec3<double> trial2;
+    vec3<double> trial3;
+    for (int i=0; i<100; i++) {
+        trial1 = randg.uniformSphere(1.0);
+        trial2 = randg.uniformSphere(2.0);
+        trial3 = randg.uniformSphere(3.0);
+        REQUIRE(trial1.norm() <= 1.0);
+        REQUIRE(trial2.norm() <= 2.0);
+        REQUIRE(trial3.norm() <= 3.0);
+    }
 }
 
 //TEST_CASE("MSM functionality", "[msm]") {
