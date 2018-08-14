@@ -24,4 +24,5 @@ public:
     double uniformRange(double rmin, double rmax);
     double normal(double mean, double stddev);
     vec3<double> normal3D(double mean, double stddev);
+    vec3<double> uniformSphere(double maxrad);
 };

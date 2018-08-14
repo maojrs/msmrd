@@ -1,6 +1,7 @@
 //
 // Created by maojrs on 7/25/18.
 //
+#include <math.h>
 #include "randomgen.hpp"
 #include "vec3.hpp"
 
@@ -37,4 +38,18 @@ vec3<double> randomgen::normal3D(double mean, double stddev) {
     randvec[1] = normaldist(mt_rand);
     randvec[2] = normaldist(mt_rand);
     return randvec;
+};
+
+// Samples random 3D vector inside sphere uniformly
+vec3<double> randomgen::uniformSphere(double maxrad) {
+    double rr = uniformRange(0, 1);
+    double th = 2.0 * uniformRange(0, 1) - 1.0;
+    double randph = 2 * M_PI * uniformRange(0, 1);
+    rr = maxrad * std::pow(rr, 1. / 3.);
+    th = std::acos(th);
+    vec3<double> result;
+    result[0] = rr * std::cos(th);
+    result[1] = rr * std::sin(th) * std::cos(randph);
+    result[2] = rr * std::sin(th) * std::sin(randph);
+    return result;
 };
