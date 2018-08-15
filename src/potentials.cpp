@@ -7,7 +7,7 @@
 
 
 // Constructor, sets random location and width of nminima Gaussians
-gaussians3D::gaussians3D(int nminima, double maxrad, double scalfactor, long seed)
+gaussians3D::gaussians3D(int nminima, double maxrad, double scalefactor, long seed)
         : nminima(nminima), maxrad(maxrad), scalefactor(scalefactor), seed(seed) {
     randg.setSeed(seed);
     minimas.resize(nminima);
@@ -22,13 +22,18 @@ gaussians3D::gaussians3D(int nminima, double maxrad, double scalfactor, long see
 
 // Returns value of potential at position x
 double gaussians3D::evaluate(vec3<double> x) {
-    double gauss = 0;
     double output = 0;
+    double gauss;
+    double denom;
+    vec3<double> m, sig;
     for (int i=0; i<nminima; i++) {
-        gauss = std::exp( -std::pow(x[0] - minimas[i][0],2)/(2*std::pow(stddevs[i][0],2)));
-        gauss += std::exp(-std::pow(x[1] - minimas[i][1],2)/(2*std::pow(stddevs[i][1],2)));
-        gauss += std::exp(-std::pow(x[2] - minimas[i][2],2)/(2*std::pow(stddevs[i][2],2)));
-        output -= gauss;
+        m = 1.0*minimas[i];
+        sig = 1.0*stddevs[i];
+        gauss = std::exp(-std::pow(x[0]-m[0],2)/(2*std::pow(sig[0],2))
+                         -std::pow(x[1]-m[1],2)/(2*std::pow(sig[1],2))
+                         -std::pow(x[2]-m[2],2)/(2*std::pow(sig[2],2)));
+        denom = std::pow(2*M_PI, 3.0/2.0)*sig[0]*sig[1]*sig[2];
+        output -= gauss/denom;
     }
     return scalefactor*output;
 };
@@ -44,17 +49,17 @@ double gaussians3D::evaluatePyBind(std::vector<double> pos) {
 vec3<double> gaussians3D::force(vec3<double> x) {
     vec3<double> force = vec3<double>(0, 0, 0);
     vec3<double> m, sig, grad;
-    double expall, denom;
+    double gauss, denom;
     for (int i=0; i<nminima; i++) {
         m = 1.0*minimas[i];
         sig = 1.0*stddevs[i];
-        expall = std::exp(-std::pow(x[0]-m[0],2)/(2*std::pow(sig[0],2))
-                          -std::pow(x[1]-m[1],2)/(2*std::pow(sig[1],2))
-                          -std::pow(x[2]-m[2],2)/(2*std::pow(sig[2],2)));
+        gauss = std::exp(-std::pow(x[0]-m[0],2)/(2*std::pow(sig[0],2))
+                         -std::pow(x[1]-m[1],2)/(2*std::pow(sig[1],2))
+                         -std::pow(x[2]-m[2],2)/(2*std::pow(sig[2],2)));
         denom = std::pow(2*M_PI, 3.0/2.0)*sig[0]*sig[1]*sig[2];
-        grad[0] = -(2*(x[0]-m[0])/(2*std::pow(sig[0],2)))*expall/denom;
-        grad[1] = -(2*(x[1]-m[1])/(2*std::pow(sig[1],2)))*expall/denom;
-        grad[2] = -(2*(x[2]-m[2])/(2*std::pow(sig[2],2)))*expall/denom;
+        grad[0] = -(2*(x[0]-m[0])/(2*std::pow(sig[0],2)))*gauss/denom;
+        grad[1] = -(2*(x[1]-m[1])/(2*std::pow(sig[1],2)))*gauss/denom;
+        grad[2] = -(2*(x[2]-m[2])/(2*std::pow(sig[2],2)))*gauss/denom;
         force -= grad;
     }
     return scalefactor*force;
