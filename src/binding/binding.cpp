@@ -14,66 +14,14 @@
 #include "quaternion.hpp"
 #include "particle.hpp"
 #include "simulation.hpp"
-#include "integrators/odLangevin.hpp"
-#include "integrators/odLangevinMarkovSwitch.hpp"
-#include "potentials/gaussians3D.hpp"
-#include "potentials/harmonicRepulsion.hpp"
-
 
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
-// Needed to connect lists/arrays of particles in python with c methods
-PYBIND11_MAKE_OPAQUE(std::vector<particle>);
-PYBIND11_MAKE_OPAQUE(std::vector<particleMS>);
-
 
 namespace py = pybind11;
 
-double arr_mean(const py::array_t<double> &arr) {
-    double sum=0;
-    for (int i=0; i<arr.size(); i++) {
-        sum += arr.at(i);
-    }
-    return sum / arr.size() ;
-}
-
-void print_list(const std::vector<double> &v) {
-    std::cout << v.size();
-    for (int i=0; i<v.size(); i++){
-        std::cout << v[i] ;
-    }
-}
-
-py::array_t<double> normal_array(const py::ssize_t size) {
-    std::mt19937 generator;
-    std::random_device r;
-    generator.seed(r());
-    std::normal_distribution<double> distribution(0.0, 1.0);
-    auto result = py::array_t<double>(size);
-    py::buffer_info buf = result.request();
-    double *ptr = (double *) buf.ptr;
-    for (size_t idx=0; idx<size; idx++)
-        ptr[idx] = distribution(generator);
-    return result; // py::array_t<double>(size);
-}
-
-int main() {
-    auto q1 = quaternion<double>(1,1,3,1);
-    auto q2 = quaternion<double>(3,4,5,6);
-    std::cout << q1+q2 << '\n';
-    std::cout << q1-q2 << '\n';
-    std::cout << q1 << '\n';
-    std::cout << q1*q2 << '\n';
-    std::cout << q1 << '\n';
-    std::cout << q1.conj() << '\n';
-    std::cout << q1*q1.conj() << '\n';
-}
-
-int add(int i, int j) {
-    return i + j;
-}
 
 /* Convert c++ vectors/arrays to numpy arrays for pybind */
 template <typename ndvec>
@@ -110,7 +58,7 @@ py::array_t<double> vec2numpy(int size, ndvec v) {
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(msmrd2binding, m) {
+PYBIND11_MODULE(main, m) {
 
     m.doc() = R"pbdoc(
         Pybind11 example plugin
@@ -126,40 +74,9 @@ PYBIND11_MODULE(msmrd2binding, m) {
            ctmsm
     )pbdoc";
 
-    m.def("add", &add, R"pbdoc(
-        Defines particle
-
-        Some other explanation about the add function.
-    )pbdoc");
-
-    m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
-        Subtract two numbers
-
-        Some other explanation about the subtract function.
-    )pbdoc");
-
-    m.def("mean", &arr_mean, R"pbdoc(
-        Subtract two numbers
-
-        Some other explanation about the subtract function.
-    )pbdoc");
-
-    m.def("main", &main, R"pbdoc(
-        Subtract two numbers
-
-        Some other explanation about the subtract function.
-    )pbdoc");
-
-    m.def("normal_array", &normal_array, R"pbdoc(
-        Subtract two numbers
-
-        Some other explanation about the subtract function.
-    )pbdoc");
-
-    m.def("print_list", &print_list);
 
     /*
-     * pyBinders for all the relevant c++ classes
+     * pyBinders for the main c++ classes
      */
 
     py::class_<particle>(m, "particle")
@@ -231,32 +148,6 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("setD", &ctmsm::setD)
             .def("setDrot", &ctmsm::setDrot)
             .def("propagate", &ctmsm::propagate);
-
-    py::class_<odLangevin>(m, "odLangevin")
-            .def(py::init<double&, long&, bool&>())
-            .def_property("clock", &odLangevin::getClock, nullptr)
-            .def("setPotential", &odLangevin::setPotential)
-            .def("integrate", &odLangevin::integrate)
-            .def("integrateList", &odLangevin::integrateList);
-
-    py::class_<odLangevinMarkovSwitch<ctmsm>>(m, "odLangevinMarkovSwitch")
-            .def(py::init<ctmsm&, double&, long&, bool&>())
-            .def_property("clock", &odLangevinMarkovSwitch<ctmsm>::getClock, nullptr)
-            .def("integrate", &odLangevinMarkovSwitch<ctmsm>::integrate)
-            .def("integrateList", &odLangevinMarkovSwitch<ctmsm>::integrateList);
-
-    py::class_<gaussians3D>(m, "gaussians3D")
-            .def(py::init<int&, double&, double&, long&>())
-            .def("evaluate", &gaussians3D::evaluatePyBind)
-            .def("force", &gaussians3D::forcePyBind);
-
-
-
-
-    // Created c++ compatible particle list/vector/array of particles in python
-    py::bind_vector<std::vector<particle>>(m, "particleList");
-    py::bind_vector<std::vector<particleMS>>(m, "particleMSList");
-
 
 
 

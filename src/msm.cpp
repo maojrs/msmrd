@@ -7,6 +7,7 @@
 #include "particle.hpp"
 #include "msm.hpp"
 
+
 /**
  * Implementation of functions for discrete-time msm (msm) and
  * continuous-time msm (ctmsm) classes.
