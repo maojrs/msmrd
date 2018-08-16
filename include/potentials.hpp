@@ -12,11 +12,16 @@ public:
 
      // Calculate value of potential and force at position "pos"
     virtual double evaluate(vec3<double> pos) = 0;
-    virtual double evaluatePyBind(std::vector<double> pos) = 0;
     virtual vec3<double> force(vec3<double> pos) = 0;
-    virtual std::vector<double> forcePyBind(std::vector<double> pos) = 0;
 };
 
+
+// Null potential
+class nullpotential: public potentials {
+public:
+    double evaluate(vec3<double> pos) {return 0;}
+    vec3<double> force(vec3<double> pos) {return vec3<double>(0,0,0);}
+};
 
 // 3D potential composed of nminima Gaussians placed randomly inside sphere of radius maxrad
 class gaussians3D: public potentials {
@@ -32,9 +37,9 @@ public:
     gaussians3D(int nminima, double maxrad, double scalefactor, long seed);
 
     double evaluate(vec3<double> pos) override;
-    double evaluatePyBind(std::vector<double> pos) override;
+    double evaluatePyBind(std::vector<double> pos);
     vec3<double> force(vec3<double> pos) override;
-    std::vector<double> forcePyBind(std::vector<double> pos) override;
+    std::vector<double> forcePyBind(std::vector<double> pos);
 };
 
 
