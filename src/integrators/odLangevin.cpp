@@ -11,12 +11,12 @@
  * @param rotation boolean to indicate if rotational degrees of freedom should be integrated
  */
 odLangevin::odLangevin(double dt, long seed, bool rotation) : integrator(dt,seed, rotation) {
-    nullpotential nullpot;
-    potential = &nullpot;
+    nullPotential nullpot;
+    potential0 = &nullpot;
 };
 
-void odLangevin::setPotential(potentials *pot) {
-    potential = pot;
+void odLangevin::setPotential(potential *pot) {
+    potential0 = pot;
 }
 
 //void odLangevin::getPotential(std::vector<double> pos) {

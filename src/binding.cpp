@@ -9,14 +9,16 @@
 #include <numeric>
 #include <iostream>
 #include <random>
-#include "integrators/odLangevin.hpp"
-#include "integrators/odLangevinMarkovSwitch.hpp"
 #include "msm.hpp"
 #include "vec3.hpp"
 #include "quaternion.hpp"
 #include "particle.hpp"
 #include "simulation.hpp"
-#include "potentials.hpp"
+#include "integrators/odLangevin.hpp"
+#include "integrators/odLangevinMarkovSwitch.hpp"
+#include "potentials/gaussians3D.hpp"
+#include "potentials/harmonicRepulsion.hpp"
+
 
 
 #pragma clang diagnostic push

@@ -6,7 +6,7 @@
 #include "integrators/integrator.hpp"
 #include "particle.hpp"
 #include "msm.hpp"
-#include "potentials.hpp"
+#include "potentials/potential.hpp"
 
 /**
  * Implementations for abstract class inherited by all child classes

@@ -19,9 +19,12 @@ set(SOURCES
         src/integrators/integrator.cpp
         src/msm.cpp
         src/randomgen.cpp
-        src/potentials.cpp
+        src/potentials/potential.cpp
+        src/integrators/integrator.cpp
         src/integrators/odLangevin.cpp
-        src/integrators/odLangevinMarkovSwitch.cpp)
+        src/integrators/odLangevinMarkovSwitch.cpp
+        src/potentials/gaussians3D.cpp
+        src/potentials/harmonicRepulsion.cpp)
 
 set(PY_SOURCES
         src/binding.cpp
@@ -31,10 +34,12 @@ set(PY_SOURCES
         include/simulation.hpp
         include/msm.hpp
         include/randomgen.hpp
-        include/potentials.hpp
         include/integrators/integrator.hpp
         include/integrators/odLangevin.hpp
         include/integrators/odLangevinMarkovSwitch.hpp
+        include/potentials/potential.hpp
+        include/potentials/gaussians3D.hpp
+        include/potentials/harmonicRepulsion.hpp
         )
 
 add_library(msmrd2core SHARED ${SOURCES})
