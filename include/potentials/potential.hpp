@@ -42,8 +42,8 @@ public:
 // Defines and implements null pairPotential
 class nullPairPotential: public pairPotential {
 public:
-    double evaluate(vec3<double> pos) {return 0;}
-    vec3<double> force(vec3<double> pos) {return vec3<double>(0,0,0);}
+    double evaluate(vec3<double> pos1, vec3<double> pos2) {return 0;}
+    vec3<double> force(vec3<double> pos1, vec3<double> pos2) {return vec3<double>(0,0,0);}
 };
 
 
