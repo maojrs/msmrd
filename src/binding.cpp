@@ -9,6 +9,8 @@
 #include <numeric>
 #include <iostream>
 #include <random>
+#include "integrators/odLangevin.hpp"
+#include "integrators/odLangevinMarkovSwitch.hpp"
 #include "msm.hpp"
 #include "vec3.hpp"
 #include "quaternion.hpp"
@@ -231,6 +233,7 @@ PYBIND11_MODULE(msmrd2binding, m) {
     py::class_<odLangevin>(m, "odLangevin")
             .def(py::init<double&, long&, bool&>())
             .def_property("clock", &odLangevin::getClock, nullptr)
+            .def("setPotential", &odLangevin::setPotential)
             .def("integrate", &odLangevin::integrate)
             .def("integrateList", &odLangevin::integrateList);
 

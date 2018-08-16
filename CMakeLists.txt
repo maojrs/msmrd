@@ -16,10 +16,12 @@ add_subdirectory(libraries/pybind11)
 set(bindings_python_version 3.6)
 set(SOURCES
         src/simulation.cpp
-        src/integrator.cpp
+        src/integrators/integrator.cpp
         src/msm.cpp
         src/randomgen.cpp
-        src/potentials.cpp)
+        src/potentials.cpp
+        src/integrators/odLangevin.cpp
+        src/integrators/odLangevinMarkovSwitch.cpp)
 
 set(PY_SOURCES
         src/binding.cpp
@@ -27,10 +29,12 @@ set(PY_SOURCES
         include/vec3.hpp
         include/particle.hpp
         include/simulation.hpp
-        include/integrator.hpp
         include/msm.hpp
         include/randomgen.hpp
         include/potentials.hpp
+        include/integrators/integrator.hpp
+        include/integrators/odLangevin.hpp
+        include/integrators/odLangevinMarkovSwitch.hpp
         )
 
 add_library(msmrd2core SHARED ${SOURCES})

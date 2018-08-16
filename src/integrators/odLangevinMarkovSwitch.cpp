@@ -1,65 +1,18 @@
 //
-// Created by dibakma on 27.06.18.
+// Created by maojrs on 8/16/18.
 //
-#include <array>
-#include <utility>
-#include "integrator.hpp"
+
+#include "integrators/odLangevinMarkovSwitch.hpp"
 #include "particle.hpp"
 #include "msm.hpp"
 
-
 /**
- * Functions of parent class integrator
- */
- 
- // Integrate list of particles instead of single one (need to be overriden for interacting or MS particles)
-void integrator::integrateList(std::vector<particle> &parts) {
-    for (int i=0; i<parts.size(); i++) {
-        integrateOne(parts[i]);
-    }
-    clock += dt;
-};
-
-/**
- * Functions and constructors of child classes of integrator
- */
-
-// Over-damped Lanegvin dynamics integrator
-odLangevin::odLangevin(double dt, long seed, bool rotation) : integrator(dt,seed, rotation) {};
-
-void odLangevin::integrateOne(particle &part) {
-    translate(part,dt);
-    if (rotation) {
-        rotate(part, dt);
-    }
-}
-
-void odLangevin::integrate(particle &part) {
-    integrateOne(part);
-    clock += dt;
-}
-
-void odLangevin::translate(particle &part, double dt0){
-    vec3<double> dr;
-    dr = std::sqrt(2*dt0*part.D)*randg.normal3D(0,1);
-    part.setPosition(part.position + dr);
-}
-
-void odLangevin::rotate(particle &part, double dt0){
-    vec3<double> dphi;
-    quaternion<double> dquat;
-    dphi = std::sqrt(2*dt0*part.Drot)*randg.normal3D(0,1);
-    dquat = angle2quaternion(dphi);
-    part.setOrientation(dquat * part.orientation);
-}
-
-/**
-* Over-damped Langevin dynamics with Markovian switch integrator
-* constructors defined in headers since they use templates.
+* Class implementation of over-damped Langevin dynamics with Markovian switch integrator
+* constructors defined in headers since templates were used.
 */
 
- 
-// Integrates rotation/translation and Markovian switch together
+
+// Integrates rotation/translation and Markovian switch of one particle (visible only inside the class)
 template<>
 void odLangevinMarkovSwitch<ctmsm>::integrateOne(particleMS &part) {
     double resdt;
@@ -81,7 +34,7 @@ void odLangevinMarkovSwitch<ctmsm>::integrateOne(particleMS &part) {
                 rotate(part, part.lagtime);
                 part.tcount += part.lagtime;
                 part.propagateTMSM = true;
-            // If current lagtime overtakes dt, integrate up to dt (by resdt) and reset lagtime to remaining portion
+                // If current lagtime overtakes dt, integrate up to dt (by resdt) and reset lagtime to remaining portion
             } else {
                 resdt = dt - part.tcount;
                 translate(part, resdt);
@@ -98,7 +51,7 @@ void odLangevinMarkovSwitch<ctmsm>::integrateOne(particleMS &part) {
         }
         part.tcount = 0;
     } else {
-    // Runs one full time step when lagtime > dt and update remaining lagtime.
+        // Runs one full time step when lagtime > dt and update remaining lagtime.
         translate(part, dt);
         rotate(part, dt);
         part.setLagtime(part.lagtime - dt);
@@ -111,6 +64,8 @@ void odLangevinMarkovSwitch<ctmsm>::integrateOne(particleMS &part) {
     };
 };
 
+
+// Same as integrateOne, but updates time and publicly visible
 template<>
 void odLangevinMarkovSwitch<ctmsm>::integrate(particleMS &part) {
     integrateOne(part);
@@ -118,8 +73,7 @@ void odLangevinMarkovSwitch<ctmsm>::integrate(particleMS &part) {
 };
 
 
-
-// Integrate list of particlesMS (override parent function)
+// Integrates list of particlesMS (needs to override parent function because it is template based and uses particleMS)
 template<>
 void odLangevinMarkovSwitch<ctmsm>::integrateList(std::vector<particleMS> &parts) {
     for (int i=0; i<parts.size(); i++) {
@@ -127,6 +81,4 @@ void odLangevinMarkovSwitch<ctmsm>::integrateList(std::vector<particleMS> &parts
     }
     clock += dt;
 };
-
-
 

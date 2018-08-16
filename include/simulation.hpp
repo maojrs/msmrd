@@ -5,7 +5,7 @@
 
 #include <array>
 #include "particle.hpp"
-#include "integrator.hpp"
+#include "integrators/integrator.hpp"
 
 class simulation {
 public:
