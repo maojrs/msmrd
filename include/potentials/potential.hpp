@@ -30,6 +30,16 @@ public:
     virtual vec3<double> force(vec3<double> pos1, vec3<double> pos2) = 0;
 };
 
+/**
+ * Abstract base class definition for pair potentials with orientation dependency
+ */
+class pairPotentialTorque{
+public:
+    pairPotentialTorque() = default;
+    // Calculate value of potential and force at position "pos"
+    virtual double evaluate(vec3<double> pos1, vec3<double> pos2, vec3<double> u1, vec3<double> u2) = 0;
+    virtual std::array<vec3<double>, 2> forceTorque(vec3<double> pos1, vec3<double> pos2, vec3<double> u1, vec3<double> u2) = 0;
+};
 
 // Defines and implements null external potential
 class nullPotential: public potential {

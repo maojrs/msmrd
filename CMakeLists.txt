@@ -24,6 +24,7 @@ set(SOURCES
         src/integrators/odLangevinMarkovSwitch.cpp
         src/potentials/gaussians3D.cpp
         src/potentials/harmonicRepulsion.cpp
+        src/potentials/gayBerne.cpp
         )
 
 set(PY_SOURCES
@@ -48,6 +49,7 @@ set(PY_SOURCES_POTENTIALS
         include/potentials/potential.hpp
         include/potentials/gaussians3D.hpp
         include/potentials/harmonicRepulsion.hpp
+        include/potentials/gayBerne.hpp
         )
 
 add_library(msmrd2core SHARED ${SOURCES})
