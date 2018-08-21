@@ -7,10 +7,9 @@
 
 
 /**
- * Class to generate good random numbers (mt_19937_64 generator)
+ * Declares class to generate good random numbers (mt_19937_64 generator)
  * and sample from common distirbutions
  */
-
 class randomgen {
 private:
     long seed = -1;

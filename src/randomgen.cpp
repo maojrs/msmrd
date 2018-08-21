@@ -5,7 +5,9 @@
 #include "randomgen.hpp"
 #include "vec3.hpp"
 
-// Functions of randomgen class
+/**
+ *  Implementation of random number generator class functions (constructor in header)
+ */
 
 // Sets seed for random generator mt19937_64
 void randomgen::setSeed(long newseed){

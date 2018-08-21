@@ -5,7 +5,7 @@
 #include "integrators/odLangevin.hpp"
 
 /**
- * Class implementation of over-damped Lanegvin dynamics integrator
+ * Implementation of over-damped Lanegvin dynamics integrator class
  * @param dt time step
  * @param seed random generator seed (Note seed = -1 corresponds to random device)
  * @param rotation boolean to indicate if rotational degrees of freedom should be integrated

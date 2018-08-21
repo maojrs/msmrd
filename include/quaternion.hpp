@@ -9,7 +9,9 @@
 #include <ostream>
 #include "vec3.hpp"
 
-// Quaternion class with operator overloading
+/**
+ * Quaternion class with operator overloading
+ */
 template<typename scalar=double>
 class quaternion {
 public:

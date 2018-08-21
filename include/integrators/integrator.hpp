@@ -12,9 +12,8 @@
 
 
 /**
- * Abstract integrators base class definition
+ * Abstract integrators base class declaration
  */
-
 class integrator {
 protected:
     double dt;

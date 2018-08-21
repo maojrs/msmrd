@@ -7,9 +7,8 @@
 #include "vec3.hpp"
 
 /**
- * Declaration of the base class for particles
+ * Declaration of the class for particles
  */
-
 class particle {
 protected:
     int pid = 0;
@@ -53,6 +52,10 @@ public:
     }
 };
 
+
+/**
+ * Declaration of particles subclass with Markovian Switch (MS)
+ */
 class particleMS: public particle {
 public:
     int type;

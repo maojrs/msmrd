@@ -8,9 +8,8 @@
 #include "potentials/potentials.hpp"
 
 /**
- * Over-damped Langevin integrator definition (a.k.a. standard Brownian motion)
+ * Over-damped Langevin integrator declaration (a.k.a. standard Brownian motion)
  */
-
 class odLangevin: public integrator {
 protected:
     void integrateOne(particle &part) override;

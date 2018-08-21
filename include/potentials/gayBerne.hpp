@@ -6,7 +6,7 @@
 #include "potentials.hpp"
 
 /*
- * Implementation of the Gay Berne potential which is an anisotropic Lennard Jones potential
+ * Declaration of the Gay Berne potential which is an anisotropic Lennard Jones potential
  * Check http://www.sklogwiki.org/SklogWiki/index.php/Gay-Berne_model for details.
  */
 class gayBerne: public pairPotentialTorque{

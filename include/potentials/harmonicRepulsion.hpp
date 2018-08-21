@@ -7,7 +7,7 @@
 #include "potentials/potentials.hpp"
 
 /*
- * Harmonic repulsion pair potential definition
+ * Harmonic repulsion pair potential declaration
  */
 class harmonicRepulsion: public pairPotential{
 public:

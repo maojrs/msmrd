@@ -11,7 +11,6 @@
  * Over-damped Langevin with Markovian Switch integrator
  * @tparam TMSM template can be an msm or a ctmsm
  */
-
 template<typename TMSM>
 class odLangevinMarkovSwitch: public odLangevin {
 private:

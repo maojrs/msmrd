@@ -6,7 +6,7 @@
 #include "randomgen.hpp"
 
 /**
- * Abstract base class definition for external potentials
+ * Abstract base class declaration for external potentials
  */
 class externalPotential{
 public:
@@ -25,7 +25,7 @@ public:
 };
 
 /**
- * Abstract base class definition for pair potentials
+ * Abstract base class declaration for pair potentials
  */
 class pairPotential{
 public:
@@ -45,7 +45,7 @@ public:
 
 
 /**
- * Abstract base class definition for pair potentials with orientation dependency
+ * Abstract base class declaration for pair potentials with orientation dependency
  */
 class pairPotentialTorque{
 public:

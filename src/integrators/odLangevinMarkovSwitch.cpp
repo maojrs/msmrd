@@ -7,8 +7,8 @@
 #include "msm.hpp"
 
 /**
-* Class implementation of over-damped Langevin dynamics with Markovian switch integrator
-* constructors defined in headers since templates were used.
+* Implementation of over-damped Langevin dynamics with Markovian switch integrator class
+* (constructors defined in headers since templates were used).
 */
 
 

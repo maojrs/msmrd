@@ -7,13 +7,35 @@
 #include "particle.hpp"
 #include "msm.hpp"
 
+/**
+ *  Implementations for abstract msm class inherited by all child classes
+ */
+msmbase::msmbase(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
+        : msmid(msmid), lagtime(lagtime), seed(seed){
+
+    // Resize vectors by input matrix size and set seed of random number generator
+    nstates = static_cast<int>(tempmatrix.size());
+    Dlist.resize(nstates);
+    Drotlist.resize(nstates);
+    tmatrix.resize(nstates);
+    randg.setSeed(seed);
+
+    // Verify input 2D vector is a square matrix and fill tmatrix
+    for (const auto& row : tempmatrix) {
+        if (tempmatrix.size() != row.size()) {
+            throw std::range_error("MSM matrix must be a square matrix");
+        }
+    }
+    for (int i=0; i<nstates; i++) {
+        tmatrix[i].resize(nstates);
+        std::copy_n(tempmatrix[i].begin(), nstates, tmatrix[i].begin());
+    }
+};
+
 
 /**
- * Implementation of functions for discrete-time msm (msm) and
- * continuous-time msm (ctmsm) classes.
+ * Implementation of discrete-time msm (msm) class
  */
-
-//Discrete-time msm (msm)
 msm::msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
         : msmbase(msmid,  tempmatrix, lagtime, seed) {
     // Verify MSM transition matrix rows sum to 1 and components between 0 and 1
@@ -37,7 +59,9 @@ void msm::propagate(particleMS &part, int ksteps) {
 };
 
 
-//Continuous-time msm (ctmsm)
+/**
+ * Implementation of continuous-time msm (ctmsm) class.
+ */
 ctmsm::ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, long seed)
         : msmbase(msmid,  tempmatrix, 0.0, seed) {
     // Verify CTMSM transition rate matrix rows sum to 0

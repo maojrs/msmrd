@@ -8,8 +8,9 @@
 #include "particle.hpp"
 #include "randomgen.hpp"
 
-
-// Abstract base class for Markov state models of particles
+/**
+ * Abstract base class for Markov state models of particles
+ */
 class msmbase {
 protected:
     const long double tolerance = 1*pow(10.0L,-10);
@@ -35,27 +36,7 @@ public:
      */
 
     // Base constructor, can receive std::vectior matrix or numpy array matrix (through pybind)
-    msmbase(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
-            : msmid(msmid), lagtime(lagtime), seed(seed){
-
-        // Resize vectors by input matrix size and set seed of random number generator
-        nstates = static_cast<int>(tempmatrix.size());
-        Dlist.resize(nstates);
-        Drotlist.resize(nstates);
-        tmatrix.resize(nstates);
-        randg.setSeed(seed);
-
-        // Verify input 2D vector is a square matrix and fill tmatrix
-        for (const auto& row : tempmatrix) {
-            if (tempmatrix.size() != row.size()) {
-                throw std::range_error("MSM matrix must be a square matrix");
-            }
-        }
-        for (int i=0; i<nstates; i++) {
-            tmatrix[i].resize(nstates);
-            std::copy_n(tempmatrix[i].begin(), nstates, tmatrix[i].begin());
-        }
-    };
+    msmbase(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed);
 
     // Main functions definitions (=0 for abstract class)
     virtual void propagate(particleMS &part, int ksteps) = 0;
@@ -75,9 +56,9 @@ public:
 };
 
 
-// Child classes of msmbase definitions: discrete-time (msm) and continuous-time (ctmsm)
-
-// Discrete time Markov state model class
+/**
+ * Discrete-time (msm) class declaration
+ */
 class msm: public msmbase {
 public:
     msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed);
@@ -85,7 +66,9 @@ public:
 };
 
 
-// Continuous time Markov state model class
+/**
+ * Continuous time Markov state model (ctmsm) class declaration
+ */
 class ctmsm: public msmbase {
 private:
     std::vector<double> lambda0;
