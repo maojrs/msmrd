@@ -14,8 +14,8 @@ public:
     double k;
     double range;
     /**
-     * @param k WHAT IS k?
-     * @param range WHAT IS range?
+     * @param k repulsion strength
+     * @param range interaction radius
      */
     harmonicRepulsion(double k, double range);
 
