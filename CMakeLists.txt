@@ -21,6 +21,8 @@ set(SOURCES
         src/integrators/integrator.cpp
         src/integrators/odLangevin.cpp
         src/integrators/odLangevinMarkovSwitch.cpp
+        src/potentials/potentials.cpp
+        src/potentials/dipole.cpp
         src/potentials/gaussians3D.cpp
         src/potentials/harmonicRepulsion.cpp
         src/potentials/gayBerne.cpp
@@ -40,6 +42,7 @@ set(PY_SOURCES
         include/integrators/odLangevin.hpp
         include/integrators/odLangevinMarkovSwitch.hpp
         include/potentials/potentials.hpp
+        include/potentials/dipole.hpp
         include/potentials/gaussians3D.hpp
         include/potentials/harmonicRepulsion.hpp
         include/potentials/gayBerne.hpp

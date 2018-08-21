@@ -46,13 +46,6 @@ double gaussians3D::evaluate(vec3<double> x) {
 };
 
 
-// Needed for PyBinding evaluate, since it can only take vectors as input.
-double gaussians3D::evaluatePyBind(std::vector<double> pos) {
-    vec3<double> x = vec3<double>(pos);
-    return evaluate(x);
-}
-
-
 // Returns minus gradient of potential (force) at position x
 vec3<double> gaussians3D::force(vec3<double> x) {
     vec3<double> force = vec3<double>(0, 0, 0);
@@ -72,14 +65,3 @@ vec3<double> gaussians3D::force(vec3<double> x) {
     }
     return scalefactor*force;
 };
-
-// Needed for PyBinding force, since it can only take vectors as input.
-std::vector<double> gaussians3D::forcePyBind(std::vector<double> pos) {
-    vec3<double> x = vec3<double>(pos);
-    vec3<double> forcex = force(x);
-    std::vector<double> output;
-    output[0] = forcex[0];
-    output[1] = forcex[1];
-    output[2] = forcex[2];
-    return output;
-}

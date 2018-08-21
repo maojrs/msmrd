@@ -20,15 +20,17 @@ protected:
     long seed;
     randomgen randg;
     bool rotation;
-    externalPotential *extPotential;
 
     /**
     * @param dt time step
     * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
     * @param randg random number generator based in mt19937
     * @param rotation boolean to indicate if rotation should be integrated
-    * @param extPotential potential to be used by integrator
+    * @param externalPot external potential to be used by integrator
+    * @param pairPot pair potential between two particles to be used by integrator
+    * @param rodPairPot potential between two rod-like particles to be used by integrator
     * @param clock keeps track of global time
+    * Note all potentials default to zero and not every integrator will make use of all this potentials
     */
 
     /*
@@ -40,16 +42,33 @@ protected:
     virtual void translate(particle &part, double dt) = 0;
     virtual void rotate(particle &part, double dt) = 0;
 public:
+    externalPotential* externalPot;
+    pairPotential* pairPot;
+    rodPairPotential* rodPairPot;
     double clock;
 
-    // Base constructor
-    integrator(double dt, long seed, bool rotation);;
+    integrator(double dt, long seed, bool rotation);
 
     // Main functions definitions (=0 for abstract class)
     virtual void integrate(particle &part) = 0;
     void integrateList(std::vector<particle> &parts);
-    void setExternalPotential(externalPotential *pot);
     double getClock() { return clock; }
+    // Potential related functions
+    void setExternalPotential(externalPotential *pot);
+    void setPairPotential(pairPotential *pot);
+    void setRodPairPotential(rodPairPotential *pot);
+//    double evalExternalPotential(std::vector<double> pos);
+//    double evalPairPotential(std::vector<double> pos1, std::vector<double> pos2);
+//    double evalRodPairPotential(std::vector<double> pos1,
+//                                std::vector<double> pos2,
+//                                std::vector<double> u1,
+//                                std::vector<double> u2);
+//    std::vector<double> evalExternalForce(std::vector<double> pos);
+//    std::vector<double> evalPairForce(std::vector<double> pos1, std::vector<double> pos2);
+//    std::vector<std::vector<double>> evalRodPairForce(std::vector<double> pos1,
+//                                                      std::vector<double> pos2,
+//                                                      std::vector<double> u1,
+//                                                      std::vector<double> u2);
 };
 
 

@@ -10,15 +10,7 @@
  * @param seed random generator seed (Note seed = -1 corresponds to random device)
  * @param rotation boolean to indicate if rotational degrees of freedom should be integrated
  */
-odLangevin::odLangevin(double dt, long seed, bool rotation) : integrator(dt,seed, rotation) {
-    nullPotential nullpot;
-    extPotential = &nullpot;
-};
-
-
-//void odLangevin::getPotential(std::vector<double> pos) {
-//    return potential.evaluate(pos);
-//}
+odLangevin::odLangevin(double dt, long seed, bool rotation) : integrator(dt,seed, rotation) {};
 
 // One particle integrate main routine (visible only inside the class)
 void odLangevin::integrateOne(particle &part) {

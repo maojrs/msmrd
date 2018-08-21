@@ -29,9 +29,6 @@ public:
      */
     gaussians3D(int nminima, double maxrad, double scalefactor, long seed);
 
-    // Functions with PyBind suffix required for Pybind (compatible with std::vector)
     double evaluate(vec3<double> pos) override;
-    double evaluatePyBind(std::vector<double> pos);
     vec3<double> force(vec3<double> pos) override;
-    std::vector<double> forcePyBind(std::vector<double> pos);
 };

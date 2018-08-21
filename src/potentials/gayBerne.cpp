@@ -39,16 +39,6 @@ double gayBerne::evaluate(vec3<double> pos1, vec3<double> pos2, vec3<double> u1,
 }
 
 
-// Needed for PyBinding evaluate, since it can only take vectors as input.
-double gayBerne::evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2, std::vector<double> u1, std::vector<double> u2) {
-    vec3<double> x = vec3<double>(pos1);
-    vec3<double> y = vec3<double>(pos1);
-    vec3<double> u = vec3<double>(pos1);
-    vec3<double> v = vec3<double>(pos1);
-    return evaluate(x, y, u, v);
-}
-
-
 std::array<vec3<double>, 2> gayBerne::forceTorque(vec3<double> pos1, vec3<double> pos2,
                                                                                vec3<double> u1, vec3<double> u2) {
     vec3<double> r = pos2 - pos1;
