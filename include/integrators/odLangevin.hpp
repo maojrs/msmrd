@@ -5,7 +5,7 @@
 #pragma once
 #include "integrators/integrator.hpp"
 #include "particle.hpp"
-#include "potentials/potential.hpp"
+#include "potentials/potentials.hpp"
 
 /**
  * Over-damped Langevin integrator definition (a.k.a. standard Brownian motion)
@@ -17,10 +17,7 @@ protected:
     void translate(particle &part, double dt) override;
     void rotate(particle &part, double dt) override;
 public:
-    potential *potential0;
-
     odLangevin(double dt, long seed, bool rotation);
 
-    void setPotential(potential *pot);
     void integrate(particle &part) override;
 };

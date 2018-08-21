@@ -39,7 +39,7 @@ set(PY_SOURCES
         include/integrators/integrator.hpp
         include/integrators/odLangevin.hpp
         include/integrators/odLangevinMarkovSwitch.hpp
-        include/potentials/potential.hpp
+        include/potentials/potentials.hpp
         include/potentials/gaussians3D.hpp
         include/potentials/harmonicRepulsion.hpp
         include/potentials/gayBerne.hpp

@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "potential.hpp"
+#include "potentials.hpp"
 
 /*
  * Implementation of the Gay Berne potential which is an anisotropic Lennard Jones potential

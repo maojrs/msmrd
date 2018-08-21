@@ -4,12 +4,12 @@
 
 #pragma once
 #include "vec3.hpp"
-#include "potentials/potential.hpp"
+#include "potentials/potentials.hpp"
 
 /*
  * 3D external potential composed of nminima Gaussians placed randomly inside sphere of radius maxrad
  */
-class gaussians3D: public potential {
+class gaussians3D: public externalPotential {
 private:
     randomgen randg;
 public:

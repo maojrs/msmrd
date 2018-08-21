@@ -8,6 +8,8 @@
 #include <memory>
 #include "particle.hpp"
 #include "randomgen.hpp"
+#include "potentials/potentials.hpp"
+
 
 /**
  * Abstract integrators base class definition
@@ -19,11 +21,14 @@ protected:
     long seed;
     randomgen randg;
     bool rotation;
+    externalPotential *extPotential;
+
     /**
     * @param dt time step
     * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
     * @param randg random number generator based in mt19937
     * @param rotation boolean to indicate if rotation should be integrated
+    * @param extPotential potential to be used by integrator
     * @param clock keeps track of global time
     */
 
@@ -39,15 +44,12 @@ public:
     double clock;
 
     // Base constructor
-    integrator(double dt, long seed, bool rotation)
-            : dt(dt), seed(seed), rotation(rotation) {
-        randg.setSeed(seed);
-        clock = 0;
-    };
+    integrator(double dt, long seed, bool rotation);;
 
     // Main functions definitions (=0 for abstract class)
     virtual void integrate(particle &part) = 0;
     void integrateList(std::vector<particle> &parts);
+    void setExternalPotential(externalPotential *pot);
     double getClock() { return clock; }
 };
 

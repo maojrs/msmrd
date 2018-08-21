@@ -11,7 +11,7 @@ void bindIntegrators(py::module& m) {
     py::class_<odLangevin>(m, "odLangevin")
             .def(py::init<double&, long&, bool&>())
             .def_property_readonly("clock", &odLangevin::getClock)
-            .def("setPotential", &odLangevin::setPotential)
+            .def("setExternalPotential", &odLangevin::setExternalPotential)
             .def("integrate", &odLangevin::integrate)
             .def("integrateList", &odLangevin::integrateList);
 

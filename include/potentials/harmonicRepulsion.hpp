@@ -4,7 +4,7 @@
 
 #pragma once
 #include "vec3.hpp"
-#include "potentials/potential.hpp"
+#include "potentials/potentials.hpp"
 
 /*
  * Harmonic repulsion pair potential definition

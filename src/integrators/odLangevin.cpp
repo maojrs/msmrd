@@ -12,12 +12,9 @@
  */
 odLangevin::odLangevin(double dt, long seed, bool rotation) : integrator(dt,seed, rotation) {
     nullPotential nullpot;
-    potential0 = &nullpot;
+    extPotential = &nullpot;
 };
 
-void odLangevin::setPotential(potential *pot) {
-    potential0 = pot;
-}
 
 //void odLangevin::getPotential(std::vector<double> pos) {
 //    return potential.evaluate(pos);
