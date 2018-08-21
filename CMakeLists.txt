@@ -15,10 +15,9 @@ include_directories(include)
 add_subdirectory(libraries/pybind11)
 set(bindings_python_version 3.6)
 set(SOURCES
-        src/simulation.cpp
-        src/integrators/integrator.cpp
         src/msm.cpp
         src/randomgen.cpp
+        src/simulation.cpp
         src/integrators/integrator.cpp
         src/integrators/odLangevin.cpp
         src/integrators/odLangevinMarkovSwitch.cpp
@@ -28,23 +27,17 @@ set(SOURCES
 
 set(PY_SOURCES
         src/binding/binding.cpp
-        include/quaternion.hpp
-        include/vec3.hpp
-        include/particle.hpp
-        include/simulation.hpp
-        include/msm.hpp
-        include/randomgen.hpp
-        )
-
-set(PY_SOURCES_INTEGRATORS
         src/binding/bindIntegrators.cpp
+        src/binding/bindPotentials.cpp
+        include/msm.hpp
+        include/particle.hpp
+        include/quaternion.hpp
+        include/randomgen.hpp
+        include/simulation.hpp
+        include/vec3.hpp
         include/integrators/integrator.hpp
         include/integrators/odLangevin.hpp
         include/integrators/odLangevinMarkovSwitch.hpp
-        )
-
-set(PY_SOURCES_POTENTIALS
-        src/binding/bindPotentials.cpp
         include/potentials/potential.hpp
         include/potentials/gaussians3D.hpp
         include/potentials/harmonicRepulsion.hpp
@@ -53,15 +46,10 @@ set(PY_SOURCES_POTENTIALS
 add_library(msmrd2core SHARED ${SOURCES})
 #target_include_directories(msmrd2core PUBLIC include libraries/pybind11/include)
 
-pybind11_add_module(main MODULE ${PY_SOURCES})
-pybind11_add_module(integrators MODULE ${PY_SOURCES_INTEGRATORS})
-pybind11_add_module(potentials MODULE ${PY_SOURCES_POTENTIALS})
-
+pybind11_add_module(msmrd2binding MODULE ${PY_SOURCES})
 
 #target_include_directories(msmrd2 PUBLIC include libraries/pybind11/include)
-target_link_libraries(main PUBLIC msmrd2core)
-target_link_libraries(integrators PUBLIC msmrd2core)
-target_link_libraries(potentials PUBLIC msmrd2core)
+target_link_libraries(msmrd2binding PUBLIC msmrd2core)
 
 
 

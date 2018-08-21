@@ -22,6 +22,10 @@
 
 namespace py = pybind11;
 
+// Define functions to bind submodules (implemented in src/binding/bind****.py)
+void bindIntegrators(py::module&);
+void bindPotentials(py::module&);
+
 
 /* Convert c++ vectors/arrays to numpy arrays for pybind */
 template <typename ndvec>
@@ -34,31 +38,13 @@ py::array_t<double> vec2numpy(int size, ndvec v) {
     return result;
 }
 
-// Template declarations for pybinding template classes
-//namespace {
-//    template<unsigned int N>
-//    static void declare_msm(py::module &mod, std::string const &suffix) {
-//        using Class = msm<N>;
-//        using PyClass = py::class_<Class, std::shared_ptr<Class>>;
-//
-//        PyClass cls(mod, ("msm" + suffix).c_str());
-//
-//        cls.def(py::init<int&, std::vector<std::vector<double>>&, double&>());
-//        cls.def_property("ID", &Class::getID, nullptr);
-//        cls.def_property("nstates", &Class::getNstates, nullptr);
-//        cls.def_property("lagtime", &Class::getLagtime, nullptr);
-//        cls.def_property("getTmatrix", &Class::getTmatrix,  nullptr);
-//
-////        //Alternative method:
-////        std::string pyclass_name = std::string("msm") + suffix;
-////        py::class_<Class>(mod, pyclass_name.c_str(), py::buffer_protocol(), py::dynamic_attr())
-////                .def(py::init<int&, double&>());
-//    }
-//}
+// Needed to connect lists/arrays of particles in python with cpp integrator methods
+PYBIND11_MAKE_OPAQUE(std::vector<particle>);
+PYBIND11_MAKE_OPAQUE(std::vector<particleMS>);
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(main, m) {
+PYBIND11_MODULE(msmrd2binding, m) {
 
     m.doc() = R"pbdoc(
         Pybind11 example plugin
@@ -74,22 +60,32 @@ PYBIND11_MODULE(main, m) {
            ctmsm
     )pbdoc";
 
+    /**
+     * Call functions to bind msmrd2 submodules (functions defined above
+     * and implemented in src/bind****.py)
+     */
+    {
+        auto integratorsSubmodule = m.def_submodule("integrators");
+        bindIntegrators(integratorsSubmodule);
+        auto potentialsSubmodule = m.def_submodule("potentials");
+        bindPotentials(potentialsSubmodule);
+    }
+
 
     /*
      * pyBinders for the main c++ classes
      */
-
     py::class_<particle>(m, "particle")
             .def(py::init<double&, double&, std::vector<double>&, std::vector<double>& >())
-            .def_property("ID", &particle::getID, nullptr)
-            .def_property("D", &particle::getD, nullptr)
-            .def_property("Drot", &particle::getDrot, nullptr)
-            .def_property("position", [](const particle &part) {
+            .def_property_readonly("ID", &particle::getID)
+            .def_property_readonly("D", &particle::getD)
+            .def_property_readonly("Drot", &particle::getDrot)
+            .def_property_readonly("position", [](const particle &part) {
                 return vec2numpy(3,part.position);
-            }, nullptr)
-            .def_property("orientation", [](const particle &part) {
+            })
+            .def_property_readonly("orientation", [](const particle &part) {
                 return vec2numpy(4,part.orientation);
-            }, nullptr)
+            })
             .def("setD", &particle::setD)
             .def("setDrot", &particle::setDrot)
             .def("setPosition", &particle::setPositionPyBind)
@@ -97,18 +93,18 @@ PYBIND11_MODULE(main, m) {
 
     py::class_<particleMS>(m, "particleMS")
             .def(py::init<int&, int&, double&, double&, std::vector<double>&, std::vector<double>& >())
-            .def_property("ID", &particleMS::getID, nullptr)
-            .def_property("type", &particleMS::getType, nullptr)
-            .def_property("state", &particleMS::getState, nullptr)
-            .def_property("lagtime", &particleMS::getLagtime, nullptr)
-            .def_property("D", &particleMS::getD, nullptr)
-            .def_property("Drot", &particleMS::getDrot, nullptr)
-            .def_property("position", [](const particleMS &part) {
+            .def_property_readonly("ID", &particleMS::getID)
+            .def_property_readonly("type", &particleMS::getType)
+            .def_property_readonly("state", &particleMS::getState)
+            .def_property_readonly("lagtime", &particleMS::getLagtime)
+            .def_property_readonly("D", &particleMS::getD)
+            .def_property_readonly("Drot", &particleMS::getDrot)
+            .def_property_readonly("position", [](const particleMS &part) {
                 return vec2numpy(3,part.position);
-            }, nullptr)
-            .def_property("orientation", [](const particleMS &part) {
+            })
+            .def_property_readonly("orientation", [](const particleMS &part) {
                 return vec2numpy(4,part.orientation);
-            }, nullptr)
+            })
             .def("setD", &particle::setD)
             .def("setDrot", &particle::setDrot)
             .def("setState", &particleMS::setState)
@@ -119,37 +115,39 @@ PYBIND11_MODULE(main, m) {
 
     py::class_<msm>(m, "msm")
             .def(py::init<int&, std::vector<std::vector<double>>&, double&, long&>())
-            .def_property("ID", &msm::getID, nullptr)
-            .def_property("nstates", &msm::getNstates, nullptr)
-            .def_property("lagtime", &msm::getLagtime, nullptr)
-            .def_property("tmatrix", &msm::getTmatrix,  nullptr)
-            .def_property("D", [](const msm &currentmsm) {
+            .def_property_readonly("ID", &msm::getID)
+            .def_property_readonly("nstates", &msm::getNstates)
+            .def_property_readonly("lagtime", &msm::getLagtime)
+            .def_property_readonly("tmatrix", &msm::getTmatrix)
+            .def_property_readonly("D", [](const msm &currentmsm) {
                 return vec2numpy(currentmsm.nstates,currentmsm.Dlist);
-            }, nullptr)
-            .def_property("Drot", [](const msm &currentmsm) {
+            })
+            .def_property_readonly("Drot", [](const msm &currentmsm) {
                 return vec2numpy(currentmsm.nstates,currentmsm.Drotlist);
-            }, nullptr)
+            })
             .def("setD", &msm::setD)
             .def("setDrot", &msm::setDrot)
             .def("propagate", &msm::propagate);
 
     py::class_<ctmsm>(m, "ctmsm")
             .def(py::init<int&, std::vector<std::vector<double>>&, long&>())
-            .def_property("ID", &ctmsm::getID, nullptr)
-            .def_property("nstates", &ctmsm::getNstates, nullptr)
-            .def_property("lagtime", &ctmsm::getLagtime, nullptr)
-            .def_property("tmatrix", &ctmsm::getTmatrix,  nullptr)
-            .def_property("D", [](const ctmsm &currentmsm) {
+            .def_property_readonly("ID", &ctmsm::getID)
+            .def_property_readonly("nstates", &ctmsm::getNstates)
+            .def_property_readonly("lagtime", &ctmsm::getLagtime)
+            .def_property_readonly("tmatrix", &ctmsm::getTmatrix)
+            .def_property_readonly("D", [](const ctmsm &currentmsm) {
                 return vec2numpy(currentmsm.nstates,currentmsm.Dlist);
-            }, nullptr)
-            .def_property("Drot", [](const msm &currentmsm) {
+            })
+            .def_property_readonly("Drot", [](const msm &currentmsm) {
                 return vec2numpy(currentmsm.nstates,currentmsm.Drotlist);
-            }, nullptr)
+            })
             .def("setD", &ctmsm::setD)
             .def("setDrot", &ctmsm::setDrot)
             .def("propagate", &ctmsm::propagate);
 
-
+// Created c++ compatible particle list/vector/array of particles in python
+    py::bind_vector<std::vector<particle>>(m, "particleList");
+    py::bind_vector<std::vector<particleMS>>(m, "particleMSList");
 
 
 #ifdef VERSION_INFO
