@@ -42,7 +42,8 @@ protected:
     virtual void translate(particle &part, double dt) = 0;
     virtual void rotate(particle &part, double dt) = 0;
 public:
-    externalPotential* externalPot;
+    externalPotential<>* externalPot;
+    externalPotential<vec3<double>>* externalRodPot;
     pairPotential* pairPot;
     rodPairPotential* rodPairPot;
     double clock;
@@ -54,7 +55,8 @@ public:
     void integrateList(std::vector<particle> &parts);
     double getClock() { return clock; }
     // Potential related functions
-    void setExternalPotential(externalPotential *pot);
+    void setExternalPotential(externalPotential<> *pot);
+    void setExternalRodPotential(externalPotential<vec3<double>> *pot);
     void setPairPotential(pairPotential *pot);
     void setRodPairPotential(rodPairPotential *pot);
 //    double evalExternalPotential(std::vector<double> pos);

@@ -13,16 +13,23 @@
 integrator::integrator(double dt, long seed, bool rotation)
         : dt(dt), seed(seed), rotation(rotation) {
     nullExternalPotential nullpot;
+    nullExternalRodPotential nullrodpot;
     nullPairPotential nullpairpot;
+    nullRodPairPotential nullrodpairpot;
     // set all potential types to zero as default
     externalPot = &nullpot;
+    externalRodPot = &nullrodpot;
     pairPot = &nullpairpot;
+    rodPairPot = &nullrodpairpot;
     randg.setSeed(seed);
     clock = 0;
 };
 
 // Incorporates custom external potential functions into integrator
-void integrator::setExternalPotential(externalPotential *pot) {  externalPot = pot; }
+void integrator::setExternalPotential(externalPotential<> *pot) {  externalPot = pot; }
+
+// Incorporates custom external potential functions into integrator
+void integrator::setExternalRodPotential(externalPotential<vec3<double>> *pot) {  externalRodPot = pot; }
 
 // Incorporates custom pair potential functions into integrator
 void integrator::setPairPotential(pairPotential *pot) { pairPot = pot; }

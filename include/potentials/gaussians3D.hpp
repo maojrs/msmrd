@@ -9,7 +9,7 @@
 /*
  * 3D external potential composed of nminima Gaussians placed randomly inside sphere of radius maxrad
  */
-class gaussians3D: public externalPotential {
+class gaussians3D: public externalPotential<> {
 private:
     randomgen randg;
 public:
@@ -30,5 +30,5 @@ public:
     gaussians3D(int nminima, double maxrad, double scalefactor, long seed);
 
     double evaluate(vec3<double> pos) override;
-    vec3<double> force(vec3<double> pos) override;
+    std::array<vec3<double>, 2> forceTorque(vec3<double> pos) override;
 };

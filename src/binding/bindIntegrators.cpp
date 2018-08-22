@@ -14,7 +14,8 @@ void bindIntegrators(py::module& m) {
             .def(py::init<double&, long&, bool&>())
             .def_property_readonly("clock", &odLangevin::getClock)
             .def("setExternalPotential", &odLangevin::setExternalPotential)
-            //.def("evalExternalPotential", &odLangevin::evalExternalPotential)
+            .def("setExternalRodPotential", &odLangevin::setExternalRodPotential)
+                    //.def("evalExternalPotential", &odLangevin::evalExternalPotential)
             //.def("evalExternalForce", &odLangevin::evalExternalForce)
             .def("integrate", &odLangevin::integrate)
             .def("integrateList", &odLangevin::integrateList);
@@ -22,8 +23,9 @@ void bindIntegrators(py::module& m) {
     py::class_<odLangevinMarkovSwitch<ctmsm>>(m, "odLangevinMarkovSwitch")
             .def(py::init<ctmsm&, double&, long&, bool&>())
             .def_property_readonly("clock", &odLangevinMarkovSwitch<ctmsm>::getClock)
-            .def("setExternalPotential", &odLangevin::setExternalPotential)
-            //.def("evaluateExternalPotential", &odLangevin::evalExternalPotential)
+            .def("setExternalPotential", &odLangevinMarkovSwitch<ctmsm>::setExternalPotential)
+            .def("setExternalPotential", &odLangevinMarkovSwitch<ctmsm>::setExternalRodPotential)
+                    //.def("evaluateExternalPotential", &odLangevin::evalExternalPotential)
             //.def("evalExternalForce", &odLangevin::evalExternalForce)
             .def("integrate", &odLangevinMarkovSwitch<ctmsm>::integrate)
             .def("integrateList", &odLangevinMarkovSwitch<ctmsm>::integrateList);

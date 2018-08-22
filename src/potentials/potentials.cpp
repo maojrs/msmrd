@@ -8,32 +8,51 @@
  *  Implementation of non-abstract functions of potentials abstract class (default constructor in header)
  */
 
-// Needed for PyBinding externalPotential.evaluate function, since it can only take vectors as input.
-double externalPotential::evaluatePyBind(std::vector<double> pos) {
+/**
+ * Needed for PyBinding externalPotential.evaluate function , since it can only take vectors as input.
+ * Note the template ORIENTATION takes zero arguments, so it corresponds to no orientation
+ */
+template<>
+double externalPotential<>::evaluatePyBind(std::vector<double> pos) {
     vec3<double> x = vec3<double>(pos);
     return evaluate(x);
 }
 
-// Needed for PyBinding externalPotential.force function , since it can only take vectors as input.
-std::vector<double> externalPotential::forcePyBind(std::vector<double> pos) {
+/**
+ * Needed for PyBinding externalPotential.forceTorque function , since it can only take vectors as input.
+ * Note the template ORIENTATION takes zero arguments, so it corresponds to no orientation
+ */
+template<>
+std::vector<double> externalPotential<>::forceTorquePyBind(std::vector<double> pos) {
     vec3<double> x = vec3<double>(pos);
-    vec3<double> forcex = force(x);
+    std::array<vec3<double>, 2> forcex = forceTorque(x);
     std::vector<double> output;
-    output[0] = forcex[0];
-    output[1] = forcex[1];
-    output[2] = forcex[2];
+    output.resize(3);
+    output[0] = forcex[0][0];
+    output[1] = forcex[0][1];
+    output[2] = forcex[0][2];
     return output;
 }
 
-// Needed for PyBinding externalRodPotential.evaluate function, since it can only take vectors as input.
-double externalRodPotential::evaluatePyBind(std::vector<double> pos1, std::vector<double> u) {
+/**
+ * Needed for PyBinding externalPotential.evaluate function of rod-like particles. Note the template
+ * ORIENTATION corresponds to vec3<double>, so it corresponds to rod-like particles with orientation
+ * described by one vector.
+ */
+template<>
+double externalPotential<vec3<double>>::evaluatePyBind(std::vector<double> pos1, std::vector<double> u) {
     vec3<double> x = vec3<double>(pos1);
     vec3<double> theta = vec3<double>(u);
     return evaluate(x,theta);
 }
 
-// Needed for PyBinding externalRodPotential.force function , since it can only take vectors as input.
-std::vector<std::vector<double>> externalRodPotential::forcePyBind(std::vector<double> pos1, std::vector<double> u) {
+/**
+ * Needed for PyBinding externalPotential.forceTorque function of rod-like particles.Note the template
+ * ORIENTATION corresponds to vec3<double>, so it corresponds to rod-like particles with orientation
+ * described by one vector.
+ */
+template<>
+std::vector<std::vector<double>> externalPotential<vec3<double>>::forceTorquePyBind(std::vector<double> pos1, std::vector<double> u) {
     vec3<double> x = vec3<double>(pos1);
     vec3<double> theta = vec3<double>(u);
     std::array<vec3<double>, 2> forceTorquex = forceTorque(x, theta);
@@ -48,6 +67,7 @@ std::vector<std::vector<double>> externalRodPotential::forcePyBind(std::vector<d
     }
     return output;
 }
+
 
 // Needed for PyBinding pairPotential.evaluate function, since it can only take vectors as input.
 double pairPotential::evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2) {
