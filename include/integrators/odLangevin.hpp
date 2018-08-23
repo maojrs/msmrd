@@ -13,8 +13,8 @@
 class odLangevin: public integrator {
 protected:
     void integrateOne(particle &part) override;
-    void translate(particle &part, double dt) override;
-    void rotate(particle &part, double dt) override;
+    void translate(particle &part, vec3<double> force, double dt) override;
+    void rotate(particle &part, vec3<double> torque, double dt) override;
 public:
     odLangevin(double dt, long seed, bool rotation);
 

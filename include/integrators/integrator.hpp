@@ -16,12 +16,14 @@
  */
 class integrator {
 protected:
+    const double KbTemp = 1.0;
     double dt;
     long seed;
     randomgen randg;
     bool rotation;
 
     /**
+    * @param KbTemp = Boltzman constant times temperature
     * @param dt time step
     * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
     * @param randg random number generator based in mt19937
@@ -39,8 +41,8 @@ protected:
      * update the clock, so we can integrate lists and update time correctly. See implementations in src/ for details.
      */
     virtual void integrateOne(particle &part) = 0;
-    virtual void translate(particle &part, double dt) = 0;
-    virtual void rotate(particle &part, double dt) = 0;
+    virtual void translate(particle &part, vec3<double> force, double dt) = 0;
+    virtual void rotate(particle &part, vec3<double> torque, double dt) = 0;
     // Private/protected functions to get forces and torques due to external or pair potentials for integrator
     std::array<vec3<double>, 2> getExternalForceTorque(particle &part);
     std::array<vec3<double>, 2> getPairsForceTorque(particle &part, std::vector<particle> &parts);

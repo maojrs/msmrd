@@ -15,6 +15,11 @@
 // Integrates rotation/translation and Markovian switch of one particle (visible only inside the class)
 template<>
 void odLangevinMarkovSwitch<ctmsm>::integrateOne(particleMS &part) {
+    // Calculate forces and torque in this time step
+    vec3<double> force;
+    vec3<double> torque;
+    std::array<vec3<double>, 2> forctorq;
+    // Do diffusion propagation taking MSM/CTMSM into account
     double resdt;
     // propagate CTMSM/MSM when synchronized and update diffusion coefficients
     part.tcount = 0;
@@ -30,15 +35,21 @@ void odLangevinMarkovSwitch<ctmsm>::integrateOne(particleMS &part) {
             }
             // Integrates for one lagtime as long as integration is still under dt
             if ( part.tcount + part.lagtime < dt ) {
-                translate(part, part.lagtime);
-                rotate(part, part.lagtime);
+                forctorq = getExternalForceTorque(part);
+                force = forctorq[0];
+                torque = forctorq[1];
+                translate(part, force, part.lagtime);
+                rotate(part, torque, part.lagtime);
                 part.tcount += part.lagtime;
                 part.propagateTMSM = true;
                 // If current lagtime overtakes dt, integrate up to dt (by resdt) and reset lagtime to remaining portion
             } else {
+                forctorq = getExternalForceTorque(part);
+                force = forctorq[0];
+                torque = forctorq[1];
                 resdt = dt - part.tcount;
-                translate(part, resdt);
-                rotate(part, resdt);
+                translate(part, force, resdt);
+                rotate(part, torque, resdt);
                 part.setLagtime(part.lagtime + part.tcount - dt);
                 part.tcount += resdt; // this means part.tcount = dt, so will exit while loop.
                 // If lag time = 0 MSM must propagate in next step, otherwise it needs to integrate remaining lagtime.
@@ -52,8 +63,11 @@ void odLangevinMarkovSwitch<ctmsm>::integrateOne(particleMS &part) {
         part.tcount = 0;
     } else {
         // Runs one full time step when lagtime > dt and update remaining lagtime.
-        translate(part, dt);
-        rotate(part, dt);
+        forctorq = getExternalForceTorque(part);
+        force = forctorq[0];
+        torque = forctorq[1];
+        translate(part, force, dt);
+        rotate(part, torque, dt);
         part.setLagtime(part.lagtime - dt);
         // If lag time = 0 MSM must propagate in next step, otherwise it needs to integrate remaining lagtime.
         if (part.lagtime == 0) {

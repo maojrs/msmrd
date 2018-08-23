@@ -61,7 +61,7 @@ public:
         };
     };
 
-    quaternion conj() {
+    quaternion<double> conj() {
         return {a, -b, -c, -d};
     }
 
@@ -187,7 +187,7 @@ public:
 
 // Other useful quaternion functions
 template<typename scalar=double>
-quaternion<scalar> angle2quaternion(const vec3<double> &phi) {
+quaternion<scalar> axisanglerep2quaternion(const vec3<double> &phi) {
     double phinorm = phi.norm();
     if (phinorm != 0) {
         vec3<double> phiunit = phi / phinorm;
@@ -198,4 +198,15 @@ quaternion<scalar> angle2quaternion(const vec3<double> &phi) {
         //returns unit quaternion (no rotation)
         return {1, 0, 0, 0};
     }
+};
+
+template<typename scalar=double>
+vec3<double> rotateVec(vec3<double> p, quaternion<double> q) {
+    vec3<double> result;
+    quaternion<double> resultquat = quaternion<double>(p);
+    resultquat = q*resultquat*q.conj();
+    result[0] = resultquat[1];
+    result[1] = resultquat[2];
+    result[2] = resultquat[3];
+    return result;
 };

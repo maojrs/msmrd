@@ -14,9 +14,15 @@ odLangevin::odLangevin(double dt, long seed, bool rotation) : integrator(dt,seed
 
 // One particle integrate main routine (visible only inside the class)
 void odLangevin::integrateOne(particle &part) {
-    translate(part,dt);
+    vec3<double> force;
+    vec3<double> torque;
+    std::array<vec3<double>, 2> forctorq;
+    forctorq = getExternalForceTorque(part);
+    force = forctorq[0];
+    torque = forctorq[1];
+    translate(part, force, dt);
     if (rotation) {
-        rotate(part, dt);
+        rotate(part, torque, dt);
     }
 }
 
@@ -26,16 +32,19 @@ void odLangevin::integrate(particle &part) {
     clock += dt;
 }
 
-void odLangevin::translate(particle &part, double dt0){
+void odLangevin::translate(particle &part, vec3<double> force, double dt0){
     vec3<double> dr;
-    dr = std::sqrt(2*dt0*part.D)*randg.normal3D(0,1);
+    dr = force*dt0*part.D/KbTemp + std::sqrt(2*dt0*part.D)*randg.normal3D(0,1);
     part.setPosition(part.position + dr);
 }
 
-void odLangevin::rotate(particle &part, double dt0){
+void odLangevin::rotate(particle &part, vec3<double> torque, double dt0){
     vec3<double> dphi;
     quaternion<double> dquat;
-    dphi = std::sqrt(2*dt0*part.Drot)*randg.normal3D(0,1);
-    dquat = angle2quaternion(dphi);
+    dphi = torque*dt0*part.Drot/KbTemp + std::sqrt(2*dt0*part.Drot)*randg.normal3D(0,1);
+    dquat = axisanglerep2quaternion(dphi);
     part.setOrientation(dquat * part.orientation);
+    // Updated orientation vector, usfule with rodlike particles
+    vec3<double> neworientation = rotateVec(part.orientvector, dquat);
+    part.setOrientationVec(neworientation);
 }
