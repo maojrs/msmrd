@@ -4,6 +4,11 @@
 #include "integrators/odLangevin.hpp"
 #include "integrators/odLangevinMarkovSwitch.hpp"
 
+
+// Needed to connect lists/arrays of particles in python with cpp integrator methods
+PYBIND11_MAKE_OPAQUE(std::vector<particle>);
+PYBIND11_MAKE_OPAQUE(std::vector<particleMS>);
+
 namespace py = pybind11;
 
 /*
@@ -29,4 +34,8 @@ void bindIntegrators(py::module& m) {
             //.def("evalExternalForce", &odLangevin::evalExternalForce)
             .def("integrate", &odLangevinMarkovSwitch<ctmsm>::integrate)
             .def("integrateList", &odLangevinMarkovSwitch<ctmsm>::integrateList);
+
+    // Created c++ compatible particle list/vector/array of particles in python
+    py::bind_vector<std::vector<particle>>(m, "particleList", py::module_local(false));
+    py::bind_vector<std::vector<particleMS>>(m, "particleMSList", py::module_local(false));
 }

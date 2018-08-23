@@ -38,10 +38,6 @@ py::array_t<double> vec2numpy(int size, ndvec v) {
     return result;
 }
 
-// Needed to connect lists/arrays of particles in python with cpp integrator methods
-PYBIND11_MAKE_OPAQUE(std::vector<particle>);
-PYBIND11_MAKE_OPAQUE(std::vector<particleMS>);
-
 namespace py = pybind11;
 
 PYBIND11_MODULE(msmrd2binding, m) {
@@ -65,8 +61,10 @@ PYBIND11_MODULE(msmrd2binding, m) {
      * and implemented in src/bind****.py)
      */
     {
+        // Load integrators submodule
         auto integratorsSubmodule = m.def_submodule("integrators");
         bindIntegrators(integratorsSubmodule);
+        // Load potentials submodule
         auto potentialsSubmodule = m.def_submodule("potentials");
         bindPotentials(potentialsSubmodule);
     }
@@ -76,10 +74,11 @@ PYBIND11_MODULE(msmrd2binding, m) {
      * pyBinders for the main c++ classes
      */
     py::class_<particle>(m, "particle")
-            .def(py::init<double&, double&, std::vector<double>&, std::vector<double>& >())
+            .def(py::init<double&, double&, std::string&, std::vector<double>&, std::vector<double>& >())
             .def_property_readonly("ID", &particle::getID)
             .def_property_readonly("D", &particle::getD)
             .def_property_readonly("Drot", &particle::getDrot)
+            .def_property_readonly("bodytype", &particle::getBodyType)
             .def_property_readonly("position", [](const particle &part) {
                 return vec2numpy(3,part.position);
             })
@@ -88,11 +87,12 @@ PYBIND11_MODULE(msmrd2binding, m) {
             })
             .def("setD", &particle::setD)
             .def("setDrot", &particle::setDrot)
+            .def("setBodyType", &particle::setBodyType)
             .def("setPosition", &particle::setPositionPyBind)
             .def("setOrientation", &particle::setOrientationPyBind);
 
-    py::class_<particleMS>(m, "particleMS")
-            .def(py::init<int&, int&, double&, double&, std::vector<double>&, std::vector<double>& >())
+    py::class_<particleMS, particle>(m, "particleMS")
+            .def(py::init<int&, int&, double&, double&, std::string&, std::vector<double>&, std::vector<double>& >())
             .def_property_readonly("ID", &particleMS::getID)
             .def_property_readonly("type", &particleMS::getType)
             .def_property_readonly("state", &particleMS::getState)
@@ -144,10 +144,6 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("setD", &ctmsm::setD)
             .def("setDrot", &ctmsm::setDrot)
             .def("propagate", &ctmsm::propagate);
-
-// Created c++ compatible particle list/vector/array of particles in python
-    py::bind_vector<std::vector<particle>>(m, "particleList");
-    py::bind_vector<std::vector<particleMS>>(m, "particleMSList");
 
 
 #ifdef VERSION_INFO

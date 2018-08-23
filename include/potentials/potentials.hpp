@@ -52,32 +52,6 @@ public:
     std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2,std::vector<double> u1, std::vector<double> u2);
 };
 
-//class pairPotential{
-//public:
-//    pairPotential() = default;
-//
-//    // Calculate value of potential and force at position "pos"
-//    virtual double evaluate(vec3<double> pos1, vec3<double> pos2) = 0;
-//    virtual vec3<double> force(vec3<double> pos1, vec3<double> pos2) = 0;
-//    double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2);
-//    std::vector<double> forcePyBind(std::vector<double> pos1, std::vector<double> pos2);
-//};
-
-
-///**
-// * Abstract base class declaration for pair potentials between rod-like particles,
-// * which means their orientation can be determined from one vector
-// */
-//class rodPairPotential{
-//public:
-//    rodPairPotential() = default;
-//    // Calculate value of potential and force at position "pos"
-//    virtual double evaluate(vec3<double> pos1, vec3<double> pos2, vec3<double> u1, vec3<double> u2) = 0;
-//    virtual std::array<vec3<double>, 2> forceTorque(vec3<double> pos1, vec3<double> pos2, vec3<double> u1, vec3<double> u2) = 0;
-//    double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2,std::vector<double> u1, std::vector<double> u2);
-//    std::vector<std::vector<double>> forcePyBind(std::vector<double> pos1, std::vector<double> pos2,std::vector<double> u1, std::vector<double> u2);
-//};
-
 
 /**
  *  Null potentials for abstract potentials classes declaration and implementation

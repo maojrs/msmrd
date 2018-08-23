@@ -16,6 +16,7 @@ protected:
 public:
     double D;
     double Drot;
+    std::string bodytype;
     vec3<double> position;
     quaternion<double> orientation;
     /**
@@ -23,16 +24,17 @@ public:
      * @param active determines if particle currently active
      * @param D diffusion constant
      * @param Drot rotational diffusion constant
+     * @param bodytype determines rotation integrator behavior, can be either point, rod or rigidsolid.
      * @param position initial position of the particle
      * @param orientation normalized quaternion representing the initial orientation of the particle
      */
 
     // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
-    particle(double D, double Drot, vec3<double> position, quaternion<double> orientation)
-            : D(D), Drot(Drot), position(position), orientation(orientation){};
+    particle(double D, double Drot, std::string bodytype, vec3<double> position, quaternion<double> orientation)
+            : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation){};
 
-    particle(double D, double Drot, std::vector<double> &position, std::vector<double> &orientation)
-            : D(D), Drot(Drot), position(position), orientation(orientation) {};
+    particle(double D, double Drot, std::string bodytype, std::vector<double> &position, std::vector<double> &orientation)
+            : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation) {};
 
     /**
      * Get and set functions. Some used by c++ and python,
@@ -41,8 +43,10 @@ public:
     int getID() { return  pid; }
     double getD() { return  D; }
     double getDrot() { return  Drot; }
+    std::string getBodyType() { return  bodytype; }
     void setD(double Dnew) { D = Dnew; }
     void setDrot(double Drotnew) { Drot = Drotnew; }
+    void setBodyType(std::string bodytypenew) { bodytype = bodytypenew; }
     void setPosition(vec3<double> newposition) { position = newposition; }
     void setPositionPyBind(std::vector<double> newposition) { position = newposition; }
     void setOrientation(quaternion<double> neworientation) { orientation = neworientation; }
@@ -73,11 +77,11 @@ public:
      */
 
     // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
-    particleMS(int type, int state, double D, double Drot, vec3<double> position, quaternion<double> orientation)
-            : type(type), state(state), particle(D, Drot, position, orientation){};
+    particleMS(int type, int state, double D, double Drot, std::string bodytype, vec3<double> position, quaternion<double> orientation)
+            : type(type), state(state), particle(D, Drot, bodytype, position, orientation){};
 
-    particleMS(int type, int state, double D, double Drot, std::vector<double> &position, std::vector<double> &orientation)
-            : type(type), state(state), particle(D, Drot, position, orientation) {};
+    particleMS(int type, int state, double D, double Drot, std::string bodytype, std::vector<double> &position, std::vector<double> &orientation)
+            : type(type), state(state), particle(D, Drot, bodytype, position, orientation) {};
 
 
     // Additional get and set functions for particleMS
