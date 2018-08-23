@@ -8,8 +8,10 @@
 /*
  * Declaration of the Gay Berne potential which is an anisotropic Lennard Jones potential
  * Check http://www.sklogwiki.org/SklogWiki/index.php/Gay-Berne_model for details.
+ * The template <vec3<double>, vec3<double>> indicates the pair-potential depends on
+ * the orientations of the two particles, each described by a vector (rod-like particles).
  */
-class gayBerne: public rodPairPotential{
+class gayBerne: public pairPotential<vec3<double>, vec3<double>>{
 private:
     double chi;
     double chip;

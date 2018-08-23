@@ -32,10 +32,10 @@ void integrator::setExternalPotential(externalPotential<> *pot) {  externalPot =
 void integrator::setExternalRodPotential(externalPotential<vec3<double>> *pot) {  externalRodPot = pot; }
 
 // Incorporates custom pair potential functions into integrator
-void integrator::setPairPotential(pairPotential *pot) { pairPot = pot; }
+void integrator::setPairPotential(pairPotential<> *pot) { pairPot = pot; }
 
 // Incorporates custom pair potential function for rod-like particles into integrator
-void integrator::setRodPairPotential(rodPairPotential *pot) { rodPairPot = pot; }
+void integrator::setRodPairPotential(pairPotential<vec3<double>,vec3<double>> *pot) { rodPairPot = pot; }
 
 
 //// Evaluates external potential from integrator at a given position

@@ -53,7 +53,6 @@ std::array<vec3<double>, 2> gaussians3D::forceTorque(vec3<double> x) {
     vec3<double> torque = vec3<double>(0, 0, 0);
     vec3<double> m, sig, grad;
     double gauss, denom;
-    std::array<vec3<double>, 2> output;
     for (int i=0; i<nminima; i++) {
         m = 1.0*minimas[i];
         sig = 1.0*stddevs[i];
@@ -66,7 +65,5 @@ std::array<vec3<double>, 2> gaussians3D::forceTorque(vec3<double> x) {
         grad[2] = -(2*(x[2]-m[2])/(2*std::pow(sig[2],2)))*gauss/denom;
         force -= grad;
     }
-    output[0] =  scalefactor*force;
-    output[1] = torque;
-    return output;
+    return {force, torque};
 };

@@ -7,7 +7,8 @@
 #include "potentials/potentials.hpp"
 
 /*
- * 3D external potential composed of nminima Gaussians placed randomly inside sphere of radius maxrad
+ * 3D external potential composed of nminima Gaussians placed randomly inside sphere of radius maxrad.
+ * The empty template <> indicates orientation is not taken into account by this potential.
  */
 class gaussians3D: public externalPotential<> {
 private:

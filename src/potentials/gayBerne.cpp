@@ -8,7 +8,6 @@
 gayBerne::gayBerne(double a, double d, double eps0, double sig0): eps0(eps0), sig0(sig0) {
     chi = (a*a-1)/(a*a+1);
     chip = (std::sqrt(d)-1)/(std::sqrt(d)+1);
-
 }
 
 double gayBerne::evaluate(vec3<double> pos1, vec3<double> pos2, vec3<double> u1, vec3<double> u2) {
@@ -40,7 +39,7 @@ double gayBerne::evaluate(vec3<double> pos1, vec3<double> pos2, vec3<double> u1,
 
 
 std::array<vec3<double>, 2> gayBerne::forceTorque(vec3<double> pos1, vec3<double> pos2,
-                                                                               vec3<double> u1, vec3<double> u2) {
+                                                  vec3<double> u1, vec3<double> u2) {
     vec3<double> r = pos2 - pos1;
     double rabs = r.norm();
     vec3<double> rhat = r / rabs;
@@ -73,7 +72,7 @@ std::array<vec3<double>, 2> gayBerne::forceTorque(vec3<double> pos1, vec3<double
                       chip * chip / epsden * epsbrak * (rup2 / (denpp * denpp) - rum2 / (denpm * denpm))) * frac6 *
                      (frac6 - 1) + dU_drabs * chi * chi * sig3 * (rup2 / (denp * denp) - rum2 / (denm * denm)) / 4;
 
-    vec3<double> f = -dU_drabs * rhat - (dU_dru1 * (u1 - ru1 * rhat) + dU_dru2 * (u2 - ru2 * rhat)) / rabs;
-    vec3<double> tau = dU_dru1 * rhat.cross(u1) - dU_du12 * u1.cross(u2);
-    return {f, tau};
+    vec3<double> force = -dU_drabs * rhat - (dU_dru1 * (u1 - ru1 * rhat) + dU_dru2 * (u2 - ru2 * rhat)) / rabs;
+    vec3<double> torque = dU_dru1 * rhat.cross(u1) - dU_du12 * u1.cross(u2);
+    return {force, torque};
 }

@@ -11,7 +11,7 @@ int something() {
     generator.seed(10);
     std::normal_distribution<double> distribution(0.0, 1.0);
     distribution(generator);
-}
+};
 
 //void simulation::run(const double timestep, const int Nsteps) {
 //    for (int step; step<Nsteps; step++) {
