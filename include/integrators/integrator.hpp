@@ -41,19 +41,23 @@ protected:
     virtual void integrateOne(particle &part) = 0;
     virtual void translate(particle &part, double dt) = 0;
     virtual void rotate(particle &part, double dt) = 0;
+    // Private/protected functions to get forces and torques due to external or pair potentials for integrator
+    std::array<vec3<double>, 2> getExternalForceTorque(particle &part);
+    std::array<vec3<double>, 2> getPairsForceTorque(particle &part, std::vector<particle> &parts);
 public:
     externalPotential<>* externalPot;
     externalPotential<vec3<double>>* externalRodPot;
     pairPotential<>* pairPot;
-    pairPotential<vec3<double>,vec3<double>>* rodPairPot;
+    pairPotential<vec3<double>,vec3<double>>* pairRodPot;
     double clock;
 
     integrator(double dt, long seed, bool rotation);
 
-    // Main functions definitions (=0 for abstract class)
+    // Main integrate functions definitions (=0 for abstract class)
     virtual void integrate(particle &part) = 0;
     void integrateList(std::vector<particle> &parts);
     double getClock() { return clock; }
+
     // Potential related functions
     void setExternalPotential(externalPotential<> *pot);
     void setExternalRodPotential(externalPotential<vec3<double>> *pot);

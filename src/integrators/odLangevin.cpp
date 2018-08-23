@@ -26,15 +26,8 @@ void odLangevin::integrate(particle &part) {
     clock += dt;
 }
 
-
 void odLangevin::translate(particle &part, double dt0){
     vec3<double> dr;
-//    std::array<vec3<double>, 2> forTorq;
-//    if (rotation) {
-//        forTorq = externalPot->forceTorque(part.position);
-//    } else {
-//        forTorq = externalPot->forceTorque(part.position);
-//    }
     dr = std::sqrt(2*dt0*part.D)*randg.normal3D(0,1);
     part.setPosition(part.position + dr);
 }

@@ -18,14 +18,18 @@ public:
     double Drot;
     std::string bodytype;
     vec3<double> position;
+    vec3<double> orientvector = vec3<double>(0.,0.,1.);
     quaternion<double> orientation;
     /**
      * @param pid ID of the particle
      * @param active determines if particle currently active
      * @param D diffusion constant
      * @param Drot rotational diffusion constant
-     * @param bodytype determines rotation integrator behavior, can be either point, rod or rigidsolid.
+     * @param bodytype determines rotation integrator behavior, can be either point, rod or rigidsolid
+     * (determined by orientational degrees of freedom, points have no orientation, rods need only one vector and
+     * rigidsolid requires a complete quaternion).
      * @param position initial position of the particle
+     * @param orientvector orientation vector (only to be used by for rod-like particles)
      * @param orientation normalized quaternion representing the initial orientation of the particle
      */
 
@@ -49,6 +53,8 @@ public:
     void setBodyType(std::string bodytypenew) { bodytype = bodytypenew; }
     void setPosition(vec3<double> newposition) { position = newposition; }
     void setPositionPyBind(std::vector<double> newposition) { position = newposition; }
+    void setOrientationVec(vec3<double> neworientvector) { orientvector = neworientvector; }
+    void setOrientationVecPyBind(std::vector<double> neworientvector) { orientvector = neworientvector; }
     void setOrientation(quaternion<double> neworientation) { orientation = neworientation; }
     void setOrientationPyBind(std::vector<double> neworientation) {
         quaternion<double> quat(neworientation);
