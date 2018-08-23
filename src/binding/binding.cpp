@@ -82,6 +82,9 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def_property_readonly("position", [](const particle &part) {
                 return vec2numpy(3,part.position);
             })
+            .def_property_readonly("orientvector", [](const particle &part) {
+                return vec2numpy(3,part.orientvector);
+            })
             .def_property_readonly("orientation", [](const particle &part) {
                 return vec2numpy(4,part.orientation);
             })
@@ -89,7 +92,7 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("setDrot", &particle::setDrot)
             .def("setBodyType", &particle::setBodyType)
             .def("setPosition", &particle::setPositionPyBind)
-            .def("setOrientationVec", &particle::setOrientationVecPyBind)
+            .def("setOrientVector", &particle::setOrientVectorPyBind)
             .def("setOrientation", &particle::setOrientationPyBind);
 
     py::class_<particleMS, particle>(m, "particleMS")

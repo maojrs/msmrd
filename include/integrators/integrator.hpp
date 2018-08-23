@@ -21,6 +21,8 @@ protected:
     long seed;
     randomgen randg;
     bool rotation;
+    bool externalPotActive = false;
+    bool pairPotActive = false;
 
     /**
     * @param KbTemp = Boltzman constant times temperature
@@ -28,6 +30,8 @@ protected:
     * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
     * @param randg random number generator based in mt19937
     * @param rotation boolean to indicate if rotation should be integrated
+    * @param externalPotActive indicates if external potential has been set
+    * @param pairPotActive indicates if potential potential has been set
     * @param externalPot external potential to be used by integrator
     * @param pairPot pair potential between two particles to be used by integrator
     * @param rodPairPot potential between two rod-like particles to be used by integrator

@@ -18,7 +18,7 @@ public:
     double Drot;
     std::string bodytype;
     vec3<double> position;
-    vec3<double> orientvector = vec3<double>(0.,0.,1.);
+    vec3<double> orientvector;
     quaternion<double> orientation;
     /**
      * @param pid ID of the particle
@@ -35,10 +35,14 @@ public:
 
     // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
     particle(double D, double Drot, std::string bodytype, vec3<double> position, quaternion<double> orientation)
-            : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation){};
+            : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation){
+        orientvector = vec3<double>(0.,0.,1.);
+    };
 
     particle(double D, double Drot, std::string bodytype, std::vector<double> &position, std::vector<double> &orientation)
-            : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation) {};
+            : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation) {
+        orientvector = vec3<double>(0.,0.,1.);
+    };
 
     /**
      * Get and set functions. Some used by c++ and python,
@@ -53,8 +57,8 @@ public:
     void setBodyType(std::string bodytypenew) { bodytype = bodytypenew; }
     void setPosition(vec3<double> newposition) { position = newposition; }
     void setPositionPyBind(std::vector<double> newposition) { position = newposition; }
-    void setOrientationVec(vec3<double> neworientvector) { orientvector = neworientvector; }
-    void setOrientationVecPyBind(std::vector<double> neworientvector) { orientvector = neworientvector; }
+    void setOrientVector(vec3<double> neworientvector) { orientvector = neworientvector; }
+    void setOrientVectorPyBind(std::vector<double> neworientvector) { orientvector = neworientvector; }
     void setOrientation(quaternion<double> neworientation) { orientation = neworientation; }
     void setOrientationPyBind(std::vector<double> neworientation) {
         quaternion<double> quat(neworientation);

@@ -46,5 +46,5 @@ void odLangevin::rotate(particle &part, vec3<double> torque, double dt0){
     part.setOrientation(dquat * part.orientation);
     // Updated orientation vector, usfule with rodlike particles
     vec3<double> neworientation = rotateVec(part.orientvector, dquat);
-    part.setOrientationVec(neworientation);
+    part.setOrientVector(neworientation);
 }
