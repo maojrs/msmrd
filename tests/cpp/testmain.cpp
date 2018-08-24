@@ -63,12 +63,12 @@ TEST_CASE("Sampling from randomgen", "[randomgen]") {
         REQUIRE(rand3 >= -750);
         REQUIRE(rand3 <= -450);
     }
-    // Normal distirbution (might fail sporadically, maybe remove)
+    // Normal distribution (might fail sporadically, maybe remove)
     rand1 = 0;
     for (int i=0; i<1000; i++) {
         rand1 += randg.normal(0,1)/1000;
     }
-    REQUIRE(rand1 <= 0.1);
+    REQUIRE(std::abs(rand1) <= 0.1);
     // Uniform Sphere
     vec3<double> trial1;
     vec3<double> trial2;

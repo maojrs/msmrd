@@ -44,7 +44,7 @@ void odLangevin::rotate(particle &part, vec3<double> torque, double dt0){
     dphi = torque*dt0*part.Drot/KbTemp + std::sqrt(2*dt0*part.Drot)*randg.normal3D(0,1);
     dquat = axisanglerep2quaternion(dphi);
     part.setOrientation(dquat * part.orientation);
-    // Updated orientation vector, usfule with rodlike particles
-    vec3<double> neworientation = rotateVec(part.orientvector, dquat);
-    part.setOrientVector(neworientation);
+    // Updated orientation vector, useful with rodlike particles
+    vec3<double> neworientvector = rotateVec(part.orientvector, dquat);
+    part.setOrientVector(neworientvector);
 }
