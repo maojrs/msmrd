@@ -29,7 +29,7 @@ void bindIntegrators(py::module& m) {
             .def(py::init<ctmsm&, double&, long&, bool&>())
             .def_property_readonly("clock", &odLangevinMarkovSwitch<ctmsm>::getClock)
             .def("setExternalPotential", &odLangevinMarkovSwitch<ctmsm>::setExternalPotential)
-            .def("setExternalPotential", &odLangevinMarkovSwitch<ctmsm>::setExternalRodPotential)
+            .def("setExternalRodPotential", &odLangevinMarkovSwitch<ctmsm>::setExternalRodPotential)
                     //.def("evaluateExternalPotential", &odLangevin::evalExternalPotential)
             //.def("evalExternalForce", &odLangevin::evalExternalForce)
             .def("integrate", &odLangevinMarkovSwitch<ctmsm>::integrate)

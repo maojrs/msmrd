@@ -74,12 +74,14 @@ class particleMS: public particle {
 public:
     int type;
     int state;
+    int nextState;
     double lagtime = 0;
     double tcount = 0;
     double propagateTMSM = true ;
     /**
      * @param type particle type, corresponds to msmid
-     * @param state particle state given and changed by the msm/ctmsm
+     * @param state particle current state
+     * @param nextState particle next state given and changed by the msm/ctmsm
      * @param lagtime saves the current lagtime from the MSM
      * @param tcount counts time in between MSM/CTMSM iterations
      * @param propagateTMSM determines if MSM/CTMSM should be propagated on a given timestep
@@ -97,8 +99,10 @@ public:
     // Additional get and set functions for particleMS
     int getType() { return  type; }
     int getState() { return  state; }
+    int getNextState() { return  nextState; }
     double getLagtime() { return  lagtime; }
     void setState(int newstate) { state = newstate; }
+    void setNextState(int newstate) { nextState = newstate; }
     void setType(int newtype) { type = newtype; }
     void setLagtime(double newlagtime) { lagtime = newlagtime; }
 };

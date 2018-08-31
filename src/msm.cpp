@@ -123,7 +123,7 @@ void ctmsm::propagate(particleMS &part,int ksteps) {
                 break;
             }
         }
-        part.setState(state);
+        part.setNextState(state);
         part.setLagtime(lagt);
         lagtime = lagt;
     }
