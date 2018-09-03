@@ -67,7 +67,7 @@ public:
     void setExternalPotential(externalPotential<> *pot);
     void setExternalRodPotential(externalPotential<vec3<double>> *pot);
     void setPairPotential(pairPotential<> *pot);
-    void setRodPairPotential(pairPotential<vec3<double>,vec3<double>> *pot);
+    void setPairRodPotential(pairPotential<vec3<double>,vec3<double>> *pot);
 //    double evalExternalPotential(std::vector<double> pos);
 //    double evalPairPotential(std::vector<double> pos1, std::vector<double> pos2);
 //    double evalRodPairPotential(std::vector<double> pos1,

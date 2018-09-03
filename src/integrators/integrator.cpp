@@ -109,7 +109,7 @@ void integrator::setPairPotential(pairPotential<> *pot) {
 }
 
 // Incorporates custom pair potential function for rod-like particles into integrator
-void integrator::setRodPairPotential(pairPotential<vec3<double>,vec3<double>> *pot) {
+void integrator::setPairRodPotential(pairPotential<vec3<double>,vec3<double>> *pot) {
     pairPotActive = true;
     pairRodPot = pot;
 }

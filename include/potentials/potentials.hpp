@@ -47,8 +47,9 @@ public:
     // PyBind evaluation functions for pair-ppotentials of particles with no orientation
     double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2);
     std::vector<double> forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2);
+
     // PyBind evaluation functions for pair-ppotentials of particles with rod-like orientation
-    double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2,std::vector<double> u1, std::vector<double> u2);
+    double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2, std::vector<double> u1, std::vector<double> u2);
     std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2,std::vector<double> u1, std::vector<double> u2);
 };
 
