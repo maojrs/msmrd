@@ -12,11 +12,10 @@
  */
 class odLangevin: public integrator {
 protected:
-    void integrateOne(particle &part) override;
+    void integrateOne(particle &part, double timestep) override;
+    void integrateOne(int partIndex, std::vector<particle> &parts, double timestep) override;
     void translate(particle &part, vec3<double> force, double dt) override;
     void rotate(particle &part, vec3<double> torque, double dt) override;
 public:
     odLangevin(double dt, long seed, bool rotation);
-
-    void integrate(particle &part) override;
 };

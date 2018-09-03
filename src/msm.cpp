@@ -103,7 +103,36 @@ void ctmsm::calculateParameters() {
     }
 };
 
-// Propagates CTMSM using the Gillespie algorithm
+/* Propagates CTMSM using the Gillespie algorithm without updating the state in the particle, useful for
+ * integration with diffusion and rotation integrator */
+void ctmsm::propagateNoUpdate(particleMS &part,int ksteps) {
+    double lagt = 0;
+    double r1, r2;
+    int state = 0;
+    int currentState = 1*part.state;
+    for (int m = 0; m < ksteps; m++) {
+        // Begins Gillespie algorithm, calculates which transition and when will it occur.
+        r1 = randg.uniformRange(0,1);
+        r2 = randg.uniformRange(0,1);
+        lagt += std::log(1.0 / r1) / lambda0[currentState];
+        for (int col = 0; col < nstates; col++) {
+            if (r2 * lambda0[currentState] <= ratescumsum[currentState][col]){
+                if (col < currentState) {
+                    state = col;
+                } else {
+                    state = col + 1;
+                }
+                break;
+            }
+        }
+        part.setNextState(state);
+        currentState = 1*state;
+        part.setLagtime(lagt);
+        lagtime = lagt;
+    }
+};
+
+// Propagates CTMSM using the Gillespie algorithm, updates state immediately.
 void ctmsm::propagate(particleMS &part,int ksteps) {
     double lagt = 0;
     double r1, r2;
@@ -123,7 +152,7 @@ void ctmsm::propagate(particleMS &part,int ksteps) {
                 break;
             }
         }
-        part.setNextState(state);
+        part.setState(state);
         part.setLagtime(lagt);
         lagtime = lagt;
     }

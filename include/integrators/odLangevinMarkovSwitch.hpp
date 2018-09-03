@@ -15,7 +15,10 @@ template<typename TMSM>
 class odLangevinMarkovSwitch: public odLangevin {
 private:
     std::string msmtype;
-    void integrateOne(particleMS &part);
+    void integrateOne(particleMS &part, double timestep);
+    void integrateOne(int partIndex, std::vector<particleMS> &parts, double timestep);
+    void integrateOneMS(particleMS &part, double timestep);
+    void integrateOneMS(int partIndex, std::vector<particleMS> &parts, double timestep);
 public:
     TMSM tmsm;
     /**
@@ -35,6 +38,5 @@ public:
     };
 
     void integrate(particleMS &part);
-    void integrateList(std::vector<particleMS> &parts);
-
+    void integrateList(std::vector<particleMS> &parts, bool pairInteractions);
 };

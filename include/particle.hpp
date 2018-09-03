@@ -66,7 +66,6 @@ public:
     }
 };
 
-
 /**
  * Declaration of particles subclass with Markovian Switch (MS)
  */
@@ -106,3 +105,9 @@ public:
     void setType(int newtype) { type = newtype; }
     void setLagtime(double newlagtime) { lagtime = newlagtime; }
 };
+
+
+
+
+
+

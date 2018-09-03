@@ -77,6 +77,7 @@ private:
 public:
     ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, long seed);
     void propagate(particleMS &part, int ksteps) override;
+    void propagateNoUpdate(particleMS &part,int ksteps);
 };
 
 

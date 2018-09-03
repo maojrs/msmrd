@@ -16,6 +16,30 @@ integrator::integrator(double dt, long seed, bool rotation)
     clock = 0;
 };
 
+// Same as integrateOne, but updates time and publicly visible (use integrate list when pair interactions enabled)
+void integrator::integrate(particle &part) {
+    integrateOne(part, dt);
+    clock += dt;
+}
+
+// Integrate list of particles instead of single one (need to override in case of interacting or MS particles)
+void integrator::integrateList(std::vector<particle> &parts, bool pairInteractions) {
+    if (pairInteractions) {
+        for (int i = 0; i < parts.size(); i++) {
+            // Calls version of integrateOne for pair interactions (needs whole particle list)
+            integrateOne(i, parts, dt);
+        }
+    }
+    else {
+        for (int i = 0; i < parts.size(); i++) {
+            // Calls version of integrateOne without pair interactions
+            integrateOne(parts[i], dt);
+        }
+    }
+    clock += dt;
+}
+
+
 // Calculates force and torque from an external potential for point, rod-like and rigidsolid particles
 std::array<vec3<double>, 2> integrator::getExternalForceTorque(particle &part) {
     if (externalPotActive) {
@@ -37,26 +61,28 @@ std::array<vec3<double>, 2> integrator::getExternalForceTorque(particle &part) {
 };
 
 // Calculates force and torque due to pair interactions for point, rod-like and rigidsolid particles
-std::array<vec3<double>, 2> integrator::getPairsForceTorque(particle &part, std::vector<particle> &parts) {
+std::array<vec3<double>, 2> integrator::getPairsForceTorque(int partIndex, std::vector<particle> &parts) {
     if (pairPotActive) {
         std::array<vec3<double>, 2> forctorq;
         vec3<double> force = vec3<double>(0., 0., 0.);
         vec3<double> torque = vec3<double>(0., 0., 0.);
-        if (part.bodytype == "point") {
-            for (auto &p : parts) {
-                forctorq = pairPot->forceTorque(part.position, p.position);
+        if (parts[partIndex].bodytype == "point") {
+            for (int i = 0; i < parts.size(); i++) {
+                if (i != partIndex) {
+                    forctorq = pairPot->forceTorque(parts[partIndex].position, parts[i].position);
+                    force += forctorq[0];
+                    torque += forctorq[1];
+                }
+            }
+            return {force, torque};
+        } else if (parts[partIndex].bodytype == "rod") {
+            for (int i = 0; i < parts.size(); i++) {
+                forctorq = pairRodPot->forceTorque(parts[partIndex].position, parts[partIndex].orientvector, parts[i].position, parts[i].orientvector);
                 force += forctorq[0];
                 torque += forctorq[1];
             }
             return {force, torque};
-        } else if (part.bodytype == "rod") {
-            for (auto &p : parts) {
-                forctorq = pairRodPot->forceTorque(part.position, part.orientvector, p.position, p.orientvector);
-                force += forctorq[0];
-                torque += forctorq[1];
-            }
-            return {force, torque};
-        } else if (part.bodytype == "rigidsolid") {
+        } else if (parts[partIndex].bodytype == "rigidsolid") {
             // to be implemented (forceTorque functions in potentials from quaternions)
             //        for (int i=0; i<parts.size(); i++) {
             //            forctorq = quatPairPot->forceTorque(part.position, part.orientvector, parts[i].position, parts[i].orientvector);
@@ -133,13 +159,6 @@ void integrator::setRodPairPotential(pairPotential<vec3<double>,vec3<double>> *p
 //    return rodPairPot->forcePyBind(pos1, pos2, u1, u2);
 //}
 
- // Integrate list of particles instead of single one (need to override in case of interacting or MS particles)
-void integrator::integrateList(std::vector<particle> &parts) {
-    for (int i=0; i<parts.size(); i++) {
-        integrateOne(parts[i]);
-    }
-    clock += dt;
-}
 
 
 
