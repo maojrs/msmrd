@@ -5,11 +5,19 @@
 #include <vec3.hpp>
 #include "potentials/gayBerne.hpp"
 
+/**
+ * Class implementation for Gay Berne pair potential
+ * @param a steric anisotropy of the particles: Length to breadth ratio
+ * @param d ratio of binding energy in the side-by-side to end-to-end configuration
+ * @param eps0 depth of the potential well
+ * @param sig0 length of the short axis of the ellipsoid
+ */
 gayBerne::gayBerne(double a, double d, double eps0, double sig0): eps0(eps0), sig0(sig0) {
     chi = (a*a-1)/(a*a+1);
     chip = (std::sqrt(d)-1)/(std::sqrt(d)+1);
 }
 
+// Evaluate Gay Berne potential
 double gayBerne::evaluate(vec3<double> pos1, vec3<double> pos2, vec3<double> u1, vec3<double> u2) {
     vec3<double> r = pos2 - pos1;
     double rabs = r.norm();
@@ -38,6 +46,7 @@ double gayBerne::evaluate(vec3<double> pos1, vec3<double> pos2, vec3<double> u1,
 }
 
 
+// Returns force and torque from a pair of particles
 std::array<vec3<double>, 2> gayBerne::forceTorque(vec3<double> pos1, vec3<double> pos2,
                                                   vec3<double> u1, vec3<double> u2) {
     vec3<double> r = pos2 - pos1;

@@ -24,7 +24,8 @@ public:
      * @param tmsm object variable, can be either an msm or a ctmsm
      */
 
-    // Constructors need to be defined in headers for template w/pybind
+    /* Constructors need to be defined in headers for template w/pybind, see parent
+     * class odLangevin for details on constructor parameters */
     odLangevinMarkovSwitch(ctmsm &tmsm, double dt, long seed, bool rotation)
             : tmsm(tmsm), odLangevin(dt,seed,rotation) {
         msmtype = "continuous-time";

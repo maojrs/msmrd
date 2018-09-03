@@ -9,6 +9,9 @@
 
 /**
  * Implementation of integrator abstract class inherited by all child classes
+ * @param dt time step
+ * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
+ * @param randg random number generator based in mt19937
  */
 integrator::integrator(double dt, long seed, bool rotation)
         : dt(dt), seed(seed), rotation(rotation) {
@@ -16,7 +19,7 @@ integrator::integrator(double dt, long seed, bool rotation)
     clock = 0;
 };
 
-// Integrate list of particles (need to override in case of interacting or MS particles)
+// Integrate list of particles (need to override in case of MS particles)
 void integrator::integrate(std::vector<particle> &parts) {
     for (int i = 0; i < parts.size(); i++) {
         integrateOne(i, parts, dt);

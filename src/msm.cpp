@@ -9,6 +9,11 @@
 
 /**
  *  Implementations for abstract msm class inherited by all child classes
+ *  @msmid Id of the Markov model to match with particle types in simulations
+ *  @param tempmatrix reference to the transition rate/transition probability matrix
+ *  @param lagtime lagtime used by Markov model, in the case of MSMs it will be a fixed
+ *  value, for CTMSM it will change in each iteration.
+ *  @param seed variable for random number generation (Note seed = -1 corresponds to random device)
  */
 msmbase::msmbase(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
         : msmid(msmid), lagtime(lagtime), seed(seed){
@@ -34,7 +39,7 @@ msmbase::msmbase(int msmid,  std::vector<std::vector<double>> &tempmatrix, doubl
 
 
 /**
- * Implementation of discrete-time msm (msm) class
+ * Implementation of discrete-time msm (msm) class, see msmbase parent class for parameter description.
  */
 msm::msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
         : msmbase(msmid,  tempmatrix, lagtime, seed) {
@@ -54,13 +59,14 @@ msm::msm(int msmid,  std::vector<std::vector<double>> &tempmatrix, double lagtim
     }
 };
 
+// MISSING IMPLEMENTATION
 void msm::propagate(particleMS &part, int ksteps) {
 
 };
 
 
 /**
- * Implementation of continuous-time msm (ctmsm) class.
+ * Implementation of continuous-time msm (ctmsm) class, see msmbase parent class for parameter description.
  */
 ctmsm::ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, long seed)
         : msmbase(msmid,  tempmatrix, 0.0, seed) {

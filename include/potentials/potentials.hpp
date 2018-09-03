@@ -6,10 +6,10 @@
 #include "randomgen.hpp"
 
 /**
- * Abstract base class declaration for external potentials, uses a variadic template
- * to define orientation since it can have no rotations (ORIENTATION has zero arguments), or it
- * can be described by an orientation vector or even a quaternion. If the orientation is simply a
- * vector (vec3<double>) it describes rod-like particles.
+ * Abstract base class declaration for external potentials
+ * @param ...ORIENTATION variadic template to define orientation. If there are no rotations, ...ORIENTATION has
+ * zero arguments); otherwise, it can be described by an orientation vector or even a quaternion. If the
+ * orientation is simply a vector (vec3<double>) it describes rod-like particles.
  */
 template<typename ...ORIENTATION>
 class externalPotential{
@@ -30,10 +30,10 @@ public:
 
 
 /**
- * Abstract base class declaration for pair potentials, also uses a variadic template
- * to define orientation since it can have no rotations (ORIENTATION has zero arguments), or it
- * can be described by an orientation vector or even a quaternion. If the orientation is simply a
- * vector (vec3<double>) it describes rod-like particles.
+ * Abstract base class declaration for pair potentials
+ * @param ...ORIENTATION variadic template to define orientation. If there are no rotations, ...ORIENTATION has
+ * zero arguments); otherwise, it can be described by an orientation vector or even a quaternion. If the
+ * orientation is simply a vector (vec3<double>) it describes rod-like particles.
  */
 template<typename ...ORIENTATION>
 class pairPotential{

@@ -97,11 +97,11 @@ void odLangevinMarkovSwitch<ctmsm>::integrateOneMS(int partIndex, std::vector<pa
  * Next function should remain at end of file to avoid instantiation before specialization
  */
 
-// Integrates list of particlesMS (needs to override parent function because it is template based and uses particleMS)
+/* Integrates list of particleMS particles (needs to override parent function because it is
+ * template based and uses particleMS) */
 template<>
 void odLangevinMarkovSwitch<ctmsm>::integrate(std::vector<particleMS> &parts) {
     for (int i = 0; i < parts.size(); i++) {
-        // Calls version of integrateOne for pair interactions (needs whole particle list)
         integrateOneMS(i, parts, dt);
     }
     clock += dt;

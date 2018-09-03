@@ -32,34 +32,34 @@ protected:
     * @param rotation boolean to indicate if rotation should be integrated
     * @param externalPotActive indicates if external potential has been set
     * @param pairPotActive indicates if potential potential has been set
-    * @param externalPot external potential to be used by integrator
-    * @param pairPot pair potential between two particles to be used by integrator
-    * @param rodPairPot potential between two rod-like particles to be used by integrator
-    * @param clock keeps track of global time
-    * Note all potentials default to zero and not every integrator will make use of all this potentials
     */
 
-    /*
-     * Protected abstract functions
-     * Note integrateOne and integrate (public) have basically the same functionality. However, integrateOne does not
-     * update the clock, so we can integrate lists and update time correctly. See implementations in src/ for details.
-     */
+    // Protected abstract functions
     virtual void integrateOne(int index, std::vector<particle> &parts, double timestep) = 0; // Version for pair interactions (full particle list required)
     virtual void translate(particle &part, vec3<double> force, double dt) = 0;
     virtual void rotate(particle &part, vec3<double> torque, double dt) = 0;
-    // Private/protected functions to get forces and torques due to external or pair potentials for integrator
+
+    // Protected functions to get forces and torques due to external or pair potentials for integrator
     std::array<vec3<double>, 2> getExternalForceTorque(particle &part);
     std::array<vec3<double>, 2> getPairsForceTorque(int partIndex, std::vector<particle> &parts);
+
 public:
     externalPotential<>* externalPot;
     externalPotential<vec3<double>>* externalRodPot;
     pairPotential<>* pairPot;
     pairPotential<vec3<double>,vec3<double>>* pairRodPot;
     double clock;
+   /**
+    * Note all potentials default to zero and not every integrator will make use of all this potentials
+    * @param externalPotential<> external potential without orientation
+    * @param externalPotential<vec3<double>> external potential with rod-like orientation
+    * @param pairPotential<vec3<double>,vec3<double>> pair potential between two particles with rod-like orientation
+    * @param clock keeps track of global time
+    */
 
     integrator(double dt, long seed, bool rotation);
 
-    // Main integrate functions definitions (=0 for abstract class)
+    // Main functions definitions
     void integrate(std::vector<particle> &parts);
     double getClock() { return clock; }
 
