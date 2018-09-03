@@ -16,25 +16,10 @@ integrator::integrator(double dt, long seed, bool rotation)
     clock = 0;
 };
 
-// Same as integrateOne, but updates time and publicly visible (use integrate list when pair interactions enabled)
-void integrator::integrate(particle &part) {
-    integrateOne(part, dt);
-    clock += dt;
-}
-
-// Integrate list of particles instead of single one (need to override in case of interacting or MS particles)
-void integrator::integrateList(std::vector<particle> &parts, bool pairInteractions) {
-    if (pairInteractions) {
-        for (int i = 0; i < parts.size(); i++) {
-            // Calls version of integrateOne for pair interactions (needs whole particle list)
-            integrateOne(i, parts, dt);
-        }
-    }
-    else {
-        for (int i = 0; i < parts.size(); i++) {
-            // Calls version of integrateOne without pair interactions
-            integrateOne(parts[i], dt);
-        }
+// Integrate list of particles (need to override in case of interacting or MS particles)
+void integrator::integrate(std::vector<particle> &parts) {
+    for (int i = 0; i < parts.size(); i++) {
+        integrateOne(i, parts, dt);
     }
     clock += dt;
 }

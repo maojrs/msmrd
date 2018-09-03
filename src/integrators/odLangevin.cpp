@@ -12,21 +12,8 @@
  */
 odLangevin::odLangevin(double dt, long seed, bool rotation) : integrator(dt,seed, rotation) {};
 
-// One particle integrate main routine (visible only inside the class)
-void odLangevin::integrateOne(particle &part, double timestep) {
-    vec3<double> force;
-    vec3<double> torque;
-    std::array<vec3<double>, 2> forctorq;
-    forctorq = getExternalForceTorque(part);
-    force = forctorq[0];
-    torque = forctorq[1];
-    translate(part, force, timestep);
-    if (rotation) {
-        rotate(part, torque, timestep);
-    }
-}
 
-// One particle with pair potential interactions integrate main routine (visible only inside the class)
+// Integrate one particle from the particle listmain routine (visible only inside the class)
 void odLangevin::integrateOne(int partIndex, std::vector<particle> &parts, double timestep) {
     vec3<double> force;
     vec3<double> torque;

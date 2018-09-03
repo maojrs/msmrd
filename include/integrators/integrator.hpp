@@ -44,7 +44,6 @@ protected:
      * Note integrateOne and integrate (public) have basically the same functionality. However, integrateOne does not
      * update the clock, so we can integrate lists and update time correctly. See implementations in src/ for details.
      */
-    virtual void integrateOne(particle &part, double timestep) = 0;
     virtual void integrateOne(int index, std::vector<particle> &parts, double timestep) = 0; // Version for pair interactions (full particle list required)
     virtual void translate(particle &part, vec3<double> force, double dt) = 0;
     virtual void rotate(particle &part, vec3<double> torque, double dt) = 0;
@@ -61,8 +60,7 @@ public:
     integrator(double dt, long seed, bool rotation);
 
     // Main integrate functions definitions (=0 for abstract class)
-    virtual void integrate(particle &part);
-    void integrateList(std::vector<particle> &parts, bool pairInteractions);
+    void integrate(std::vector<particle> &parts);
     double getClock() { return clock; }
 
     // Potential related functions
