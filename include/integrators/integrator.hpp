@@ -61,7 +61,7 @@ public:
 
     // Main functions definitions
     void integrate(std::vector<particle> &parts);
-    double getClock() { return clock; }
+    double getClock() const { return clock; }
 
     // Potential related functions
     void setExternalPotential(externalPotential<> *pot);

@@ -65,10 +65,10 @@ public:
         orientvector = 1*nextOrientvector;
         orientation = 1*nextOrientation;
     };
-    int getID() { return  pid; }
-    double getD() { return  D; }
-    double getDrot() { return  Drot; }
-    std::string getBodyType() { return  bodytype; }
+    int getID() const { return  pid; }
+    double getD() const { return  D; }
+    double getDrot() const { return  Drot; }
+    std::string getBodyType() const { return  bodytype; }
 
     void setD(double Dnew) { D = Dnew; }
     void setDrot(double Drotnew) { Drot = Drotnew; }
@@ -121,9 +121,9 @@ public:
 
     // Additional functions and getters and setters for particleMS
     void updateState() { state = 1*nextState; };
-    int getType() { return  type; }
-    int getState() { return  state; }
-    double getLagtime() { return  lagtime; }
+    int getType() const { return  type; }
+    int getState() const { return  state; }
+    double getLagtime() const { return  lagtime; }
     void setState(int newstate) { state = newstate; }
     void setNextState(int newstate) { nextState = newstate; }
     void setType(int newtype) { type = newtype; }

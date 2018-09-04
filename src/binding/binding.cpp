@@ -43,7 +43,7 @@ namespace py = pybind11;
 PYBIND11_MODULE(msmrd2binding, m) {
 
     m.doc() = R"pbdoc(
-        Pybind11 example plugin
+        Pybind11 for msmrd2
         -----------------------
 
         .. currentmodule:: msmrd2

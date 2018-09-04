@@ -13,21 +13,21 @@
  */
 class msmbase {
 protected:
+    int msmid;
     const long double tolerance = 1*pow(10.0L,-10);
     long seed;
     randomgen randg;
 public:
-    int msmid;
     double lagtime;
     std::vector<std::vector<double>> tmatrix;
     unsigned int nstates;
     std::vector<double> Dlist;
     std::vector<double> Drotlist;
     /**
+     * @param msmid ID of the msm, corresponds to the particle type
      * @param tolerance tolerance limit for MSM integrity check
      * @param seed variable for random number generation; seed = -1 corresponds to random_device;
      * @param randg random number generator class based on mt19937
-     * @param msmid ID of the msm, corresponds to the particle type
      * @param lagtime msm lagtime (in ctmsm it is calculated after each propagation step)
      * @param tmatrix transition matrix (for ctmsm transition rate matrix)
      * @param nstates number of states in the msm (obtained directly from matrix size)
@@ -41,10 +41,10 @@ public:
     // Main functions definitions (=0 for abstract class)
     virtual void propagate(particleMS &part, int ksteps) = 0;
     // Get and set functions (**some needed for pybindinng)
-    int getID() { return  msmid; }
-    int getNstates() { return  nstates; }
-    double getLagtime() {return lagtime; }
-    std::vector<std::vector<double>> getTmatrix() { return  tmatrix; }
+    int getID() const { return  msmid; }
+    int getNstates() const { return  nstates; }
+    double getLagtime() const {return lagtime; }
+    std::vector<std::vector<double>> getTmatrix() const { return  tmatrix; }
     void setD(std::vector<double> &D){
         Dlist.resize(nstates);
         Dlist=D;
