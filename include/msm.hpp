@@ -78,6 +78,10 @@ public:
     ctmsm(int msmid,  std::vector<std::vector<double>> &tempmatrix, long seed);
     void propagate(particleMS &part, int ksteps) override;
     void propagateNoUpdate(particleMS &part,int ksteps);
+
+    // Getters for testing purposes
+    std::vector<double> getLambda0() const { return lambda0; };
+    std::vector<std::vector<double>> getRatescumsum() const {return ratescumsum; };
 };
 
 

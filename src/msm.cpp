@@ -89,7 +89,7 @@ void ctmsm::calculateParameters() {
     int index;
     lambda0.resize(nstates);
     ratescumsum.resize(nstates);
-    // Calculates lambda0 (sum of outgoing rates), for each state
+    // Calculates lambda0 (sum of outgoing rates), for each state (sum of row excluding diagonal negative value)
     for (int row = 0; row < nstates; row++) {
         index = 0;
         for (int col = 0; col < nstates; col++) {

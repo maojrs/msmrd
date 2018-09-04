@@ -3,10 +3,11 @@
 //
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include <catch2/catch.hpp>
-#include "simulation.hpp"
-#include "vec3.hpp"
+#include "msm.hpp"
 #include "particle.hpp"
+#include "quaternion.hpp"
 #include "randomgen.hpp"
+#include "vec3.hpp"
 
 
 TEST_CASE("Basic vector arithmetic", "[vectors]") {
@@ -84,7 +85,36 @@ TEST_CASE("Sampling from randomgen", "[randomgen]") {
     }
 }
 
-TEST_CASE("Particle and particleMS classes basic functionality", "[particle]") {
+TEST_CASE("Particle class basic functionality", "[particle]") {
+    double D = 1.0;
+    double Drot = 0.5;
+    std::string bodytype = "rigidsolid";
+    auto position = vec3<double> {0.0, 0.0, 0.0};
+    auto orientation = quaternion<double> {1.0, 0.0, 0.0, 0.0};
+    particle part = particle(D, Drot, bodytype, position, orientation);
+    // Constructor consistency test
+    REQUIRE(part.getD() == D);
+    REQUIRE(part.getDrot() == Drot);
+    REQUIRE(part.getBodyType() == bodytype);
+    REQUIRE(part.position == position);
+    REQUIRE(part.orientation == orientation);
+    // Some functionality testing
+    auto newposition = vec3<double> {1.0, 2.5, 3.0};
+    auto neworientation = quaternion<double> {0.0, 0.0, 0.0, 1.0};
+    part.setNextPosition(newposition);
+    part.setNextOrientation(neworientation);
+    // Check main values haven't been changed
+    REQUIRE(part.position == position);
+    REQUIRE(part.orientation == orientation);
+    // Update current values with new ones ("nextValues")
+    part.updatePosition();
+    part.updateOrientation();
+    // Check values indeed were changed
+    REQUIRE(part.position == newposition);
+    REQUIRE(part.orientation == neworientation);
+}
+
+TEST_CASE("ParticleMS class basic functionality", "[particleMS]") {
     int type = 0;
     int state = 2;
     double D = 1.0;
@@ -92,28 +122,20 @@ TEST_CASE("Particle and particleMS classes basic functionality", "[particle]") {
     std::string bodytype = "rigidsolid";
     auto position = vec3<double> {0.0, 0.0, 0.0};
     auto orientation = quaternion<double> {1.0, 0.0, 0.0, 0.0};
-    particle part = particle(D, Drot, bodytype, position, orientation);
     particleMS partMS = particleMS(type, state, D, Drot, bodytype, position, orientation);
     // Constructor consistency test
     REQUIRE(partMS.getType() == type);
     REQUIRE(partMS.getState() == state);
-    REQUIRE(part.getD() == D);
     REQUIRE(partMS.getD() == D);
-    REQUIRE(part.getDrot() == Drot);
     REQUIRE(partMS.getDrot() == Drot);
-    REQUIRE(part.getBodyType() == bodytype);
     REQUIRE(partMS.getBodyType() == bodytype);
-    REQUIRE(part.position == position);
     REQUIRE(partMS.position == position);
-    REQUIRE(part.orientation == orientation);
     REQUIRE(partMS.orientation == orientation);
     // Some functionality testing
     int newstate = 0;
     int newtype = 1;
     auto newposition = vec3<double> {1.0, 2.5, 3.0};
     auto neworientation = quaternion<double> {0.0, 0.0, 0.0, 1.0};
-    part.setNextPosition(newposition);
-    part.setNextOrientation(neworientation);
     partMS.setNextType(newtype);
     partMS.setNextState(newstate);
     partMS.setNextPosition(newposition);
@@ -121,13 +143,9 @@ TEST_CASE("Particle and particleMS classes basic functionality", "[particle]") {
     // Check main values haven't been changed
     REQUIRE(partMS.getType() == type);
     REQUIRE(partMS.getState() == state);
-    REQUIRE(part.position == position);
     REQUIRE(partMS.position == position);
-    REQUIRE(part.orientation == orientation);
     REQUIRE(partMS.orientation == orientation);
-    // Update current values with new ones
-    part.updatePosition();
-    part.updateOrientation();
+    // Update current values with new ones ("nextValues")
     partMS.updatePosition();
     partMS.updateOrientation();
     partMS.updateType();
@@ -135,14 +153,41 @@ TEST_CASE("Particle and particleMS classes basic functionality", "[particle]") {
     // Check values indeed were changed
     REQUIRE(partMS.getType() == newtype);
     REQUIRE(partMS.getState() == newstate);
-    REQUIRE(part.position == newposition);
     REQUIRE(partMS.position == newposition);
-    REQUIRE(part.orientation == neworientation);
     REQUIRE(partMS.orientation == neworientation);
 }
 
 
-//TEST_CASE("MSM functionality", "[msm]") {
-//    std::vector<std::vector<double>> tmatrix ={ {-5, 2, 3,}, {3, -4, 1}, {2, 2, -4} };
-//
-//}
+TEST_CASE("Fundamental CTMSM parameters and propagation test", "[ctmsm]") {
+    int msmid = 0;
+    std::vector<std::vector<double>> tmatrix ={ {-5, 2, 3,}, {3, -6, 3}, {1, 3, -4} };
+    // sum of outgoing rates for each state (row sum without diagonal negative value)
+    std::vector<double> lambda0 = {5, 6, 4};
+    // cumulative sum of outgoing rates for each state
+    std::vector<std::vector<double>> ratescumsum = {{2, 5}, {3, 6}, {1, 4}};
+    long seed = 0;
+    ctmsm ctmsmTest = ctmsm(msmid, tmatrix, seed);
+    REQUIRE(ctmsmTest.nstates == 3);
+    REQUIRE(ctmsmTest.getLambda0() == lambda0);
+    REQUIRE(ctmsmTest.getRatescumsum() == ratescumsum);
+    // Propagation test requires creating a particleMS
+    int type = 0;
+    int state = 2;
+    double D = 1.0;
+    double Drot = 0.5;
+    std::string bodytype = "rigidsolid";
+    auto position = vec3<double> {0.0, 0.0, 0.0};
+    auto orientation = quaternion<double> {1.0, 0.0, 0.0, 0.0};
+    particleMS partMS = particleMS(type, state, D, Drot, bodytype, position, orientation);
+    // Create a second particle and a second ctmsm with same seed
+    ctmsm ctmsmTest2 = ctmsm(msmid, tmatrix, seed);
+    particleMS partMS2 = particleMS(type, state, D, Drot, bodytype, position, orientation);
+    /* Propagate each particle using the same seed but the update and noupdate method,
+     * respectively, and compare output at each timestep. */
+    for (int i=0; i<100; i++) {
+        ctmsmTest.propagate(partMS, 3);
+        ctmsmTest2.propagateNoUpdate(partMS2, 3);
+        partMS2.updateState();
+        REQUIRE(partMS.getState() == partMS2.getState());
+    }
+}
