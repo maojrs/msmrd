@@ -99,10 +99,8 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def(py::init<int&, int&, double&, double&, std::string&, std::vector<double>&, std::vector<double>& >())
             .def_property_readonly("type", &particleMS::getType)
             .def_property_readonly("state", &particleMS::getState)
-            .def_property_readonly("nextstate", &particleMS::getNextState)
             .def_property_readonly("lagtime", &particleMS::getLagtime)
             .def("setState", &particleMS::setState)
-            .def("setNextState", &particleMS::setNextState)
             .def("setType", &particleMS::setType)
             .def("setLagtime", &particleMS::setLagtime);
 

@@ -24,7 +24,15 @@ void integrator::integrate(std::vector<particle> &parts) {
     for (int i = 0; i < parts.size(); i++) {
         integrateOne(i, parts, dt);
     }
-    clock += dt;
+    /* Update positions and orientations ( Sets calculated next position/orientation
+     * calculated by integrator as current position/orientation). */
+    for (int i = 0; i < parts.size(); i++) {
+        parts[i].updatePosition();
+        if (rotation) {
+            parts[i].updateOrientation();
+        }
+    }
+        clock += dt;
 }
 
 

@@ -53,7 +53,7 @@ void odLangevinMarkovSwitch<ctmsm>::integrateOneMS(int partIndex, std::vector<pa
                 part.setLagtime(0);
                 // Ready to propagate MSM, update state and diffusion coefficients
                 part.propagateTMSM = true;
-                part.setState(part.nextState);
+                part.updateState(); // Sets calculated next state as current state
                 part.setD(tmsm.Dlist[part.state]);
                 part.setDrot(tmsm.Drotlist[part.state]);
                 // If current lagtime overtakes dt, integrate up to dt (by resdt) and reset lagtime to remaining portion
@@ -66,7 +66,7 @@ void odLangevinMarkovSwitch<ctmsm>::integrateOneMS(int partIndex, std::vector<pa
                 if (part.lagtime == 0) {
                     // Ready to propagate CTMSM, update state and diffusion coefficients
                     part.propagateTMSM = true;
-                    part.setState(part.nextState);
+                    part.updateState(); // Sets calculated next state as current state
                     part.setD(tmsm.Dlist[part.state]);
                     part.setDrot(tmsm.Drotlist[part.state]);
                 } else {
@@ -83,7 +83,7 @@ void odLangevinMarkovSwitch<ctmsm>::integrateOneMS(int partIndex, std::vector<pa
         if (part.lagtime == 0) {
             // Ready to propagate CTMSM, update state and diffusion coefficients
             part.propagateTMSM = true;
-            part.setState(part.nextState);
+            part.updateState(); // Sets calculated next state as current state
             part.setD(tmsm.Dlist[part.state]);
             part.setDrot(tmsm.Drotlist[part.state]);
         } else {
@@ -103,6 +103,13 @@ template<>
 void odLangevinMarkovSwitch<ctmsm>::integrate(std::vector<particleMS> &parts) {
     for (int i = 0; i < parts.size(); i++) {
         integrateOneMS(i, parts, dt);
+    }
+    // Update positions and orientations
+    for (int i = 0; i < parts.size(); i++) {
+        parts[i].updatePosition();
+        if (rotation) {
+            parts[i].updateOrientation();
+        }
     }
     clock += dt;
 };

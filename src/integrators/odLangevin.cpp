@@ -32,7 +32,7 @@ void odLangevin::integrateOne(int partIndex, std::vector<particle> &parts, doubl
 void odLangevin::translate(particle &part, vec3<double> force, double dt0){
     vec3<double> dr;
     dr = force*dt0*part.D/KbTemp + std::sqrt(2*dt0*part.D)*randg.normal3D(0,1);
-    part.setPosition(part.position + dr);
+    part.setNextPosition(part.position + dr);
 }
 
 void odLangevin::rotate(particle &part, vec3<double> torque, double dt0){
@@ -40,8 +40,8 @@ void odLangevin::rotate(particle &part, vec3<double> torque, double dt0){
     quaternion<double> dquat;
     dphi = torque*dt0*part.Drot/KbTemp + std::sqrt(2*dt0*part.Drot)*randg.normal3D(0,1);
     dquat = axisanglerep2quaternion(dphi);
-    part.setOrientation(dquat * part.orientation);
+    part.setNextOrientation(dquat * part.orientation);
     // Updated orientation vector, useful with rodlike particles
     vec3<double> neworientvector = rotateVec(part.orientvector, dquat);
-    part.setOrientVector(neworientvector);
+    part.setNextOrientVector(neworientvector);
 }
