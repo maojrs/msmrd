@@ -33,7 +33,7 @@ public:
     /**
      * @param D diffusion constant
      * @param Drot rotational diffusion constant
-     * @param bodytype determines rotation integrator behavior, can be either point, rod or rigidsolid
+     * @param bodytype determines rotation integrator behavior, can be either point, rod or rigidbody
      * (determined by orientational degrees of freedom, points have no orientation, rods need only one vector and
      * rigidsolid requires a complete quaternion).
      * @param position position vector of the particle
@@ -95,6 +95,7 @@ public:
  */
 class particleMS: public particle {
 protected:
+    int nextType;
     int nextState;
 public:
     int type;
@@ -121,12 +122,14 @@ public:
 
     // Additional functions and getters and setters for particleMS
     void updateState() { state = 1*nextState; };
+    void updateType() { type = 1*nextType; };
     int getType() const { return  type; }
     int getState() const { return  state; }
     double getLagtime() const { return  lagtime; }
     void setState(int newstate) { state = newstate; }
-    void setNextState(int newstate) { nextState = newstate; }
+    void setNextState(int nextstate) { nextState = nextstate; }
     void setType(int newtype) { type = newtype; }
+    void setNextType(int nexttype) { nextType = nexttype; }
     void setLagtime(double newlagtime) { lagtime = newlagtime; }
 };
 

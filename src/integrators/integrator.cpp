@@ -43,11 +43,11 @@ std::array<vec3<double>, 2> integrator::getExternalForceTorque(particle &part) {
             return externalPot->forceTorque(part.position);
         } else if (part.bodytype == "rod") {
             return externalRodPot->forceTorque(part.position, part.orientvector);
-        } else if (part.bodytype == "rigidsolid") {
+        } else if (part.bodytype == "rigidbody") {
             // to be implemented (forceTorque functions in potentials from quaternions)
             // return externalQuatPot->forceTorque(part.position, part.orientation);
         } else {
-            throw std::runtime_error("Unknown particle bodytype. it should be either point, rod or rigidsolid.");
+            throw std::runtime_error("Unknown particle bodytype. it should be either point, rod or rigidbody.");
         };
     }
     // Return zero values if external potential has not been yet set
@@ -78,7 +78,7 @@ std::array<vec3<double>, 2> integrator::getPairsForceTorque(int partIndex, std::
                 torque += forctorq[1];
             }
             return {force, torque};
-        } else if (parts[partIndex].bodytype == "rigidsolid") {
+        } else if (parts[partIndex].bodytype == "rigidbody") {
             // to be implemented (forceTorque functions in potentials from quaternions)
             //        for (int i=0; i<parts.size(); i++) {
             //            forctorq = quatPairPot->forceTorque(part.position, part.orientvector, parts[i].position, parts[i].orientvector);
@@ -87,7 +87,7 @@ std::array<vec3<double>, 2> integrator::getPairsForceTorque(int partIndex, std::
             //        }
             //        return {force, torque};
         } else {
-            throw std::runtime_error("Unknown particle bodytype. it should be either point, rod or rigidsolid.");
+            throw std::runtime_error("Unknown particle bodytype. it should be either point, rod or rigidbody.");
         };
     }
     // Return zero values if pair potential has not been yet set

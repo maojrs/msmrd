@@ -9,17 +9,6 @@
 #include "randomgen.hpp"
 
 
-unsigned int Factorial( unsigned int number ) {
-    return number <= 1 ? number : Factorial(number-1)*number;
-}
-
-TEST_CASE( "Factorials are computed", "[factorial]" ) {
-REQUIRE( Factorial(1) == 1 );
-REQUIRE( Factorial(2) == 2 );
-REQUIRE( Factorial(3) == 6 );
-REQUIRE( Factorial(10) == 3628800 );
-}
-
 TEST_CASE("Basic vector arithmetic", "[vectors]") {
     vec3<double> v1({1.,2.,3});
     vec3<double> v2({3.,1.,2});
@@ -94,6 +83,64 @@ TEST_CASE("Sampling from randomgen", "[randomgen]") {
         REQUIRE(trial3.norm() >= 3.0);
     }
 }
+
+TEST_CASE("Particle and particleMS classes basic functionality", "[particle]") {
+    int type = 0;
+    int state = 2;
+    double D = 1.0;
+    double Drot = 0.5;
+    std::string bodytype = "rigidsolid";
+    auto position = vec3<double> {0.0, 0.0, 0.0};
+    auto orientation = quaternion<double> {1.0, 0.0, 0.0, 0.0};
+    particle part = particle(D, Drot, bodytype, position, orientation);
+    particleMS partMS = particleMS(type, state, D, Drot, bodytype, position, orientation);
+    // Constructor consistency test
+    REQUIRE(partMS.getType() == type);
+    REQUIRE(partMS.getState() == state);
+    REQUIRE(part.getD() == D);
+    REQUIRE(partMS.getD() == D);
+    REQUIRE(part.getDrot() == Drot);
+    REQUIRE(partMS.getDrot() == Drot);
+    REQUIRE(part.getBodyType() == bodytype);
+    REQUIRE(partMS.getBodyType() == bodytype);
+    REQUIRE(part.position == position);
+    REQUIRE(partMS.position == position);
+    REQUIRE(part.orientation == orientation);
+    REQUIRE(partMS.orientation == orientation);
+    // Some functionality testing
+    int newstate = 0;
+    int newtype = 1;
+    auto newposition = vec3<double> {1.0, 2.5, 3.0};
+    auto neworientation = quaternion<double> {0.0, 0.0, 0.0, 1.0};
+    part.setNextPosition(newposition);
+    part.setNextOrientation(neworientation);
+    partMS.setNextType(newtype);
+    partMS.setNextState(newstate);
+    partMS.setNextPosition(newposition);
+    partMS.setNextOrientation(neworientation);
+    // Check main values haven't been changed
+    REQUIRE(partMS.getType() == type);
+    REQUIRE(partMS.getState() == state);
+    REQUIRE(part.position == position);
+    REQUIRE(partMS.position == position);
+    REQUIRE(part.orientation == orientation);
+    REQUIRE(partMS.orientation == orientation);
+    // Update current values with new ones
+    part.updatePosition();
+    part.updateOrientation();
+    partMS.updatePosition();
+    partMS.updateOrientation();
+    partMS.updateType();
+    partMS.updateState();
+    // Check values indeed were changed
+    REQUIRE(partMS.getType() == newtype);
+    REQUIRE(partMS.getState() == newstate);
+    REQUIRE(part.position == newposition);
+    REQUIRE(partMS.position == newposition);
+    REQUIRE(part.orientation == neworientation);
+    REQUIRE(partMS.orientation == neworientation);
+}
+
 
 //TEST_CASE("MSM functionality", "[msm]") {
 //    std::vector<std::vector<double>> tmatrix ={ {-5, 2, 3,}, {3, -4, 1}, {2, 2, -4} };
