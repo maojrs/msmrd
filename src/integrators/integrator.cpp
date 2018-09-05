@@ -77,9 +77,12 @@ std::array<vec3<double>, 2> integrator::getPairsForceTorque(int partIndex, std::
             return {force, torque};
         } else if (parts[partIndex].bodytype == "rod") {
             for (int i = 0; i < parts.size(); i++) {
-                forctorq = pairRodPot->forceTorque(parts[partIndex].position, parts[partIndex].orientvector, parts[i].position, parts[i].orientvector);
-                force += forctorq[0];
-                torque += forctorq[1];
+                if (i != partIndex) {
+                    forctorq = pairRodPot->forceTorque(parts[partIndex].position, parts[i].position,
+                                                       parts[partIndex].orientvector, parts[i].orientvector);
+                    force += forctorq[0];
+                    torque += forctorq[1];
+                }
             }
             return {force, torque};
         } else if (parts[partIndex].bodytype == "rigidbody") {

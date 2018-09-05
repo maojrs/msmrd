@@ -45,6 +45,7 @@ public:
     particle(double D, double Drot, std::string bodytype, vec3<double> position, quaternion<double> orientation)
             : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation){
         orientvector = vec3<double>(0.,0.,1.);
+        orientvector = rotateVec(orientvector,orientation);
         nextPosition = 1.0*position;
         nextOrientation = 1.0*orientation;
         nextOrientvector = 1.0*orientvector;
@@ -53,6 +54,7 @@ public:
     particle(double D, double Drot, std::string bodytype, std::vector<double> &position, std::vector<double> &orientation)
             : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation) {
         orientvector = vec3<double>(0.,0.,1.);
+        orientvector = rotateVec(orientvector,orientation);
         std::vector<double> nextPosition(position);
         std::vector<double> nextOrientation(orientation);
         nextOrientvector = 1.0*orientvector;
