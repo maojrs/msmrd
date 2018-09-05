@@ -13,15 +13,9 @@ class particle {
 protected:
     int pid = 0;
     bool active = true;
-    vec3<double> nextPosition;
-    vec3<double> nextOrientvector;
-    quaternion<double> nextOrientation;
     /**
      * @param pid ID of the particle
      * @param active determines if particle currently active
-     * @param nextPosition saves next position for integrator to update
-     * @param nextOrientvector saves next orientation vector for integrator to update
-     * @param nextOrientation saves next orientation quaternions for integrator to update
      */
 public:
     double D;
@@ -30,6 +24,9 @@ public:
     vec3<double> position;
     vec3<double> orientvector;
     quaternion<double> orientation;
+    vec3<double> nextPosition;
+    vec3<double> nextOrientvector;
+    quaternion<double> nextOrientation;
     /**
      * @param D diffusion constant
      * @param Drot rotational diffusion constant
@@ -39,6 +36,9 @@ public:
      * @param position position vector of the particle
      * @param orientvector orientation vector (only to be used by for rod-like particles)
      * @param orientation normalized quaternion representing the initial orientation of the particle
+     * @param nextPosition saves next position for integrator to update
+     * @param nextOrientvector saves next orientation vector for integrator to update
+     * @param nextOrientation saves next orientation quaternions for integrator to update
      */
 
     // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
@@ -65,6 +65,7 @@ public:
         orientvector = 1*nextOrientvector;
         orientation = 1*nextOrientation;
     };
+    void deactivate() {active = false; }
     int getID() const { return  pid; }
     double getD() const { return  D; }
     double getDrot() const { return  Drot; }

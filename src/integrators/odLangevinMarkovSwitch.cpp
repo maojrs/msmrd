@@ -101,11 +101,15 @@ void odLangevinMarkovSwitch<ctmsm>::integrateOneMS(int partIndex, std::vector<pa
  * template based and uses particleMS) */
 template<>
 void odLangevinMarkovSwitch<ctmsm>::integrate(std::vector<particleMS> &parts) {
+    // Integrate and save next positions/orientations in parts[i].next***
     for (int i = 0; i < parts.size(); i++) {
         integrateOneMS(i, parts, dt);
     }
-    // Update positions and orientations
+    // Enforce boundary and update positions/orientations
     for (int i = 0; i < parts.size(); i++) {
+        if (boundaryActive) {
+            domainBoundary->enforceBoundary(parts[i]);
+        }
         parts[i].updatePosition();
         if (rotation) {
             parts[i].updateOrientation();

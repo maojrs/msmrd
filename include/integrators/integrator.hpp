@@ -6,6 +6,7 @@
 #include <array>
 #include <utility>
 #include <memory>
+#include "boundary.hpp"
 #include "particle.hpp"
 #include "randomgen.hpp"
 #include "potentials/potentials.hpp"
@@ -21,8 +22,10 @@ protected:
     long seed;
     randomgen randg;
     bool rotation;
+    bool boundaryActive = false;
     bool externalPotActive = false;
     bool pairPotActive = false;
+
 
     /**
     * @param KbTemp = Boltzman constant times temperature
@@ -44,13 +47,15 @@ protected:
     std::array<vec3<double>, 2> getPairsForceTorque(int partIndex, std::vector<particle> &parts);
 
 public:
-    externalPotential<>* externalPot;
-    externalPotential<vec3<double>>* externalRodPot;
-    pairPotential<>* pairPot;
-    pairPotential<vec3<double>,vec3<double>>* pairRodPot;
+    boundary *domainBoundary;
+    externalPotential<> *externalPot;
+    externalPotential<vec3<double>> *externalRodPot;
+    pairPotential<> *pairPot;
+    pairPotential<vec3<double>,vec3<double>> *pairRodPot;
     double clock;
    /**
     * Note all potentials default to zero and not every integrator will make use of all this potentials
+    * @param domainBoundary determines the boundary of the domain to be used.
     * @param externalPotential<> external potential without orientation
     * @param externalPotential<vec3<double>> external potential with rod-like orientation
     * @param pairPotential<vec3<double>,vec3<double>> pair potential between two particles with rod-like orientation
@@ -64,6 +69,7 @@ public:
     double getClock() const { return clock; }
 
     // Potential related functions
+    void setBoundary(boundary *bndry);
     void setExternalPotential(externalPotential<> *pot);
     void setExternalRodPotential(externalPotential<vec3<double>> *pot);
     void setPairPotential(pairPotential<> *pot);

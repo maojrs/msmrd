@@ -15,6 +15,7 @@ include_directories(include)
 add_subdirectory(libraries/pybind11)
 set(bindings_python_version 3.6)
 set(SOURCES
+        src/boundary.cpp
         src/msm.cpp
         src/randomgen.cpp
         src/simulation.cpp
@@ -32,6 +33,7 @@ set(PY_SOURCES
         src/binding/binding.cpp
         src/binding/bindIntegrators.cpp
         src/binding/bindPotentials.cpp
+        include/boundary.hpp
         include/msm.hpp
         include/particle.hpp
         include/quaternion.hpp

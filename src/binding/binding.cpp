@@ -136,6 +136,15 @@ PYBIND11_MODULE(msmrd2binding, m) {
             .def("setDrot", &ctmsm::setDrot)
             .def("propagate", &ctmsm::propagate);
 
+    pybind11::class_<boundary >(m, "boundary");
+    py::class_<box, boundary>(m, "box")
+            .def(py::init<double&, double&, double&, std::string>())
+            .def_property_readonly("boxsize", [](const box &currentbox) {
+                return vec2numpy(3,currentbox.boxsize);
+            })
+            .def_property_readonly("boundaryType", &box::getBoundaryType);
+
+
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;

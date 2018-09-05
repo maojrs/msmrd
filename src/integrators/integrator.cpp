@@ -21,12 +21,16 @@ integrator::integrator(double dt, long seed, bool rotation)
 
 // Integrate list of particles (need to override in case of MS particles)
 void integrator::integrate(std::vector<particle> &parts) {
+    // Integrate and save next positions/orientations in parts[i].next***
     for (int i = 0; i < parts.size(); i++) {
         integrateOne(i, parts, dt);
     }
-    /* Update positions and orientations ( Sets calculated next position/orientation
+    /* Enforce boundary and update positions/orientations ( Sets calculated next position/orientation
      * calculated by integrator as current position/orientation). */
     for (int i = 0; i < parts.size(); i++) {
+        if (boundaryActive) {
+            domainBoundary->enforceBoundary(parts[i]);
+        }
         parts[i].updatePosition();
         if (rotation) {
             parts[i].updateOrientation();
@@ -47,7 +51,7 @@ std::array<vec3<double>, 2> integrator::getExternalForceTorque(particle &part) {
             // to be implemented (forceTorque functions in potentials from quaternions)
             // return externalQuatPot->forceTorque(part.position, part.orientation);
         } else {
-            throw std::runtime_error("Unknown particle bodytype. it should be either point, rod or rigidbody.");
+            throw std::runtime_error("Unknown particle bodytype; it should be either point, rod or rigidbody.");
         };
     }
     // Return zero values if external potential has not been yet set
@@ -97,6 +101,11 @@ std::array<vec3<double>, 2> integrator::getPairsForceTorque(int partIndex, std::
 };
 
 
+// Incorporates custom boundary into integrator
+void integrator::setBoundary(boundary *bndry) {
+    boundaryActive = true;
+    domainBoundary = bndry;
+}
 
 // Incorporates custom external potential functions into integrator
 void integrator::setExternalPotential(externalPotential<> *pot) {

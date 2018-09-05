@@ -87,6 +87,14 @@ public:
         return std::inner_product(data.begin(), data.end(), data.begin(), static_cast<scalar>(0));
     };
 
+    scalar infnorm() const {
+        scalar inorm = 0;
+        for (auto i = 0; i < 3; ++i) {
+            inorm += std::abs(data[i]);
+        }
+        return inorm;
+    };
+
     scalar operator[](std::size_t i) const {
         return data.at(i);
     };
