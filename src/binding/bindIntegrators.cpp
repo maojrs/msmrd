@@ -18,6 +18,7 @@ void bindIntegrators(py::module& m) {
     py::class_<odLangevin>(m, "odLangevin")
             .def(py::init<double&, long&, bool&>())
             .def_property_readonly("clock", &odLangevin::getClock)
+            .def("setKbT", &odLangevin::setKbT)
             .def("setBoundary", &odLangevin::setBoundary)
             .def("setExternalPotential", &odLangevin::setExternalPotential)
             .def("setExternalRodPotential", &odLangevin::setExternalRodPotential)
@@ -27,16 +28,8 @@ void bindIntegrators(py::module& m) {
             //.def("evalExternalForce", &odLangevin::evalExternalForce)
             .def("integrate", &odLangevin::integrate);
 
-    py::class_<odLangevinMarkovSwitch<ctmsm>>(m, "odLangevinMarkovSwitch")
+    py::class_<odLangevinMarkovSwitch<ctmsm>, odLangevin>(m, "odLangevinMarkovSwitch")
             .def(py::init<ctmsm&, double&, long&, bool&>())
-            .def_property_readonly("clock", &odLangevinMarkovSwitch<ctmsm>::getClock)
-            .def("setBoundary", &odLangevinMarkovSwitch<ctmsm>::setBoundary)
-            .def("setExternalPotential", &odLangevinMarkovSwitch<ctmsm>::setExternalPotential)
-            .def("setExternalRodPotential", &odLangevinMarkovSwitch<ctmsm>::setExternalRodPotential)
-            .def("setPairPotential", &odLangevinMarkovSwitch<ctmsm>::setPairPotential)
-            .def("setPairRodPotential", &odLangevinMarkovSwitch<ctmsm>::setPairRodPotential)
-                    //.def("evaluateExternalPotential", &odLangevin::evalExternalPotential)
-            //.def("evalExternalForce", &odLangevin::evalExternalForce)
             .def("integrate", &odLangevinMarkovSwitch<ctmsm>::integrate);
 
     // Created c++ compatible particle list/vector/array of particles in python

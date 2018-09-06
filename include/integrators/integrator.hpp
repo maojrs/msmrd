@@ -17,7 +17,7 @@
  */
 class integrator {
 protected:
-    const double KbTemp = 1.0;
+    double KbTemp = 1.0;
     double dt;
     long seed;
     randomgen randg;
@@ -67,8 +67,9 @@ public:
     // Main functions definitions
     void integrate(std::vector<particle> &parts);
     double getClock() const { return clock; }
+    void setKbT( double kbt) {KbTemp = kbt; }
 
-    // Potential related functions
+    // Potential and boundary related functions
     void setBoundary(boundary *bndry);
     void setExternalPotential(externalPotential<> *pot);
     void setExternalRodPotential(externalPotential<vec3<double>> *pot);
