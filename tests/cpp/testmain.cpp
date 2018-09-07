@@ -9,6 +9,7 @@
 #include "randomgen.hpp"
 #include "vec3.hpp"
 
+using namespace msmrd;
 
 TEST_CASE("Basic vector arithmetic", "[vectors]") {
     vec3<double> v1({1.,2.,3});

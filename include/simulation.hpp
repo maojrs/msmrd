@@ -7,10 +7,15 @@
 #include "particle.hpp"
 #include "integrators/integrator.hpp"
 
-class simulation {
-public:
-    std::vector<particle> &particles;
-    const int Nparticles;
-    simulation(std::vector<particle> particles): particles(particles), Nparticles(particles.size()) {};
-    void run(const double timestep, const int steps);
-};
+namespace msmrd {
+    class simulation {
+    public:
+        std::vector<particle> &particles;
+        const int Nparticles;
+
+        simulation(std::vector<particle> particles) : particles(particles), Nparticles(particles.size()) {};
+
+        void run(const double timestep, const int steps);
+    };
+
+}
