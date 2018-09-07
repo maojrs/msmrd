@@ -8,6 +8,8 @@
 #include "msm.hpp"
 
 namespace msmrd {
+    using msm = msmrd::discreteTimeMarkovStateModel;
+    using ctmsm = msmrd::continuousTimeMarkovStateModel;
     /**
      * Over-damped Langevin with Markovian Switch integrator
      * @tparam TMSM template can be an msm or a ctmsm

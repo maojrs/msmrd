@@ -7,7 +7,13 @@
 #include "particle.hpp"
 #include "msm.hpp"
 
+
+
 namespace msmrd {
+    using msmbase = baseMarkovStateModel;
+    using msm = discreteTimeMarkovStateModel;
+    using ctmsm = continuousTimeMarkovStateModel;
+
     /**
      *  Implementations for abstract msm class inherited by all child classes
      *  @msmid Id of the Markov model to match with particle types in simulations
@@ -16,7 +22,7 @@ namespace msmrd {
      *  value, for CTMSM it will change in each iteration.
      *  @param seed variable for random number generation (Note seed = -1 corresponds to random device)
      */
-    msmbase::msmbase(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
+    msmbase::baseMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
             : msmid(msmid), lagtime(lagtime), seed(seed) {
 
         // Resize vectors by input matrix size and set seed of random number generator
@@ -42,7 +48,7 @@ namespace msmrd {
     /**
      * Implementation of discrete-time msm (msm) class, see msmbase parent class for parameter description.
      */
-    msm::msm(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
+    msm::discreteTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
             : msmbase(msmid, tempmatrix, lagtime, seed) {
         // Verify MSM transition matrix rows sum to 1 and components between 0 and 1
         double rowsum;
@@ -69,7 +75,7 @@ namespace msmrd {
     /**
      * Implementation of continuous-time msm (ctmsm) class, see msmbase parent class for parameter description.
      */
-    ctmsm::ctmsm(int msmid, std::vector<std::vector<double>> &tempmatrix, long seed)
+    ctmsm::continuousTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, long seed)
             : msmbase(msmid, tempmatrix, 0.0, seed) {
         // Verify CTMSM transition rate matrix rows sum to 0
         double long rowsum;

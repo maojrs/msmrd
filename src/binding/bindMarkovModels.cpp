@@ -5,6 +5,8 @@
 #include "msm.hpp"
 
 namespace msmrd {
+    using msm = msmrd::discreteTimeMarkovStateModel;
+    using ctmsm = msmrd:: continuousTimeMarkovStateModel;
     /*
      * pyBinders for the c++ Markov state models (MSMs) classes
      */
