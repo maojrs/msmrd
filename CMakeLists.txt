@@ -25,9 +25,10 @@ set(SOURCES
         src/potentials/potentials.cpp
         src/potentials/dipole.cpp
         src/potentials/gaussians3D.cpp
-        src/potentials/harmonicRepulsion.cpp
         src/potentials/gayBerne.cpp
-)
+        src/potentials/harmonicRepulsion.cpp
+        src/potentials/patchyParticle.cpp
+        )
 
 set(PY_SOURCES
         src/binding/binding.hpp
@@ -50,8 +51,9 @@ set(PY_SOURCES
         include/potentials/potentials.hpp
         include/potentials/dipole.hpp
         include/potentials/gaussians3D.hpp
-        include/potentials/harmonicRepulsion.hpp
         include/potentials/gayBerne.hpp
+        include/potentials/harmonicRepulsion.hpp
+        include/potentials/patchyParticle.hpp
         )
 
 add_library(msmrd2core SHARED ${SOURCES})

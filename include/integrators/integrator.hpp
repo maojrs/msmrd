@@ -24,8 +24,8 @@ namespace msmrd {
         randomgen randg;
         bool rotation;
         bool boundaryActive = false;
-        bool externalPotActive = false;
-        bool pairPotActive = false;
+        bool externalPotentialActive = false;
+        bool pairPotentialActive = false;
 
 
         /**
@@ -54,8 +54,10 @@ namespace msmrd {
         boundary *domainBoundary;
         externalPotential<> *externalPot;
         externalPotential<vec3<double>> *externalRodPot;
+        externalPotential<quaternion<double>> *externalRigidBodyPot;
         pairPotential<> *pairPot;
         pairPotential<vec3<double>, vec3<double>> *pairRodPot;
+        pairPotential<quaternion<double>, quaternion<double>> *pairRigidBodyPot;
         double clock;
 
         /**
@@ -83,9 +85,14 @@ namespace msmrd {
 
         void setExternalRodPotential(externalPotential<vec3<double>> *pot);
 
+        void setExternalRigidBodyPotential(externalPotential<quaternion<double>> *pot);
+
         void setPairPotential(pairPotential<> *pot);
 
         void setPairRodPotential(pairPotential<vec3<double>, vec3<double>> *pot);
+
+        void setPairRigidBodyPotential(pairPotential<quaternion<double>, quaternion<double>> *pot);
+
 //    double evalExternalPotential(std::vector<double> pos);
 //    double evalPairPotential(std::vector<double> pos1, std::vector<double> pos2);
 //    double evalRodPairPotential(std::vector<double> pos1,

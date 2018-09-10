@@ -42,14 +42,13 @@ namespace msmrd {
 
     // Calculates force and torque from an external potential for point, rod-like and rigidsolid particles
     std::array<vec3<double>, 2> integrator::getExternalForceTorque(particle &part) {
-        if (externalPotActive) {
+        if (externalPotentialActive) {
             if (part.bodytype == "point") {
                 return externalPot->forceTorque(part.position);
             } else if (part.bodytype == "rod") {
                 return externalRodPot->forceTorque(part.position, part.orientvector);
             } else if (part.bodytype == "rigidbody") {
-                // to be implemented (forceTorque functions in potentials from quaternions)
-                // return externalQuatPot->forceTorque(part.position, part.orientation);
+                return externalRigidBodyPot->forceTorque(part.position, part.orientation);
             } else {
                 throw std::runtime_error("Unknown particle bodytype; it should be either point, rod or rigidbody.");
             };
@@ -62,7 +61,7 @@ namespace msmrd {
 
     // Calculates force and torque due to pair interactions for point, rod-like and rigidsolid particles
     std::array<vec3<double>, 2> integrator::getPairsForceTorque(int partIndex, std::vector<particle> &parts) {
-        if (pairPotActive) {
+        if (pairPotentialActive) {
             std::array<vec3<double>, 2> forctorq;
             vec3<double> force = vec3<double>(0., 0., 0.);
             vec3<double> torque = vec3<double>(0., 0., 0.);
@@ -86,13 +85,16 @@ namespace msmrd {
                 }
                 return {force, torque};
             } else if (parts[partIndex].bodytype == "rigidbody") {
-                // to be implemented (forceTorque functions in potentials from quaternions)
-                //        for (int i=0; i<parts.size(); i++) {
-                //            forctorq = quatPairPot->forceTorque(part.position, part.orientvector, parts[i].position, parts[i].orientvector);
-                //            force += forctorq[0];
-                //            torque += forctorq[1];
-                //        }
-                //        return {force, torque};
+                        for (int i=0; i<parts.size(); i++) {
+                            if (i != partIndex) {
+
+                                forctorq = pairRigidBodyPot->forceTorque(parts[partIndex].position, parts[i].position,
+                                                                         parts[partIndex].orientation, parts[i].orientation);
+                                force += forctorq[0];
+                                torque += forctorq[1];
+                            }
+                        }
+                        return {force, torque};
             } else {
                 throw std::runtime_error("Unknown particle bodytype. it should be either point, rod or rigidbody.");
             };
@@ -112,26 +114,38 @@ namespace msmrd {
 
     // Incorporates custom external potential functions into integrator
     void integrator::setExternalPotential(externalPotential<> *pot) {
-        externalPotActive = true;
+        externalPotentialActive = true;
         externalPot = pot;
     }
 
-    // Incorporates custom external potential functions into integrator
+    // Incorporates custom external potential functions for rod-like particles into integrator
     void integrator::setExternalRodPotential(externalPotential<vec3<double>> *pot) {
-        externalPotActive = true;
+        externalPotentialActive = true;
         externalRodPot = pot;
+    }
+
+    // Incorporates custom external potential functions for rigidbody particles into integrator
+    void integrator::setExternalRigidBodyPotential(externalPotential<quaternion<double>> *pot) {
+        externalPotentialActive = true;
+        externalRigidBodyPot = pot;
     }
 
     // Incorporates custom pair potential functions into integrator
     void integrator::setPairPotential(pairPotential<> *pot) {
-        pairPotActive = true;
+        pairPotentialActive = true;
         pairPot = pot;
     }
 
     // Incorporates custom pair potential function for rod-like particles into integrator
     void integrator::setPairRodPotential(pairPotential<vec3<double>, vec3<double>> *pot) {
-        pairPotActive = true;
+        pairPotentialActive = true;
         pairRodPot = pot;
+    }
+
+    // Incorporates custom pair potential function for rigidbody particles into integrator
+    void integrator::setPairRigidBodyPotential(pairPotential<quaternion<double>, quaternion<double>> *pot) {
+        pairPotentialActive = true;
+        pairRigidBodyPot = pot;
     }
 
 
