@@ -10,23 +10,28 @@ namespace msmrd {
      * pyBinders for the c++ potentials classes
      */
     void bindPotentials(py::module &m) {
+        // Bind parent class instantiated templates so inheritance works correctly
         pybind11::class_<externalPotential<> >(m, "externalPotential");
         pybind11::class_<externalPotential<vec3<double>>>(m, "externalRodPotential");
+        pybind11::class_<externalPotential<quaternion<double>>>(m, "externalRigidBodyPotential");
         pybind11::class_<pairPotential<> >(m, "pairPotential");
         pybind11::class_<pairPotential<vec3<double>, vec3<double>>>(m, "pairRodPotential");
+        pybind11::class_<pairPotential<quaternion<double>, quaternion<double>>>(m, "pairRidigBodyPotential");
 
 
         py::class_<gaussians3D, externalPotential<> >(m, "gaussians3D")
                 .def(py::init<int &, double &, double &, long &>())
-                .def("evaluate", (double (gaussians3D::*)(std::vector<double>)) &gaussians3D::evaluatePyBind)
-                .def("force",
-                     (std::vector<double> (gaussians3D::*)(std::vector<double>)) &gaussians3D::forceTorquePyBind);
+                .def("evaluate", (double (gaussians3D::*)
+                        (std::vector<double>)) &gaussians3D::evaluatePyBind)
+                .def("force", (std::vector<double> (gaussians3D::*)
+                        (std::vector<double>)) &gaussians3D::forceTorquePyBind);
 
         py::class_<dipole, externalPotential<vec3<double>>>(m, "dipole")
                 .def(py::init<double &, std::vector<double> &>())
-                .def("evaluate", (double (dipole::*)(std::vector<double>, std::vector<double>)) &dipole::evaluatePyBind)
-                .def("forceTorque", (std::vector<std::vector<double>> (dipole::*)(std::vector<double>,
-                                                                                  std::vector<double>)) &dipole::forceTorquePyBind);
+                .def("evaluate", (double (dipole::*)
+                        (std::vector<double>, std::vector<double>)) &dipole::evaluatePyBind)
+                .def("forceTorque", (std::vector<std::vector<double>> (dipole::*)
+                        (std::vector<double>, std::vector<double>)) &dipole::forceTorquePyBind);
 
         py::class_<gayBerne, pairPotential<vec3<double>, vec3<double>>>(m, "gayBerne")
                 .def(py::init<double &, double &, double &, double &>())

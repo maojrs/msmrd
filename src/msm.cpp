@@ -22,7 +22,7 @@ namespace msmrd {
      *  value, for CTMSM it will change in each iteration.
      *  @param seed variable for random number generation (Note seed = -1 corresponds to random device)
      */
-    msmbase::baseMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
+    baseMarkovStateModel::baseMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
             : msmid(msmid), lagtime(lagtime), seed(seed) {
 
         // Resize vectors by input matrix size and set seed of random number generator
@@ -48,8 +48,8 @@ namespace msmrd {
     /**
      * Implementation of discrete-time msm (msm) class, see msmbase parent class for parameter description.
      */
-    msm::discreteTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
-            : msmbase(msmid, tempmatrix, lagtime, seed) {
+    discreteTimeMarkovStateModel::discreteTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
+            : baseMarkovStateModel(msmid, tempmatrix, lagtime, seed) {
         // Verify MSM transition matrix rows sum to 1 and components between 0 and 1
         double rowsum;
         for (const auto &row : tempmatrix) {
@@ -67,7 +67,7 @@ namespace msmrd {
     };
 
     // MISSING IMPLEMENTATION
-    void msm::propagate(particleMS &part, int ksteps) {
+    void discreteTimeMarkovStateModel::propagate(particleMS &part, int ksteps) {
 
     };
 
@@ -75,8 +75,8 @@ namespace msmrd {
     /**
      * Implementation of continuous-time msm (ctmsm) class, see msmbase parent class for parameter description.
      */
-    ctmsm::continuousTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, long seed)
-            : msmbase(msmid, tempmatrix, 0.0, seed) {
+    continuousTimeMarkovStateModel::continuousTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, long seed)
+            : baseMarkovStateModel(msmid, tempmatrix, 0.0, seed) {
         // Verify CTMSM transition rate matrix rows sum to 0
         double long rowsum;
         for (const auto &row : tempmatrix) {
@@ -91,7 +91,7 @@ namespace msmrd {
     };
 
     // Calculates parameters often used by ctmsm::propagate from transition matrix
-    void ctmsm::calculateParameters() {
+    void continuousTimeMarkovStateModel::calculateParameters() {
         std::vector<double> ratevector(nstates - 1);
         int index;
         lambda0.resize(nstates);
@@ -118,7 +118,7 @@ namespace msmrd {
 
     /* Propagates CTMSM using the Gillespie algorithm without updating the state in the particle, useful for
      * integration with diffusion and rotation integrator */
-    void ctmsm::propagateNoUpdate(particleMS &part, int ksteps) {
+    void continuousTimeMarkovStateModel::propagateNoUpdate(particleMS &part, int ksteps) {
         double lagt = 0;
         double r1, r2;
         int state = 0;
@@ -146,7 +146,7 @@ namespace msmrd {
     };
 
     // Propagates CTMSM using the Gillespie algorithm, updates state immediately.
-    void ctmsm::propagate(particleMS &part, int ksteps) {
+    void continuousTimeMarkovStateModel::propagate(particleMS &part, int ksteps) {
         double lagt = 0;
         double r1, r2;
         int state = 0;

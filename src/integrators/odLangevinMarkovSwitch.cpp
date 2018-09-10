@@ -12,6 +12,10 @@ namespace msmrd {
     * (constructors defined in headers since templates were used).
     */
 
+   // Aliases for classes with long names
+    using msm = msmrd::discreteTimeMarkovStateModel;
+    using ctmsm = msmrd::continuousTimeMarkovStateModel;
+
 
     /* Integrates diffusion and rotation of one particle, called by the
      * integrateOneMS (visible only inside the class) */
