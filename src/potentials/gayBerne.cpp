@@ -20,7 +20,7 @@ namespace msmrd {
 
     // Evaluate Gay Berne potential
     double gayBerne::evaluate(vec3<double> pos1, vec3<double> pos2, vec3<double> u1, vec3<double> u2) {
-        vec3<double> r = pos2 - pos1;
+        vec3<double> r = pos1 - pos2;
         double rabs = r.norm();
         vec3<double> rhat = r / rabs;
         double ru1 = rhat * u1;
@@ -39,8 +39,8 @@ namespace msmrd {
         double eps =
                 eps0 * epsbrak * epsbrak /
                 epsden;  // epsilon function of the Gay-Berne potential, spelled out the square
-        double sig = 1 / std::sqrt(1 - chi / 2 * (rup2 / denp + rum2 / denm));
-        double frac = 1 / (rabs / sig0 - sig + 1); // bracket in the potential term
+        double sig = 1.0 / std::sqrt(1 - chi / 2 * (rup2 / denp + rum2 / denm));
+        double frac = 1 / (rabs/sig0 - sig + 1); // bracket in the potential term
         double frac2 = frac * frac;
         double frac6 = frac2 * frac2 * frac2;
         double en_pot = eps * frac6 * (frac6 - 1);
@@ -48,10 +48,10 @@ namespace msmrd {
     }
 
 
-    // Returns force and torque from a pair of particles
+    // Returns force and torque exerted on the first particle by the second one.
     std::array<vec3<double>, 2> gayBerne::forceTorque(vec3<double> pos1, vec3<double> pos2,
                                                       vec3<double> u1, vec3<double> u2) {
-        vec3<double> r = pos2 - pos1;
+        vec3<double> r = pos1 - pos2;
         double rabs = r.norm();
         vec3<double> rhat = r / rabs;
         double ru1 = rhat * u1;
@@ -67,8 +67,7 @@ namespace msmrd {
         double denpm = 1 - chip * u1u2; // denominator prime minus
         double epsbrak = (1 - chip / 2 * (rup2 / denpp + rum2 / denpm)); // bracket in the epsilon term
         double epsden = std::sqrt(denp * denm); //denominator in the epsilon term
-        double eps =
-                eps0 * epsbrak * epsbrak /
+        double eps = eps0 * epsbrak * epsbrak /
                 epsden;  // epsilon function of the Gay-Berne potential, spelled out the square
         double sig = 1 / std::sqrt(1 - chi / 2 * (rup2 / denp + rum2 / denm));
         double sig3 = sig * sig * sig;
