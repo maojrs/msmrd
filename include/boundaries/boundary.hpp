@@ -28,6 +28,15 @@ namespace msmrd {
         boundary(std::string boundarytype);
 
         void enforceBoundary(particle &part);
+
+        /** Function to reflect vector
+         * @param dr vector pointing from previous position to current position
+         * @param r0 vector of previous position
+         * @param intersection cooridnates of intersection with boundary
+         * @param normal unitary inner normal in boundary at intersection point
+         * returns corresponding portion of vector dr that was reflected in boundary
+         */
+         vec3<double> reflectVector(vec3<double> r0, vec3<double> dr, vec3<double> intersection, vec3<double> normal);
     };
 
 }

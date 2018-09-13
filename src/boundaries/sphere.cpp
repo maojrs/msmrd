@@ -37,12 +37,8 @@ namespace msmrd {
             vec3<double> intersection = r0 + al * dr;
             // Normal to sphere at intersection point
             vec3<double> normal = -1.0*intersection / intersection.norm();
-            // Calculate reflected vector (reflection of vector in plane formula), and rescale
-            vec3<double> reflectedvec = dr - 2.0 * (dr * normal) * normal;
-            vec3<double> remaindervec = r0 + dr - intersection;
-            reflectedvec = remaindervec.norm()*reflectedvec / reflectedvec.norm();
-            // Translate reflected vector and assign new position
-            reflectedvec = intersection + reflectedvec;
+            // Obtain reflected vector from boundary function and assign into newPosition
+            vec3<double> reflectedvec = reflectVector(r0, dr, intersection, normal);
             part.setNextPosition(reflectedvec);
         }
     };

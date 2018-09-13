@@ -36,19 +36,32 @@ namespace msmrd {
         vec3<double> reflectedVec;
         vec3<double> invnormal;
         double scalarProd;
-        throw std::runtime_error("Reflective boundary for box is not yet implemented.");
-        // TO BE IMPLEMENTED
-        //    for (int i = 0; i<3; i++) {
-        //        if (part.nextPosition[i] >= boxsize[i] / 2) {
-        //            scalarProd = normals[i]*part.nextPosition;
-        //            reflectedVec = part.nextPosition - 2*normals[i]*scalarProd;
-        //        }
-        //        if (part.nextPosition[i] <= -boxsize[i] / 2) {
-        //            invnormal = -1*normals[i];
-        //            scalarProd = invnormal*part.nextPosition;
-        //            reflectedVec = part.nextPosition - 2*invnormal*scalarProd;
-        //        }
-        //    }
+        //throw std::runtime_error("Reflective boundary for box is not yet implemented.");
+        for (int i = 0; i<3; i++) {
+            if (part.nextPosition[i] >= boxsize[i] / 2) {
+                vec3<double> r0 = part.nextPosition;
+                vec3<double> dr = part.nextPosition - part.position;
+                // Find intersection point
+                double al = (boxsize[i] / 2 - r0[i])/dr[i];
+                vec3<double> intersection = r0 + al*dr;
+                // Obtain reflected vector from boundary function and assign into newPosition
+                vec3<double> reflectedvec = reflectVector(r0, dr, intersection, normals[i]);
+                part.setPosition(intersection); // Need to asign in case it bounces in a corner (other loop iteration)
+                part.setNextPosition(reflectedvec);
+            }
+            if (part.nextPosition[i] <= -boxsize[i] / 2) {
+                invnormal = -1*normals[i];
+                vec3<double> r0 = part.nextPosition;
+                vec3<double> dr = part.nextPosition - part.position;
+                // Find intersection point
+                double al = (-boxsize[i] / 2 - r0[i])/dr[i];
+                vec3<double> intersection = r0 + al*dr;
+                // Obtain reflected vector from boundary function and assign into newPosition
+                vec3<double> reflectedvec = reflectVector(r0, dr, intersection, invnormal);
+                part.setPosition(intersection); // Need to asign in case it bounces in a corner (other loop iteration)
+                part.setNextPosition(reflectedvec);
+            }
+        }
     };
 
     // Enforces open boundary condition
