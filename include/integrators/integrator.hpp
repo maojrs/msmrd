@@ -6,7 +6,7 @@
 #include <array>
 #include <utility>
 #include <memory>
-#include "boundary.hpp"
+#include "boundaries/boundary.hpp"
 #include "particle.hpp"
 #include "randomgen.hpp"
 #include "potentials/potentials.hpp"

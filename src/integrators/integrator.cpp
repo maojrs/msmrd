@@ -25,13 +25,16 @@ namespace msmrd {
         for (int i = 0; i < parts.size(); i++) {
             integrateOne(i, parts, dt);
         }
-        /* Enforce boundary and update positions/orientations ( Sets calculated next position/orientation
-         * calculated by integrator as current position/orientation). */
+        // Enforce boundary and set new positions into parts[i].nextPosition
         for (int i = 0; i < parts.size(); i++) {
             if (boundaryActive) {
                 domainBoundary->enforceBoundary(parts[i]);
             }
-            parts[i].updatePosition();
+        }
+        /* Update positions and orientations (sets calculated next position/orientation
+         * calculated by integrator and boundary as current position/orientation). */
+        for (int i = 0; i < parts.size(); i++) {
+                parts[i].updatePosition();
             if (rotation) {
                 parts[i].updateOrientation();
             }

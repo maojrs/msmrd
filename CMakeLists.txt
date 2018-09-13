@@ -15,10 +15,12 @@ include_directories(include)
 add_subdirectory(libraries/pybind11)
 set(bindings_python_version 3.6)
 set(SOURCES
-        src/boundary.cpp
         src/msm.cpp
         src/randomgen.cpp
         src/simulation.cpp
+        src/boundaries/boundary.cpp
+        src/boundaries/box.cpp
+        src/boundaries/sphere.cpp
         src/integrators/integrator.cpp
         src/integrators/odLangevin.cpp
         src/integrators/odLangevinMarkovSwitch.cpp
@@ -38,13 +40,15 @@ set(PY_SOURCES
         src/binding/bindMarkovModels.cpp
         src/binding/bindParticles.cpp
         src/binding/bindPotentials.cpp
-        include/boundary.hpp
         include/msm.hpp
         include/particle.hpp
         include/quaternion.hpp
         include/randomgen.hpp
         include/simulation.hpp
         include/vec3.hpp
+        include/boundaries/boundary.hpp
+        include/boundaries/box.hpp
+        include/boundaries/sphere.hpp
         include/integrators/integrator.hpp
         include/integrators/odLangevin.hpp
         include/integrators/odLangevinMarkovSwitch.hpp
