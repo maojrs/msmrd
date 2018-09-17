@@ -61,12 +61,12 @@ namespace msmrd{ ;
         vec3<double> patch1;
         vec3<double> patch2;
         vec3<double> rpatch;
-        vec3<double> rvec = pos1 - pos2;
+        vec3<double> rvec = pos2 - pos1;
 
-        repulsivePotential = quadraticPotential(rvec.norm(), epsRepulsive, rstarRepulsive, aRepulsive);
-        attractivePotential = quadraticPotential(rvec.norm(), epsAttractive, rstarAttractive, aAttractive);
+        repulsivePotential = quadraticPotential(rvec.norm(), epsRepulsive, aRepulsive, rstarRepulsive);
+        attractivePotential = quadraticPotential(rvec.norm(), epsAttractive, aAttractive, rstarAttractive);
 
-        //if (rvec.norm() <= 2*sigma) {
+        if (rvec.norm() <= 2*sigma) {
             // Loop over all patches
             for (int i = 0; i < patchesCoordinates.size(); i++) {
                 patch1 = rotateVec(patchesCoordinates[i], theta1);
@@ -75,22 +75,68 @@ namespace msmrd{ ;
                     patch2 = rotateVec(patchesCoordinates[j], theta2);
                     patch2 = pos2 + 0.5*sigma*patch2;
                     rpatch = patch1 - patch2; // Scale unit distance of patches by sigma
-                    patchesPotential += quadraticPotential(rpatch.norm(), epsPatches, rstarPatches, aPatches);
+                    patchesPotential += quadraticPotential(rpatch.norm(), epsPatches, aPatches, rstarPatches);
                 }
             }
-        //}
+        }
         return repulsivePotential + attractivePotential + patchesPotential;
         //return patchesPotential;
     }
 
-    std::array<vec3<double>, 2> patchyParticle::forceTorque(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) {}
+    std::array<vec3<double>, 2> patchyParticle::forceTorque(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) {
+        vec3<double> force = vec3<double> (0.0, 0.0, 0.0);
+        vec3<double> torque = vec3<double> (0.0, 0.0, 0.0);
+        vec3<double> rvec = pos2 - pos1;
+        // auxiliary variables to calculate force and torque
+        double repulsiveForceNorm = 0.0;
+        double attractiveForceNorm = 0.0;
+        double patchesForceNorm = 0.0;
+        vec3<double> patchForce;
+        vec3<double> patchForceNormal;
+        vec3<double> patchForceTangent;
+        vec3<double> patch1;
+        vec3<double> patch2;
+        vec3<double> patchNormal1;
+        vec3<double> patchNormal2;
+        vec3<double> rpatch;
+
+        // Calculate and add forces due to repulsive and attractive isotropic potentials.
+        repulsiveForceNorm = -1.0*derivativeQuadraticPotential(rvec.norm(), epsRepulsive, aRepulsive, rstarRepulsive);
+        attractiveForceNorm = -1.0*derivativeQuadraticPotential(rvec.norm(), epsAttractive, aAttractive, rstarAttractive);
+        force = (repulsiveForceNorm + attractiveForceNorm)*rvec/rvec.norm();
+
+        // Calculate forces and torque due to patches interaction
+        if (rvec.norm() <= 2*sigma) {
+            // Loop over all patches of particle 1
+            for (int i = 0; i < patchesCoordinates.size(); i++) {
+                patchNormal1 = rotateVec(patchesCoordinates[i], theta1);
+                patch1 = pos1 + 0.5*sigma*patchNormal1;
+                // Loop over all patches of particle 2
+                for (int j = 0; j < patchesCoordinates.size(); j++) {
+                    patchNormal2 = rotateVec(patchesCoordinates[j], theta2);
+                    patch2 = pos2 + 0.5*sigma*patchNormal2;
+                    rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
+                    // Calculate force vector between patches
+                    patchesForceNorm = -1.0*derivativeQuadraticPotential(rpatch.norm(), epsPatches, aPatches, rstarPatches);
+                    patchForce = patchesForceNorm*rpatch/rpatch.norm();
+                    // Decompose into tangential and normal components according to normal at patch
+                    patchForceNormal = (patchForce * patchNormal1) * patchNormal1;
+                    patchForceTangent = patchForce - patchForceNormal;
+                    // Add values to previous forces and torques
+                    force += patchForceNormal;
+                    torque += 0.5*sigma * patchNormal1.cross(patchForceTangent);
+                }
+            }
+        }
+        return {force, torque};
+    }
 
     /* Custom quadratic potential:
      * @param r is distance between particles or  patches,
      * @param eps strength of the potential
      * @param rstar distance to switch to second potential function
      * @param a the stiffness, together with rstar determines the range of the potential */
-    double patchyParticle::quadraticPotential(double r, double eps, double rstar, double a) {
+    double patchyParticle::quadraticPotential(double r, double eps, double a, double rstar) {
         // Parameters to force continuity and continuous derivative
         double rcritical = std::pow(sigma, 2)/(a*rstar);
         double b = (1.0 - a*std::pow(rstar/sigma, 2))/std::pow(rcritical/sigma - rstar/sigma, 2);
@@ -106,7 +152,7 @@ namespace msmrd{ ;
         }
     }
 
-    double patchyParticle::derivativeQuadraticPotential(double r, double rstar, double eps, double a) {
+    double patchyParticle::derivativeQuadraticPotential(double r, double eps, double a, double rstar) {
         // Parameters to force continuity and continuous derivative
         double rcritical = std::pow(sigma, 2)/(a*rstar);
         double b = (1.0 - a*std::pow(rstar/sigma, 2))/std::pow(rcritical/sigma - rstar/sigma, 2);

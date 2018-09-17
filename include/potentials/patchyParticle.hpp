@@ -29,8 +29,8 @@ namespace msmrd {
         double rstarAttractive;
         double rstarPatches;
 
-        double quadraticPotential(double r, double rstar, double eps, double a);
-        double derivativeQuadraticPotential(double r, double rstar, double eps, double a);
+        double quadraticPotential(double r, double eps, double a, double rstar);
+        double derivativeQuadraticPotential(double r, double eps, double a, double rstar);
 
     public:
         /*
