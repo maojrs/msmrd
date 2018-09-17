@@ -4,6 +4,8 @@
 #include "potentials/gaussians3D.hpp"
 #include "potentials/harmonicRepulsion.hpp"
 #include "potentials/gayBerne.hpp"
+#include "potentials/patchyParticle.hpp"
+
 
 namespace msmrd {
     /*
@@ -36,11 +38,24 @@ namespace msmrd {
         py::class_<gayBerne, pairPotential<vec3<double>, vec3<double>>>(m, "gayBerne")
                 .def(py::init<double &, double &, double &, double &>())
                 .def("evaluate", (double (gayBerne::*)
-                        (std::vector<double>, std::vector<double>, std::vector<double>,
-                         std::vector<double>)) &gayBerne::evaluatePyBind)
+                        (std::vector<double>, std::vector<double>,
+                         std::vector<double>, std::vector<double>))
+                        &gayBerne::evaluatePyBind)
                 .def("forceTorque", (std::vector<std::vector<double>> (gayBerne::*)
-                        (std::vector<double>, std::vector<double>, std::vector<double>,
-                         std::vector<double>)) &gayBerne::forceTorquePyBind);
+                        (std::vector<double>, std::vector<double>,
+                         std::vector<double>, std::vector<double>))
+                        &gayBerne::forceTorquePyBind);
+
+        py::class_<patchyParticle, pairPotential<quaternion<double>, quaternion<double>>>(m, "patchyParticle")
+                .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
+                .def("evaluate", (double (patchyParticle::*)
+                        (std::vector<double>, std::vector<double>,
+                         std::vector<double>, std::vector<double>))
+                        &patchyParticle::evaluatePyBind)
+                .def("forceTorque", (std::vector<std::vector<double>> (patchyParticle::*)
+                        (std::vector<double>, std::vector<double>,
+                         std::vector<double>, std::vector<double>))
+                        &patchyParticle::forceTorquePyBind);
     }
 
 }

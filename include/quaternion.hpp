@@ -203,7 +203,7 @@ quaternion<scalar> axisanglerep2quaternion(const vec3<double> &phi) {
 template<typename scalar=double>
 vec3<double> rotateVec(vec3<double> p, quaternion<double> q) {
     vec3<double> result;
-    quaternion<double> resultquat = quaternion<double>(p);
+    quaternion<double> resultquat = 1.0*quaternion<double>(p);
     resultquat = q*(resultquat*q.conj());
     result[0] = resultquat[1];
     result[1] = resultquat[2];

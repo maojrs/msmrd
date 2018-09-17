@@ -14,18 +14,36 @@ namespace msmrd {
     class patchyParticle : public pairPotential<quaternion<double>, quaternion<double>> {
     private:
         std::vector<vec3<double>> patchesCoordinates;
-        double sigma;
+        double sigma = 1.0;
+        double strength = 100.0;
+        // Strength of potentials
+        double epsRepulsive;
+        double epsAttractive;
+        double epsPatches;
+        // Stiffness of potentials
+        double aRepulsive;
+        double aAttractive;
+        double aPatches;
+        // Range parameter of potentials
+        double rstarRepulsive;
+        double rstarAttractive;
+        double rstarPatches;
 
         double quadraticPotential(double r, double rstar, double eps, double a);
         double derivativeQuadraticPotential(double r, double rstar, double eps, double a);
 
     public:
         /*
-         * @param sigma diameter of sphere at which patches are placed. Corresponds to the diameter of the particle.
          * @param patchesCoordintates list of patches coordinates in a sphere of unit radius
+         * @param sigma diameter of sphere at which patches are placed. Corresponds to the diameter of the particle.
+         * @param strength overall strength of potential, eps values scaled in terms of this value.
+         * @param eps*** strength paramaters for isotropic attractive, isotropic repulsive and
+         * anisotropic attractive patches potentials.
+         * @param a*** stiffness paramaters for the same three potentials.
+         * @param rstar*** range paramaters for the same three potentials.
          */
-        patchyParticle(double sigma, std::vector<vec3<double>> patchesCoordinates);
-        patchyParticle(double sigma, std::vector<std::vector<double>> patchesCoordinates);
+        patchyParticle(double sigma, double strength, std::vector<vec3<double>> patchesCoordinates);
+        patchyParticle(double sigma, double strength, std::vector<std::vector<double>> patchesCoordinates);
 
 
         double evaluate(vec3<double> pos1, vec3<double> pos2, quaternion<double> u1, quaternion<double> u2) override;
