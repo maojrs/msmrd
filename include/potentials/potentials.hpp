@@ -19,16 +19,16 @@ namespace msmrd {
         externalPotential() = default;
 
         // Virtual functions to calculate value of potential and force/torque at position "pos" and orientation u
-        virtual double evaluate(vec3<double> pos, ORIENTATION... u) = 0;
-        virtual std::array<vec3<double>, 2> forceTorque(vec3<double> pos, ORIENTATION... u) = 0;
+        virtual double evaluate(vec3<double> pos, ORIENTATION... theta) = 0;
+        virtual std::array<vec3<double>, 2> forceTorque(vec3<double> pos, ORIENTATION... theta) = 0;
 
 
         /* PyBind evaluation functions for external potentials of particles with no orientation, rod-like orientation or
          * full orientation. They rely on evaluate and forceTorque functions above */
         double evaluatePyBind(std::vector<double> pos);
-        double evaluatePyBind(std::vector<double> pos, std::vector<double> u);
+        double evaluatePyBind(std::vector<double> pos, std::vector<double> theta);
         std::vector<double> forceTorquePyBind(std::vector<double> pos);
-        std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos, std::vector<double> u);
+        std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos, std::vector<double> theta);
 
     };
 
@@ -45,20 +45,20 @@ namespace msmrd {
         pairPotential() = default;
 
         // Virtual functions to calculate value of potential and force/torque at positions "pos1" and "pos2" and orientations u
-        virtual double evaluate(vec3<double> pos1, vec3<double> pos2, ORIENTATION... u) = 0;
-        virtual std::array<vec3<double>, 2> forceTorque(vec3<double> pos1, vec3<double> pos2, ORIENTATION... u) = 0;
+        virtual double evaluate(vec3<double> pos1, vec3<double> pos2, ORIENTATION... theta) = 0;
+        virtual std::array<vec3<double>, 2> forceTorque(vec3<double> pos1, vec3<double> pos2, ORIENTATION... theta) = 0;
 
 
         /* PyBind evaluation functions for pair potentials of particles with no orientation, rod-like orientation or
          * full orientation. They rely on evaluate and forceTorque functions above */
         double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2);
         double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2,
-                              std::vector<double> u1, std::vector<double> u2);
+                              std::vector<double> theta1, std::vector<double> theta2);
         std::vector<double> forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2);
         std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos1,
                                                            std::vector<double> pos2,
-                                                           std::vector<double> u1,
-                                                           std::vector<double> u2);
+                                                           std::vector<double> theta1,
+                                                           std::vector<double> theta2);
 
 
 

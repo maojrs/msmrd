@@ -25,20 +25,20 @@ namespace msmrd {
     /* Evaluates potential. Template ORIENTATION corresponds to vec3<double>, so it corresponds to rod-like
      * particles with orientation described by one vector. */
     template<>
-    double externalPotential<vec3<double>>::evaluatePyBind(std::vector<double> pos1, std::vector<double> u) {
+    double externalPotential<vec3<double>>::evaluatePyBind(std::vector<double> pos1, std::vector<double> theta1) {
         vec3<double> x = vec3<double>(pos1);
-        vec3<double> theta = vec3<double>(u);
-        return evaluate(x, theta);
+        vec3<double> th = vec3<double>(theta1);
+        return evaluate(x, th);
     }
 
 
     /* Evaluates potential. Template ORIENTATION corresponds to quaternion<double>, so it corresponds to
      * rigidbody particles with orientation described by a quaternion. */
     template<>
-    double externalPotential<quaternion<double>>::evaluatePyBind(std::vector<double> pos1, std::vector<double> u) {
+    double externalPotential<quaternion<double>>::evaluatePyBind(std::vector<double> pos1, std::vector<double> theta1) {
         vec3<double> x = vec3<double>(pos1);
-        quaternion<double> theta = quaternion<double>(u);
-        return evaluate(x, theta);
+        quaternion<double> th = quaternion<double>(theta1);
+        return evaluate(x, th);
     }
 
 
@@ -60,10 +60,10 @@ namespace msmrd {
      * rod-like particles with orientation described by one vector. */
     template<>
     std::vector<std::vector<double>>
-    externalPotential<vec3<double>>::forceTorquePyBind(std::vector<double> pos1, std::vector<double> u) {
+    externalPotential<vec3<double>>::forceTorquePyBind(std::vector<double> pos1, std::vector<double> theta1) {
         vec3<double> x = vec3<double>(pos1);
-        vec3<double> theta = vec3<double>(u);
-        std::array<vec3<double>, 2> forceTorquex = forceTorque(x, theta);
+        vec3<double> th = vec3<double>(theta1);
+        std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th);
         std::vector<std::vector<double>> output;
         output.resize(2);
         output[0].resize(3);
@@ -81,10 +81,10 @@ namespace msmrd {
      * rigidbody particles with orientation described by a quaternion. */
     template<>
     std::vector<std::vector<double>>
-    externalPotential<quaternion<double>>::forceTorquePyBind(std::vector<double> pos1, std::vector<double> u) {
+    externalPotential<quaternion<double>>::forceTorquePyBind(std::vector<double> pos1, std::vector<double> theta1) {
         vec3<double> x = vec3<double>(pos1);
-        quaternion<double> theta = quaternion<double>(u);
-        std::array<vec3<double>, 2> forceTorquex = forceTorque(x, theta);
+        quaternion<double> th = quaternion<double>(theta1);
+        std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th);
         std::vector<std::vector<double>> output;
         output.resize(2);
         output[0].resize(3);
@@ -121,13 +121,13 @@ namespace msmrd {
     template<>
     double pairPotential<vec3<double>, vec3<double>>::evaluatePyBind(std::vector<double> pos1,
                                                                      std::vector<double> pos2,
-                                                                     std::vector<double> u1,
-                                                                     std::vector<double> u2) {
+                                                                     std::vector<double> theta1,
+                                                                     std::vector<double> theta2) {
         vec3<double> x1 = vec3<double>(pos1);
         vec3<double> x2 = vec3<double>(pos2);
-        vec3<double> theta1 = vec3<double>(u1);
-        vec3<double> theta2 = vec3<double>(u2);
-        return evaluate(x1, x2, theta1, theta2);
+        vec3<double> th1 = vec3<double>(theta1);
+        vec3<double> th2 = vec3<double>(theta2);
+        return evaluate(x1, x2, th1, th2);
     }
 
 
@@ -136,13 +136,13 @@ namespace msmrd {
     template<>
     double pairPotential<quaternion<double>, quaternion<double>>::evaluatePyBind(std::vector<double> pos1,
                                                                                  std::vector<double> pos2,
-                                                                                 std::vector<double> u1,
-                                                                                 std::vector<double> u2) {
+                                                                                 std::vector<double> theta1,
+                                                                                 std::vector<double> theta2) {
         vec3<double> x1 = vec3<double>(pos1);
         vec3<double> x2 = vec3<double>(pos2);
-        quaternion<double> theta1 = quaternion<double>(u1);
-        quaternion<double> theta2 = quaternion<double>(u2);
-        return evaluate(x1, x2, theta1, theta2);
+        quaternion<double> th1 = quaternion<double>(theta1);
+        quaternion<double> th2 = quaternion<double>(theta2);
+        return evaluate(x1, x2, th1, th2);
     }
 
 
@@ -167,13 +167,13 @@ namespace msmrd {
     std::vector<std::vector<double>>
     pairPotential<vec3<double>, vec3<double>>::forceTorquePyBind(std::vector<double> pos1,
                                                                  std::vector<double> pos2,
-                                                                 std::vector<double> u1,
-                                                                 std::vector<double> u2) {
+                                                                 std::vector<double> theta1,
+                                                                 std::vector<double> theta2) {
         vec3<double> x1 = vec3<double>(pos1);
         vec3<double> x2 = vec3<double>(pos2);
-        vec3<double> theta1 = vec3<double>(u1);
-        vec3<double> theta2 = vec3<double>(u2);
-        std::array<vec3<double>, 2> forceTorquex = forceTorque(x1, x2, theta1, theta2);
+        vec3<double> th1 = vec3<double>(theta1);
+        vec3<double> th2 = vec3<double>(theta2);
+        std::array<vec3<double>, 2> forceTorquex = forceTorque(x1, x2, th1, th2);
         std::vector<std::vector<double>> output;
         output.resize(2);
         output[0].resize(3);
@@ -193,13 +193,13 @@ namespace msmrd {
     std::vector<std::vector<double>>
     pairPotential<quaternion<double>, quaternion<double>>::forceTorquePyBind(std::vector<double> pos1,
                                                                              std::vector<double> pos2,
-                                                                             std::vector<double> u1,
-                                                                             std::vector<double> u2) {
+                                                                             std::vector<double> theta1,
+                                                                             std::vector<double> theta2) {
         vec3<double> x1 = vec3<double>(pos1);
         vec3<double> x2 = vec3<double>(pos2);
-        quaternion<double> theta1 = quaternion<double>(u1);
-        quaternion<double> theta2 = quaternion<double>(u2);
-        std::array<vec3<double>, 2> forceTorquex = forceTorque(x1, x2, theta1, theta2);
+        quaternion<double> th1 = quaternion<double>(theta1);
+        quaternion<double> th2 = quaternion<double>(theta2);
+        std::array<vec3<double>, 2> forceTorquex = forceTorque(x1, x2, th1, th2);
         std::vector<std::vector<double>> output;
         output.resize(2);
         output[0].resize(3);

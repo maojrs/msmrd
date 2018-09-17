@@ -24,9 +24,9 @@ namespace msmrd {
         dipole(double scalefactor, std::vector<double> &directionEField);
 
 
-        double evaluate(vec3<double> pos, vec3<double> u) override;
+        double evaluate(vec3<double> pos, vec3<double> theta) override;
 
-        std::array<vec3<double>, 2> forceTorque(vec3<double> pos, vec3<double> u) override;
+        std::array<vec3<double>, 2> forceTorque(vec3<double> pos, vec3<double> theta) override;
     };
 
 }

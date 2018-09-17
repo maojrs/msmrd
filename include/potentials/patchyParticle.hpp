@@ -46,10 +46,10 @@ namespace msmrd {
         patchyParticle(double sigma, double strength, std::vector<std::vector<double>> patchesCoordinates);
 
 
-        double evaluate(vec3<double> pos1, vec3<double> pos2, quaternion<double> u1, quaternion<double> u2) override;
+        double evaluate(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) override;
 
         std::array<vec3<double>, 2>
-        forceTorque(vec3<double> pos1, vec3<double> pos2, quaternion<double> u1, quaternion<double> u2) override;
+        forceTorque(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) override;
 
     };
 }

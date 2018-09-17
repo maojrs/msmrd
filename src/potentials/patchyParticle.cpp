@@ -54,7 +54,7 @@ namespace msmrd{ ;
     }
 
 
-    double patchyParticle::evaluate(vec3<double> pos1, vec3<double> pos2, quaternion<double> u1, quaternion<double> u2) {
+    double patchyParticle::evaluate(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) {
         double repulsivePotential = 0.0;
         double attractivePotential = 0.0;
         double patchesPotential = 0.0;
@@ -69,10 +69,10 @@ namespace msmrd{ ;
         //if (rvec.norm() <= 2*sigma) {
             // Loop over all patches
             for (int i = 0; i < patchesCoordinates.size(); i++) {
-                patch1 = rotateVec(patchesCoordinates[i], u1);
+                patch1 = rotateVec(patchesCoordinates[i], theta1);
                 patch1 = pos1 + 0.5*sigma*patch1;
                 for (int j = 0; j < patchesCoordinates.size(); j++) {
-                    patch2 = rotateVec(patchesCoordinates[j], u2);
+                    patch2 = rotateVec(patchesCoordinates[j], theta2);
                     patch2 = pos2 + 0.5*sigma*patch2;
                     rpatch = patch1 - patch2; // Scale unit distance of patches by sigma
                     patchesPotential += quadraticPotential(rpatch.norm(), epsPatches, rstarPatches, aPatches);
@@ -83,7 +83,7 @@ namespace msmrd{ ;
         //return patchesPotential;
     }
 
-    std::array<vec3<double>, 2> patchyParticle::forceTorque(vec3<double> pos1, vec3<double> pos2, quaternion<double> u1, quaternion<double> u2) {}
+    std::array<vec3<double>, 2> patchyParticle::forceTorque(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) {}
 
     /* Custom quadratic potential:
      * @param r is distance between particles or  patches,

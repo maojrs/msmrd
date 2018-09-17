@@ -20,10 +20,10 @@ namespace msmrd {
     };
 
 // Calculates force and torque due to potential, output force is zero
-    std::array<vec3<double>, 2> dipole::forceTorque(vec3<double> pos, vec3<double> u) {
+    std::array<vec3<double>, 2> dipole::forceTorque(vec3<double> pos, vec3<double> theta) {
         vec3<double> force = vec3<double>(0., 0., 0.);
         vec3<double> torque;
-        torque = u.cross(directionEField);
+        torque = theta.cross(directionEField);
         return {force, scalefactor * torque};
     }
 
