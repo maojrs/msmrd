@@ -22,8 +22,8 @@ set(SOURCES
         src/boundaries/box.cpp
         src/boundaries/sphere.cpp
         src/integrators/integrator.cpp
-        src/integrators/odLangevin.cpp
-        src/integrators/odLangevinMarkovSwitch.cpp
+        src/integrators/overdampedLangevin.cpp
+        src/integrators/overdampedLangevinMarkovSwitch.cpp
         src/potentials/potentials.cpp
         src/potentials/dipole.cpp
         src/potentials/gaussians3D.cpp
@@ -50,8 +50,8 @@ set(PY_SOURCES
         include/boundaries/box.hpp
         include/boundaries/sphere.hpp
         include/integrators/integrator.hpp
-        include/integrators/odLangevin.hpp
-        include/integrators/odLangevinMarkovSwitch.hpp
+        include/integrators/overdampedLangevin.hpp
+        include/integrators/overdampedLangevinMarkovSwitch.hpp
         include/potentials/potentials.hpp
         include/potentials/dipole.hpp
         include/potentials/gaussians3D.hpp

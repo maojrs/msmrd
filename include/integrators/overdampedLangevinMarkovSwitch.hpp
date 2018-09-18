@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "integrators/odLangevin.hpp"
+#include "integrators/overdampedLangevin.hpp"
 #include "particle.hpp"
 #include "msm.hpp"
 
@@ -15,7 +15,7 @@ namespace msmrd {
      * @tparam TMSM template can be an msm or a ctmsm
      */
     template<typename TMSM>
-    class odLangevinMarkovSwitch : public odLangevin {
+    class overdampedLangevinMarkovSwitch : public overdampedLangevin {
     private:
         std::string msmtype;
 
@@ -32,13 +32,13 @@ namespace msmrd {
 
         /* Constructors need to be defined in headers for template w/pybind, see parent
          * class odLangevin for details on constructor parameters */
-        odLangevinMarkovSwitch(ctmsm &tmsm, double dt, long seed, bool rotation)
-                : tmsm(tmsm), odLangevin(dt, seed, rotation) {
+        overdampedLangevinMarkovSwitch(ctmsm &tmsm, double dt, long seed, bool rotation)
+                : tmsm(tmsm), overdampedLangevin(dt, seed, rotation) {
             msmtype = "continuous-time";
         };
 
-        odLangevinMarkovSwitch(msm &tmsm, double dt, long seed, bool rotation)
-                : tmsm(tmsm), odLangevin(dt, seed, rotation) {
+        overdampedLangevinMarkovSwitch(msm &tmsm, double dt, long seed, bool rotation)
+                : tmsm(tmsm), overdampedLangevin(dt, seed, rotation) {
             msmtype = "discrete-time";
         };
 

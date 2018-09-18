@@ -17,18 +17,18 @@ namespace msmrd{ ;
             : sigma(sigma), strength(strength), patchesCoordinates(patchesCoordinates)  {
         // Set strengths of the three potential parts
         epsRepulsive = strength;
-        epsPatches = -0.2*strength;
         epsAttractive = -0.1*strength;
+        epsPatches = -0.2*strength;
 
         // Set stiffness for the three potentials
         aRepulsive = 1.0;
+        aAttractive = 0.8;
         aPatches = 20.0;
-        aAttractive = 0.5;
 
         // Set range parameter for the three potentials
         rstarRepulsive = 0.85*sigma;
-        rstarPatches = 0.1*sigma;
         rstarAttractive = 0.85*sigma;
+        rstarPatches = 0.1*sigma;
     }
 
     patchyParticle::patchyParticle(double sigma, double strength, std::vector<std::vector<double>> patchesCoords)
@@ -39,12 +39,12 @@ namespace msmrd{ ;
         }
         // Set strengths of the three potential parts
         epsRepulsive = strength;
-        epsAttractive = -0.1*strength;
-        epsPatches = -0.2*strength;
+        epsAttractive = -0.2*strength;
+        epsPatches = -0.5*strength;
 
         // Set stiffness for the three potentials
         aRepulsive = 1.0;
-        aAttractive = 0.5;
+        aAttractive = 0.55;
         aPatches = 20.0;
 
         // Set range parameter for the three potentials
@@ -61,7 +61,7 @@ namespace msmrd{ ;
         vec3<double> patch1;
         vec3<double> patch2;
         vec3<double> rpatch;
-        vec3<double> rvec = pos2 - pos1;
+        vec3<double> rvec = pos1 - pos2;
 
         repulsivePotential = quadraticPotential(rvec.norm(), epsRepulsive, aRepulsive, rstarRepulsive);
         attractivePotential = quadraticPotential(rvec.norm(), epsAttractive, aAttractive, rstarAttractive);
@@ -74,7 +74,7 @@ namespace msmrd{ ;
                 for (int j = 0; j < patchesCoordinates.size(); j++) {
                     patch2 = rotateVec(patchesCoordinates[j], theta2);
                     patch2 = pos2 + 0.5*sigma*patch2;
-                    rpatch = patch1 - patch2; // Scale unit distance of patches by sigma
+                    rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
                     patchesPotential += quadraticPotential(rpatch.norm(), epsPatches, aPatches, rstarPatches);
                 }
             }
@@ -86,7 +86,7 @@ namespace msmrd{ ;
     std::array<vec3<double>, 2> patchyParticle::forceTorque(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) {
         vec3<double> force = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> torque = vec3<double> (0.0, 0.0, 0.0);
-        vec3<double> rvec = pos2 - pos1;
+        vec3<double> rvec = pos1 - pos2;
         // auxiliary variables to calculate force and torque
         double repulsiveForceNorm = 0.0;
         double attractiveForceNorm = 0.0;
@@ -115,7 +115,7 @@ namespace msmrd{ ;
                 for (int j = 0; j < patchesCoordinates.size(); j++) {
                     patchNormal2 = rotateVec(patchesCoordinates[j], theta2);
                     patch2 = pos2 + 0.5*sigma*patchNormal2;
-                    rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
+                    rpatch = patch1 - patch2; // Scale unit distance of patches by sigma
                     // Calculate force vector between patches
                     patchesForceNorm = -1.0*derivativeQuadraticPotential(rpatch.norm(), epsPatches, aPatches, rstarPatches);
                     patchForce = patchesForceNorm*rpatch/rpatch.norm();

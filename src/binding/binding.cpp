@@ -7,6 +7,7 @@
  */
 PYBIND11_MODULE(msmrd2binding, module) {
 
+    module.attr("__name__") = "msmrd2";
     module.doc() =  "msmrd with python bindings";
 
     // Load classes in main module
@@ -19,6 +20,5 @@ PYBIND11_MODULE(msmrd2binding, module) {
     msmrd::bindIntegrators(integratorsSubmodule);
     auto potentialsSubmodule = module.def_submodule("potentials");
     msmrd::bindPotentials(potentialsSubmodule);
-
 
 }

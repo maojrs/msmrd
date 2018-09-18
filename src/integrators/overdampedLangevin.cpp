@@ -2,7 +2,7 @@
 // Created by maojrs on 8/16/18.
 //
 
-#include "integrators/odLangevin.hpp"
+#include "integrators/overdampedLangevin.hpp"
 
 namespace msmrd {
     /**
@@ -11,11 +11,11 @@ namespace msmrd {
      * @param seed random generator seed (Note seed = -1 corresponds to random device)
      * @param rotation boolean to indicate if rotational degrees of freedom should be integrated
      */
-    odLangevin::odLangevin(double dt, long seed, bool rotation) : integrator(dt, seed, rotation) {};
+    overdampedLangevin::overdampedLangevin(double dt, long seed, bool rotation) : integrator(dt, seed, rotation) {};
 
 
     // Integrate one particle from the particle list main routine (visible only inside the class)
-    void odLangevin::integrateOne(int partIndex, std::vector<particle> &parts, double timestep) {
+    void overdampedLangevin::integrateOne(int partIndex, std::vector<particle> &parts, double timestep) {
         vec3<double> force;
         vec3<double> torque;
         std::array<vec3<double>, 2> forctorq;
@@ -30,13 +30,13 @@ namespace msmrd {
         }
     }
 
-    void odLangevin::translate(particle &part, vec3<double> force, double dt0) {
+    void overdampedLangevin::translate(particle &part, vec3<double> force, double dt0) {
         vec3<double> dr;
         dr = force * dt0 * part.D / KbTemp + std::sqrt(2 * dt0 * part.D) * randg.normal3D(0, 1);
         part.setNextPosition(part.position + dr);
     }
 
-    void odLangevin::rotate(particle &part, vec3<double> torque, double dt0) {
+    void overdampedLangevin::rotate(particle &part, vec3<double> torque, double dt0) {
         vec3<double> dphi;
         quaternion<double> dquat;
         dphi = torque * dt0 * part.Drot / KbTemp + std::sqrt(2 * dt0 * part.Drot) * randg.normal3D(0, 1);
