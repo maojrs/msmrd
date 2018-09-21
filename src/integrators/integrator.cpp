@@ -13,11 +13,14 @@ namespace msmrd {
      * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
      * @param randg random number generator based in mt19937
      */
-    integrator::integrator(double dt, long seed, bool rotation)
-            : dt(dt), seed(seed), rotation(rotation) {
+    integrator::integrator(double dt, long seed, std::string bodytype, bool rotation)
+            : dt(dt), seed(seed), bodytype(bodytype), rotation(rotation) {
         randg.setSeed(seed);
         clock = 0;
-    };
+        if (bodytype != "point" && bodytype != "rod" && bodytype != "rigidbody") {
+            throw std::runtime_error("Unknown particle bodytype; it should be either point, rod or rigidbody.");
+        }
+     };
 
     // Integrate list of particles (need to override in case of MS particles)
     void integrator::integrate(std::vector<particle> &parts) {
@@ -46,11 +49,11 @@ namespace msmrd {
     // Calculates force and torque from an external potential for point, rod-like and rigidsolid particles
     std::array<vec3<double>, 2> integrator::getExternalForceTorque(particle &part) {
         if (externalPotentialActive) {
-            if (part.bodytype == "point") {
+            if (bodytype == "point") {
                 return externalPot->forceTorque(part.position);
-            } else if (part.bodytype == "rod") {
+            } else if (bodytype == "rod") {
                 return externalRodPot->forceTorque(part.position, part.orientvector);
-            } else if (part.bodytype == "rigidbody") {
+            } else if (bodytype == "rigidbody") {
                 return externalRigidBodyPot->forceTorque(part.position, part.orientation);
             } else {
                 throw std::runtime_error("Unknown particle bodytype; it should be either point, rod or rigidbody.");
@@ -68,7 +71,7 @@ namespace msmrd {
             std::array<vec3<double>, 2> forctorq;
             vec3<double> force = vec3<double>(0., 0., 0.);
             vec3<double> torque = vec3<double>(0., 0., 0.);
-            if (parts[partIndex].bodytype == "point") {
+            if (bodytype == "point") {
                 for (int i = 0; i < parts.size(); i++) {
                     if (i != partIndex) {
                         forctorq = pairPot->forceTorque(parts[partIndex].position, parts[i].position);
@@ -77,7 +80,7 @@ namespace msmrd {
                     }
                 }
                 return {force, torque};
-            } else if (parts[partIndex].bodytype == "rod") {
+            } else if (bodytype == "rod") {
                 for (int i = 0; i < parts.size(); i++) {
                     if (i != partIndex) {
                         forctorq = pairRodPot->forceTorque(parts[partIndex].position, parts[i].position,
@@ -87,7 +90,7 @@ namespace msmrd {
                     }
                 }
                 return {force, torque};
-            } else if (parts[partIndex].bodytype == "rigidbody") {
+            } else if (bodytype == "rigidbody") {
                         for (int i=0; i<parts.size(); i++) {
                             if (i != partIndex) {
 
@@ -150,39 +153,6 @@ namespace msmrd {
         pairPotentialActive = true;
         pairRigidBodyPot = pot;
     }
-
-
-    //// Evaluates external potential from integrator at a given position
-    //double integrator::evalExternalPotential(std::vector<double> pos) {
-    //    return externalPot->evaluatePyBind(pos);
-    //}
-    //
-    //// Evaluates pair potential from integrator at a given position
-    //double integrator::evalPairPotential(std::vector<double> pos1, std::vector<double> pos2) {
-    //    return pairPot->evaluatePyBind(pos1, pos2);
-    //}
-    //
-    //// Evaluates pair potential of rod-like particles from integrator at a given position
-    //double integrator::evalRodPairPotential(std::vector<double> pos1, std::vector<double> pos2,
-    //                                        std::vector<double> u1, std::vector<double> u2) {
-    //    return rodPairPot->evaluatePyBind(pos1, pos2, u1, u2);
-    //}
-    //
-    //// Evaluates force due to external potential from integrator at a given position
-    //std::vector<double> integrator::evalExternalForce(std::vector<double> pos) {
-    //    return externalPot->forcePyBind(pos);
-    //}
-    //
-    //// Evaluates force due to pair potential from integrator at a given position
-    //std::vector<double> integrator::evalPairForce(std::vector<double> pos1, std::vector<double> pos2) {
-    //    return pairPot->forcePyBind(pos1, pos2);
-    //}
-    //
-    //// Evaluates force due to pair potential from integrator at a given position
-    //std::vector<std::vector<double>> integrator::evalRodPairForce(std::vector<double> pos1, std::vector<double> pos2,
-    //                                                              std::vector<double> u1, std::vector<double> u2) {
-    //    return rodPairPot->forcePyBind(pos1, pos2, u1, u2);
-    //}
 
 }
 

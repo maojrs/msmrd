@@ -32,13 +32,13 @@ namespace msmrd {
 
         /* Constructors need to be defined in headers for template w/pybind, see parent
          * class odLangevin for details on constructor parameters */
-        overdampedLangevinMarkovSwitch(ctmsm &tmsm, double dt, long seed, bool rotation)
-                : tmsm(tmsm), overdampedLangevin(dt, seed, rotation) {
+        overdampedLangevinMarkovSwitch(ctmsm &tmsm, double dt, long seed, std::string bodytype, bool rotation)
+                : tmsm(tmsm), overdampedLangevin(dt, seed, bodytype, rotation) {
             msmtype = "continuous-time";
         };
 
-        overdampedLangevinMarkovSwitch(msm &tmsm, double dt, long seed, bool rotation)
-                : tmsm(tmsm), overdampedLangevin(dt, seed, rotation) {
+        overdampedLangevinMarkovSwitch(msm &tmsm, double dt, long seed, std::string bodytype, bool rotation)
+                : tmsm(tmsm), overdampedLangevin(dt, seed, bodytype, rotation) {
             msmtype = "discrete-time";
         };
 

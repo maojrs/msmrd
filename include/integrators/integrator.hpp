@@ -21,8 +21,9 @@ namespace msmrd {
         double KbTemp = 1.0;
         double dt;
         long seed;
-        randomgen randg;
+        std::string bodytype;
         bool rotation;
+        randomgen randg;
         bool boundaryActive = false;
         bool externalPotentialActive = false;
         bool pairPotentialActive = false;
@@ -32,8 +33,12 @@ namespace msmrd {
         * @param KbTemp = Boltzman constant times temperature
         * @param dt time step
         * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
-        * @param randg random number generator based in mt19937
+        * @param bodytype body type of particles to integrate; determines rotation integrator behavior, can
+        * be either point, rod or rigidbody, and it is determined by orientational degrees of freedom, points
+        * have no orientation, rods need only one vector and rigidsolid requires a complete quaternion).
         * @param rotation boolean to indicate if rotation should be integrated
+        * @param randg random number generator based in mt19937
+        * @param boundaryActive indicates if a boundary conditions is active
         * @param externalPotActive indicates if external potential has been set
         * @param pairPotActive indicates if potential potential has been set
         */
@@ -69,7 +74,7 @@ namespace msmrd {
          * @param clock keeps track of global time
          */
 
-        integrator(double dt, long seed, bool rotation);
+        integrator(double dt, long seed, std::string bodytype, bool rotation);
 
         // Main functions definitions
         void integrate(std::vector<particle> &parts);
@@ -93,18 +98,17 @@ namespace msmrd {
 
         void setPairRigidBodyPotential(pairPotential<quaternion<double>, quaternion<double>> *pot);
 
-//    double evalExternalPotential(std::vector<double> pos);
-//    double evalPairPotential(std::vector<double> pos1, std::vector<double> pos2);
-//    double evalRodPairPotential(std::vector<double> pos1,
-//                                std::vector<double> pos2,
-//                                std::vector<double> u1,
-//                                std::vector<double> u2);
-//    std::vector<double> evalExternalForce(std::vector<double> pos);
-//    std::vector<double> evalPairForce(std::vector<double> pos1, std::vector<double> pos2);
-//    std::vector<std::vector<double>> evalRodPairForce(std::vector<double> pos1,
-//                                                      std::vector<double> pos2,
-//                                                      std::vector<double> u1,
-//                                                      std::vector<double> u2);
+
+        void calculateAllPairsForceTorque(std::vector<particle> &parts) {
+            int N = parts.size();
+            double numberPairinteractions = N*(N-1)/2;
+            for (int i = 0; i < N; i++) {
+                for (int j = i+1; i < N; i++) {
+
+                }
+
+            }
+        }
     };
 
 }

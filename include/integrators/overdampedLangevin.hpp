@@ -20,7 +20,7 @@ namespace msmrd {
         void rotate(particle &part, vec3<double> torque, double dt) override;
 
     public:
-        overdampedLangevin(double dt, long seed, bool rotation);
+        overdampedLangevin(double dt, long seed, std::string bodytype, bool rotation);
     };
 
 }

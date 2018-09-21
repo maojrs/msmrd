@@ -91,14 +91,12 @@ TEST_CASE("Sampling from randomgen", "[randomgen]") {
 TEST_CASE("Particle class basic functionality", "[particle]") {
     double D = 1.0;
     double Drot = 0.5;
-    std::string bodytype = "rigidsolid";
     auto position = vec3<double> {0.0, 0.0, 0.0};
     auto orientation = quaternion<double> {1.0, 0.0, 0.0, 0.0};
-    particle part = particle(D, Drot, bodytype, position, orientation);
+    particle part = particle(D, Drot, position, orientation);
     // Constructor consistency test
     REQUIRE(part.getD() == D);
     REQUIRE(part.getDrot() == Drot);
-    REQUIRE(part.getBodyType() == bodytype);
     REQUIRE(part.position == position);
     REQUIRE(part.orientation == orientation);
     // Some functionality testing
@@ -122,16 +120,14 @@ TEST_CASE("ParticleMS class basic functionality", "[particleMS]") {
     int state = 2;
     double D = 1.0;
     double Drot = 0.5;
-    std::string bodytype = "rigidsolid";
     auto position = vec3<double> {0.0, 0.0, 0.0};
     auto orientation = quaternion<double> {1.0, 0.0, 0.0, 0.0};
-    particleMS partMS = particleMS(type, state, D, Drot, bodytype, position, orientation);
+    particleMS partMS = particleMS(type, state, D, Drot, position, orientation);
     // Constructor consistency test
     REQUIRE(partMS.getType() == type);
     REQUIRE(partMS.getState() == state);
     REQUIRE(partMS.getD() == D);
     REQUIRE(partMS.getDrot() == Drot);
-    REQUIRE(partMS.getBodyType() == bodytype);
     REQUIRE(partMS.position == position);
     REQUIRE(partMS.orientation == orientation);
     // Some functionality testing
@@ -178,13 +174,12 @@ TEST_CASE("Fundamental CTMSM parameters and propagation test", "[ctmsm]") {
     int state = 2;
     double D = 1.0;
     double Drot = 0.5;
-    std::string bodytype = "rigidsolid";
     auto position = vec3<double> {0.0, 0.0, 0.0};
     auto orientation = quaternion<double> {1.0, 0.0, 0.0, 0.0};
-    particleMS partMS = particleMS(type, state, D, Drot, bodytype, position, orientation);
+    particleMS partMS = particleMS(type, state, D, Drot, position, orientation);
     // Create a second particle and a second ctmsm with same seed
     ctmsm ctmsmTest2 = ctmsm(msmid, tmatrix, seed);
-    particleMS partMS2 = particleMS(type, state, D, Drot, bodytype, position, orientation);
+    particleMS partMS2 = particleMS(type, state, D, Drot, position, orientation);
     /* Propagate each particle using the same seed but the update and noupdate method,
      * respectively, and compare output at each timestep. */
     for (int i=0; i<100; i++) {

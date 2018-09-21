@@ -21,7 +21,6 @@ namespace msmrd {
     public:
         double D;
         double Drot;
-        std::string bodytype;
         vec3<double> position;
         vec3<double> orientvector;
         quaternion<double> orientation;
@@ -31,9 +30,6 @@ namespace msmrd {
         /**
          * @param D diffusion constant
          * @param Drot rotational diffusion constant
-         * @param bodytype determines rotation integrator behavior, can be either point, rod or rigidbody
-         * (determined by orientational degrees of freedom, points have no orientation, rods need only one vector and
-         * rigidsolid requires a complete quaternion).
          * @param position position vector of the particle
          * @param orientvector orientation vector (only to be used by for rod-like particles)
          * @param orientation normalized quaternion representing the initial orientation of the particle
@@ -43,8 +39,8 @@ namespace msmrd {
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
-        particle(double D, double Drot, std::string bodytype, vec3<double> position, quaternion<double> orientation)
-                : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation) {
+        particle(double D, double Drot, vec3<double> position, quaternion<double> orientation)
+                : D(D), Drot(Drot), position(position), orientation(orientation) {
             orientvector = vec3<double>(0., 0., 1.);
             orientvector = rotateVec(orientvector, orientation);
             nextPosition = 1.0 * position;
@@ -52,9 +48,9 @@ namespace msmrd {
             nextOrientvector = 1.0 * orientvector;
         };
 
-        particle(double D, double Drot, std::string bodytype, std::vector<double> &position,
+        particle(double D, double Drot, std::vector<double> &position,
                  std::vector<double> &orientation)
-                : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation) {
+                : D(D), Drot(Drot), position(position), orientation(orientation) {
             orientvector = vec3<double>(0., 0., 1.);
             orientvector = rotateVec(orientvector, orientation);
             std::vector<double> nextPosition(position);
@@ -79,13 +75,9 @@ namespace msmrd {
 
         double getDrot() const { return Drot; }
 
-        std::string getBodyType() const { return bodytype; }
-
         void setD(double Dnew) { D = Dnew; }
 
         void setDrot(double Drotnew) { Drot = Drotnew; }
-
-        void setBodyType(std::string bodytypenew) { bodytype = bodytypenew; }
 
         void setPosition(vec3<double> newposition) { position = newposition; }
 
@@ -133,13 +125,13 @@ namespace msmrd {
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
-        particleMS(int type, int state, double D, double Drot, std::string bodytype, vec3<double> position,
+        particleMS(int type, int state, double D, double Drot, vec3<double> position,
                    quaternion<double> orientation)
-                : type(type), state(state), particle(D, Drot, bodytype, position, orientation) {};
+                : type(type), state(state), particle(D, Drot, position, orientation) {};
 
-        particleMS(int type, int state, double D, double Drot, std::string bodytype, std::vector<double> &position,
+        particleMS(int type, int state, double D, double Drot, std::vector<double> &position,
                    std::vector<double> &orientation)
-                : type(type), state(state), particle(D, Drot, bodytype, position, orientation) {};
+                : type(type), state(state), particle(D, Drot, position, orientation) {};
 
         // Additional functions and getters and setters for particleMS
         void updateState() { state = 1 * nextState; };

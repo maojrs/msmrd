@@ -11,7 +11,8 @@ namespace msmrd {
      * @param seed random generator seed (Note seed = -1 corresponds to random device)
      * @param rotation boolean to indicate if rotational degrees of freedom should be integrated
      */
-    overdampedLangevin::overdampedLangevin(double dt, long seed, bool rotation) : integrator(dt, seed, rotation) {};
+    overdampedLangevin::overdampedLangevin(double dt, long seed, std::string bodytype, bool rotation)
+            : integrator(dt, seed, bodytype, rotation) {};
 
 
     // Integrate one particle from the particle list main routine (visible only inside the class)
