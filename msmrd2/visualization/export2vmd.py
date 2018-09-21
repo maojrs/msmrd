@@ -145,7 +145,7 @@ def generateTCL_patchyParticles(numparticles = 10, outfname = "patchyParticles",
     file.write('display resetview \n \n')
 
     # Define particle types (first one for bonds, second two for big and small spheres)
-    file.write('mol representation VDW 0.30000 0.5 \n')
+    file.write('mol representation VDW 0.35000 0.5 \n')
     file.write('mol selection name type_0 \n')
     file.write('mol color ColorID 23 \n')
     file.write('mol material AOShiny \n')
