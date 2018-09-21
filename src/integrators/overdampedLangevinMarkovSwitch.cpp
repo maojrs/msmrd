@@ -17,16 +17,16 @@ namespace msmrd {
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
 
 
-    /* Integrates diffusion and rotation of one particle, called by the
-     * integrateOneMS (visible only inside the class) */
+    /* Integrates diffusion and rotation of one particle, called by the integrateOneMS (visible only
+     * inside the class). Note it cannot be inherited from overdampedLangevin::integrateOne since it
+     * uses a particleMS list instead of a particle list */
     template<>
     void overdampedLangevinMarkovSwitch<ctmsm>::integrateOne(int partIndex, std::vector<particleMS> &parts, double timestep) {
         vec3<double> force;
         vec3<double> torque;
         std::array<vec3<double>, 2> forctorq;
-        forctorq = getExternalForceTorque(parts[partIndex]);
-        force = forctorq[0];
-        torque = forctorq[1];
+        force = forceField[partIndex];
+        torque = torqueField[partIndex];
         translate(parts[partIndex], force, timestep);
         if (rotation) {
             rotate(parts[partIndex], torque, timestep);
@@ -107,6 +107,9 @@ namespace msmrd {
      * template based and uses particleMS) */
     template<>
     void overdampedLangevinMarkovSwitch<ctmsm>::integrate(std::vector<particleMS> &parts) {
+        // Calculate forces and torques and save them into forceField and torqueField
+        calculateTotalForceTorqueFields<particleMS>(parts);
+
         // Integrate and save next positions/orientations in parts[i].next***
         for (int i = 0; i < parts.size(); i++) {
             integrateOneMS(i, parts, dt);

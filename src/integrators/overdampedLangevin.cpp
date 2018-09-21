@@ -19,12 +19,8 @@ namespace msmrd {
     void overdampedLangevin::integrateOne(int partIndex, std::vector<particle> &parts, double timestep) {
         vec3<double> force;
         vec3<double> torque;
-        std::array<vec3<double>, 2> forctorq;
-        std::array<vec3<double>, 2> forctorqPairs;
-        forctorq = getExternalForceTorque(parts[partIndex]);
-        forctorqPairs = getPairsForceTorque(partIndex, parts);
-        force = forctorq[0] + forctorqPairs[0];
-        torque = forctorq[1] + forctorqPairs[1];
+        force = forceField[partIndex];
+        torque = torqueField[partIndex];
         translate(parts[partIndex], force, timestep);
         if (rotation) {
             rotate(parts[partIndex], torque, timestep);
@@ -44,8 +40,10 @@ namespace msmrd {
         dquat = axisanglerep2quaternion(dphi);
         part.setNextOrientation(dquat * part.orientation);
         // Updated orientation vector, useful with rodlike particles
-        vec3<double> neworientvector = rotateVec(part.orientvector, dquat);
-        part.setNextOrientVector(neworientvector);
+        if (bodytype == "rod") {
+            vec3<double> neworientvector = rotateVec(part.orientvector, dquat);
+            part.setNextOrientVector(neworientvector);
+        }
     }
 
 }

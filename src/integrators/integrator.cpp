@@ -7,8 +7,10 @@
 #include "particle.hpp"
 
 namespace msmrd {
+    //
     /**
-     * Implementation of integrator abstract class inherited by all child classes
+     * Implementation of integrator abstract class inherited by all child classes, note some of its methods
+     * are templates and therefore are implemented in the header file
      * @param dt time step
      * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
      * @param randg random number generator based in mt19937
@@ -17,6 +19,10 @@ namespace msmrd {
             : dt(dt), seed(seed), bodytype(bodytype), rotation(rotation) {
         randg.setSeed(seed);
         clock = 0;
+        forceField.resize(0);
+        torqueField.resize(0);
+        forcePairField.resize(0);
+        torquePairField.resize(0);
         if (bodytype != "point" && bodytype != "rod" && bodytype != "rigidbody") {
             throw std::runtime_error("Unknown particle bodytype; it should be either point, rod or rigidbody.");
         }
@@ -24,6 +30,9 @@ namespace msmrd {
 
     // Integrate list of particles (need to override in case of MS particles)
     void integrator::integrate(std::vector<particle> &parts) {
+        // Calculate forces and torques and save them into forceField and torqueField
+        calculateTotalForceTorqueFields<particle>(parts);
+
         // Integrate and save next positions/orientations in parts[i].next***
         for (int i = 0; i < parts.size(); i++) {
             integrateOne(i, parts, dt);
@@ -44,73 +53,6 @@ namespace msmrd {
         }
         clock += dt;
     }
-
-
-    // Calculates force and torque from an external potential for point, rod-like and rigidsolid particles
-    std::array<vec3<double>, 2> integrator::getExternalForceTorque(particle &part) {
-        if (externalPotentialActive) {
-            if (bodytype == "point") {
-                return externalPot->forceTorque(part.position);
-            } else if (bodytype == "rod") {
-                return externalRodPot->forceTorque(part.position, part.orientvector);
-            } else if (bodytype == "rigidbody") {
-                return externalRigidBodyPot->forceTorque(part.position, part.orientation);
-            } else {
-                throw std::runtime_error("Unknown particle bodytype; it should be either point, rod or rigidbody.");
-            };
-        }
-            // Return zero values if external potential has not been yet set
-        else {
-            return {vec3<double>(0, 0, 0), vec3<double>(0, 0, 0)};
-        }
-    };
-
-    // Calculates force and torque due to pair interactions for point, rod-like and rigidsolid particles
-    std::array<vec3<double>, 2> integrator::getPairsForceTorque(int partIndex, std::vector<particle> &parts) {
-        if (pairPotentialActive) {
-            std::array<vec3<double>, 2> forctorq;
-            vec3<double> force = vec3<double>(0., 0., 0.);
-            vec3<double> torque = vec3<double>(0., 0., 0.);
-            if (bodytype == "point") {
-                for (int i = 0; i < parts.size(); i++) {
-                    if (i != partIndex) {
-                        forctorq = pairPot->forceTorque(parts[partIndex].position, parts[i].position);
-                        force += forctorq[0];
-                        torque += forctorq[1];
-                    }
-                }
-                return {force, torque};
-            } else if (bodytype == "rod") {
-                for (int i = 0; i < parts.size(); i++) {
-                    if (i != partIndex) {
-                        forctorq = pairRodPot->forceTorque(parts[partIndex].position, parts[i].position,
-                                                           parts[partIndex].orientvector, parts[i].orientvector);
-                        force += forctorq[0];
-                        torque += forctorq[1];
-                    }
-                }
-                return {force, torque};
-            } else if (bodytype == "rigidbody") {
-                        for (int i=0; i<parts.size(); i++) {
-                            if (i != partIndex) {
-
-                                forctorq = pairRigidBodyPot->forceTorque(parts[partIndex].position, parts[i].position,
-                                                                         parts[partIndex].orientation, parts[i].orientation);
-                                force += forctorq[0];
-                                torque += forctorq[1];
-                            }
-                        }
-                        return {force, torque};
-            } else {
-                throw std::runtime_error("Unknown particle bodytype. it should be either point, rod or rigidbody.");
-            };
-        }
-            // Return zero values if pair potential has not been yet set
-        else {
-            return {vec3<double>(0, 0, 0), vec3<double>(0, 0, 0)};
-        }
-    };
-
 
     // Incorporates custom boundary into integrator
     void integrator::setBoundary(boundary *bndry) {
