@@ -60,7 +60,7 @@ namespace msmrd {
 
         /* Additional functions and getters and setters. Some used by c++ and python,
          * some only to be used by pyhon with python bindings. */
-        void updatePosition() { position = 1 * nextPosition; };
+        void updatePosition() { position = 1.0 * nextPosition; };
 
         void updateOrientation() {
             orientvector = 1 * nextOrientvector;

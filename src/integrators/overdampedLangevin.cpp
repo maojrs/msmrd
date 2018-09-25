@@ -19,8 +19,8 @@ namespace msmrd {
     void overdampedLangevin::integrateOne(int partIndex, std::vector<particle> &parts, double timestep) {
         vec3<double> force;
         vec3<double> torque;
-        force = forceField[partIndex];
-        torque = torqueField[partIndex];
+        force = 1.0*forceField[partIndex];
+        torque = 1.0*torqueField[partIndex];
         translate(parts[partIndex], force, timestep);
         if (rotation) {
             rotate(parts[partIndex], torque, timestep);

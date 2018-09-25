@@ -21,8 +21,6 @@ namespace msmrd {
         clock = 0;
         forceField.resize(0);
         torqueField.resize(0);
-        forcePairField.resize(0);
-        torquePairField.resize(0);
         if (bodytype != "point" && bodytype != "rod" && bodytype != "rigidbody") {
             throw std::runtime_error("Unknown particle bodytype; it should be either point, rod or rigidbody.");
         }
@@ -30,13 +28,40 @@ namespace msmrd {
 
     // Integrate list of particles (need to override in case of MS particles)
     void integrator::integrate(std::vector<particle> &parts) {
-        // Calculate forces and torques and save them into forceField and torqueField
-        calculateTotalForceTorqueFields<particle>(parts);
+        vec3<double> force;
+        vec3<double> torque;
 
+        // Calculate forces and torques and save them into forceField and torqueField
+        calculateForceTorqueFields<particle>(parts);
         // Integrate and save next positions/orientations in parts[i].next***
         for (int i = 0; i < parts.size(); i++) {
             integrateOne(i, parts, dt);
         }
+
+//        // Integrate and save next positions/orientations in parts[i].next***
+//        calculateForceTorqueFields<particle>(parts);
+//        for (int i = 0; i < parts.size(); i++) {
+//            force = 1.0*forceField[i];
+//            translate(parts[i], force, dt/2.0);
+//            parts[i].updatePosition();
+//        }
+//
+//        // Integrate and save next positions/orientations in parts[i].next***
+//        calculateForceTorqueFields<particle>(parts);
+//        for (int i = 0; i < parts.size(); i++) {
+//            torque = 1.0*torqueField[i];
+//            rotate(parts[i], torque, dt);
+//            parts[i].updateOrientation();
+//        }
+//
+//        // Integrate and save next positions/orientations in parts[i].next***
+//        calculateForceTorqueFields<particle>(parts);
+//        for (int i = 0; i < parts.size(); i++) {
+//            force = 1.0*forceField[i];
+//            translate(parts[i], force, dt/2.0);
+//            parts[i].updatePosition();
+//        }
+
         // Enforce boundary and set new positions into parts[i].nextPosition
         for (int i = 0; i < parts.size(); i++) {
             if (boundaryActive) {

@@ -31,8 +31,6 @@ namespace msmrd {
 
         std::vector<vec3<double>> forceField;
         std::vector<vec3<double>> torqueField;
-        std::vector<vec3<double>> forcePairField;
-        std::vector<vec3<double>> torquePairField;
 
 
         /**
@@ -47,27 +45,28 @@ namespace msmrd {
         * @param boundaryActive indicates if a boundary conditions is active
         * @param externalPotActive indicates if external potential has been set
         * @param pairPotActive indicates if potential potential has been set
-        * @param forceField stores forceField for each particle being integrated at the moment
-        * @param torqueField stores torqueField for each particle being integrated at the moment
-        * @param forcePairField stores all forces between pairs of particles, used to obtain forceField
-        * @param torquePairField stores all torques between pairs of particles, used to obtain torqueField
+        * @param forceField stores force experienced by each particle at a given time
+        * @param torqueField stores torque experienced by each particle at a given time
         */
 
-        // Protected abstract functions
-        virtual void integrateOne(int index, std::vector<particle> &parts,
-                                  double timestep) = 0; // Version for pair interactions (full particle list required)
+        // Protected abstract functions required by main integrate public routine
+        virtual void integrateOne(int index, std::vector<particle> &parts, double timestep) = 0;
+
         virtual void translate(particle &part, vec3<double> force, double dt) = 0;
 
         virtual void rotate(particle &part, vec3<double> torque, double dt) = 0;
 
+
         // Protected functions to get forces and torques due to external or pair potentials for integrator
         template< typename PARTICLE >
-        void calculateTotalForceTorqueFields(std::vector<PARTICLE> &parts); // external + pairs
+        void calculateForceTorqueFields(std::vector<PARTICLE> &parts); // external + pairs
 
         template< typename PARTICLE >
-        void calculatePairsForceTorqueFields(std::vector<PARTICLE> &parts); // only pairs/auxiliary
+        void calculateExternalForceTorques(std::vector<PARTICLE> &parts, int numParticles);
 
-        // std::array<vec3<double>, 2> getOnePairForceTorque(int numParticles, int part1Index, int part2Index); //auxiliary
+        template< typename PARTICLE >
+        void calculatePairsForceTorques(std::vector<PARTICLE> &parts, int numParticles);
+
 
     public:
         boundary *domainBoundary;
@@ -97,6 +96,7 @@ namespace msmrd {
 
         void setKbT(double kbt) { KbTemp = kbt; }
 
+
         // Potential and boundary related functions
         void setBoundary(boundary *bndry);
 
@@ -118,16 +118,14 @@ namespace msmrd {
     /**
      * Implements template functions to calculate force and torque fields
      * @tparam PARTICLE it can take values of particle or particleMS or other custom defined particles
-     * @param parts is a list of PARTICLE objects
+     * @param parts is a vector of PARTICLE objects
      */
 
     /* Calculates the total force and torque fields experienced by all particles, including external and
-     * interaction pairs potentials. Relies on other functions to divide the work. */
+     * interaction pairs potentials. Relies on two other auxiliary functions to divide the work. */
     template< typename PARTICLE >
-    void integrator::calculateTotalForceTorqueFields(std::vector<PARTICLE> &parts) {
+    void integrator::calculateForceTorqueFields(std::vector<PARTICLE> &parts) {
         unsigned int N = static_cast<int>(parts.size());
-        std::array<vec3<double>, 2> forctorq;
-        unsigned int interactionIndex;
 
         // Resize force/torque fields array if the number of particles have changed
         if (static_cast<int>(forceField.size()) != N) {
@@ -138,27 +136,7 @@ namespace msmrd {
         /* Add forces and torques due to external potential from all particles to fields,
          * initialize to zero if there is no external potential. */
         if (externalPotentialActive) {
-            if (bodytype == "point") {
-                for (int i = 0; i < N; i++) {
-                    forctorq = externalPot->forceTorque(parts[i].position);
-                    forceField[i] = forctorq[0];
-                    torqueField[i] = forctorq[1];
-                }
-            } else if (bodytype == "rod") {
-                for (int i = 0; i < N; i++) {
-                    forctorq = externalRodPot->forceTorque(parts[i].position, parts[i].orientvector);
-                    forceField[i] = forctorq[0];
-                    torqueField[i] = forctorq[1];
-                }
-            } else if (bodytype == "rigidbody") {
-                for (int i = 0; i < N; i++) {
-                    forctorq = externalRigidBodyPot->forceTorque(parts[i].position, parts[i].orientation);
-                    forceField[i] = forctorq[0];
-                    torqueField[i] = forctorq[1];
-                }
-            } else {
-                throw std::runtime_error("Unknown particle bodytype; it should be either point, rod or rigidbody.");
-            }
+            calculateExternalForceTorques(parts, N);
         } else {
             for (int i = 0; i < N; i++) {
                 forceField[i] = vec3<double> (0,0,0);
@@ -166,82 +144,89 @@ namespace msmrd {
             }
         }
 
-        /* Add forces and torques coming from pair interactions. The routine "calculatePairsForceTorqueFields"
-         * calculates all the pair forces (only once) and stores it into forcePairField and torquePairField arrays.
-         * The rest of this code sums the correponding forces to the force/torque fields. Note as the
-         * pair force/torque acting on i due to its interaction with j is the same as the force/torque acting on j due
-         * to i (except for a minus sign), we multiply by -1 for the inverse pair interaction. The index
-         * for the i,j interaction with i<j is i*(2*N - 1 - i)/2.0 + j - (i+1) (first term obtained from substracting
-         * summation formulas of first N-1 and N-1-i natural numbers), with N the total number of particles.*/
+        // Add forces and torques coming from pair interactions.
         if (pairPotentialActive) {
-            calculatePairsForceTorqueFields<PARTICLE>(parts);
-            for (int i = 0; i < N; i++) {
-                for (int j = i+1; j < N; j++) {
-                    interactionIndex = i*(2*N - 1 - i)/2 + j - (i+1);
-                    forceField[i] += forcePairField[interactionIndex];
-                    torqueField[i] += torquePairField[interactionIndex];
-                    forceField[j] += -1.0*forcePairField[interactionIndex];
-                    torqueField[j] += -1.0*torquePairField[interactionIndex];
-                }
+            calculatePairsForceTorques(parts, N);
+        }
+    }
+
+
+    /* Calculate external forces and torques due to interactiion with an external potential and save it into
+     * forceField and torqueField. Note different bodytypes require different fucntion calls */
+    template< typename PARTICLE >
+    void integrator::calculateExternalForceTorques(std::vector<PARTICLE> &parts, int numParticles) {
+        std::array<vec3<double>, 2> forctorq;
+        if (bodytype == "point") {
+            for (int i = 0; i < numParticles; i++) {
+                forctorq = externalPot->forceTorque(parts[i].position);
+                forceField[i] = 1.0*forctorq[0];
+                torqueField[i] = 1.0*forctorq[1];
             }
+        } else if (bodytype == "rod") {
+            for (int i = 0; i < numParticles; i++) {
+                forctorq = externalRodPot->forceTorque(parts[i].position, parts[i].orientvector);
+                forceField[i] = 1.0*forctorq[0];
+                torqueField[i] = 1.0*forctorq[1];
+            }
+        } else if (bodytype == "rigidbody") {
+            for (int i = 0; i < numParticles; i++) {
+                forctorq = externalRigidBodyPot->forceTorque(parts[i].position, parts[i].orientation);
+                forceField[i] = 1.0*forctorq[0];
+                torqueField[i] = 1.0*forctorq[1];
+            }
+        } else {
+            throw std::runtime_error("Unknown particle bodytype; it should be either point, rod or rigidbody.");
         }
     };
 
-
-    /* Calculates all the possible pair interaction forces and torques and saves them into one dimensional
-     * array of vectors: forcePairField and torquePairField. The length of this arrays corresponds to the total
-     * number of possible pair interactions. The index for the i,j interaction with i<j is
-     * i*(2*N - 1 - i)/2.0 + j - (i+1) (first term obtained from substracting summation formulas of first N-1 and
-     * N-1-i natural numbers) with N the total number of particles. */
+    /* Calculate pairs forces and torques due to interactiion with other particles and sums it into
+     * forceField and torqueField. Note different bodytypes require different fucntion calls. Also note
+     * to avoid duplicate calls to pairPotential.forceTorque, the two loops cover all the pair interactions
+     * only once. The function pairPotential.forceTorque returns the force and torque exerted on particle1
+     * and the force and torque exerted on particle2 (in that order), from their mutual interaction. */
     template< typename PARTICLE >
-    void integrator::calculatePairsForceTorqueFields(std::vector<PARTICLE> &parts) {
+    void integrator::calculatePairsForceTorques(std::vector<PARTICLE> &parts, int numParticles) {
         unsigned int N = static_cast<int>(parts.size());
-        unsigned int numberPairInteractions = N * (N - 1) / 2;
-        unsigned int interactionIndex;
-        std::array<vec3<double>, 2> forctorq;
-
-        // Resize pair force/torque fields array if the number of particles have changed
-        if (static_cast<int>(forcePairField.size()) != numberPairInteractions) {
-            forcePairField.resize(numberPairInteractions);
-            torquePairField.resize(numberPairInteractions);
-        }
-
+        std::array<vec3<double>, 4> forctorq;
         // Calculate the forces and torque for each possible interaction
         if (bodytype == "point") {
-            for (int i = 0; i < N; i++) {
-                for (int j = i + 1; j < N; j++) {
+            for (int i = 0; i < numParticles; i++) {
+                for (int j = i + 1; j < numParticles; j++) {
                     forctorq = pairPot->forceTorque(parts[i].position, parts[j].position);
-                    interactionIndex = i*(2*N - 1 - i)/2 + j - (i+1);
-                    forcePairField[interactionIndex] = forctorq[0];
-                    torquePairField[interactionIndex] = forctorq[1];
+                    forceField[i] += 1.0*forctorq[0];
+                    torqueField[i] += 1.0*forctorq[1];
+                    forceField[j] += 1.0*forctorq[2];
+                    torqueField[j] += 1.0*forctorq[3];
                 }
             }
         } else if (bodytype == "rod") {
-            for (int i = 0; i < N; i++) {
-                for (int j = i + 1; j < N; j++) {
+            for (int i = 0; i < numParticles; i++) {
+                for (int j = i + 1; j < numParticles; j++) {
                     forctorq = pairRodPot->forceTorque(parts[i].position, parts[j].position,
                                                        parts[i].orientvector, parts[j].orientvector);
-                    interactionIndex = i*(2*N - 1 - i)/2 + j - (i+1);
-                    forcePairField[interactionIndex] = forctorq[0];
-                    torquePairField[interactionIndex] = forctorq[1];
+                    forceField[i] += 1.0*forctorq[0];
+                    torqueField[i] += 1.0*forctorq[1];
+                    forceField[j] += 1.0*forctorq[2];
+                    torqueField[j] += 1.0*forctorq[3];
                 }
             }
         } else if (bodytype == "rigidbody") {
-            for (int i = 0; i < N; i++) {
-                for (int j = i + 1; j < N; j++) {
+            for (int i = 0; i < numParticles; i++) {
+                for (int j = i + 1; j < numParticles; j++) {
 
                     forctorq = pairRigidBodyPot->forceTorque(parts[i].position, parts[j].position,
                                                              parts[i].orientation, parts[j].orientation);
-                    interactionIndex = i*(2*N - 1 - i)/2 + j - (i+1);
-                    forcePairField[interactionIndex] = forctorq[0];
-                    torquePairField[interactionIndex] = forctorq[1];
+                    forceField[i] += 1.0*forctorq[0];
+                    torqueField[i] += 1.0*forctorq[1];
+                    forceField[j] += 1.0*forctorq[2];
+                    torqueField[j] += 1.0*forctorq[3];
                 }
             }
         } else {
             throw std::runtime_error(
-                    "Unknown particle bodytype. it should be either point, rod or rigidbody.");
+                    "Unknown particle bodytype; it should be either point, rod or rigidbody.");
         }
-    };
+    }
 
 }
 

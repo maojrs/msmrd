@@ -49,9 +49,9 @@ namespace msmrd {
         std::array<vec3<double>, 2> forcex = forceTorque(x);
         std::vector<double> output;
         output.resize(3);
-        output[0] = forcex[0][0];
-        output[1] = forcex[0][1];
-        output[2] = forcex[0][2];
+        output[0] = 1.0*forcex[0][0];
+        output[1] = 1.0*forcex[0][1];
+        output[2] = 1.0*forcex[0][2];
         return output;
     }
 
@@ -69,9 +69,9 @@ namespace msmrd {
         output[0].resize(3);
         output[1].resize(3);
         for (int i = 0; i < 2; i++) {
-            output[i][0] = forceTorquex[i][0];
-            output[i][1] = forceTorquex[i][1];
-            output[i][2] = forceTorquex[i][2];
+            output[i][0] = 1.0*forceTorquex[i][0];
+            output[i][1] = 1.0*forceTorquex[i][1];
+            output[i][2] = 1.0*forceTorquex[i][2];
         }
         return output;
     }
@@ -90,9 +90,9 @@ namespace msmrd {
         output[0].resize(3);
         output[1].resize(3);
         for (int i = 0; i < 2; i++) {
-            output[i][0] = forceTorquex[i][0];
-            output[i][1] = forceTorquex[i][1];
-            output[i][2] = forceTorquex[i][2];
+            output[i][0] = 1.0*forceTorquex[i][0];
+            output[i][1] = 1.0*forceTorquex[i][1];
+            output[i][2] = 1.0*forceTorquex[i][2];
         }
         return output;
     }
@@ -151,12 +151,12 @@ namespace msmrd {
     std::vector<double> pairPotential<>::forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2) {
         vec3<double> x1 = vec3<double>(pos1);
         vec3<double> x2 = vec3<double>(pos2);
-        std::array<vec3<double>, 2> forcex = forceTorque(x1, x2);
+        std::array<vec3<double>, 4> forcex = forceTorque(x1, x2);
         std::vector<double> output;
         output.resize(3);
-        output[0] = forcex[0][0];
-        output[1] = forcex[0][1];
-        output[2] = forcex[0][2];
+        output[0] = 1.0*forcex[0][0];
+        output[1] = 1.0*forcex[0][1];
+        output[2] = 1.0*forcex[0][2];
         return output;
     }
 
@@ -173,15 +173,14 @@ namespace msmrd {
         vec3<double> x2 = vec3<double>(pos2);
         vec3<double> th1 = vec3<double>(theta1);
         vec3<double> th2 = vec3<double>(theta2);
-        std::array<vec3<double>, 2> forceTorquex = forceTorque(x1, x2, th1, th2);
+        std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, th1, th2);
         std::vector<std::vector<double>> output;
-        output.resize(2);
-        output[0].resize(3);
-        output[1].resize(3);
-        for (int i = 0; i < 2; i++) {
-            output[i][0] = forceTorquex[i][0];
-            output[i][1] = forceTorquex[i][1];
-            output[i][2] = forceTorquex[i][2];
+        output.resize(4);
+        for (int i = 0; i < 4; i++) {
+            output[i].resize(3);
+            output[i][0] = 1.0*forceTorquex[i][0];
+            output[i][1] = 1.0*forceTorquex[i][1];
+            output[i][2] = 1.0*forceTorquex[i][2];
         }
         return output;
     }
@@ -199,15 +198,14 @@ namespace msmrd {
         vec3<double> x2 = vec3<double>(pos2);
         quaternion<double> th1 = quaternion<double>(theta1);
         quaternion<double> th2 = quaternion<double>(theta2);
-        std::array<vec3<double>, 2> forceTorquex = forceTorque(x1, x2, th1, th2);
+        std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, th1, th2);
         std::vector<std::vector<double>> output;
-        output.resize(2);
-        output[0].resize(3);
-        output[1].resize(3);
-        for (int i = 0; i < 2; i++) {
-            output[i][0] = forceTorquex[i][0];
-            output[i][1] = forceTorquex[i][1];
-            output[i][2] = forceTorquex[i][2];
+        output.resize(4);
+        for (int i = 0; i < 4; i++) {
+            output[i].resize(3);
+            output[i][0] = 1.0*forceTorquex[i][0];
+            output[i][1] = 1.0*forceTorquex[i][1];
+            output[i][2] = 1.0*forceTorquex[i][2];
         }
         return output;
     }

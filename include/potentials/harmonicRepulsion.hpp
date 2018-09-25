@@ -24,7 +24,7 @@ namespace msmrd {
 
         double evaluate(vec3<double> pos1, vec3<double> pos2) override;
 
-        std::array<vec3<double>, 2> forceTorque(vec3<double> pos1, vec3<double> pos2) override;
+        std::array<vec3<double>, 4> forceTorque(vec3<double> pos1, vec3<double> pos2) override;
     };
 
 }

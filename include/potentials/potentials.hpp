@@ -44,9 +44,11 @@ namespace msmrd {
     public:
         pairPotential() = default;
 
-        // Virtual functions to calculate value of potential and force/torque at positions "pos1" and "pos2" and orientations u
+        /* Virtual functions to calculate value of potential and force/torque at positions "pos1" and "pos2"
+         * and orientations u. The function forceTorque should return (force1, torque1, force2, torque2), which
+         * correspond to the force and torque acting on particle 1 and 2 respectively.*/
         virtual double evaluate(vec3<double> pos1, vec3<double> pos2, ORIENTATION... theta) = 0;
-        virtual std::array<vec3<double>, 2> forceTorque(vec3<double> pos1, vec3<double> pos2, ORIENTATION... theta) = 0;
+        virtual std::array<vec3<double>, 4> forceTorque(vec3<double> pos1, vec3<double> pos2, ORIENTATION... theta) = 0;
 
 
         /* PyBind evaluation functions for pair potentials of particles with no orientation, rod-like orientation or

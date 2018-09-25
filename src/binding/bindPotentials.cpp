@@ -18,7 +18,7 @@ namespace msmrd {
         pybind11::class_<externalPotential<quaternion<double>>>(m, "externalRigidBodyPotential");
         pybind11::class_<pairPotential<> >(m, "pairPotential");
         pybind11::class_<pairPotential<vec3<double>, vec3<double>>>(m, "pairRodPotential");
-        pybind11::class_<pairPotential<quaternion<double>, quaternion<double>>>(m, "pairRidigBodyPotential");
+        pybind11::class_<pairPotential<quaternion<double>, quaternion<double>>>(m, "pairRigidBodyPotential");
 
 
         py::class_<gaussians3D, externalPotential<> >(m, "gaussians3D")

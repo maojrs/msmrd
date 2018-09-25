@@ -108,7 +108,7 @@ namespace msmrd {
     template<>
     void overdampedLangevinMarkovSwitch<ctmsm>::integrate(std::vector<particleMS> &parts) {
         // Calculate forces and torques and save them into forceField and torqueField
-        calculateTotalForceTorqueFields<particleMS>(parts);
+        calculateForceTorqueFields<particleMS>(parts);
 
         // Integrate and save next positions/orientations in parts[i].next***
         for (int i = 0; i < parts.size(); i++) {
