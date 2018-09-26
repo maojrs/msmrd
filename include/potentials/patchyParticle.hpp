@@ -9,10 +9,10 @@ namespace msmrd {
     /*
      * Declaration of potential function between patchy particles. The template
      * <quaternion<double>,quaternion<double>> indicates the pair potential depends on the
-     * orientation of both particles, each with all its three degrees of freedom.
+     * orientation of both particles, each with all its three rotational degrees of freedom.
      */
     class patchyParticle : public pairPotential<quaternion<double>, quaternion<double>> {
-    private:
+    protected:
         std::vector<vec3<double>> patchesCoordinates;
         double sigma = 1.0;
         double strength = 100.0;

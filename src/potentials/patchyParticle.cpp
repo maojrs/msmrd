@@ -57,8 +57,8 @@ namespace msmrd{ ;
 
     // Evaluates potential at given positions and orientations of two particles
     double patchyParticle::evaluate(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) {
-        double repulsivePotential = 0.0;
-        double attractivePotential = 0.0;
+        double repulsivePotential;
+        double attractivePotential;
         double patchesPotential = 0.0;
         double angleModulation;
         vec3<double> patch1;

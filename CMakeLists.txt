@@ -30,6 +30,7 @@ set(SOURCES
         src/potentials/gayBerne.cpp
         src/potentials/harmonicRepulsion.cpp
         src/potentials/patchyParticle.cpp
+        src/potentials/patchyProtein.cpp
         )
 
 set(PY_SOURCES
@@ -58,6 +59,7 @@ set(PY_SOURCES
         include/potentials/gayBerne.hpp
         include/potentials/harmonicRepulsion.hpp
         include/potentials/patchyParticle.hpp
+        include/potentials/patchyProtein.hpp
         )
 
 add_library(msmrd2core SHARED ${SOURCES})

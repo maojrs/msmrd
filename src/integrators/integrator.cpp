@@ -38,30 +38,6 @@ namespace msmrd {
             integrateOne(i, parts, dt);
         }
 
-//        // Integrate and save next positions/orientations in parts[i].next***
-//        calculateForceTorqueFields<particle>(parts);
-//        for (int i = 0; i < parts.size(); i++) {
-//            force = 1.0*forceField[i];
-//            translate(parts[i], force, dt/2.0);
-//            parts[i].updatePosition();
-//        }
-//
-//        // Integrate and save next positions/orientations in parts[i].next***
-//        calculateForceTorqueFields<particle>(parts);
-//        for (int i = 0; i < parts.size(); i++) {
-//            torque = 1.0*torqueField[i];
-//            rotate(parts[i], torque, dt);
-//            parts[i].updateOrientation();
-//        }
-//
-//        // Integrate and save next positions/orientations in parts[i].next***
-//        calculateForceTorqueFields<particle>(parts);
-//        for (int i = 0; i < parts.size(); i++) {
-//            force = 1.0*forceField[i];
-//            translate(parts[i], force, dt/2.0);
-//            parts[i].updatePosition();
-//        }
-
         // Enforce boundary and set new positions into parts[i].nextPosition
         for (int i = 0; i < parts.size(); i++) {
             if (boundaryActive) {
