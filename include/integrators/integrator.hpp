@@ -21,7 +21,7 @@ namespace msmrd {
         double KbTemp = 1.0;
         double dt;
         long seed;
-        std::string bodytype;
+        std::string particlestype;
         bool rotation;
         randomgen randg;
 
@@ -37,7 +37,7 @@ namespace msmrd {
         * @param KbTemp = Boltzman constant times temperature
         * @param dt time step
         * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
-        * @param bodytype body type of particles to integrate; determines rotation integrator behavior, can
+        * @param particlestype type of particles to integrate; determines rotation integrator behavior, can
         * be either point, rod or rigidbody, and it is determined by orientational degrees of freedom, points
         * have no orientation, rods need only one vector and rigidsolid requires a complete quaternion).
         * @param rotation boolean to indicate if rotation should be integrated
@@ -156,26 +156,27 @@ namespace msmrd {
     template< typename PARTICLE >
     void integrator::calculateExternalForceTorques(std::vector<PARTICLE> &parts, int numParticles) {
         std::array<vec3<double>, 2> forctorq;
-        if (bodytype == "point") {
+        if (particlestype == "point") {
             for (int i = 0; i < numParticles; i++) {
                 forctorq = externalPot->forceTorque(parts[i].position);
                 forceField[i] = 1.0*forctorq[0];
                 torqueField[i] = 1.0*forctorq[1];
             }
-        } else if (bodytype == "rod") {
+        } else if (particlestype == "rod") {
             for (int i = 0; i < numParticles; i++) {
                 forctorq = externalRodPot->forceTorque(parts[i].position, parts[i].orientvector);
                 forceField[i] = 1.0*forctorq[0];
                 torqueField[i] = 1.0*forctorq[1];
             }
-        } else if (bodytype == "rigidbody") {
+        } else if (particlestype == "rigidbody") {
             for (int i = 0; i < numParticles; i++) {
                 forctorq = externalRigidBodyPot->forceTorque(parts[i].position, parts[i].orientation);
                 forceField[i] = 1.0*forctorq[0];
                 torqueField[i] = 1.0*forctorq[1];
             }
         } else {
-            throw std::runtime_error("Unknown particle bodytype; it should be either point, rod or rigidbody.");
+            throw std::runtime_error("Unknown particle bodytype; it should be either point, rod, rigidbody,"
+                                     "pointMS, rodMS or rigibodyMS.");
         }
     };
 
@@ -189,7 +190,7 @@ namespace msmrd {
         unsigned int N = static_cast<int>(parts.size());
         std::array<vec3<double>, 4> forctorq;
         // Calculate the forces and torque for each possible interaction
-        if (bodytype == "point") {
+        if (particlestype == "point") {
             for (int i = 0; i < numParticles; i++) {
                 for (int j = i + 1; j < numParticles; j++) {
                     forctorq = pairPot->forceTorque(parts[i].position, parts[j].position);
@@ -199,7 +200,7 @@ namespace msmrd {
                     torqueField[j] += 1.0*forctorq[3];
                 }
             }
-        } else if (bodytype == "rod") {
+        } else if (particlestype == "rod") {
             for (int i = 0; i < numParticles; i++) {
                 for (int j = i + 1; j < numParticles; j++) {
                     forctorq = pairRodPot->forceTorque(parts[i].position, parts[j].position,
@@ -210,7 +211,7 @@ namespace msmrd {
                     torqueField[j] += 1.0*forctorq[3];
                 }
             }
-        } else if (bodytype == "rigidbody") {
+        } else if (particlestype == "rigidbody") {
             for (int i = 0; i < numParticles; i++) {
                 for (int j = i + 1; j < numParticles; j++) {
 
@@ -223,8 +224,8 @@ namespace msmrd {
                 }
             }
         } else {
-            throw std::runtime_error(
-                    "Unknown particle bodytype; it should be either point, rod or rigidbody.");
+            throw std::runtime_error("Unknown particle bodytype; it should be either point, rod, rigidbody,"
+                    "pointMS, rodMS or rigibodyMS.");
         }
     }
 

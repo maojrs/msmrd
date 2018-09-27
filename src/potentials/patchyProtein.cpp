@@ -20,7 +20,7 @@ namespace msmrd {
         rstarAttractive = 0.85*sigma;
     };
 
-    patchyProtein::patchyProtein(double sigma, double strength, std::vector<std::vector<double>> patchesCoords)
+    patchyProtein::patchyProtein(double sigma, double strength, std::vector<std::vector<double>> patchesCoordinates)
             : patchyParticle(sigma, strength, patchesCoordinates) {
         // Set patchy particle parameters (strength, stiffness and range) for attractive isotropic potential
         epsAttractive = -0.05*strength;

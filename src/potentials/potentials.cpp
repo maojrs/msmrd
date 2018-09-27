@@ -8,13 +8,14 @@ namespace msmrd {
     /**
      *  Implementation of non-abstract functions of externalPotential abstract class (default constructor in header)
      *  All these functions are needed for PyBinding evaluate and forceTorque functions, since pyBind only accepts
-     *  vectors as input. The different versions of the same functions depend on the ORIENTATION template that can
+     *  vectors as input. The different versions of the same functions depend on the AUXVARIABLES template that can
      *  be used for particles with no orientation, rod-like particles with their orientation described by one vectors,
-     *  and by rigidbody particles with no symmetry and their orientation described by quaternions.
+     *  and by rigidbody particles with no symmetry and their orientation described by quaternions. AUXVARIABLES
+     *  can also incorporate particle types to incorporate type-specific behavior in the potential function.
      */
 
 
-    //Evaluates potential. Template ORIENTATION takes zero arguments, so it corresponds to no orientation.
+    //Evaluates potential. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation.
     template<>
     double externalPotential<>::evaluatePyBind(std::vector<double> pos) {
         vec3<double> x = vec3<double>(pos);
@@ -22,7 +23,7 @@ namespace msmrd {
     }
 
 
-    /* Evaluates potential. Template ORIENTATION corresponds to vec3<double>, so it corresponds to rod-like
+    /* Evaluates potential. Template AUXVARIABLES corresponds to vec3<double>, so it corresponds to rod-like
      * particles with orientation described by one vector. */
     template<>
     double externalPotential<vec3<double>>::evaluatePyBind(std::vector<double> pos1, std::vector<double> theta1) {
@@ -32,7 +33,7 @@ namespace msmrd {
     }
 
 
-    /* Evaluates potential. Template ORIENTATION corresponds to quaternion<double>, so it corresponds to
+    /* Evaluates potential. Template AUXVARIABLES corresponds to quaternion<double>, so it corresponds to
      * rigidbody particles with orientation described by a quaternion. */
     template<>
     double externalPotential<quaternion<double>>::evaluatePyBind(std::vector<double> pos1, std::vector<double> theta1) {
@@ -42,7 +43,7 @@ namespace msmrd {
     }
 
 
-    // Evaluates force and torque. Template ORIENTATION takes zero arguments, so it corresponds to no orientation.
+    // Evaluates force and torque. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation.
     template<>
     std::vector<double> externalPotential<>::forceTorquePyBind(std::vector<double> pos) {
         vec3<double> x = vec3<double>(pos);
@@ -56,7 +57,7 @@ namespace msmrd {
     }
 
 
-    /* Evaluates force and torque. Template ORIENTATION corresponds to vec3<double>, so it corresponds to
+    /* Evaluates force and torque. Template AUXVARIABLES corresponds to vec3<double>, so it corresponds to
      * rod-like particles with orientation described by one vector. */
     template<>
     std::vector<std::vector<double>>
@@ -77,7 +78,7 @@ namespace msmrd {
     }
 
 
-    /* Evaluates force and torque. Template ORIENTATION corresponds to quaternion<double>, so it corresponds to
+    /* Evaluates force and torque. Template AUXVARIABLES corresponds to quaternion<double>, so it corresponds to
      * rigidbody particles with orientation described by a quaternion. */
     template<>
     std::vector<std::vector<double>>
@@ -101,13 +102,14 @@ namespace msmrd {
     /**
      *  Implementation of non-abstract functions of pairPotential abstract class (default constructor in header)
      *  All these functions are needed for PyBinding evaluate and forceTorque functions, since pyBind only accepts
-     *  vectors as input. The different versions of the same functions depend on the ORIENTATION template that can
+     *  vectors as input. The different versions of the same functions depend on the AUXVARIABLES template that can
      *  be used for particles with no orientation, rod-like particles with their orientation described by one vectors,
-     *  and by rigidbody particles with no symmetry and their orientation described by quaternions.
+     *  and by rigidbody particles with no symmetry and their orientation described by quaternions. AUXVARIABLES
+     *  can also incorporate particle types to incorporate type-specific behavior in the potential function.
      */
 
 
-    // Evaluates potential. Template ORIENTATION takes zero arguments, so it corresponds to no orientation.
+    // Evaluates potential. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation.
     template<>
     double pairPotential<>::evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2) {
         vec3<double> x1 = vec3<double>(pos1);
@@ -116,7 +118,7 @@ namespace msmrd {
     }
 
 
-    /* Evaluate potential. Template ORIENTATION corresponds to <vec3<double>, vec3<double>>, so it
+    /* Evaluate potential. Template AUXVARIABLES corresponds to <vec3<double>, vec3<double>>, so it
      * corresponds to two rod-like particles each with orientation described by one vector. */
     template<>
     double pairPotential<vec3<double>, vec3<double>>::evaluatePyBind(std::vector<double> pos1,
@@ -131,7 +133,7 @@ namespace msmrd {
     }
 
 
-    /* Evaluate potential. Template ORIENTATION corresponds to <quaternion<double>, quaternion<double>>, so it
+    /* Evaluate potential. Template AUXVARIABLES corresponds to <quaternion<double>, quaternion<double>>, so it
      * corresponds to two rigidbody particles each with orientation described by a quaternion. */
     template<>
     double pairPotential<quaternion<double>, quaternion<double>>::evaluatePyBind(std::vector<double> pos1,
@@ -146,7 +148,7 @@ namespace msmrd {
     }
 
 
-    // Evaluates force and torque. Template ORIENTATION takes zero arguments, so it corresponds to no orientation
+    // Evaluates force and torque. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation
     template<>
     std::vector<double> pairPotential<>::forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2) {
         vec3<double> x1 = vec3<double>(pos1);
@@ -161,7 +163,7 @@ namespace msmrd {
     }
 
 
-    /* Evaluates force and torque. Template ORIENTATION corresponds to <vec3<double>,vec3<double>>, so
+    /* Evaluates force and torque. Template AUXVARIABLES corresponds to <vec3<double>,vec3<double>>, so
      * it corresponds to two rod-like particles each with orientation described by one vector. */
     template<>
     std::vector<std::vector<double>>
@@ -186,7 +188,7 @@ namespace msmrd {
     }
 
 
-    /* Evaluates force and torque. Template ORIENTATION corresponds to <quaternion<double>, quaternion<double>>,
+    /* Evaluates force and torque. Template AUXVARIABLES corresponds to <quaternion<double>, quaternion<double>>,
      * so it corresponds to two rigidbody particles each with orientation described by a quaternion. */
     template<>
     std::vector<std::vector<double>>

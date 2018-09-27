@@ -40,7 +40,7 @@ namespace msmrd {
         dquat = axisanglerep2quaternion(dphi);
         part.setNextOrientation(dquat * part.orientation);
         // Updated orientation vector, useful with rodlike particles
-        if (bodytype == "rod") {
+        if (particlestype == "rod" || particlestype == "rodMS") {
             vec3<double> neworientvector = rotateVec(part.orientvector, dquat);
             part.setNextOrientVector(neworientvector);
         }

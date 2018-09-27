@@ -9,25 +9,34 @@
 namespace msmrd {
     /**
      * Abstract base class declaration for external potentials
-     * @param ...ORIENTATION variadic template to define orientation. If there are no rotations, ...ORIENTATION has
-     * zero arguments); otherwise, it can be described by an orientation vector or even a quaternion. If the
-     * orientation is simply a vector (vec3<double>) it describes rod-like particles.
+     * @param ...AUXVARIABLES variadic template to define orientation and/or particle type, since different particle
+     * types might behave different on under the same external potential. If there are no rotations or particle types
+     * dependence, ...AUXVARIABLES has zero arguments); otherwise, orientation can be described by an orientation
+     * vector or even a quaternion, while particle types are simply integers that provide the particle
+     * type to the potential function. For example, if ...AUXVARIABLES == vec3<double> it does not depend on the
+     * particle type, and its orientation describes rod-like particles, while ...AUXVARIABLES == quaternion<double>)
+     * would describe general rigidbody particles with arbitrary rotations (again with no particle type dependence).
      */
-    template<typename ...ORIENTATION>
+    template<typename ...AUXVARIABLES>
     class externalPotential {
     public:
         externalPotential() = default;
 
-        // Virtual functions to calculate value of potential and force/torque at position "pos" and orientation u
-        virtual double evaluate(vec3<double> pos, ORIENTATION... theta) = 0;
-        virtual std::array<vec3<double>, 2> forceTorque(vec3<double> pos, ORIENTATION... theta) = 0;
+        /* Virtual functions to calculate value of potential and force/torque at position "pos".
+         * Possible orientation dependence can be added into the aux variables. */
+        virtual double evaluate(vec3<double> pos, AUXVARIABLES... aux) = 0;
+
+        virtual std::array<vec3<double>, 2> forceTorque(vec3<double> pos, AUXVARIABLES... aux) = 0;
 
 
         /* PyBind evaluation functions for external potentials of particles with no orientation, rod-like orientation or
          * full orientation. They rely on evaluate and forceTorque functions above */
         double evaluatePyBind(std::vector<double> pos);
+
         double evaluatePyBind(std::vector<double> pos, std::vector<double> theta);
+
         std::vector<double> forceTorquePyBind(std::vector<double> pos);
+
         std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos, std::vector<double> theta);
 
     };
@@ -35,28 +44,38 @@ namespace msmrd {
 
     /**
      * Abstract base class declaration for pair potentials
-     * @param ...ORIENTATION variadic template to define orientation. If there are no rotations, ...ORIENTATION has
-     * zero arguments); otherwise, it can be described by an orientation vector or even a quaternion. If the
-     * orientation is simply a vector (vec3<double>) it describes rod-like particles.
+     * @param ...AUXVARIABLES variadic template to define orientation and/or particle type. If there are no
+     * rotations nor particle types, ...AUXVARIABLES has zero arguments); otherwise, orientation can be described by
+     * an orientation vector or even a quaternion, while particle types are simply integers that provide the particle
+     * type to the potential function. For example, if ...AUXVARIABLES == vec3<double>, vec3<double> it does not
+     * depend on the particle type, and its orientation describes pairs of rod-like particles,
+     * while ...AUXVARIABLES == quaternion<double>, quaternion<double> would describe general rigidbody particles
+     * with arbitrary rotations (again with no particle type dependence).
      */
-    template<typename ...ORIENTATION>
+    template<typename ...AUXVARIABLES>
     class pairPotential {
     public:
         pairPotential() = default;
 
-        /* Virtual functions to calculate value of potential and force/torque at positions "pos1" and "pos2"
-         * and orientations u. The function forceTorque should return (force1, torque1, force2, torque2), which
-         * correspond to the force and torque acting on particle 1 and 2 respectively.*/
-        virtual double evaluate(vec3<double> pos1, vec3<double> pos2, ORIENTATION... theta) = 0;
-        virtual std::array<vec3<double>, 4> forceTorque(vec3<double> pos1, vec3<double> pos2, ORIENTATION... theta) = 0;
+        /* Virtual functions to calculate value of potential and force/torque at positions "pos1" and "pos2".
+         * Possible orientation dependence can be added into the aux variables. The function forceTorque should
+         * return (force1, torque1, force2, torque2), the first two correspond to the force and torque acting on
+         * particle 1 due to its interaction with particle 2, and the second two correspond to the force and
+         * torque acting on particle 2 due to its interaction with particle 1.*/
+        virtual double evaluate(vec3<double> pos1, vec3<double> pos2, AUXVARIABLES... aux) = 0;
+
+        virtual std::array<vec3<double>, 4> forceTorque(vec3<double> pos1, vec3<double> pos2, AUXVARIABLES... aux) = 0;
 
 
         /* PyBind evaluation functions for pair potentials of particles with no orientation, rod-like orientation or
          * full orientation. They rely on evaluate and forceTorque functions above */
         double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2);
+
         double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2,
                               std::vector<double> theta1, std::vector<double> theta2);
+
         std::vector<double> forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2);
+
         std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos1,
                                                            std::vector<double> pos2,
                                                            std::vector<double> theta1,

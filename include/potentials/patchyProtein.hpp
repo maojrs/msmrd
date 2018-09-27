@@ -15,7 +15,7 @@ namespace msmrd{
     class patchyProtein : public patchyParticle {
     public:
         patchyProtein(double sigma, double strength, std::vector<vec3<double>> patchesCoordinates);
-        patchyProtein(double sigma, double strength, std::vector<std::vector> patchesCoordinates);
+        patchyProtein(double sigma, double strength, std::vector<std::vector<double>> patchesCoordinates);
 
         double evaluate(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) override;
 
