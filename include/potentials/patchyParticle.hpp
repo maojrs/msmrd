@@ -12,7 +12,7 @@ namespace msmrd {
      * orientation of both particles, each with all its three rotational degrees of freedom.
      */
     class patchyParticle : public pairPotential<quaternion<double>, quaternion<double>> {
-    protected:
+    private:
         std::vector<vec3<double>> patchesCoordinates;
         double sigma = 1.0;
         double strength = 100.0;

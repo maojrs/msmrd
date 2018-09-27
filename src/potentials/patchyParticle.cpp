@@ -10,7 +10,7 @@
 
 namespace msmrd{ ;
     /*
-     * @param radius radius at which patches are placed. Corresponds to the radius of the particle
+     * @param sigma diameter of sphere at which patches are placed. Corresponds to the radius of the particle.
      * @param patchesCoordintates list of patches coordinates in a sphere of unit radius
      */
     patchyParticle::patchyParticle(double sigma, double strength, std::vector<vec3<double>> patchesCoordinates)
@@ -185,9 +185,10 @@ namespace msmrd{ ;
         }
     }
 
+    // Derivative of patchyParticle::quadraticPotential
     double patchyParticle::derivativeQuadraticPotential(double r, double sig, double eps, double a, double rstar) {
         // Parameters to force continuity and continuous derivative
-        double rcritical = std::pow(sigma, 2)/(a*rstar);
+        double rcritical = std::pow(sig, 2)/(a*rstar);
         double b = (1.0 - a*std::pow(rstar/sig, 2))/std::pow(rcritical/sig - rstar/sig, 2);
         // Distance cannot be negative, so it is always the absolute value
         double rlocal = std::abs(r);
