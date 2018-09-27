@@ -21,32 +21,60 @@ namespace msmrd {
         double KbTemp = 1.0;
         double dt;
         long seed;
-        std::string particlestype;
+        std::string particlesbodytype;
         bool rotation;
         randomgen randg;
+
+        std::vector<vec3<double>> forceField;
+        std::vector<vec3<double>> torqueField;
 
         bool boundaryActive = false;
         bool externalPotentialActive = false;
         bool pairPotentialActive = false;
 
-        std::vector<vec3<double>> forceField;
-        std::vector<vec3<double>> torqueField;
-
+        // Boundary pointer
+        boundary *domainBoundary;
+        // External potentials pointers (external__Pot)
+        externalPotential<> *externalPot;
+        externalPotential<int> *externalMixPot;
+        externalPotential<vec3<double>> *externalRodPot;
+        externalPotential<vec3<double>, int> *externalRodMixPot;
+        externalPotential<quaternion<double>> *externalRigidBodyPot;
+        externalPotential<quaternion<double>, int> *externalRigidBodyMixPot;
+        // Pair potentials pointers (pair__Pot)
+        pairPotential<> *pairPot;
+        pairPotential<int, int> *pairMixPot;
+        pairPotential<vec3<double>, vec3<double>> *pairRodPot;
+        pairPotential<vec3<double>, vec3<double>, int, int> *pairRodMixPot;
+        pairPotential<quaternion<double>, quaternion<double>> *pairRigidBodyPot;
+        pairPotential<quaternion<double>, quaternion<double>, int, int> *pairRigidBodyMixPot;
 
         /**
         * @param KbTemp = Boltzman constant times temperature
         * @param dt time step
         * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
-        * @param particlestype type of particles to integrate; determines rotation integrator behavior, can
+        * @param particlesbodytype body type of particles to integrate. It determines rotation integrator behavior, can
         * be either point, rod or rigidbody, and it is determined by orientational degrees of freedom, points
-        * have no orientation, rods need only one vector and rigidsolid requires a complete quaternion).
+        * have no orientation, rods need only one vector and rigidsolid requires a complete quaternion). The particles
+        * body type can also be pointMix, rodMix or rigidbodyMix, where there are different types of
+        * particles (particleMS.type) with the same body type. This allows the integrator to pass the particle type to
+        * the potential function. Note the particlesbodytype has to match the potential used.
         * @param rotation boolean to indicate if rotation should be integrated
         * @param randg random number generator based in mt19937
+        *
+        * @param forceField stores force experienced by each particle at a given time
+        * @param torqueField stores torque experienced by each particle at a given time
+        *
         * @param boundaryActive indicates if a boundary conditions is active
         * @param externalPotActive indicates if external potential has been set
         * @param pairPotActive indicates if potential potential has been set
-        * @param forceField stores force experienced by each particle at a given time
-        * @param torqueField stores torque experienced by each particle at a given time
+
+        * @param *domainBoundary pointer to the boundary object to be used.
+        * Note all following potentials default to zero and not every integrator will make use of all this potentials
+        * @param *external__Pot pointers to external potential, template arguments determine
+        * orientation and particle type.
+        * @param *pair__Pot pointers to pair potential between two particles, template arguments determine
+        * orientation and particle type.
         */
 
         // Protected abstract functions required by main integrate public routine
@@ -57,7 +85,8 @@ namespace msmrd {
         virtual void rotate(particle &part, vec3<double> torque, double dt) = 0;
 
 
-        // Protected functions to get forces and torques due to external or pair potentials for integrator
+        /* Protected functions to get forces and torques due to external or pair potentials for integrator.
+         * The template PARTICLE can take values of particle or particleMS or other custom defined particles*/
         template< typename PARTICLE >
         void calculateForceTorqueFields(std::vector<PARTICLE> &parts); // external + pairs
 
@@ -69,25 +98,12 @@ namespace msmrd {
 
 
     public:
-        boundary *domainBoundary;
-        externalPotential<> *externalPot;
-        externalPotential<vec3<double>> *externalRodPot;
-        externalPotential<quaternion<double>> *externalRigidBodyPot;
-        pairPotential<> *pairPot;
-        pairPotential<vec3<double>, vec3<double>> *pairRodPot;
-        pairPotential<quaternion<double>, quaternion<double>> *pairRigidBodyPot;
         double clock;
-
         /**
-         * Note all potentials default to zero and not every integrator will make use of all this potentials
-         * @param domainBoundary determines the boundary of the domain to be used.
-         * @param externalPotential<> external potential without orientation
-         * @param externalPotential<vec3<double>> external potential with rod-like orientation
-         * @param pairPotential<vec3<double>,vec3<double>> pair potential between two particles with rod-like orientation
          * @param clock keeps track of global time
          */
 
-        integrator(double dt, long seed, std::string bodytype, bool rotation);
+        integrator(double dt, long seed, std::string particlesbodytype, bool rotation);
 
         // Main public functions definitions
         void integrate(std::vector<particle> &parts);
@@ -102,15 +118,27 @@ namespace msmrd {
 
         void setExternalPotential(externalPotential<> *pot);
 
+        void setExternalMixPotential(externalPotential<int> *pot);
+
         void setExternalRodPotential(externalPotential<vec3<double>> *pot);
+
+        void setExternalRodMixPotential(externalPotential<vec3<double>, int> *pot);
 
         void setExternalRigidBodyPotential(externalPotential<quaternion<double>> *pot);
 
+        void setExternalRigidBodyMixPotential(externalPotential<quaternion<double>, int> *pot);
+
         void setPairPotential(pairPotential<> *pot);
+
+        void setPairMixPotential(pairPotential<int, int> *pot);
 
         void setPairRodPotential(pairPotential<vec3<double>, vec3<double>> *pot);
 
+        void setPairRodMixPotential(pairPotential<vec3<double>, vec3<double>, int, int> *pot);
+
         void setPairRigidBodyPotential(pairPotential<quaternion<double>, quaternion<double>> *pot);
+
+        void setPairRigidBodyMixPotential(pairPotential<quaternion<double>, quaternion<double>, int, int> *pot);
 
     };
 
@@ -156,27 +184,45 @@ namespace msmrd {
     template< typename PARTICLE >
     void integrator::calculateExternalForceTorques(std::vector<PARTICLE> &parts, int numParticles) {
         std::array<vec3<double>, 2> forctorq;
-        if (particlestype == "point") {
+        if (particlesbodytype == "point") {
             for (int i = 0; i < numParticles; i++) {
                 forctorq = externalPot->forceTorque(parts[i].position);
                 forceField[i] = 1.0*forctorq[0];
                 torqueField[i] = 1.0*forctorq[1];
             }
-        } else if (particlestype == "rod") {
+        } else if (particlesbodytype == "pointMix") {
+            for (int i = 0; i < numParticles; i++) {
+                forctorq = externalMixPot->forceTorque(parts[i].position, parts[i].type);
+                forceField[i] = 1.0*forctorq[0];
+                torqueField[i] = 1.0*forctorq[1];
+            }
+        } else if (particlesbodytype == "rod") {
             for (int i = 0; i < numParticles; i++) {
                 forctorq = externalRodPot->forceTorque(parts[i].position, parts[i].orientvector);
                 forceField[i] = 1.0*forctorq[0];
                 torqueField[i] = 1.0*forctorq[1];
             }
-        } else if (particlestype == "rigidbody") {
+        } else if (particlesbodytype == "rodMix") {
+            for (int i = 0; i < numParticles; i++) {
+                forctorq = externalRodMixPot->forceTorque(parts[i].position, parts[i].orientvector, parts[i].type);
+                forceField[i] = 1.0*forctorq[0];
+                torqueField[i] = 1.0*forctorq[1];
+            }
+        } else if (particlesbodytype == "rigidbody") {
             for (int i = 0; i < numParticles; i++) {
                 forctorq = externalRigidBodyPot->forceTorque(parts[i].position, parts[i].orientation);
                 forceField[i] = 1.0*forctorq[0];
                 torqueField[i] = 1.0*forctorq[1];
             }
+        } else if (particlesbodytype == "rigidbodyMix") {
+            for (int i = 0; i < numParticles; i++) {
+                forctorq = externalRigidBodyMixPot->forceTorque(parts[i].position, parts[i].orientation, parts[i].type);
+                forceField[i] = 1.0*forctorq[0];
+                torqueField[i] = 1.0*forctorq[1];
+            }
         } else {
-            throw std::runtime_error("Unknown particle bodytype; it should be either point, rod, rigidbody,"
-                                     "pointMS, rodMS or rigibodyMS.");
+            throw std::runtime_error("Unknown particles bodytype; it should be either point, rod, rigidbody,"
+                                     "pointMix, rodMix or rigibodyMix.");
         }
     };
 
@@ -190,7 +236,7 @@ namespace msmrd {
         unsigned int N = static_cast<int>(parts.size());
         std::array<vec3<double>, 4> forctorq;
         // Calculate the forces and torque for each possible interaction
-        if (particlestype == "point") {
+        if (particlesbodytype == "point") {
             for (int i = 0; i < numParticles; i++) {
                 for (int j = i + 1; j < numParticles; j++) {
                     forctorq = pairPot->forceTorque(parts[i].position, parts[j].position);
@@ -200,7 +246,18 @@ namespace msmrd {
                     torqueField[j] += 1.0*forctorq[3];
                 }
             }
-        } else if (particlestype == "rod") {
+        } else if (particlesbodytype == "pointMix") {
+            for (int i = 0; i < numParticles; i++) {
+                for (int j = i + 1; j < numParticles; j++) {
+                    forctorq = pairMixPot->forceTorque(parts[i].position, parts[j].position,
+                                                       parts[i].type, parts[j].type);
+                    forceField[i] += 1.0*forctorq[0];
+                    torqueField[i] += 1.0*forctorq[1];
+                    forceField[j] += 1.0*forctorq[2];
+                    torqueField[j] += 1.0*forctorq[3];
+                }
+            }
+        } else if (particlesbodytype == "rod") {
             for (int i = 0; i < numParticles; i++) {
                 for (int j = i + 1; j < numParticles; j++) {
                     forctorq = pairRodPot->forceTorque(parts[i].position, parts[j].position,
@@ -211,7 +268,19 @@ namespace msmrd {
                     torqueField[j] += 1.0*forctorq[3];
                 }
             }
-        } else if (particlestype == "rigidbody") {
+        } else if (particlesbodytype == "rodMix") {
+            for (int i = 0; i < numParticles; i++) {
+                for (int j = i + 1; j < numParticles; j++) {
+                    forctorq = pairRodMixPot->forceTorque(parts[i].position, parts[j].position,
+                                                       parts[i].orientvector, parts[j].orientvector,
+                                                       parts[i].type, parts[j].type);
+                    forceField[i] += 1.0*forctorq[0];
+                    torqueField[i] += 1.0*forctorq[1];
+                    forceField[j] += 1.0*forctorq[2];
+                    torqueField[j] += 1.0*forctorq[3];
+                }
+            }
+        } else if (particlesbodytype == "rigidbody") {
             for (int i = 0; i < numParticles; i++) {
                 for (int j = i + 1; j < numParticles; j++) {
 
@@ -223,9 +292,22 @@ namespace msmrd {
                     torqueField[j] += 1.0*forctorq[3];
                 }
             }
+        } else if (particlesbodytype == "rigidbodyMix") {
+            for (int i = 0; i < numParticles; i++) {
+                for (int j = i + 1; j < numParticles; j++) {
+
+                    forctorq = pairRigidBodyMixPot->forceTorque(parts[i].position, parts[j].position,
+                                                             parts[i].orientation, parts[j].orientation,
+                                                             parts[i].type, parts[j].type);
+                    forceField[i] += 1.0*forctorq[0];
+                    torqueField[i] += 1.0*forctorq[1];
+                    forceField[j] += 1.0*forctorq[2];
+                    torqueField[j] += 1.0*forctorq[3];
+                }
+            }
         } else {
-            throw std::runtime_error("Unknown particle bodytype; it should be either point, rod, rigidbody,"
-                    "pointMS, rodMS or rigibodyMS.");
+            throw std::runtime_error("Unknown particles bodytype; it should be either point, rod, rigidbody,"
+                    "pointMix, rodMix or rigibodyMix.");
         }
     }
 

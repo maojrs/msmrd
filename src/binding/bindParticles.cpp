@@ -14,6 +14,7 @@ namespace msmrd {
                 .def_property_readonly("ID", &particle::getID)
                 .def_property_readonly("D", &particle::getD)
                 .def_property_readonly("Drot", &particle::getDrot)
+                .def_property_readonly("type", &particle::getType)
                 .def_property_readonly("position", [](const particle &part) {
                     return vec2numpy(3, part.position);
                 })
@@ -25,17 +26,16 @@ namespace msmrd {
                 })
                 .def("setD", &particle::setD)
                 .def("setDrot", &particle::setDrot)
+                .def("setType", &particleMS::setType)
                 .def("setPosition", &particle::setPositionPyBind)
                 .def("setOrientVector", &particle::setOrientVectorPyBind)
                 .def("setOrientation", &particle::setOrientationPyBind);
 
         py::class_<particleMS, particle>(m, "particleMS")
                 .def(py::init<int &, int &, double &, double &, std::vector<double> &, std::vector<double> &>())
-                .def_property_readonly("type", &particleMS::getType)
                 .def_property_readonly("state", &particleMS::getState)
                 .def_property_readonly("lagtime", &particleMS::getLagtime)
                 .def("setState", &particleMS::setState)
-                .def("setType", &particleMS::setType)
                 .def("setLagtime", &particleMS::setLagtime);
     }
 

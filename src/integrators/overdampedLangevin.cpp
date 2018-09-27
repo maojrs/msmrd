@@ -11,8 +11,8 @@ namespace msmrd {
      * @param seed random generator seed (Note seed = -1 corresponds to random device)
      * @param rotation boolean to indicate if rotational degrees of freedom should be integrated
      */
-    overdampedLangevin::overdampedLangevin(double dt, long seed, std::string bodytype, bool rotation)
-            : integrator(dt, seed, bodytype, rotation) {};
+    overdampedLangevin::overdampedLangevin(double dt, long seed, std::string particlesbodytype, bool rotation)
+            : integrator(dt, seed, particlesbodytype, rotation) {};
 
 
     // Integrate one particle from the particle list main routine (visible only inside the class)
@@ -40,7 +40,7 @@ namespace msmrd {
         dquat = axisanglerep2quaternion(dphi);
         part.setNextOrientation(dquat * part.orientation);
         // Updated orientation vector, useful with rodlike particles
-        if (particlestype == "rod" || particlestype == "rodMS") {
+        if (particlesbodytype == "rod" || particlesbodytype == "rodMix") {
             vec3<double> neworientvector = rotateVec(part.orientvector, dquat);
             part.setNextOrientVector(neworientvector);
         }

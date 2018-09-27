@@ -15,16 +15,16 @@ namespace msmrd {
      * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
      * @param randg random number generator based in mt19937
      */
-    integrator::integrator(double dt, long seed, std::string particlestype, bool rotation)
-            : dt(dt), seed(seed), particlestype(particlestype), rotation(rotation) {
+    integrator::integrator(double dt, long seed, std::string particlesbodytype, bool rotation)
+            : dt(dt), seed(seed), particlesbodytype(particlesbodytype), rotation(rotation) {
         randg.setSeed(seed);
         clock = 0;
         forceField.resize(0);
         torqueField.resize(0);
-        if (particlestype != "point" && particlestype != "rod" && particlestype != "rigidbody" &&
-            particlestype != "pointMS" && particlestype != "rodMS" && particlestype != "rigidbodyMS") {
-            throw std::runtime_error("Unknown particle bodytype; it should be either point, rod, rigidbody,"
-                                     "pointMS, rodMS or rigibodyMS.");
+        if (particlesbodytype != "point" && particlesbodytype != "rod" && particlesbodytype != "rigidbody" &&
+            particlesbodytype != "pointMix" && particlesbodytype != "rodMix" && particlesbodytype != "rigidbodyMix") {
+            throw std::runtime_error("Unknown particles bodytype; it should be either point, rod, rigidbody,"
+                                     "pointMix, rodMix or rigibodyMix.");
         }
      };
 
@@ -63,40 +63,124 @@ namespace msmrd {
         domainBoundary = bndry;
     }
 
+
+    /*
+     * Integrator set potential functions for external potentials.
+     */
+
+
     // Incorporates custom external potential functions into integrator
     void integrator::setExternalPotential(externalPotential<> *pot) {
+        if (particlesbodytype != "point") {
+            throw std::runtime_error("This potential requires particles bodytype = 'point'. ");
+        }
         externalPotentialActive = true;
         externalPot = pot;
     }
 
+    // Incorporates custom external potential functions for mix of point particles into integrator
+    void integrator::setExternalMixPotential(externalPotential<int> *pot) {
+        if (particlesbodytype != "pointMix") {
+            throw std::runtime_error("This potential requires particles bodytype = 'pointMix'. ");
+        }
+        externalPotentialActive = true;
+        externalMixPot = pot;
+    }
+
     // Incorporates custom external potential functions for rod-like particles into integrator
     void integrator::setExternalRodPotential(externalPotential<vec3<double>> *pot) {
+        if (particlesbodytype != "rod") {
+            throw std::runtime_error("This potential requires particles bodytype = 'rod'. ");
+        }
         externalPotentialActive = true;
         externalRodPot = pot;
     }
 
+    // Incorporates custom external potential functions for mix of rod-like particles into integrator
+    void integrator::setExternalRodMixPotential(externalPotential<vec3<double>, int> *pot) {
+        if (particlesbodytype != "rodMix") {
+            throw std::runtime_error("This potential requires particles bodytype = 'rodMix'. ");
+        }
+        externalPotentialActive = true;
+        externalRodMixPot = pot;
+    }
+
     // Incorporates custom external potential functions for rigidbody particles into integrator
     void integrator::setExternalRigidBodyPotential(externalPotential<quaternion<double>> *pot) {
+        if (particlesbodytype != "rigidbody") {
+            throw std::runtime_error("This potential requires particles bodytype = 'rigidbody'. ");
+        }
         externalPotentialActive = true;
         externalRigidBodyPot = pot;
     }
 
+    // Incorporates custom external potential functions for mix of rigidbody particles into integrator
+    void integrator::setExternalRigidBodyMixPotential(externalPotential<quaternion<double>, int> *pot) {
+        if (particlesbodytype != "rigidbodyMix") {
+            throw std::runtime_error("This potential requires particles bodytype = 'rigidbodyMix'. ");
+        }
+        externalPotentialActive = true;
+        externalRigidBodyMixPot = pot;
+    }
+
+
+    /*
+     * Integrator set potential functions for pair potentials.
+     */
+
+
     // Incorporates custom pair potential functions into integrator
     void integrator::setPairPotential(pairPotential<> *pot) {
+        if (particlesbodytype != "point") {
+            throw std::runtime_error("This potential requires particles bodytype = 'point'. ");
+        }
         pairPotentialActive = true;
         pairPot = pot;
     }
 
+    // Incorporates custom pair potential functions for mix of point particles into integrator
+    void integrator::setPairMixPotential(pairPotential<int, int> *pot) {
+        if (particlesbodytype != "pointMix") {
+            throw std::runtime_error("This potential requires particles bodytype = 'pointMix'. ");
+        }
+        pairPotentialActive = true;
+        pairMixPot = pot;
+    }
+
     // Incorporates custom pair potential function for rod-like particles into integrator
     void integrator::setPairRodPotential(pairPotential<vec3<double>, vec3<double>> *pot) {
+        if (particlesbodytype != "rod") {
+            throw std::runtime_error("This potential requires particles bodytype = 'rod'. ");
+        }
         pairPotentialActive = true;
         pairRodPot = pot;
     }
 
+    // Incorporates custom pair potential function for mix of rod-like particles into integrator
+    void integrator::setPairRodMixPotential(pairPotential<vec3<double>, vec3<double>, int, int> *pot) {
+        if (particlesbodytype != "rodMix") {
+            throw std::runtime_error("This potential requires particles bodytype = 'rodMix'. ");
+        }
+        pairPotentialActive = true;
+        pairRodMixPot = pot;
+    }
+
     // Incorporates custom pair potential function for rigidbody particles into integrator
     void integrator::setPairRigidBodyPotential(pairPotential<quaternion<double>, quaternion<double>> *pot) {
+        if (particlesbodytype != "rigidbody") {
+            throw std::runtime_error("This potential requires particles bodytype = 'rigidbody'. ");
+        }
         pairPotentialActive = true;
         pairRigidBodyPot = pot;
+    }
+
+    // Incorporates custom pair potential function for mix of rigidbody particles into integrator
+    void integrator::setPairRigidBodyMixPotential(pairPotential<quaternion<double>, quaternion<double>, int, int> *pot) {
+        if (particlesbodytype != "rigidbodyMix") {
+            throw std::runtime_error("This potential requires particles bodytype = 'rigidbodyMix'. ");
+        }
+        pairPotentialActive = true;
+        pairRigidBodyMixPot = pot;
     }
 
 }
