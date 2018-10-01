@@ -37,8 +37,10 @@ namespace msmrd {
 
         py::class_<gaussians3D, externalPotential<> >(m, "gaussians3D")
                 .def(py::init<int &, double &, double &, long &>())
-                .def("evaluate", &gaussians3D::evaluatePyBind)
-                .def("force", &gaussians3D::forceTorquePyBind);
+                .def("evaluate", (double (gaussians3D::*)
+                        (std::vector<double>)) &gaussians3D::evaluatePyBind)
+                .def("force", (std::vector<double> (gaussians3D::*)
+                        (std::vector<double>))&gaussians3D::forceTorquePyBind);
 
         py::class_<dipole, externalPotential<vec3<double>>>(m, "dipole")
                 .def(py::init<double &, std::vector<double> &>())
@@ -69,16 +71,16 @@ namespace msmrd {
                          std::vector<double>, std::vector<double>))
                         &patchyParticle::forceTorquePyBind);
 
-        py::class_<patchyProtein, pairPotential<quaternion<double>, quaternion<double>, int, int>>(m, "patchyProtein")
-                .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
-                .def("evaluate", (double (patchyParticle::*)
-                        (std::vector<double>, std::vector<double>,
-                         std::vector<double>, std::vector<double>, int, int))
-                        &patchyParticle::evaluatePyBind)
-                .def("forceTorque", (std::vector<std::vector<double>> (patchyParticle::*)
-                        (std::vector<double>, std::vector<double>,
-                         std::vector<double>, std::vector<double>, int, int))
-                        &patchyParticle::forceTorquePyBind);
+//        py::class_<patchyProtein, pairPotential<quaternion<double>, quaternion<double>, int, int>>(m, "patchyProtein")
+//                .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
+//                .def("evaluate", (double (patchyParticle::*)
+//                        (std::vector<double>, std::vector<double>,
+//                         std::vector<double>, std::vector<double>))
+//                        &patchyParticle::evaluatePyBind)
+//                .def("forceTorque", (std::vector<std::vector<double>> (patchyParticle::*)
+//                        (std::vector<double>, std::vector<double>,
+//                         std::vector<double>, std::vector<double>))
+//                        &patchyParticle::forceTorquePyBind);
     }
 
 }

@@ -1,6 +1,7 @@
 //
 // Created by maojrs on 8/21/18.
 //
+#include <tuple>
 #include "vec3.hpp"
 #include "potentials/potentials.hpp"
 
@@ -15,13 +16,13 @@ namespace msmrd {
      */
 
 
-    //Evaluates potential. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation.
+    /* Evaluates potential. Template AUXVARIABLES is empty, so it corresponds to particles with
+     * no relevant orientation. */
     template<>
-    double externalPotential<>::evaluatePyBind(std::vector<double> pos) {
-        vec3<double> x = vec3<double>(pos);
+    double externalPotential<>::evaluatePyBind(std::vector<double> pos1) {
+        vec3<double> x = vec3<double>(pos1);
         return evaluate(x);
     }
-
 
     /* Evaluates potential. Template AUXVARIABLES corresponds to vec3<double>, so it corresponds to rod-like
      * particles with orientation described by one vector. */
@@ -40,6 +41,16 @@ namespace msmrd {
         vec3<double> x = vec3<double>(pos1);
         quaternion<double> th = quaternion<double>(theta1);
         return evaluate(x, th);
+    }
+
+    /* Evaluates potential. Template AUXVARIABLES corresponds to quaternion<double>, int, so it corresponds to
+     * rigidbody particles of a type given by an int with orientation described by a quaternion. */
+    template<>
+    double externalPotential<quaternion<double>, int>::evaluatePyBind(std::vector<double> pos1,
+                                                                      std::vector<double> theta1, int type1) {
+        vec3<double> x = vec3<double>(pos1);
+        quaternion<double> th = quaternion<double>(theta1);
+        return evaluate(x, th, type1);
     }
 
 
@@ -86,6 +97,28 @@ namespace msmrd {
         vec3<double> x = vec3<double>(pos1);
         quaternion<double> th = quaternion<double>(theta1);
         std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th);
+        std::vector<std::vector<double>> output;
+        output.resize(2);
+        output[0].resize(3);
+        output[1].resize(3);
+        for (int i = 0; i < 2; i++) {
+            output[i][0] = 1.0*forceTorquex[i][0];
+            output[i][1] = 1.0*forceTorquex[i][1];
+            output[i][2] = 1.0*forceTorquex[i][2];
+        }
+        return output;
+    }
+
+
+    /* Evaluates force and torque. Template AUXVARIABLES corresponds to quaternion<double>, int so it corresponds to
+     * rigidbody particles of a type given by an int with orientation described by a quaternion. */
+    template<>
+    std::vector<std::vector<double>>
+    externalPotential<quaternion<double>, int>::forceTorquePyBind(std::vector<double> pos1,
+                                                                  std::vector<double> theta1, int type1) {
+        vec3<double> x = vec3<double>(pos1);
+        quaternion<double> th = quaternion<double>(theta1);
+        std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th, type1);
         std::vector<std::vector<double>> output;
         output.resize(2);
         output[0].resize(3);
