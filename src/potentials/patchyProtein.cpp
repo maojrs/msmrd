@@ -2,65 +2,77 @@
 // Created by maojrs on 9/26/18.
 //
 
+#include <utility>
 #include "potentials/patchyProtein.hpp"
 #include "quaternion.hpp"
-
 
 namespace msmrd {
    /*
     * Constructors analogous to the patchyParticle potential.
     * @param sigma diameter of sphere at which patches are placed. Corresponds to the radius of the particle.
-    * @param patchesCoordintates list of patches coordinates in a sphere of unit radius
+    * @param strength overall strength of the potential
+    * @param patchesCoordintatesA list of patches coordinates in a unit sphere corresponding to type1 particles.
+    * @param patchesCoordintatesA list of patches coordinates in a unit sphere corresponding to type2 particles
+
     */
-    patchyProtein::patchyProtein(double sigma1, double sigma2, double strength1, double strength2,
-                                 std::vector<vec3<double>> patchesCoordinates)
-            :  sigma1(sigma1), sigma2(sigma2), strength1(strength1), strength2(strength2),
-               patchesCoordinates(patchesCoordinates) {
+    patchyProtein::patchyProtein(double sigma, double strength,
+                                 std::vector<vec3<double>> patchesCoordinatesA,
+                                 std::vector<vec3<double>> patchesCoordinatesB)
+            :  sigma(sigma), strength(strength),
+               patchesCoordinatesA(std::move(patchesCoordinatesA)),
+               patchesCoordinatesB(std::move(patchesCoordinatesB)) {
+
        setPotentialParameters();
     };
 
-    patchyProtein::patchyProtein(double sigma1, double sigma2, double strength1, double strength2,
-                                 std::vector<std::vector<double>> patchesCoords)
-            : sigma1(sigma1), sigma2(sigma2), strength1(strength1), strength2(strength2) {
-        patchesCoordinates.resize(patchesCoords.size());
-        for (int i=0; i < patchesCoords.size(); i++ ) {
-            patchesCoordinates[i] = vec3<double> (patchesCoords[i]);
+    patchyProtein::patchyProtein(double sigma, double strength,
+                                 std::vector<std::vector<double>> patchesCoordsA,
+                                 std::vector<std::vector<double>> patchesCoordsB)
+            :  sigma(sigma), strength(strength) {
+        patchesCoordinatesA.resize(patchesCoordsA.size());
+        patchesCoordinatesA.resize(patchesCoordsB.size());
+        for (int i=0; i < patchesCoordsA.size(); i++ ) {
+            patchesCoordinatesA[i] = vec3<double> (patchesCoordsA[i]);
+        }
+        for (int i=0; i < patchesCoordsB.size(); i++ ) {
+            patchesCoordinatesB[i] = vec3<double> (patchesCoordsB[i]);
         }
         setPotentialParameters();
     }
 
 
-    // Set potential parameters for potential
+    /* Set potentials parameters for overall potential. Consists of isotropic attractive and
+     * repulsive parts plus two types of patches interactions*/
     void patchyProtein::setPotentialParameters() {
-        // Set strengths of the three potential parts
-        epsRepulsive[0] = 1.0*strength1;
-        epsAttractive[0] = -0.0*strength1;
-        epsPatches[0] = -0.15*strength1;
+        // Check pacthes coordinates have unit norm
+        for (auto &patch : patchesCoordinatesA) {
+            if (patch.norm() != 1) {
+                throw std::range_error("Patches coordinates must be in a sphere of unit radius");
+            }
+        }
+        for (auto &patch : patchesCoordinatesB) {
+            if (patch.norm() != 1) {
+                throw std::range_error("Patches coordinates must be in a sphere of unit radius");
+            }
+        }
 
-        // Set stiffness for the three potentials
-        aRepulsive[0] = 1.5;
-        aAttractive[0] = 0.75;
+        // Set strengths of potential parts
+        epsRepulsive = 1.0*strength;
+        epsAttractive = -0.05*strength;
+        epsPatches[0] = -0.15*strength;
+        epsPatches[1] = -0.30*strength; // Special binding site
+
+        // Set stiffness of potentials parts
+        aRepulsive = 1.5;
+        aAttractive = 0.75;
         aPatches[0] = 40.0;
+        aPatches[1] = 40.0; // Special binding site
 
-        // Set range parameter for the three potentials
-        rstarRepulsive[0] = 0.75*sigma1;
-        rstarAttractive[0] = 0.85*sigma1;
-        rstarPatches[0] = 0.1*sigma1;
-
-        // Set strengths of the three potential parts
-        epsRepulsive[1] = 1.0*strength2;
-        epsAttractive[1] = -0.0*strength2;
-        epsPatches[1] = -0.15*strength2;
-
-        // Set stiffness for the three potentials
-        aRepulsive[1] = 1.5;
-        aAttractive[1] = 0.75;
-        aPatches[1] = 40.0;
-
-        // Set range parameter for the three potentials
-        rstarRepulsive[1] = 0.75*sigma2;
-        rstarAttractive[1] = 0.85*sigma2;
-        rstarPatches[1] = 0.1*sigma2;
+        // Set range parameter potentials parts
+        rstarRepulsive = 0.75*sigma;
+        rstarAttractive = 0.85*sigma;
+        rstarPatches[0] = 0.1*sigma;
+        rstarPatches[1] = 0.1*sigma; // Special binding site
     }
 
 
@@ -68,6 +80,8 @@ namespace msmrd {
     double patchyProtein::evaluate(vec3<double> pos1, vec3<double> pos2,
                                    quaternion<double> theta1, quaternion<double> theta2,
                                     int type1, int type2) {
+        std::vector<vec3<double>> patchesCoords1;
+        std::vector<vec3<double>> patchesCoords2;
         double repulsivePotential;
         double attractivePotential;
         double patchesPotential = 0.0;
@@ -78,22 +92,36 @@ namespace msmrd {
         vec3<double> rpatch;
         vec3<double> rvec = pos2 - pos1;
 
-        repulsivePotential = quadraticPotential(rvec.norm(), sigma1, epsRepulsive[0], aRepulsive[0], rstarRepulsive[0]);
-        attractivePotential = quadraticPotential(rvec.norm(), sigma1, epsAttractive[0], aAttractive[0], rstarAttractive[0]);
+        repulsivePotential = quadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
+        attractivePotential = quadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
 
-        if (rvec.norm() <= 2*sigma1) {
+        /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
+        patchesCoords1 = assignPatches(type1);
+        patchesCoords2 = assignPatches(type2);
+
+
+        // Interaction if particles are different
+        if (rvec.norm() <= 2*sigma) {
             // Loop over all patches
-            for (int i = 0; i < patchesCoordinates.size(); i++) {
-                patchNormal1 = rotateVec(patchesCoordinates[i], theta1);
-                patch1 = pos1 + 0.5*sigma1*patchNormal1;
-                for (int j = 0; j < patchesCoordinates.size(); j++) {
-                    patchNormal2 = rotateVec(patchesCoordinates[j], theta2);
-                    patch2 = pos2 + 0.5*sigma1*patchNormal2;
+            for (int i = 0; i < patchesCoords1.size(); i++) {
+                patchNormal1 = rotateVec(patchesCoords1[i], theta1);
+                patch1 = pos1 + 0.5*sigma*patchNormal1;
+                for (int j = 0; j < patchesCoords2.size(); j++) {
+                    patchNormal2 = rotateVec(patchesCoords2[j], theta2);
+                    patch2 = pos2 + 0.5*sigma*patchNormal2;
                     rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
-                    patchesPotential += quadraticPotential(rpatch.norm(), sigma1, epsPatches[0], aPatches[0], rstarPatches[0]);
+                    // Assumes the first patch from type1 has a different type of interaction,
+                    if ( (i == 0 && type1 == 0) || (j == 0 && type2 == 0) ) {
+                        patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[1], aPatches[1], rstarPatches[1]);
+                    }
+                    // while all the other patches combinations have another type of interaction.
+                    else{
+                        patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[0], aPatches[0], rstarPatches[0]);
+                    }
                 }
             }
         }
+
         return repulsivePotential + attractivePotential + patchesPotential;
     }
 
@@ -108,6 +136,8 @@ namespace msmrd {
         vec3<double> torque1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> torque2 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> rvec = pos2 - pos1;
+        std::vector<vec3<double>> patchesCoords1;
+        std::vector<vec3<double>> patchesCoords2;
         // auxiliary variables to calculate force and torque
         double repulsiveForceNorm;
         double attractiveForceNorm;
@@ -121,25 +151,35 @@ namespace msmrd {
 
         /* Calculate and add forces due to repulsive and attractive isotropic potentials.
          *  Note correct sign/direction of force given by rvec/rvec.norm*() */
-        repulsiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma1, epsRepulsive[0], aRepulsive[0], rstarRepulsive[0]);
-        attractiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma1, epsAttractive[0], aAttractive[0], rstarAttractive[0]);
+        repulsiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
+        attractiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
         force = (repulsiveForceNorm + attractiveForceNorm)*rvec/rvec.norm();
 
+        /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
+        patchesCoords1 = assignPatches(type1);
+        patchesCoords2 = assignPatches(type2);
+
         // Calculate forces and torque due to patches interaction
-        if (rvec.norm() <= 2*sigma1) {
+        if (rvec.norm() <= 2*sigma) {
             // Loop over all patches of particle 1
-            for (int i = 0; i < patchesCoordinates.size(); i++) {
-                patchNormal1 = rotateVec(patchesCoordinates[i], theta1);
+            for (int i = 0; i < patchesCoords1.size(); i++) {
+                patchNormal1 = rotateVec(patchesCoords1[i], theta1);
                 patchNormal1 = patchNormal1/patchNormal1.norm();
-                patch1 = pos1 + 0.5*sigma1*patchNormal1;
+                patch1 = pos1 + 0.5*sigma*patchNormal1;
                 // Loop over all patches of particle 2
-                for (int j = 0; j < patchesCoordinates.size(); j++) {
-                    patchNormal2 = rotateVec(patchesCoordinates[j], theta2);
+                for (int j = 0; j < patchesCoords2.size(); j++) {
+                    patchNormal2 = rotateVec(patchesCoords2[j], theta2);
                     patchNormal2 = patchNormal2/patchNormal2.norm();
-                    patch2 = pos2 + 0.5*sigma1*patchNormal2;
+                    patch2 = pos2 + 0.5*sigma*patchNormal2;
                     rpatch = patch2 - patch1;
-                    // Calculate force vector between patches , correct sign of force given by rpatch/rpatch.norm().
-                    patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma1, epsPatches[0], aPatches[0], rstarPatches[0]);
+                    /* Calculate force vector between patches , correct sign of force given by rpatch/rpatch.norm().
+                     * It also assumes the first patch from type1 has a different type of interaction. */
+                    if ( (i == 0 && type1 == 0) || (j == 0 && type2 == 0) ) {
+                        patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[1], aPatches[1], rstarPatches[1]);
+                    }
+                    else {
+                        patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[0], aPatches[0], rstarPatches[0]);
+                    }
                     if (rpatch.norm() == 0) {
                         patchForce = vec3<double> (0, 0, 0);
                     }
@@ -148,11 +188,11 @@ namespace msmrd {
                     }
                     // Calculate force and torque acting on particle 1 and add values to previous forces and torques
                     force1 += patchForce;
-                    torque1 += 0.5*sigma1 * patchNormal1.cross(patchForce);
+                    torque1 += 0.5*sigma * patchNormal1.cross(patchForce);
 
                     // Calculate force and torque acting on particle 2 and add values to previous forces and torques
                     force2 += -1.0*patchForce;
-                    torque2 += 0.5*sigma1 * patchNormal2.cross(-1.0*patchForce);
+                    torque2 += 0.5*sigma * patchNormal2.cross(-1.0*patchForce);
                 }
             }
         }
@@ -195,6 +235,19 @@ namespace msmrd {
             return -2.0*eps * b * (rcritical - rlocal)/std::pow(sig,2);
         } else {
             return 0.0;
+        }
+    }
+
+    // Assign pacthes coordinates in terms of particle type
+    std::vector<vec3<double>> patchyProtein::assignPatches(int type) {
+        if (type == 0) {
+            return patchesCoordinatesA;
+        }
+        else if (type == 1) {
+            return patchesCoordinatesB;
+        }
+        else {
+            throw std::runtime_error("This potential only supports for two different types of particles.");
         }
     }
 

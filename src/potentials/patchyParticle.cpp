@@ -11,7 +11,8 @@
 namespace msmrd{ ;
     /*
      * @param sigma diameter of sphere at which patches are placed. Corresponds to the radius of the particle.
-     * @param patchesCoordintates list of patches coordinates in a sphere of unit radius
+     * @param strength overall strength of the potential
+     * @param patchesCoordinates list of patches coordinates in a sphere of unit radius
      */
     patchyParticle::patchyParticle(double sigma, double strength, std::vector<vec3<double>> patchesCoordinates)
             : sigma(sigma), strength(strength), patchesCoordinates(patchesCoordinates)  {
@@ -30,6 +31,12 @@ namespace msmrd{ ;
         rstarRepulsive = 0.75*sigma;
         rstarAttractive = 0.85*sigma;
         rstarPatches = 0.1*sigma;
+
+        for (auto &patch : patchesCoordinates) {
+            if (patch.norm() != 1) {
+                throw std::range_error("Patches coordinates must be in the unit sphere");
+            }
+        }
     }
 
     patchyParticle::patchyParticle(double sigma, double strength, std::vector<std::vector<double>> patchesCoords)
@@ -53,6 +60,12 @@ namespace msmrd{ ;
         rstarRepulsive = 0.75*sigma;
         rstarAttractive = 0.85*sigma;
         rstarPatches = 0.1*sigma;
+
+        for (auto &patch : patchesCoordinates) {
+            if (patch.norm() != 1) {
+                throw std::range_error("Patches coordinates must be in the unit sphere");
+            }
+        }
     }
 
     // Evaluates potential at given positions and orientations of two particles
