@@ -6,7 +6,7 @@
 #include "potentials/gayBerne.hpp"
 #include "potentials/patchyParticle.hpp"
 #include "msm.hpp"
-#include "integrators/odLangevin.hpp"
+#include "integrators/overdampedLangevin.hpp"
 #include "simulation.hpp"
 #include "trajectory.hpp"
 #include "particle.hpp"
@@ -242,8 +242,8 @@ TEST_CASE("Write to trajectory", "[writeTraj]"){
     auto p2 = vec3<double> {0.0, 0.4, 0.0};
     auto o1 = quaternion<double> {1.0, 0.0, 0.0, 0.0};
     auto o2 = quaternion<double> {1.0, 0.0, 0.0, 0.0};
-    particle part1 = particle(1., 1., "rigidsolid", p1, o1);
-    particle part2 = particle(1., 1., "rigidsolid", p2, o2);
+    particle part1 = particle(1., 1., p1, o1);
+    particle part2 = particle(1., 1., p2, o2);
     std::vector<particle> particles{part1, part2};
     trajectoryPositionOrientation traj(2, 1);
     traj.sample(0.1, particles); //traj.sample(0.1, particles);
@@ -254,10 +254,10 @@ TEST_CASE("Fundamental trajectory recording", "[trajectory]") {
     auto p2 = vec3<double> {0.0, 0.0, 0.0};
     auto o1 = quaternion<double> {1.0, 0.0, 0.0, 0.0};
     auto o2 = quaternion<double> {1.0, 0.0, 0.0, 0.0};
-    particle part1(1., 1., "rigidsolid", p1, o1);
-    particle part2(1., 1., "rigidsolid", p2, o2);
+    particle part1(1., 1., p1, o1);
+    particle part2(1., 1., p2, o2);
     std::vector<particle> particles {part1, part2};
-    odLangevin integrator(0.01, 15, true);
+    overdampedLangevin integrator(0.01, 15, "rigidbody", true);
     simulation sim(integrator, particles);
     trajectoryPositionOrientation traj(2, 20000);
     sim.run(10000, traj, 1);
