@@ -4,23 +4,16 @@
 
 //#include <random>
 #include "simulation.hpp"
+#include "trajectory.hpp"
+
 
 namespace msmrd {
-
-    template<typename rng>
-    int something() {
-        std::mt19937 generator;
-        generator.seed(10);
-        std::normal_distribution<double> distribution(0.0, 1.0);
-        distribution(generator);
+    void simulation::run(const int Nsteps, trajectory& traj, int stride) {
+        for (int step=0; step < Nsteps; step++) {
+            integ.integrate(particleList);
+            if (step % stride == 0) {
+                traj.sample(step, particleList);
+            }
+        }
     }
-
-    //void simulation::run(const double timestep, const int Nsteps) {
-    //    for (int step; step<Nsteps; step++) {
-    //        for (int i; i<Nparticles; i++) {
-    //            particles.at(i).position += 1;
-    //        }
-    //    }
-    //}
-
 }

@@ -18,6 +18,7 @@ set(SOURCES
         src/msm.cpp
         src/randomgen.cpp
         src/simulation.cpp
+        src/trajectory.cpp
         src/boundaries/boundary.cpp
         src/boundaries/box.cpp
         src/boundaries/sphere.cpp
@@ -40,10 +41,13 @@ set(PY_SOURCES
         src/binding/bindMarkovModels.cpp
         src/binding/bindParticles.cpp
         src/binding/bindPotentials.cpp
+        src/binding/bindSimulation.cpp
+        src/binding/bindTrajectory.cpp
         include/msm.hpp
         include/particle.hpp
         include/quaternion.hpp
         include/randomgen.hpp
+        include/trajectory.hpp
         include/simulation.hpp
         include/vec3.hpp
         include/boundaries/boundary.hpp

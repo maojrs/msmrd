@@ -3,7 +3,11 @@
 //
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include <catch2/catch.hpp>
+#include <functional>
 #include "msm.hpp"
+#include "integrators/odLangevin.hpp"
+#include "simulation.hpp"
+#include "trajectory.hpp"
 #include "particle.hpp"
 #include "quaternion.hpp"
 #include "randomgen.hpp"
@@ -12,6 +16,7 @@
 using namespace msmrd;
 using msm = msmrd::discreteTimeMarkovStateModel;
 using ctmsm = msmrd::continuousTimeMarkovStateModel;
+using namespace std::placeholders;
 
 TEST_CASE("Basic vector arithmetic", "[vectors]") {
     vec3<double> v1({1.,2.,3});
@@ -193,4 +198,31 @@ TEST_CASE("Fundamental CTMSM parameters and propagation test", "[ctmsm]") {
         partMS2.updateState();
         REQUIRE(partMS.getState() == partMS2.getState());
     }
+}
+
+TEST_CASE("Write to trajectory", "[writeTraj]"){
+    auto p1 = vec3<double> {0.0, 0.2, 0.0};
+    auto p2 = vec3<double> {0.0, 0.4, 0.0};
+    auto o1 = quaternion<double> {1.0, 0.0, 0.0, 0.0};
+    auto o2 = quaternion<double> {1.0, 0.0, 0.0, 0.0};
+    particle part1 = particle(1., 1., "rigidsolid", p1, o1);
+    particle part2 = particle(1., 1., "rigidsolid", p2, o2);
+    std::vector<particle> particles{part1, part2};
+    trajectoryPositionOrientation traj(2, 1);
+    traj.sample(0.1, particles); //traj.sample(0.1, particles);
+}
+
+TEST_CASE("Fundamental trajectory recording", "[trajectory]") {
+    auto p1 = vec3<double> {0.0, 0.0, 0.0};
+    auto p2 = vec3<double> {0.0, 0.0, 0.0};
+    auto o1 = quaternion<double> {1.0, 0.0, 0.0, 0.0};
+    auto o2 = quaternion<double> {1.0, 0.0, 0.0, 0.0};
+    particle part1(1., 1., "rigidsolid", p1, o1);
+    particle part2(1., 1., "rigidsolid", p2, o2);
+    std::vector<particle> particles {part1, part2};
+    odLangevin integrator(0.01, 15, true);
+    simulation sim(integrator, particles);
+    trajectoryPositionOrientation traj(2, 20000);
+    sim.run(10000, traj, 1);
+    REQUIRE(traj.data.size() == 20000);
 }

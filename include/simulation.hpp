@@ -6,16 +6,15 @@
 #include <array>
 #include "particle.hpp"
 #include "integrators/integrator.hpp"
+#include "trajectory.hpp"
 
 namespace msmrd {
     class simulation {
     public:
-        std::vector<particle> &particles;
-        const int Nparticles;
-
-        simulation(std::vector<particle> particles) : particles(particles), Nparticles(particles.size()) {};
-
-        void run(const double timestep, const int steps);
+        integrator& integ;
+        std::vector<particle> &particleList;
+        simulation(integrator& integ, std::vector<particle> &particleList) : integ(integ), particleList(particleList) {};
+        void run(const int steps, trajectory& traj, int stride);
     };
 
 }
