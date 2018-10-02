@@ -39,7 +39,7 @@ namespace msmrd {
                 .def(py::init<int &, double &, double &, long &>())
                 .def("evaluate", (double (gaussians3D::*)
                         (std::vector<double>)) &gaussians3D::evaluatePyBind)
-                .def("force", (std::vector<double> (gaussians3D::*)
+                .def("forceTorque", (std::vector<std::vector<double>> (gaussians3D::*)
                         (std::vector<double>))&gaussians3D::forceTorquePyBind);
 
         py::class_<dipole, externalPotential<vec3<double>>>(m, "dipole")

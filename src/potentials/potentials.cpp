@@ -16,12 +16,22 @@ namespace msmrd {
      */
 
 
+    /* Evaluate functions */
+
+
     /* Evaluates potential. Template AUXVARIABLES is empty, so it corresponds to particles with
      * no relevant orientation. */
     template<>
     double externalPotential<>::evaluatePyBind(std::vector<double> pos1) {
         vec3<double> x = vec3<double>(pos1);
         return evaluate(x);
+    }
+
+    /* Same as previous function with particle type dependence */
+    template<>
+    double externalPotential<int>::evaluatePyBind(std::vector<double> pos1, int type1) {
+        vec3<double> x = vec3<double>(pos1);
+        return evaluate(x, type1);
     }
 
     /* Evaluates potential. Template AUXVARIABLES corresponds to vec3<double>, so it corresponds to rod-like
@@ -31,6 +41,15 @@ namespace msmrd {
         vec3<double> x = vec3<double>(pos1);
         vec3<double> th = vec3<double>(theta1);
         return evaluate(x, th);
+    }
+
+    /* Same as previous function with particle type dependence */
+    template<>
+    double externalPotential<vec3<double>, int>::evaluatePyBind(std::vector<double> pos1, std::vector<double> theta1,
+                                                                int type1) {
+        vec3<double> x = vec3<double>(pos1);
+        vec3<double> th = vec3<double>(theta1);
+        return evaluate(x, th, type1);
     }
 
 
@@ -43,8 +62,7 @@ namespace msmrd {
         return evaluate(x, th);
     }
 
-    /* Evaluates potential. Template AUXVARIABLES corresponds to quaternion<double>, int, so it corresponds to
-     * rigidbody particles of a type given by an int with orientation described by a quaternion. */
+    /* Same as previous function with particle type dependence */
     template<>
     double externalPotential<quaternion<double>, int>::evaluatePyBind(std::vector<double> pos1,
                                                                       std::vector<double> theta1, int type1) {
@@ -54,17 +72,22 @@ namespace msmrd {
     }
 
 
-    // Evaluates force and torque. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation.
+    /* Force torque functions */
+
+    /* Evaluates force and torque. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation. */
     template<>
-    std::vector<double> externalPotential<>::forceTorquePyBind(std::vector<double> pos) {
+    std::vector<std::vector<double>> externalPotential<>::forceTorquePyBind(std::vector<double> pos) {
         vec3<double> x = vec3<double>(pos);
-        std::array<vec3<double>, 2> forcex = forceTorque(x);
-        std::vector<double> output;
-        output.resize(3);
-        output[0] = 1.0*forcex[0][0];
-        output[1] = 1.0*forcex[0][1];
-        output[2] = 1.0*forcex[0][2];
-        return output;
+        std::array<vec3<double>, 2> forceTorquex = forceTorque(x);
+        return array2vec(forceTorquex);
+    }
+
+    /* Same as previous function with particle type dependence */
+    template<>
+    std::vector<std::vector<double>> externalPotential<int>::forceTorquePyBind(std::vector<double> pos1, int type1) {
+        vec3<double> x = vec3<double>(pos1);
+        std::array<vec3<double>, 2> forceTorquex = forceTorque(x, type1);
+        return array2vec(forceTorquex);
     }
 
 
@@ -76,16 +99,18 @@ namespace msmrd {
         vec3<double> x = vec3<double>(pos1);
         vec3<double> th = vec3<double>(theta1);
         std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th);
-        std::vector<std::vector<double>> output;
-        output.resize(2);
-        output[0].resize(3);
-        output[1].resize(3);
-        for (int i = 0; i < 2; i++) {
-            output[i][0] = 1.0*forceTorquex[i][0];
-            output[i][1] = 1.0*forceTorquex[i][1];
-            output[i][2] = 1.0*forceTorquex[i][2];
-        }
-        return output;
+        return array2vec(forceTorquex);
+    }
+
+    /* Same as previous function with particle type dependence */
+    template<>
+    std::vector<std::vector<double>>
+    externalPotential<vec3<double>, int>::forceTorquePyBind(std::vector<double> pos1, std::vector<double> theta1,
+                                                       int type1) {
+        vec3<double> x = vec3<double>(pos1);
+        vec3<double> th = vec3<double>(theta1);
+        std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th, type1);
+        return array2vec(forceTorquex);
     }
 
 
@@ -97,21 +122,11 @@ namespace msmrd {
         vec3<double> x = vec3<double>(pos1);
         quaternion<double> th = quaternion<double>(theta1);
         std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th);
-        std::vector<std::vector<double>> output;
-        output.resize(2);
-        output[0].resize(3);
-        output[1].resize(3);
-        for (int i = 0; i < 2; i++) {
-            output[i][0] = 1.0*forceTorquex[i][0];
-            output[i][1] = 1.0*forceTorquex[i][1];
-            output[i][2] = 1.0*forceTorquex[i][2];
-        }
-        return output;
+        return array2vec(forceTorquex);
     }
 
 
-    /* Evaluates force and torque. Template AUXVARIABLES corresponds to quaternion<double>, int so it corresponds to
-     * rigidbody particles of a type given by an int with orientation described by a quaternion. */
+    /* Same as previous function with particle type dependence */
     template<>
     std::vector<std::vector<double>>
     externalPotential<quaternion<double>, int>::forceTorquePyBind(std::vector<double> pos1,
@@ -119,16 +134,7 @@ namespace msmrd {
         vec3<double> x = vec3<double>(pos1);
         quaternion<double> th = quaternion<double>(theta1);
         std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th, type1);
-        std::vector<std::vector<double>> output;
-        output.resize(2);
-        output[0].resize(3);
-        output[1].resize(3);
-        for (int i = 0; i < 2; i++) {
-            output[i][0] = 1.0*forceTorquex[i][0];
-            output[i][1] = 1.0*forceTorquex[i][1];
-            output[i][2] = 1.0*forceTorquex[i][2];
-        }
-        return output;
+        return array2vec(forceTorquex);
     }
 
 
@@ -142,12 +148,24 @@ namespace msmrd {
      */
 
 
+    /* Evaluate functions */
+
+
     // Evaluates potential. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation.
     template<>
     double pairPotential<>::evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2) {
         vec3<double> x1 = vec3<double>(pos1);
         vec3<double> x2 = vec3<double>(pos2);
         return evaluate(x1, x2);
+    }
+
+    /* Same as previous function with particle type dependence */
+    template<>
+    double pairPotential<int, int>::evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2,
+                                                   int type1, int type2) {
+        vec3<double> x1 = vec3<double>(pos1);
+        vec3<double> x2 = vec3<double>(pos2);
+        return evaluate(x1, x2, type1, type2);
     }
 
 
@@ -165,6 +183,20 @@ namespace msmrd {
         return evaluate(x1, x2, th1, th2);
     }
 
+    /* Same as previous function with particle type dependence */
+    template<>
+    double pairPotential<vec3<double>, vec3<double>, int, int>::evaluatePyBind(std::vector<double> pos1,
+                                                                               std::vector<double> pos2,
+                                                                               std::vector<double> theta1,
+                                                                               std::vector<double> theta2,
+                                                                               int type1, int type2) {
+        vec3<double> x1 = vec3<double>(pos1);
+        vec3<double> x2 = vec3<double>(pos2);
+        vec3<double> th1 = vec3<double>(theta1);
+        vec3<double> th2 = vec3<double>(theta2);
+        return evaluate(x1, x2, th1, th2, type1, type2);
+    }
+
 
     /* Evaluate potential. Template AUXVARIABLES corresponds to <quaternion<double>, quaternion<double>>, so it
      * corresponds to two rigidbody particles each with orientation described by a quaternion. */
@@ -180,19 +212,43 @@ namespace msmrd {
         return evaluate(x1, x2, th1, th2);
     }
 
+    /* Same as previous function with particle type dependence */
+    template<>
+    double pairPotential<quaternion<double>, quaternion<double>, int, int>::evaluatePyBind(std::vector<double> pos1,
+                                                                                           std::vector<double> pos2,
+                                                                                           std::vector<double> theta1,
+                                                                                           std::vector<double> theta2,
+                                                                                           int type1, int type2) {
+        vec3<double> x1 = vec3<double>(pos1);
+        vec3<double> x2 = vec3<double>(pos2);
+        quaternion<double> th1 = quaternion<double>(theta1);
+        quaternion<double> th2 = quaternion<double>(theta2);
+        return evaluate(x1, x2, th1, th2, type1, type2);
+    }
+
+
+    /* Force torque functions */
+
 
     // Evaluates force and torque. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation
     template<>
-    std::vector<double> pairPotential<>::forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2) {
+    std::vector<std::vector<double>> pairPotential<>::forceTorquePyBind(std::vector<double> pos1,
+                                                                        std::vector<double> pos2) {
         vec3<double> x1 = vec3<double>(pos1);
         vec3<double> x2 = vec3<double>(pos2);
-        std::array<vec3<double>, 4> forcex = forceTorque(x1, x2);
-        std::vector<double> output;
-        output.resize(3);
-        output[0] = 1.0*forcex[0][0];
-        output[1] = 1.0*forcex[0][1];
-        output[2] = 1.0*forcex[0][2];
-        return output;
+        std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2);
+        return array2vec(forceTorquex);
+    }
+
+    /* Same as previous function with particle type dependence */
+    template<>
+    std::vector<std::vector<double>> pairPotential<int, int>::forceTorquePyBind(std::vector<double> pos1,
+                                                                                std::vector<double> pos2,
+                                                                                int type1, int type2) {
+        vec3<double> x1 = vec3<double>(pos1);
+        vec3<double> x2 = vec3<double>(pos2);
+        std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, type1, type2);
+        return array2vec(forceTorquex);
     }
 
 
@@ -209,15 +265,23 @@ namespace msmrd {
         vec3<double> th1 = vec3<double>(theta1);
         vec3<double> th2 = vec3<double>(theta2);
         std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, th1, th2);
-        std::vector<std::vector<double>> output;
-        output.resize(4);
-        for (int i = 0; i < 4; i++) {
-            output[i].resize(3);
-            output[i][0] = 1.0*forceTorquex[i][0];
-            output[i][1] = 1.0*forceTorquex[i][1];
-            output[i][2] = 1.0*forceTorquex[i][2];
-        }
-        return output;
+        return array2vec(forceTorquex);
+    }
+
+    /* Same as previous function with particle type dependence */
+    template<>
+    std::vector<std::vector<double>>
+            pairPotential<vec3<double>, vec3<double>, int, int>::forceTorquePyBind(std::vector<double> pos1,
+                                                                                   std::vector<double> pos2,
+                                                                                   std::vector<double> theta1,
+                                                                                   std::vector<double> theta2,
+                                                                                   int type1, int type2) {
+        vec3<double> x1 = vec3<double>(pos1);
+        vec3<double> x2 = vec3<double>(pos2);
+        vec3<double> th1 = vec3<double>(theta1);
+        vec3<double> th2 = vec3<double>(theta2);
+        std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, th1, th2, type1, type2);
+        return array2vec(forceTorquex);
     }
 
 
@@ -234,15 +298,23 @@ namespace msmrd {
         quaternion<double> th1 = quaternion<double>(theta1);
         quaternion<double> th2 = quaternion<double>(theta2);
         std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, th1, th2);
-        std::vector<std::vector<double>> output;
-        output.resize(4);
-        for (int i = 0; i < 4; i++) {
-            output[i].resize(3);
-            output[i][0] = 1.0*forceTorquex[i][0];
-            output[i][1] = 1.0*forceTorquex[i][1];
-            output[i][2] = 1.0*forceTorquex[i][2];
-        }
-        return output;
+        return array2vec(forceTorquex);
+    }
+
+    /* Same as previous function with particle type dependence */
+    template<>
+    std::vector<std::vector<double>>
+    pairPotential<quaternion<double>, quaternion<double>, int, int>::forceTorquePyBind(std::vector<double> pos1,
+                                                                                       std::vector<double> pos2,
+                                                                                       std::vector<double> theta1,
+                                                                                       std::vector<double> theta2,
+                                                                                       int type1, int type2) {
+        vec3<double> x1 = vec3<double>(pos1);
+        vec3<double> x2 = vec3<double>(pos2);
+        quaternion<double> th1 = quaternion<double>(theta1);
+        quaternion<double> th2 = quaternion<double>(theta2);
+        std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, th1, th2, type1, type2);
+        return array2vec(forceTorquex);
     }
 
 }

@@ -30,18 +30,15 @@ namespace msmrd {
 
 
         /* PyBind evaluation functions for external potentials of particles with no orientation, rod-like orientation
-         * or full orientation. They rely on evaluate and forceTorque functions above */
-
-//        template<typename ...AUXVARS>
-//        double evaluatePyBind(std::vector<double> pos, AUXVARS... auxvars);
-//        template<typename ...AUXVARS>
-//        std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos, AUXVARS... auxvars);
-
+         * or full orientation. They rely on evaluate and forceTorque functions above. Note each possible combination
+         * needs to be declared and implemented (template approaches failed, but might be possible). */
         double evaluatePyBind(std::vector<double> pos);
+        double evaluatePyBind(std::vector<double> pos, int type);
         double evaluatePyBind(std::vector<double> pos, std::vector<double> theta);
         double evaluatePyBind(std::vector<double> pos, std::vector<double> theta, int type);
 
-        std::vector<double> forceTorquePyBind(std::vector<double> pos);
+        std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos);
+        std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos, int type);
         std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos, std::vector<double> theta);
         std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos, std::vector<double> theta, int type);
 
@@ -74,157 +71,40 @@ namespace msmrd {
 
 
         /* PyBind evaluation functions for pair potentials of particles with no orientation, rod-like orientation or
-         * full orientation. They rely on evaluate and forceTorque functions above */
-//        template<typename ...AUXVARS>
-//        double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2, AUXVARS... auxvars);
-//        template<typename ...AUXVARS>
-//        std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2,
-//                                                           AUXVARS... auxvars);
-
-
+         * full orientation. They rely on evaluate and forceTorque functions above. Note each possible combination
+         * needs to be declared and implemented (template approaches failed, but might be possible). */
         double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2);
+        double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2, int type1, int type2);
         double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2,
                               std::vector<double> theta1, std::vector<double> theta2);
+        double evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2,
+                              std::vector<double> theta1, std::vector<double> theta2,
+                              int type1, int type2);
 
-        std::vector<double> forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2);
+        std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2);
+        std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2,
+                                                           int type1, int type2);
         std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2,
                                                            std::vector<double> theta1, std::vector<double> theta2);
+        std::vector<std::vector<double>> forceTorquePyBind(std::vector<double> pos1, std::vector<double> pos2,
+                                                           std::vector<double> theta1, std::vector<double> theta2,
+                                                           int type1, int type2);
 
     };
 
 
-
-
-
-//    //Evaluates potential. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation.
-//    template<typename ...AUXVARIABLES>
-//    template<typename ...AUXVARS>
-//    double externalPotential<AUXVARIABLES...>::evaluatePyBind(std::vector<double> pos1, AUXVARS... auxvars) {
-//        int n = sizeof...(AUXVARS);
-//        std::tuple<AUXVARS...> auxvarsPack(auxvars...); // Stores auxvars into auxvarsPack tuple
-//
-//        vec3<double> x = vec3<double>(pos1);
-//
-//        if ( n == 0 ) {
-//            return evaluate(x);
-//        }
-//        else if (n >= 1 && n < 3) {
-//            // extract type of first argument in variadic template
-//            using ORIENTATION = std::tuple_element<0, std::tuple<AUXVARIABLES...>>;
-//            ORIENTATION theta1 = ORIENTATION(auxvarsPack[0]);
-//            if ( n == 1 ) { return evaluate(x, theta1); };
-//            if ( n == 2 ) { return evaluate(x, theta1, std::get<1>(auxvarsPack)); };
-//        }
-//        else{
-//            throw std::runtime_error("Variadic template for external potential only supports up to two arguments.");
-//        }
-//    }
-//
-//    // Evaluates force and torque. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation.
-//    template<typename ...AUXVARIABLES>
-//    template<typename ...AUXVARS>
-//    std::vector<std::vector<double>> externalPotential<AUXVARIABLES...>::forceTorquePyBind(std::vector<double> pos1,
-//                                                                                           AUXVARS... auxvars) {
-//        int n = sizeof...(AUXVARS);
-//        std::tuple<AUXVARS...> auxvarsPack(auxvars...); // Stores auxvars into auxvarsPack tuple
-//
-//        vec3<double> x = vec3<double>(pos1);
-//        std::array<vec3<double>, 2> forcetorq;
-//        std::vector<std::vector<double>> output;
-//
-//        if ( n == 0 ) {
-//            forcetorq = forceTorque(x, auxvarsPack);
-//        }
-//        else if (n >= 1 && n < 3) {
-//            // extract type of first argument in variadic template
-//            using ORIENTATION = typename std::tuple_element<0, std::tuple<AUXVARIABLES...>>;
-//            ORIENTATION theta1 = ORIENTATION(auxvarsPack[0]);
-//            if ( n == 1 ) { forcetorq = forceTorque(x, theta1); };
-//            if ( n == 2 ) { forcetorq = forceTorque(x, theta1, auxvarsPack[1]); };
-//        }
-//        else{
-//            throw std::runtime_error("Variadic template for external potential only supports up to two arguments.");
-//        }
-//
-//        output.resize(2);
-//        output[0].resize(3);
-//        output[1].resize(3);
-//        for (int i = 0; i < 2; i++) {
-//            output[i][0] = 1.0*forcetorq[i][0];
-//            output[i][1] = 1.0*forcetorq[i][1];
-//            output[i][2] = 1.0*forcetorq[i][2];
-//        }
-//        return output;
-//    }
-//
-//
-//    //Evaluates potential. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation.
-//    template<typename ...AUXVARIABLES>
-//    template<typename ...AUXVARS>
-//    double pairPotential<AUXVARIABLES...>::evaluatePyBind(std::vector<double> pos1, std::vector<double> pos2,
-//                                                          AUXVARS... auxvars) {
-//        int n = sizeof...(AUXVARS);
-//        std::tuple<AUXVARS...> auxvarsPack(auxvars...); // Stores auxvars into auxvarsPack tuple
-//
-//        vec3<double> x1 = vec3<double>(pos1);
-//        vec3<double> x2 = vec3<double>(pos2);
-//        //std::tuple<AUXVARS...> auxvariables(auxvars...);
-//        if ( n == 0 ) {
-//            return evaluate(x1, x2, auxvarsPack);
-//        }
-//        else if (n == 2 || n == 4) {
-//            // extract type of first argument in variadic template
-//            using ORIENTATION = typename std::tuple_element<0, std::tuple<AUXVARIABLES...>>;
-//            ORIENTATION theta1 = ORIENTATION(auxvarsPack[0]);
-//            ORIENTATION theta2 = ORIENTATION(auxvarsPack[1]);
-//            if ( n == 2 ) { return evaluate(x1, x2, theta1, theta2); };
-//            if ( n == 4 ) { return evaluate(x1, x2, theta1, theta2, auxvarsPack[2], auxvarsPack[3]); };
-//        }
-//        else{
-//            throw std::runtime_error("Variadic template for pair potential only supports zero, two or four arguments.");
-//        }
-//    }
-//
-//
-//    // Evaluates force and torque. Template AUXVARIABLES takes zero arguments, so it corresponds to no orientation.
-//    template<typename ...AUXVARIABLES>
-//    template<typename ...AUXVARS>
-//    std::vector<std::vector<double>> pairPotential<AUXVARIABLES...>::forceTorquePyBind(std::vector<double> pos1,
-//                                                                                       std::vector<double> pos2,
-//                                                                                       AUXVARS... auxvars) {
-//        int n = sizeof...(AUXVARS);
-//        std::tuple<AUXVARS...> auxvarsPack(auxvars...); // Stores auxvars into auxvarsPack tuple
-//
-//        vec3<double> x1 = vec3<double>(pos1);
-//        vec3<double> x2 = vec3<double>(pos2);
-//        std::array<vec3<double>, 4> forcetorq;
-//        std::vector<std::vector<double>> output;
-//
-//        if ( n == 0 ) {
-//            forcetorq = forceTorque(x1, x2, auxvarsPack);
-//        }
-//        else if (n == 2 || n == 4) {
-//            // extract type of first argument in variadic template
-//            using ORIENTATION = typename std::tuple_element<0, std::tuple<AUXVARIABLES...>>;
-//            ORIENTATION theta1 = ORIENTATION(auxvarsPack[0]);
-//            ORIENTATION theta2 = ORIENTATION(auxvarsPack[1]);
-//            if ( n == 2 ) { forcetorq = forceTorque(x1, x2, theta1, theta2); };
-//            if ( n == 4 ) { forcetorq = forceTorque(x1, x2, theta1, theta2, auxvarsPack[2], auxvarsPack[3]); };
-//        }
-//        else{
-//            throw std::runtime_error("Variadic template for pair potential only supports zero, two or four arguments.");
-//        }
-//
-//        output.resize(4);
-//        for (int i = 0; i < 4; i++) {
-//            output[i].resize(3);
-//            output[i][0] = 1.0*forcetorq[i][0];
-//            output[i][1] = 1.0*forcetorq[i][1];
-//            output[i][2] = 1.0*forcetorq[i][2];
-//        }
-//        return output;
-//    }
-
+    template<long unsigned int N>
+    std::vector<std::vector<double>> array2vec(std::array<vec3<double>, N> forceTorque) {
+        std::vector<std::vector<double>> output;
+        output.resize(N);
+        for (int i = 0; i < N; i++) {
+            output[i].resize(3);
+            output[i][0] = 1.0*forceTorque[i][0];
+            output[i][1] = 1.0*forceTorque[i][1];
+            output[i][2] = 1.0*forceTorque[i][2];
+        }
+        return output;
+    }
 }
 
 
