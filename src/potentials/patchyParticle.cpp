@@ -4,6 +4,7 @@
 
 #include "potentials/patchyParticle.hpp"
 #include "quaternion.hpp"
+#include "tools.hpp"
 
 
 
@@ -87,10 +88,10 @@ namespace msmrd{ ;
         if (rvec.norm() <= 2*sigma) {
             // Loop over all patches
             for (int i = 0; i < patchesCoordinates.size(); i++) {
-                patchNormal1 = rotateVec(patchesCoordinates[i], theta1);
+                patchNormal1 = msmrdtools::rotateVec(patchesCoordinates[i], theta1);
                 patch1 = pos1 + 0.5*sigma*patchNormal1;
                 for (int j = 0; j < patchesCoordinates.size(); j++) {
-                    patchNormal2 = rotateVec(patchesCoordinates[j], theta2);
+                    patchNormal2 = msmrdtools::rotateVec(patchesCoordinates[j], theta2);
                     patch2 = pos2 + 0.5*sigma*patchNormal2;
                     rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
 //                    angleModulation = -1*patchNormal1*patchNormal2; //angular modulation
@@ -137,12 +138,12 @@ namespace msmrd{ ;
         if (rvec.norm() <= 2*sigma) {
             // Loop over all patches of particle 1
             for (int i = 0; i < patchesCoordinates.size(); i++) {
-                patchNormal1 = rotateVec(patchesCoordinates[i], theta1);
+                patchNormal1 = msmrdtools::rotateVec(patchesCoordinates[i], theta1);
                 patchNormal1 = patchNormal1/patchNormal1.norm();
                 patch1 = pos1 + 0.5*sigma*patchNormal1;
                 // Loop over all patches of particle 2
                 for (int j = 0; j < patchesCoordinates.size(); j++) {
-                    patchNormal2 = rotateVec(patchesCoordinates[j], theta2);
+                    patchNormal2 = msmrdtools::rotateVec(patchesCoordinates[j], theta2);
                     patchNormal2 = patchNormal2/patchNormal2.norm();
                     patch2 = pos2 + 0.5*sigma*patchNormal2;
                     rpatch = patch2 - patch1;

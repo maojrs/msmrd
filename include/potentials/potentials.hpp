@@ -93,18 +93,6 @@ namespace msmrd {
     };
 
 
-    template<long unsigned int N>
-    std::vector<std::vector<double>> array2vec(std::array<vec3<double>, N> forceTorque) {
-        std::vector<std::vector<double>> output;
-        output.resize(N);
-        for (int i = 0; i < N; i++) {
-            output[i].resize(3);
-            output[i][0] = 1.0*forceTorque[i][0];
-            output[i][1] = 1.0*forceTorque[i][1];
-            output[i][2] = 1.0*forceTorque[i][2];
-        }
-        return output;
-    }
 }
 
 

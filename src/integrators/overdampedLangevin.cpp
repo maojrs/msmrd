@@ -3,6 +3,7 @@
 //
 
 #include "integrators/overdampedLangevin.hpp"
+#include "tools.hpp"
 
 namespace msmrd {
     /**
@@ -37,11 +38,11 @@ namespace msmrd {
         vec3<double> dphi;
         quaternion<double> dquat;
         dphi = torque * dt0 * part.Drot / KbTemp + std::sqrt(2 * dt0 * part.Drot) * randg.normal3D(0, 1);
-        dquat = axisanglerep2quaternion(dphi);
+        dquat = msmrdtools::axisangle2quaternion(dphi);
         part.setNextOrientation(dquat * part.orientation);
         // Updated orientation vector, useful with rodlike particles
         if (particlesbodytype == "rod" || particlesbodytype == "rodMix") {
-            vec3<double> neworientvector = rotateVec(part.orientvector, dquat);
+            vec3<double> neworientvector = msmrdtools::rotateVec(part.orientvector, dquat);
             part.setNextOrientVector(neworientvector);
         }
     }

@@ -4,6 +4,7 @@
 
 #pragma once
 #include "quaternion.hpp"
+#include "tools.hpp"
 #include "vec3.hpp"
 
 namespace msmrd {
@@ -46,7 +47,7 @@ namespace msmrd {
                 : D(D), Drot(Drot), position(position), orientation(orientation) {
             type = 0;
             orientvector = vec3<double>(0., 0., 1.);
-            orientvector = rotateVec(orientvector, orientation);
+            orientvector = msmrdtools::rotateVec(orientvector, orientation);
             nextPosition = 1.0 * position;
             nextOrientation = 1.0 * orientation;
             nextOrientvector = 1.0 * orientvector;
@@ -57,7 +58,7 @@ namespace msmrd {
                 : D(D), Drot(Drot), position(position), orientation(orientation) {
             type = 0;
             orientvector = vec3<double>(0., 0., 1.);
-            orientvector = rotateVec(orientvector, orientation);
+            orientvector = msmrdtools::rotateVec(orientvector, orientation);
             std::vector<double> nextPosition(position);
             std::vector<double> nextOrientation(orientation);
             nextOrientvector = 1.0 * orientvector;

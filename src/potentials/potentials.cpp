@@ -2,8 +2,9 @@
 // Created by maojrs on 8/21/18.
 //
 #include <tuple>
-#include "vec3.hpp"
 #include "potentials/potentials.hpp"
+#include "tools.hpp"
+#include "vec3.hpp"
 
 namespace msmrd {
     /**
@@ -79,7 +80,7 @@ namespace msmrd {
     std::vector<std::vector<double>> externalPotential<>::forceTorquePyBind(std::vector<double> pos) {
         vec3<double> x = vec3<double>(pos);
         std::array<vec3<double>, 2> forceTorquex = forceTorque(x);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
     /* Same as previous function with particle type dependence */
@@ -87,7 +88,7 @@ namespace msmrd {
     std::vector<std::vector<double>> externalPotential<int>::forceTorquePyBind(std::vector<double> pos1, int type1) {
         vec3<double> x = vec3<double>(pos1);
         std::array<vec3<double>, 2> forceTorquex = forceTorque(x, type1);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
 
@@ -99,7 +100,7 @@ namespace msmrd {
         vec3<double> x = vec3<double>(pos1);
         vec3<double> th = vec3<double>(theta1);
         std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
     /* Same as previous function with particle type dependence */
@@ -110,7 +111,7 @@ namespace msmrd {
         vec3<double> x = vec3<double>(pos1);
         vec3<double> th = vec3<double>(theta1);
         std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th, type1);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
 
@@ -122,7 +123,7 @@ namespace msmrd {
         vec3<double> x = vec3<double>(pos1);
         quaternion<double> th = quaternion<double>(theta1);
         std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
 
@@ -134,7 +135,7 @@ namespace msmrd {
         vec3<double> x = vec3<double>(pos1);
         quaternion<double> th = quaternion<double>(theta1);
         std::array<vec3<double>, 2> forceTorquex = forceTorque(x, th, type1);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
 
@@ -237,7 +238,7 @@ namespace msmrd {
         vec3<double> x1 = vec3<double>(pos1);
         vec3<double> x2 = vec3<double>(pos2);
         std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
     /* Same as previous function with particle type dependence */
@@ -248,7 +249,7 @@ namespace msmrd {
         vec3<double> x1 = vec3<double>(pos1);
         vec3<double> x2 = vec3<double>(pos2);
         std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, type1, type2);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
 
@@ -265,7 +266,7 @@ namespace msmrd {
         vec3<double> th1 = vec3<double>(theta1);
         vec3<double> th2 = vec3<double>(theta2);
         std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, th1, th2);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
     /* Same as previous function with particle type dependence */
@@ -281,7 +282,7 @@ namespace msmrd {
         vec3<double> th1 = vec3<double>(theta1);
         vec3<double> th2 = vec3<double>(theta2);
         std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, th1, th2, type1, type2);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
 
@@ -298,7 +299,7 @@ namespace msmrd {
         quaternion<double> th1 = quaternion<double>(theta1);
         quaternion<double> th2 = quaternion<double>(theta2);
         std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, th1, th2);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
     /* Same as previous function with particle type dependence */
@@ -314,7 +315,7 @@ namespace msmrd {
         quaternion<double> th1 = quaternion<double>(theta1);
         quaternion<double> th2 = quaternion<double>(theta2);
         std::array<vec3<double>, 4> forceTorquex = forceTorque(x1, x2, th1, th2, type1, type2);
-        return array2vec(forceTorquex);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
 }

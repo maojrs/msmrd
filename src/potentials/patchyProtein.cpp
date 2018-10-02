@@ -5,6 +5,7 @@
 #include <utility>
 #include "potentials/patchyProtein.hpp"
 #include "quaternion.hpp"
+#include "tools.hpp"
 
 namespace msmrd {
    /*
@@ -104,10 +105,10 @@ namespace msmrd {
         if (rvec.norm() <= 2*sigma) {
             // Loop over all patches
             for (int i = 0; i < patchesCoords1.size(); i++) {
-                patchNormal1 = rotateVec(patchesCoords1[i], theta1);
+                patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], theta1);
                 patch1 = pos1 + 0.5*sigma*patchNormal1;
                 for (int j = 0; j < patchesCoords2.size(); j++) {
-                    patchNormal2 = rotateVec(patchesCoords2[j], theta2);
+                    patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], theta2);
                     patch2 = pos2 + 0.5*sigma*patchNormal2;
                     rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
                     // Assumes the first patch from type1 has a different type of interaction,
@@ -163,12 +164,12 @@ namespace msmrd {
         if (rvec.norm() <= 2*sigma) {
             // Loop over all patches of particle 1
             for (int i = 0; i < patchesCoords1.size(); i++) {
-                patchNormal1 = rotateVec(patchesCoords1[i], theta1);
+                patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], theta1);
                 patchNormal1 = patchNormal1/patchNormal1.norm();
                 patch1 = pos1 + 0.5*sigma*patchNormal1;
                 // Loop over all patches of particle 2
                 for (int j = 0; j < patchesCoords2.size(); j++) {
-                    patchNormal2 = rotateVec(patchesCoords2[j], theta2);
+                    patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], theta2);
                     patchNormal2 = patchNormal2/patchNormal2.norm();
                     patch2 = pos2 + 0.5*sigma*patchNormal2;
                     rpatch = patch2 - patch1;

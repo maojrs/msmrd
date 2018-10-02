@@ -46,6 +46,7 @@ set(PY_SOURCES
         include/quaternion.hpp
         include/randomgen.hpp
         include/simulation.hpp
+        include/tools.hpp
         include/vec3.hpp
         include/boundaries/boundary.hpp
         include/boundaries/box.hpp
