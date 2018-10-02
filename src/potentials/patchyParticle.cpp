@@ -35,7 +35,7 @@ namespace msmrd{ ;
 
         for (auto &patch : patchesCoordinates) {
             if (patch.norm() != 1) {
-                throw std::range_error("Patches coordinates must be in the unit sphere");
+                throw std::range_error("Patches coordinates must have norm one");
             }
         }
     }
@@ -64,7 +64,7 @@ namespace msmrd{ ;
 
         for (auto &patch : patchesCoordinates) {
             if (patch.norm() != 1) {
-                throw std::range_error("Patches coordinates must be in the unit sphere");
+                throw std::range_error("Patches coordinates must have norm one");
             }
         }
     }
