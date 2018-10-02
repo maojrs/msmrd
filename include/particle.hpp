@@ -4,6 +4,7 @@
 
 #pragma once
 #include "quaternion.hpp"
+#include "tools.hpp"
 #include "vec3.hpp"
 
 namespace msmrd {
@@ -19,9 +20,9 @@ namespace msmrd {
          * @param active determines if particle currently active
          */
     public:
+        int type;
         double D;
         double Drot;
-        std::string bodytype;
         vec3<double> position;
         vec3<double> orientvector;
         quaternion<double> orientation;
@@ -31,32 +32,33 @@ namespace msmrd {
         /**
          * @param D diffusion constant
          * @param Drot rotational diffusion constant
-         * @param bodytype determines rotation integrator behavior, can be either point, rod or rigidbody
-         * (determined by orientational degrees of freedom, points have no orientation, rods need only one vector and
-         * rigidsolid requires a complete quaternion).
          * @param position position vector of the particle
          * @param orientvector orientation vector (only to be used by for rod-like particles)
          * @param orientation normalized quaternion representing the initial orientation of the particle
+         * @param type particle type (defaults to zero), for Markovian swithching should be
+         * considered the same as the msmid.
          * @param nextPosition saves next position for integrator to update
          * @param nextOrientvector saves next orientation vector for integrator to update
          * @param nextOrientation saves next orientation quaternions for integrator to update
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
-        particle(double D, double Drot, std::string bodytype, vec3<double> position, quaternion<double> orientation)
-                : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation) {
+        particle(double D, double Drot, vec3<double> position, quaternion<double> orientation)
+                : D(D), Drot(Drot), position(position), orientation(orientation) {
+            type = 0;
             orientvector = vec3<double>(0., 0., 1.);
-            orientvector = rotateVec(orientvector, orientation);
+            orientvector = msmrdtools::rotateVec(orientvector, orientation);
             nextPosition = 1.0 * position;
             nextOrientation = 1.0 * orientation;
             nextOrientvector = 1.0 * orientvector;
         };
 
-        particle(double D, double Drot, std::string bodytype, std::vector<double> &position,
+        particle(double D, double Drot, std::vector<double> &position,
                  std::vector<double> &orientation)
-                : D(D), Drot(Drot), bodytype(bodytype), position(position), orientation(orientation) {
+                : D(D), Drot(Drot), position(position), orientation(orientation) {
+            type = 0;
             orientvector = vec3<double>(0., 0., 1.);
-            orientvector = rotateVec(orientvector, orientation);
+            orientvector = msmrdtools::rotateVec(orientvector, orientation);
             std::vector<double> nextPosition(position);
             std::vector<double> nextOrientation(orientation);
             nextOrientvector = 1.0 * orientvector;
@@ -64,7 +66,7 @@ namespace msmrd {
 
         /* Additional functions and getters and setters. Some used by c++ and python,
          * some only to be used by pyhon with python bindings. */
-        void updatePosition() { position = 1 * nextPosition; };
+        void updatePosition() { position = 1.0 * nextPosition; };
 
         void updateOrientation() {
             orientvector = 1 * nextOrientvector;
@@ -79,13 +81,13 @@ namespace msmrd {
 
         double getDrot() const { return Drot; }
 
-        std::string getBodyType() const { return bodytype; }
+        int getType() const { return type; }
 
         void setD(double Dnew) { D = Dnew; }
 
         void setDrot(double Drotnew) { Drot = Drotnew; }
 
-        void setBodyType(std::string bodytypenew) { bodytype = bodytypenew; }
+        void setType(int newtype) { type = newtype; }
 
         void setPosition(vec3<double> newposition) { position = newposition; }
 
@@ -117,13 +119,11 @@ namespace msmrd {
         int nextType;
         int nextState;
     public:
-        int type;
         int state;
         double lagtime = 0;
         double tcount = 0;
         double propagateTMSM = true;
         /**
-         * @param type particle type, corresponds to msmid
          * @param state particle current state
          * @param nextState particle next state given and changed by the msm/ctmsm
          * @param lagtime saves the current lagtime from the MSM
@@ -133,20 +133,22 @@ namespace msmrd {
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
-        particleMS(int type, int state, double D, double Drot, std::string bodytype, vec3<double> position,
+        particleMS(int type0, int state, double D, double Drot, vec3<double> position,
                    quaternion<double> orientation)
-                : type(type), state(state), particle(D, Drot, bodytype, position, orientation) {};
+                : state(state), particle(D, Drot, position, orientation) {
+            type = type0;
+        };
 
-        particleMS(int type, int state, double D, double Drot, std::string bodytype, std::vector<double> &position,
+        particleMS(int type0, int state, double D, double Drot, std::vector<double> &position,
                    std::vector<double> &orientation)
-                : type(type), state(state), particle(D, Drot, bodytype, position, orientation) {};
+                : state(state), particle(D, Drot, position, orientation) {
+            type = type0;
+        };
 
         // Additional functions and getters and setters for particleMS
         void updateState() { state = 1 * nextState; };
 
         void updateType() { type = 1 * nextType; };
-
-        int getType() const { return type; }
 
         int getState() const { return state; }
 
@@ -155,8 +157,6 @@ namespace msmrd {
         void setState(int newstate) { state = newstate; }
 
         void setNextState(int nextstate) { nextState = nextstate; }
-
-        void setType(int newtype) { type = newtype; }
 
         void setNextType(int nexttype) { nextType = nexttype; }
 

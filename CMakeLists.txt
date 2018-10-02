@@ -23,14 +23,15 @@ set(SOURCES
         src/boundaries/box.cpp
         src/boundaries/sphere.cpp
         src/integrators/integrator.cpp
-        src/integrators/odLangevin.cpp
-        src/integrators/odLangevinMarkovSwitch.cpp
+        src/integrators/overdampedLangevin.cpp
+        src/integrators/overdampedLangevinMarkovSwitch.cpp
         src/potentials/potentials.cpp
         src/potentials/dipole.cpp
         src/potentials/gaussians3D.cpp
         src/potentials/gayBerne.cpp
         src/potentials/harmonicRepulsion.cpp
         src/potentials/patchyParticle.cpp
+        src/potentials/patchyProtein.cpp
         )
 
 set(PY_SOURCES
@@ -49,19 +50,21 @@ set(PY_SOURCES
         include/randomgen.hpp
         include/trajectory.hpp
         include/simulation.hpp
+        include/tools.hpp
         include/vec3.hpp
         include/boundaries/boundary.hpp
         include/boundaries/box.hpp
         include/boundaries/sphere.hpp
         include/integrators/integrator.hpp
-        include/integrators/odLangevin.hpp
-        include/integrators/odLangevinMarkovSwitch.hpp
+        include/integrators/overdampedLangevin.hpp
+        include/integrators/overdampedLangevinMarkovSwitch.hpp
         include/potentials/potentials.hpp
         include/potentials/dipole.hpp
         include/potentials/gaussians3D.hpp
         include/potentials/gayBerne.hpp
         include/potentials/harmonicRepulsion.hpp
         include/potentials/patchyParticle.hpp
+        include/potentials/patchyProtein.hpp
         )
 
 add_library(msmrd2core SHARED ${SOURCES})

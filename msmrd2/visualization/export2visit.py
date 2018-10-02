@@ -1,5 +1,8 @@
 import numpy as np
-from pyevtk.hl import imageToVTK
+try:
+    from pyevtk.hl import imageToVTK
+except ImportError:
+    print('Failed to import pyEVTK, export2visit functions will not work')
 # Create file from trajectory data to visualize 3D density plot in visit
 
 def createDensityData(trajs, filename = "densityData", radius=2.0):

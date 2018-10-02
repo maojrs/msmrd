@@ -2,7 +2,7 @@
 // Created by maojrs on 8/16/18.
 //
 
-#include "integrators/odLangevinMarkovSwitch.hpp"
+#include "integrators/overdampedLangevinMarkovSwitch.hpp"
 #include "particle.hpp"
 #include "msm.hpp"
 
@@ -17,16 +17,16 @@ namespace msmrd {
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
 
 
-    /* Integrates diffusion and rotation of one particle, called by the
-     * integrateOneMS (visible only inside the class) */
+    /* Integrates diffusion and rotation of one particle, called by the integrateOneMS (visible only
+     * inside the class). Note it cannot be inherited from overdampedLangevin::integrateOne since it
+     * uses a particleMS list instead of a particle list */
     template<>
-    void odLangevinMarkovSwitch<ctmsm>::integrateOne(int partIndex, std::vector<particleMS> &parts, double timestep) {
+    void overdampedLangevinMarkovSwitch<ctmsm>::integrateOne(int partIndex, std::vector<particleMS> &parts, double timestep) {
         vec3<double> force;
         vec3<double> torque;
         std::array<vec3<double>, 2> forctorq;
-        forctorq = getExternalForceTorque(parts[partIndex]);
-        force = forctorq[0];
-        torque = forctorq[1];
+        force = forceField[partIndex];
+        torque = torqueField[partIndex];
         translate(parts[partIndex], force, timestep);
         if (rotation) {
             rotate(parts[partIndex], torque, timestep);
@@ -37,7 +37,7 @@ namespace msmrd {
     /* Integrates rotation/translation and Markovian switch of one particle, with pair interactions
      * (visible only inside the class) */
     template<>
-    void odLangevinMarkovSwitch<ctmsm>::integrateOneMS(int partIndex, std::vector<particleMS> &parts, double timestep) {
+    void overdampedLangevinMarkovSwitch<ctmsm>::integrateOneMS(int partIndex, std::vector<particleMS> &parts, double timestep) {
         auto &part = parts[partIndex];
         // Do diffusion/rotation propagation taking MSM/CTMSM into account
         double resdt;
@@ -106,16 +106,23 @@ namespace msmrd {
     /* Integrates list of particleMS particles (needs to override parent function because it is
      * template based and uses particleMS) */
     template<>
-    void odLangevinMarkovSwitch<ctmsm>::integrate(std::vector<particleMS> &parts) {
+    void overdampedLangevinMarkovSwitch<ctmsm>::integrate(std::vector<particleMS> &parts) {
+        // Calculate forces and torques and save them into forceField and torqueField
+        calculateForceTorqueFields<particleMS>(parts);
+
         // Integrate and save next positions/orientations in parts[i].next***
         for (int i = 0; i < parts.size(); i++) {
             integrateOneMS(i, parts, dt);
         }
-        // Enforce boundary and update positions/orientations
+        // Enforce boundary and set new positions into parts[i].nextPosition
         for (int i = 0; i < parts.size(); i++) {
             if (boundaryActive) {
                 domainBoundary->enforceBoundary(parts[i]);
             }
+        }
+        /* Update positions and orientations (sets calculated next position/orientation
+         * calculated by integrator and boundary as current position/orientation). */
+        for (int i = 0; i < parts.size(); i++) {
             parts[i].updatePosition();
             if (rotation) {
                 parts[i].updateOrientation();

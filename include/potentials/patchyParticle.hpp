@@ -9,7 +9,7 @@ namespace msmrd {
     /*
      * Declaration of potential function between patchy particles. The template
      * <quaternion<double>,quaternion<double>> indicates the pair potential depends on the
-     * orientation of both particles, each with all its three degrees of freedom.
+     * orientation of both particles, each with all its three rotational degrees of freedom.
      */
     class patchyParticle : public pairPotential<quaternion<double>, quaternion<double>> {
     private:
@@ -29,8 +29,8 @@ namespace msmrd {
         double rstarAttractive;
         double rstarPatches;
 
-        double quadraticPotential(double r, double eps, double a, double rstar);
-        double derivativeQuadraticPotential(double r, double eps, double a, double rstar);
+        double quadraticPotential(double r, double sig, double eps, double a, double rstar);
+        double derivativeQuadraticPotential(double r, double sig, double eps, double a, double rstar);
 
     public:
         /*
@@ -48,7 +48,7 @@ namespace msmrd {
 
         double evaluate(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) override;
 
-        std::array<vec3<double>, 2>
+        std::array<vec3<double>, 4>
         forceTorque(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) override;
 
     };

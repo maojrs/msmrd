@@ -51,7 +51,7 @@ namespace msmrd {
 
 
     // Returns force and torque exerted on the first particle by the second one.
-    std::array<vec3<double>, 2> gayBerne::forceTorque(vec3<double> pos1, vec3<double> pos2,
+    std::array<vec3<double>, 4> gayBerne::forceTorque(vec3<double> pos1, vec3<double> pos2,
                                                       vec3<double> theta1, vec3<double> theta2) {
         vec3<double> u1 = theta1;
         vec3<double> u2 = theta2;
@@ -88,7 +88,8 @@ namespace msmrd {
                          (frac6 - 1) + dU_drabs * chi * chi * sig3 * (rup2 / (denp * denp) - rum2 / (denm * denm)) / 4;
 
         vec3<double> force = -dU_drabs * rhat - (dU_dru1 * (u1 - ru1 * rhat) + dU_dru2 * (u2 - ru2 * rhat)) / rabs;
-        vec3<double> torque = dU_dru1 * rhat.cross(u1) - dU_du12 * u1.cross(u2);
-        return {force, torque};
+        vec3<double> torque1 = dU_dru1 * rhat.cross(u1) - dU_du12 * u1.cross(u2);
+        vec3<double> torque2 = dU_dru2 * rhat.cross(u2) - dU_du12 * u2.cross(u1);
+        return {force, torque1, -1*force, torque2};
     }
 }

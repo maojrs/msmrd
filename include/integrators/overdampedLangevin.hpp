@@ -11,7 +11,7 @@ namespace msmrd {
     /**
      * Over-damped Langevin integrator declaration (a.k.a. standard Brownian motion)
      */
-    class odLangevin : public integrator {
+    class overdampedLangevin : public integrator {
     protected:
         void integrateOne(int partIndex, std::vector<particle> &parts, double timestep) override;
 
@@ -20,7 +20,7 @@ namespace msmrd {
         void rotate(particle &part, vec3<double> torque, double dt) override;
 
     public:
-        odLangevin(double dt, long seed, bool rotation);
+        overdampedLangevin(double dt, long seed, std::string particlesbodytype, bool rotation);
     };
 
 }
