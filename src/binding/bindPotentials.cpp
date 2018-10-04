@@ -71,16 +71,18 @@ namespace msmrd {
                          std::vector<double>, std::vector<double>))
                         &patchyParticle::forceTorquePyBind);
 
-//        py::class_<patchyProtein, pairPotential<quaternion<double>, quaternion<double>, int, int>>(m, "patchyProtein")
-//                .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
-//                .def("evaluate", (double (patchyParticle::*)
-//                        (std::vector<double>, std::vector<double>,
-//                         std::vector<double>, std::vector<double>))
-//                        &patchyParticle::evaluatePyBind)
-//                .def("forceTorque", (std::vector<std::vector<double>> (patchyParticle::*)
-//                        (std::vector<double>, std::vector<double>,
-//                         std::vector<double>, std::vector<double>))
-//                        &patchyParticle::forceTorquePyBind);
+        py::class_<patchyProtein, pairPotential<quaternion<double>, quaternion<double>, int, int>>(m, "patchyProtein")
+                .def(py::init<double &, double &,
+                        std::vector<std::vector<double>> &,
+                        std::vector<std::vector<double>> &>())
+                .def("evaluate", (double (patchyProtein::*)
+                        (std::vector<double>, std::vector<double>,
+                         std::vector<double>, std::vector<double>, int, int))
+                        &patchyProtein::evaluatePyBind)
+                .def("forceTorque", (std::vector<std::vector<double>> (patchyProtein::*)
+                        (std::vector<double>, std::vector<double>,
+                         std::vector<double>, std::vector<double>, int, int))
+                        &patchyProtein::forceTorquePyBind);
     }
 
 }

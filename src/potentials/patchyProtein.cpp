@@ -31,7 +31,7 @@ namespace msmrd {
                                  std::vector<std::vector<double>> patchesCoordsB)
             :  sigma(sigma), strength(strength) {
         patchesCoordinatesA.resize(patchesCoordsA.size());
-        patchesCoordinatesA.resize(patchesCoordsB.size());
+        patchesCoordinatesB.resize(patchesCoordsB.size());
         for (int i=0; i < patchesCoordsA.size(); i++ ) {
             patchesCoordinatesA[i] = vec3<double> (patchesCoordsA[i]);
         }
@@ -48,20 +48,20 @@ namespace msmrd {
         // Check pacthes coordinates have unit norm
         for (auto &patch : patchesCoordinatesA) {
             if (patch.norm() != 1) {
-                throw std::range_error("Patches coordinates must be in a sphere of unit radius");
+                throw std::range_error("Patches coordinates must have norm one");
             }
         }
         for (auto &patch : patchesCoordinatesB) {
             if (patch.norm() != 1) {
-                throw std::range_error("Patches coordinates must be in a sphere of unit radius");
+                throw std::range_error("Patches coordinates must must have norm one");
             }
         }
 
         // Set strengths of potential parts
         epsRepulsive = 1.0*strength;
         epsAttractive = -0.05*strength;
-        epsPatches[0] = -0.15*strength;
-        epsPatches[1] = -0.30*strength; // Special binding site
+        epsPatches[0] = -0.10*strength;
+        epsPatches[1] = -0.20*strength; // Special binding site
 
         // Set stiffness of potentials parts
         aRepulsive = 1.5;
@@ -174,7 +174,7 @@ namespace msmrd {
                     patch2 = pos2 + 0.5*sigma*patchNormal2;
                     rpatch = patch2 - patch1;
                     /* Calculate force vector between patches , correct sign of force given by rpatch/rpatch.norm().
-                     * It also assumes the first patch from type1 has a different type of interaction. */
+                     * It also assumes the first patch from type = 0 has a different type of interaction. */
                     if ( (i == 0 && type1 == 0) || (j == 0 && type2 == 0) ) {
                         patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[1], aPatches[1], rstarPatches[1]);
                     }
