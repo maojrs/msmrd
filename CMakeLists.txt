@@ -48,9 +48,9 @@ set(PY_SOURCES
         include/particle.hpp
         include/quaternion.hpp
         include/randomgen.hpp
-        include/trajectory.hpp
         include/simulation.hpp
         include/tools.hpp
+        include/trajectory.hpp
         include/vec3.hpp
         include/boundaries/boundary.hpp
         include/boundaries/box.hpp

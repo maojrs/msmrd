@@ -59,8 +59,8 @@ namespace msmrd {
 
         // Set strengths of potential parts
         epsRepulsive = 1.0*strength;
-        epsAttractive = -0.05*strength;
-        epsPatches[0] = -0.10*strength;
+        epsAttractive = -0.15*strength;
+        epsPatches[0] = -0.15*strength;
         epsPatches[1] = -0.20*strength; // Special binding site
 
         // Set stiffness of potentials parts
