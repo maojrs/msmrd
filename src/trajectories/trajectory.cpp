@@ -20,12 +20,28 @@ namespace msmrd {
         std::array<double, 4> sample;
         for (int i = 0; i < particleList.size(); i++) {
             sample[0] = time;
-            for (int j = 1; j < 4; j++) {
-                sample[j] = particleList[i].position[j];
+            for (int k = 1; k < 4; k++) {
+                sample[k] = particleList[i].position[k];
             }
             data.push_back(sample);
         }
     }
+
+    // Sample relative positions and orientations from list of particles and store in data
+    void trajectoryPosition::sampleRelative(double time, std::vector<particle> &particleList) {
+        std::array<double, 4> sample;
+        // Loops over all possible pairs
+        for (int i = 0; i < particleList.size(); i++) {
+            for (int j = i + 1; j < particleList.size(); j++) {
+                sample[0] = time;
+                // Relative position to particleList[j] measured from particleList[i]
+                for (int k = 0; k < 3; k++) {
+                    sample[k+1] = particleList[j].position[k] - particleList[i].position[k];
+                }
+                data.push_back(sample);
+            }
+        }
+    };
 
 
     /**
@@ -42,13 +58,35 @@ namespace msmrd {
         std::array<double, 8> sample;
         for (int i = 0; i < particleList.size(); i++) {
             sample[0] = time;
-            for (int j = 0; j < 3; j++) {
-                sample[j+1] = particleList[i].position[j];
+            for (int k = 0; k < 3; k++) {
+                sample[k+1] = particleList[i].position[k];
             }
             for (int k = 0; k < 4; k++) {
                 sample[k+4] = particleList[i].orientation[k];
             }
             data.push_back(sample);
+        }
+    };
+
+    // Sample relative positiona and orientation from list of particles and store in data
+    void trajectoryPositionOrientation::sampleRelative(double time, std::vector<particle> &particleList) {
+        std::array<double, 8> sample;
+        quaternion<double> relativeOrientation;
+        // Loops over all possible pairs
+        for (int i = 0; i < particleList.size(); i++) {
+            for (int j = i + 1; j < particleList.size(); j++) {
+                sample[0] = time;
+                // Relative position to particleList[j] measured from particleList[i]
+                for (int k = 0; k < 3; k++) {
+                    sample[k+1] = particleList[j].position[k] - particleList[i].position[k];
+                }
+                // Relative orientation to particleList[j] measured from particleList[i]
+                relativeOrientation = particleList[j].orientation * particleList[i].orientation.conj();
+                for (int k = 0; k < 4; k++) {
+                    sample[k+4] = relativeOrientation[k];
+                }
+                data.push_back(sample);
+            }
         }
     };
 
@@ -60,31 +98,6 @@ namespace msmrd {
     };
 
 
-    /**
-     *  Implementation of trajectory class to store relative position and
-     *  orientation (given by a quaternion) between two particles
-     */
-    twoParticleRelativeTrajectory::twoParticleRelativeTrajectory(int approx_size)
-            : trajectory(2){
-        data.reserve(approx_size);
-    };
-
-    // Sample from list of particles and store in data (only works for lists of two particles)
-    void twoParticleRelativeTrajectory::sample(double time, std::vector<particle> &particleList) {
-        std::array<double, 8> sample;
-        quaternion<double> relativeOrientation;
-        sample[0] = time;
-        // Relative position from particleList[0]
-        for (int j = 0; j < 3; j++) {
-            sample[j+1] = particleList[1].position[j] - particleList[0].position[j];
-        }
-        // Relative orientation from particleList[0]
-        relativeOrientation = particleList[1].orientation * particleList[0].orientation.conj();
-        for (int k = 0; k < 4; k++) {
-            sample[k+4] = relativeOrientation[k];
-        }
-        data.push_back(sample);
-    };
 
 
 } //namespace msmrd

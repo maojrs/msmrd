@@ -18,14 +18,20 @@ namespace msmrd {
     public:
         int Nparticles;
         /**
-         * @param Nparticles is the number of particles in the trajectory
-         * @param data (defined in child classes) stores trajectory data (time, position, auxvariables)
+         * @param Nparticles is the number of particles in the trajectory. In the case of relative
+         * sampling of cooridnates, it should correspond to the number of all possible pairs of
+         * particles.
+         * @param data (defined in child classes to avoid template) stores
+         * trajectory data (time, position, and/or other variables like orientation)
          */
 
         trajectory(int Nparticles): Nparticles(Nparticles){};
 
-        // Virtual function to sample from list of particles and store in data
+        // Virtual functions to sample from list of particles and store in data
         virtual void sample(double time, std::vector<particle> &particleList) = 0;
+
+        virtual void sampleRelative(double time, std::vector<particle> &particleList) = 0;
+
 
 //        void append(sample_type sample) {
 //            data.push_back(sample);
@@ -44,12 +50,18 @@ namespace msmrd {
      * Class to store position only trajectories
      */
     class trajectoryPosition : public trajectory {
-    public:
+    private:
         std::vector<std::array<double, 4>> data;
+    public:
 
         trajectoryPosition(int Nparticles, int approx_size);
 
-        void sample(double time, std::vector<particle> &particleList);
+        void sample(double time, std::vector<particle> &particleList) override;
+
+        void sampleRelative(double time, std::vector<particle> &particleList) override;
+
+        std::vector<std::array<double, 4>> getData() const { return data; };
+
     };
 
 
@@ -57,12 +69,17 @@ namespace msmrd {
      * Class to store trajectories with position and orientation (given by a quaternion)
      */
     class trajectoryPositionOrientation : public trajectory {
-    public:
+    private:
         std::vector<std::array<double, 8>> data;
+    public:
 
         trajectoryPositionOrientation(int Nparticles, int approx_size);
 
-        void sample(double time, std::vector<particle> &particleList);
+        void sample(double time, std::vector<particle> &particleList) override;
+
+        void sampleRelative(double time, std::vector<particle> &particleList) override;
+
+        std::vector<std::array<double, 8>> getData() const { return data; };
 
         void printTime();
 //        std::function<void(double, std::vector<particle>&)> f = std::bind(&trajectoryPositionOrientation::sample, this, _1, _2);
@@ -71,19 +88,6 @@ namespace msmrd {
 //        }
     };
 
-
-    /**
-     * Class to store trajectories with relative position and relative
-     * orientation (given by a quaternion) between two particles
-     */
-    class twoParticleRelativeTrajectory : public trajectory {
-    public:
-        std::vector<std::array<double, 8>> data;
-
-        twoParticleRelativeTrajectory(int approx_size);
-
-        void sample(double time, std::vector<particle> &particleList);
-    };
 
 
 } //namespace msmrd
