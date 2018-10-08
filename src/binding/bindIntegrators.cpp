@@ -15,7 +15,7 @@ namespace msmrd {
      */
     void bindIntegrators(py::module &m) {
         py::class_<overdampedLangevin>(m, "overdampedLangevin")
-                .def(py::init<double &, long &, std::string &,  bool &>())
+                .def(py::init<double &, long &, std::string &>())
                 .def_property_readonly("clock", &overdampedLangevin::getClock)
                 .def("setKbT", &overdampedLangevin::setKbT)
                 .def("setBoundary", &overdampedLangevin::setBoundary)
@@ -34,7 +34,7 @@ namespace msmrd {
                 .def("integrate", &overdampedLangevin::integrate);
 
         py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch")
-                .def(py::init<ctmsm &, double &, long &, std::string &, bool &>())
+                .def(py::init<ctmsm &, double &, long &, std::string &>())
                 .def("integrate", &overdampedLangevinMarkovSwitch<ctmsm>::integrate);
 
         // Created c++ compatible particle list/vector/array of particles in python

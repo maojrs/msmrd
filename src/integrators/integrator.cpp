@@ -15,12 +15,15 @@ namespace msmrd {
      * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
      * @param randg random number generator based in mt19937
      */
-    integrator::integrator(double dt, long seed, std::string particlesbodytype, bool rotation)
-            : dt(dt), seed(seed), particlesbodytype(particlesbodytype), rotation(rotation) {
+    integrator::integrator(double dt, long seed, std::string particlesbodytype)
+            : dt(dt), seed(seed), particlesbodytype(particlesbodytype) {
         randg.setSeed(seed);
         clock = 0;
         forceField.resize(0);
         torqueField.resize(0);
+        if (particlesbodytype != "point") {
+            rotation = true;
+        }
         if (particlesbodytype != "point" && particlesbodytype != "rod" && particlesbodytype != "rigidbody" &&
             particlesbodytype != "pointMix" && particlesbodytype != "rodMix" && particlesbodytype != "rigidbodyMix") {
             throw std::runtime_error("Unknown particles bodytype; it should be either point, rod, rigidbody,"

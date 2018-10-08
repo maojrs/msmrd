@@ -22,7 +22,7 @@ namespace msmrd {
         double dt;
         long seed;
         std::string particlesbodytype;
-        bool rotation;
+        bool rotation = false;
         randomgen randg;
 
         std::vector<vec3<double>> forceField;
@@ -103,7 +103,7 @@ namespace msmrd {
          * @param clock keeps track of global time
          */
 
-        integrator(double dt, long seed, std::string particlesbodytype, bool rotation);
+        integrator(double dt, long seed, std::string particlesbodytype);
 
         // Main public functions definitions
         void integrate(std::vector<particle> &parts);
