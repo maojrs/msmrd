@@ -16,10 +16,12 @@ namespace msmrd {
      */
     void bindBoundaries(py::module&);
     void bindIntegrators(py::module&);
+    void bindInternal(py::module&);
     void bindMarkovModels(py::module&);
     void bindParticles(py::module&);
     void bindPotentials(py::module&);
     void bindTrajectories(py::module&);
+
 
     // Function template to transform vectors to numpy for pyBindings
     template<typename ndvec>

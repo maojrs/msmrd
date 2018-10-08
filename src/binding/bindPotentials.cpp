@@ -8,48 +8,29 @@
 #include "potentials/patchyProtein.hpp"
 
 
-
-
 namespace msmrd {
     /*
-     * pyBinders for the c++ potentials classes
+     * pyBinders for the c++ potentials classes (see bindInternal for the parent classes)
      */
     void bindPotentials(py::module &m) {
-        /* Bind external potential parent classes as instantiated templates
-         * so inheritance works correctly. */
-        pybind11::class_<externalPotential<> >(m, "externalPotential");
-        pybind11::class_<externalPotential<int> >(m, "externalMixPotential");
-        pybind11::class_<externalPotential<vec3<double>>>(m, "externalRodPotential");
-        pybind11::class_<externalPotential<vec3<double>, int>>(m, "externalRodMixPotential");
-        pybind11::class_<externalPotential<quaternion<double>>>(m, "externalRigidBodyPotential");
-        pybind11::class_<externalPotential<quaternion<double>, int>>(m, "externalRigidBodyMixPotential");
-
-        /* Bind pair potential parent classes as instantiated templates
-         * so inheritance works correctly. */
-        pybind11::class_<pairPotential<> >(m, "pairPotential");
-        pybind11::class_<pairPotential<int, int> >(m, "pairMixPotential");
-        pybind11::class_<pairPotential<vec3<double>, vec3<double>>>(m, "pairRodPotential");
-        pybind11::class_<pairPotential<vec3<double>, vec3<double>, int, int>>(m, "pairRodMixPotential");
-        pybind11::class_<pairPotential<quaternion<double>, quaternion<double>>>(m, "pairRigidBodyPotential");
-        pybind11::class_<pairPotential<quaternion<double>, quaternion<double>, int, int>>
-                (m, "pairRigidBodyMixPotential");
-
-
-        py::class_<gaussians3D, externalPotential<> >(m, "gaussians3D")
+        py::class_<gaussians3D, externalPotential<> >(m, "gaussians3D", "Gaussians-based potential (nminima, "
+                                                                        "maxrad, scalefactor, seed)")
                 .def(py::init<int &, double &, double &, long &>())
                 .def("evaluate", (double (gaussians3D::*)
                         (std::vector<double>)) &gaussians3D::evaluatePyBind)
                 .def("forceTorque", (std::vector<std::vector<double>> (gaussians3D::*)
                         (std::vector<double>))&gaussians3D::forceTorquePyBind);
 
-        py::class_<dipole, externalPotential<vec3<double>>>(m, "dipole")
+        py::class_<dipole, externalPotential<vec3<double>>>(m, "dipole", "dipole potential (scalefactor, "
+                                                                         "directionEField)")
                 .def(py::init<double &, std::vector<double> &>())
                 .def("evaluate", (double (dipole::*)
                         (std::vector<double>, std::vector<double>)) &dipole::evaluatePyBind)
                 .def("forceTorque", (std::vector<std::vector<double>> (dipole::*)
                         (std::vector<double>, std::vector<double>)) &dipole::forceTorquePyBind);
 
-        py::class_<gayBerne, pairPotential<vec3<double>, vec3<double>>>(m, "gayBerne")
+        py::class_<gayBerne, pairPotential<vec3<double>, vec3<double>>>(m, "gayBerne", "Gay-Berne potential "
+                                                                                       "(a, d, eps0, sig0)")
                 .def(py::init<double &, double &, double &, double &>())
                 .def("evaluate", (double (gayBerne::*)
                         (std::vector<double>, std::vector<double>,
@@ -60,7 +41,8 @@ namespace msmrd {
                          std::vector<double>, std::vector<double>))
                         &gayBerne::forceTorquePyBind);
 
-        py::class_<patchyParticle, pairPotential<quaternion<double>, quaternion<double>>>(m, "patchyParticle")
+        py::class_<patchyParticle, pairPotential<quaternion<double>, quaternion<double>>>(m, "patchyParticle", "Patchy "
+                                                             "particle potential (sigma, strength, patchesCoordinates)")
                 .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
                 .def("evaluate", (double (patchyParticle::*)
                         (std::vector<double>, std::vector<double>,
@@ -71,7 +53,9 @@ namespace msmrd {
                          std::vector<double>, std::vector<double>))
                         &patchyParticle::forceTorquePyBind);
 
-        py::class_<patchyProtein, pairPotential<quaternion<double>, quaternion<double>, int, int>>(m, "patchyProtein")
+        py::class_<patchyProtein, pairPotential<quaternion<double>, quaternion<double>, int, int>>(m, "patchyProtein",
+                                                                    "Patchy protein potential (sigma, strength, patches"
+                                                                    " coordinates A, patches coordinates B)")
                 .def(py::init<double &, double &,
                         std::vector<std::vector<double>> &,
                         std::vector<std::vector<double>> &>())

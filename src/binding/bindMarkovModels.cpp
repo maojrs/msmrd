@@ -12,7 +12,8 @@ namespace msmrd {
      * pyBinders for the c++ Markov state models (MSMs) classes
      */
     void bindMarkovModels(py::module &m) {
-        py::class_<msm>(m, "discreteTimeMarkovStateModel")
+        py::class_<msm>(m, "discreteTimeMarkovStateModel", "discrete time Markov state model (MSM ID, "
+                                                           "transition matrix, lagtime, seed)")
                 .def(py::init<int &, std::vector<std::vector<double>> &, double &, long &>())
                 .def_property_readonly("ID", &msm::getID)
                 .def_property_readonly("nstates", &msm::getNstates)
@@ -28,7 +29,8 @@ namespace msmrd {
                 .def("setDrot", &msm::setDrot)
                 .def("propagate", &msm::propagate);
 
-        py::class_<ctmsm>(m, "continuousTimeMarkovStateModel")
+        py::class_<ctmsm>(m, "continuousTimeMarkovStateModel", "continuous time Markov state model (MSM ID, "
+                                                               "transition rate matrix, seed)")
                 .def(py::init<int &, std::vector<std::vector<double>> &, long &>())
                 .def_property_readonly("ID", &ctmsm::getID)
                 .def_property_readonly("nstates", &ctmsm::getNstates)

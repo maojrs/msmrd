@@ -39,6 +39,7 @@ set(PY_SOURCES
         src/binding/binding.cpp
         src/binding/bindBoundaries.cpp
         src/binding/bindIntegrators.cpp
+        src/binding/bindInternal.cpp
         src/binding/bindMarkovModels.cpp
         src/binding/bindParticles.cpp
         src/binding/bindPotentials.cpp

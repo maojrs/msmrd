@@ -14,7 +14,9 @@ namespace msmrd {
      * pyBinders for the c++ integrators classes
      */
     void bindIntegrators(py::module &m) {
-        py::class_<overdampedLangevin>(m, "overdampedLangevin")
+        py::class_<overdampedLangevin>(m, "overdampedLangevin", "overdamped Langevin integrator (timestep, seed, "
+                                                                "particlesbodytype (point, rod, rigidbody, "
+                                                                "pointmix, rodmix or rigidbodymix) )")
                 .def(py::init<double &, long &, std::string &>())
                 .def_property_readonly("clock", &overdampedLangevin::getClock)
                 .def("setKbT", &overdampedLangevin::setKbT)
@@ -33,7 +35,12 @@ namespace msmrd {
                 .def("setPairRigidBodyMixPotential", &overdampedLangevin::setPairRigidBodyMixPotential)
                 .def("integrate", &overdampedLangevin::integrate);
 
-        py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch")
+        py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch",
+                                                                              "overdamped Langevin integrator with "
+                                                                              "Markov switch (Markov model, timestep,"
+                                                                              " seed, particlesbodytype (point, "
+                                                                              "rod, rigidbody, pointmix, rodmix or "
+                                                                              "rigidbodymix) )")
                 .def(py::init<ctmsm &, double &, long &, std::string &>())
                 .def("integrate", &overdampedLangevinMarkovSwitch<ctmsm>::integrate);
 
