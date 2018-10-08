@@ -20,5 +20,7 @@ PYBIND11_MODULE(msmrd2binding, module) {
     msmrd::bindIntegrators(integratorsSubmodule);
     auto potentialsSubmodule = module.def_submodule("potentials");
     msmrd::bindPotentials(potentialsSubmodule);
+    auto trajectoriesSubmodule = module.def_submodule("trajectories");
+    msmrd::bindTrajectories(trajectoriesSubmodule);
 
 }
