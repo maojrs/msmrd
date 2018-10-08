@@ -59,4 +59,32 @@ namespace msmrd {
         }
     };
 
+
+    /**
+     *  Implementation of trajectory class to store relative position and
+     *  orientation (given by a quaternion) between two particles
+     */
+    twoParticleRelativeTrajectory::twoParticleRelativeTrajectory(int approx_size)
+            : trajectory(2){
+        data.reserve(approx_size);
+    };
+
+    // Sample from list of particles and store in data (only works for lists of two particles)
+    void twoParticleRelativeTrajectory::sample(double time, std::vector<particle> &particleList) {
+        std::array<double, 8> sample;
+        quaternion<double> relativeOrientation;
+        sample[0] = time;
+        // Relative position from particleList[0]
+        for (int j = 0; j < 3; j++) {
+            sample[j+1] = particleList[1].position[j] - particleList[0].position[j];
+        }
+        // Relative orientation from particleList[0]
+        relativeOrientation = particleList[1].orientation * particleList[0].orientation.conj();
+        for (int k = 0; k < 4; k++) {
+            sample[k+4] = relativeOrientation[k];
+        }
+        data.push_back(sample);
+    };
+
+
 } //namespace msmrd

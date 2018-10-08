@@ -54,7 +54,7 @@ namespace msmrd {
 
 
     /**
-     * Class to store trajectories with 3D position and orientation given by a quaternion
+     * Class to store trajectories with position and orientation (given by a quaternion)
      */
     class trajectoryPositionOrientation : public trajectory {
     public:
@@ -69,6 +69,20 @@ namespace msmrd {
 //        std::function<void(double, std::vector<particle>&)> get_sampler() {
 //            return f;
 //        }
+    };
+
+
+    /**
+     * Class to store trajectories with relative position and relative
+     * orientation (given by a quaternion) between two particles
+     */
+    class twoParticleRelativeTrajectory : public trajectory {
+    public:
+        std::vector<std::array<double, 8>> data;
+
+        twoParticleRelativeTrajectory(int approx_size);
+
+        void sample(double time, std::vector<particle> &particleList);
     };
 
 
