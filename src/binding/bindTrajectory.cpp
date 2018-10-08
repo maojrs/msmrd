@@ -1,5 +1,5 @@
 #include "binding.hpp"
-#include "trajectory.hpp"
+#include "trajectories/trajectory.hpp"
 
 
 namespace msmrd {

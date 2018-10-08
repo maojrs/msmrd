@@ -6,7 +6,7 @@
 #include <array>
 #include "particle.hpp"
 #include "integrators/integrator.hpp"
-#include "trajectory.hpp"
+#include "trajectories/trajectory.hpp"
 
 namespace msmrd {
     class simulation {

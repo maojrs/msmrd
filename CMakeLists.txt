@@ -18,7 +18,6 @@ set(SOURCES
         src/msm.cpp
         src/randomgen.cpp
         src/simulation.cpp
-        src/trajectory.cpp
         src/boundaries/boundary.cpp
         src/boundaries/box.cpp
         src/boundaries/sphere.cpp
@@ -32,6 +31,7 @@ set(SOURCES
         src/potentials/harmonicRepulsion.cpp
         src/potentials/patchyParticle.cpp
         src/potentials/patchyProtein.cpp
+        src/trajectories/trajectory.cpp
         )
 
 set(PY_SOURCES
@@ -50,7 +50,6 @@ set(PY_SOURCES
         include/randomgen.hpp
         include/simulation.hpp
         include/tools.hpp
-        include/trajectory.hpp
         include/vec3.hpp
         include/boundaries/boundary.hpp
         include/boundaries/box.hpp
@@ -65,6 +64,7 @@ set(PY_SOURCES
         include/potentials/harmonicRepulsion.hpp
         include/potentials/patchyParticle.hpp
         include/potentials/patchyProtein.hpp
+        include/trajectories/trajectory.hpp
         )
 
 add_library(msmrd2core SHARED ${SOURCES})

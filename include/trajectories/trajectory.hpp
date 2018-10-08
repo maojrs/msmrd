@@ -11,11 +11,20 @@
 using namespace std::placeholders;
 
 namespace msmrd {
+    /**
+     * Abstract base class to store full trajectories
+     */
     class trajectory {
     public:
         int Nparticles;
+        /**
+         * @param Nparticles is the number of particles in the trajectory
+         * @param data (defined in child classes) stores trajectory data (time, position, auxvariables)
+         */
+
         trajectory(int Nparticles): Nparticles(Nparticles){};
 
+        // Virtual function to sample from list of particles and store in data
         virtual void sample(double time, std::vector<particle> &particleList) = 0;
 
 //        void append(sample_type sample) {
@@ -31,11 +40,30 @@ namespace msmrd {
 //        };
     };
 
+    /**
+     * Class to store position only trajectories
+     */
+    class trajectoryPosition : public trajectory {
+    public:
+        std::vector<std::array<double, 4>> data;
+
+        trajectoryPosition(int Nparticles, int approx_size);
+
+        void sample(double time, std::vector<particle> &particleList);
+    };
+
+
+    /**
+     * Class to store trajectories with 3D position and orientation given by a quaternion
+     */
     class trajectoryPositionOrientation : public trajectory {
     public:
         std::vector<std::array<double, 8>> data;
+
         trajectoryPositionOrientation(int Nparticles, int approx_size);
+
         void sample(double time, std::vector<particle> &particleList);
+
         void printTime();
 //        std::function<void(double, std::vector<particle>&)> f = std::bind(&trajectoryPositionOrientation::sample, this, _1, _2);
 //        std::function<void(double, std::vector<particle>&)> get_sampler() {
@@ -43,8 +71,5 @@ namespace msmrd {
 //        }
     };
 
-//    class trajectoryPosition : public trajectory<std::array<double, 4>> {
-//    public:
-//        void sample(double time, std::vector<particle> &particleList);
-//    };
+
 } //namespace msmrd

@@ -4,7 +4,7 @@
 
 //#include <random>
 #include "simulation.hpp"
-#include "trajectory.hpp"
+#include "trajectories/trajectory.hpp"
 
 
 namespace msmrd {

@@ -8,7 +8,7 @@
 #include "msm.hpp"
 #include "integrators/overdampedLangevin.hpp"
 #include "simulation.hpp"
-#include "trajectory.hpp"
+#include "trajectories/trajectory.hpp"
 #include "particle.hpp"
 #include "quaternion.hpp"
 #include "randomgen.hpp"
