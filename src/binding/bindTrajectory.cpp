@@ -13,6 +13,7 @@ namespace msmrd {
                 .def(py::init<int &, int &>())
                 .def("sample", &trajectoryPosition::sample)
                 .def("sampleRelative", &trajectoryPosition::sampleRelative)
+                .def("write2file", &trajectoryPosition::write2file)
                 .def_property_readonly("data", &trajectoryPosition::getData);
 
 

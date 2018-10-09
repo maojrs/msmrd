@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include "trajectories/trajectory.hpp"
 #include "particle.hpp"
 
@@ -41,6 +42,18 @@ namespace msmrd {
                 data.push_back(sample);
             }
         }
+    };
+
+    //
+    void trajectoryPosition::write2file(std::string filename) {
+        size_t datasize = data.size();
+        std::fstream outputfile;
+        outputfile.open(filename, std::ios::out); // |  std::ios::binary); //vstd::ios::app |
+        for(auto const& value: data)
+            outputfile << value[0] << " " << value[1] << " " << value[3] << " " << value[4] << std::endl;
+        //outputfile.write((char*)&data[0], datasize * sizeof(std::array<double, 4>));
+        //outputfile.write((char*)&data[0], kB);
+        outputfile.close();
     };
 
 

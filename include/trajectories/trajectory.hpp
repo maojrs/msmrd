@@ -15,9 +15,13 @@ namespace msmrd {
      * Abstract base class to store full trajectories
      */
     class trajectory {
+    protected:
+        const std::size_t kB = 1024;
+        const std::size_t MB = 1024 * kB;
     public:
         int Nparticles;
         /**
+         * @param kB/MB, constant buffer sizes in bytes for writing data
          * @param Nparticles is the number of particles in the trajectory. In the case of relative
          * sampling of cooridnates, it should correspond to the number of all possible pairs of
          * particles.
@@ -59,6 +63,8 @@ namespace msmrd {
         void sample(double time, std::vector<particle> &particleList) override;
 
         void sampleRelative(double time, std::vector<particle> &particleList) override;
+
+        void write2file(std::string filename);
 
         std::vector<std::array<double, 4>> getData() const { return data; };
 
