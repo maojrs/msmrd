@@ -11,6 +11,15 @@ use_cxx14()
 
 FIND_PROGRAM(PYTHON "python")
 
+# Find and add headers location of HDF5 library
+#find_package(HDF5 COMPONENTS HL C CXX REQUIRED)
+find_package(HDF5 REQUIRED COMPONENTS C CXX)
+message(STATUS "HDF5_FOUND: ${HDF5_FOUND}, version ${HDF5_VERSION}")
+include_directories(${HDF5_INCLUDE_DIR})
+
+#include_directories("${HDF5_INCLUDE_DIR}")
+
+# Set include and source
 include_directories(include)
 add_subdirectory(libraries/pybind11)
 set(bindings_python_version 3.6)
@@ -69,16 +78,19 @@ set(PY_SOURCES
         )
 
 add_library(msmrd2core SHARED ${SOURCES})
-#target_include_directories(msmrd2core PUBLIC include libraries/pybind11/include)
 
+target_link_libraries(msmrd2core ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
+
+#target_include_directories(msmrd2core PUBLIC include libraries/pybind11/include)
 pybind11_add_module(msmrd2binding MODULE ${PY_SOURCES})
 
 #target_include_directories(msmrd2 PUBLIC include libraries/pybind11/include)
 target_link_libraries(msmrd2binding PUBLIC msmrd2core)
 
 
-
 #EXECUTE_PROCESS(COMMAND git submodule update --init WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Add catch2 library
 add_library(catch2 INTERFACE)
 target_include_directories(catch2 INTERFACE "libraries/Catch2/single_include")
 add_subdirectory(tests/cpp)

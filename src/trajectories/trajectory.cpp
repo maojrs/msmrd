@@ -6,6 +6,11 @@
 #include <fstream>
 #include "trajectories/trajectory.hpp"
 #include "particle.hpp"
+#include "H5Cpp.h"
+
+
+// Needed to write to HDF5 files.
+using namespace H5;
 
 namespace msmrd {
 
@@ -44,7 +49,7 @@ namespace msmrd {
         }
     };
 
-    //
+    // Writes data into normal text file
     void trajectoryPosition::write2file(std::string filename) {
         size_t datasize = data.size();
         std::fstream outputfile;
@@ -54,6 +59,34 @@ namespace msmrd {
         //outputfile.write((char*)&data[0], datasize * sizeof(std::array<double, 4>));
         //outputfile.write((char*)&data[0], kB);
         outputfile.close();
+    };
+
+    // Writes data into HDF5 binary file
+    void trajectoryPosition::write2H5file(std::string filename, std::string datasetname) {
+        const H5std_string FILE_NAME = filename + ".h5";
+        const H5std_string	DATASET_NAME = datasetname;
+        auto writetype = H5F_ACC_RDWR; // Appends data to existing file
+
+        // Opens a new/existing file and dataset.
+        if (firstrun) {
+            // CHange write type to overwrite previous file/create new file
+            writetype = H5F_ACC_TRUNC;
+            firstrun = false;
+        }
+        H5File file(FILE_NAME, writetype);
+
+        // Sets shape of data into dataspace
+        hsize_t dims[2];               // dataset dimensions
+        dims[0] = data.size();
+        dims[1] = 4;
+        DataSpace dataspace(2, dims);
+
+        // Creates dataset and write data into it
+        DataSet dataset = file.createDataSet(DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace);
+        for (auto row = data.begin(); row != data.end(); row++) {
+            dataset.write(&row, H5::PredType::NATIVE_DOUBLE);
+        }
+
     };
 
 

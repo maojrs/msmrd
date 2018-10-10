@@ -14,6 +14,7 @@ namespace msmrd {
                 .def("sample", &trajectoryPosition::sample)
                 .def("sampleRelative", &trajectoryPosition::sampleRelative)
                 .def("write2file", &trajectoryPosition::write2file)
+                .def("write2H5file", &trajectoryPosition::write2H5file)
                 .def_property_readonly("data", &trajectoryPosition::getData);
 
 

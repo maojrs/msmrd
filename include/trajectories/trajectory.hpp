@@ -8,6 +8,7 @@
 #include <vector>
 #include "particle.hpp"
 
+
 using namespace std::placeholders;
 
 namespace msmrd {
@@ -18,6 +19,7 @@ namespace msmrd {
     protected:
         const std::size_t kB = 1024;
         const std::size_t MB = 1024 * kB;
+        bool firstrun = true;
     public:
         int Nparticles;
         /**
@@ -65,6 +67,8 @@ namespace msmrd {
         void sampleRelative(double time, std::vector<particle> &particleList) override;
 
         void write2file(std::string filename);
+
+        void write2H5file(std::string filename, std::string datasetname);
 
         std::vector<std::array<double, 4>> getData() const { return data; };
 
