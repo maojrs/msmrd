@@ -14,11 +14,14 @@ using namespace H5;
 
 namespace msmrd {
 
+    trajectory::trajectory(int Nparticles, int bufferSize): Nparticles(Nparticles), bufferSize(bufferSize){};
+
     /**
      * Implementation of trajectory class to store full position only trajectories
      */
-    trajectoryPosition::trajectoryPosition(int Nparticles, int approx_size) : trajectory(Nparticles){
-        data.reserve(Nparticles*approx_size);
+    trajectoryPosition::trajectoryPosition(int Nparticles, int bufferSize) : trajectory(Nparticles, bufferSize){
+        data.resize(0);
+        data.reserve(Nparticles*bufferSize);
     };
 
     // Sample from list of particles and store in data
@@ -66,6 +69,16 @@ namespace msmrd {
         const H5std_string FILE_NAME = filename + ".h5";
         const H5std_string	DATASET_NAME = "dset";
         auto writetype = H5F_ACC_RDWR; // Appends data to existing file
+        int datasize = static_cast<int>(data.size());
+
+        // Copies data into fixed size array
+        double datafixed[datasize][4];          // buffer for data to write
+        for (int i = 0; i < datasize; i++)
+        {
+            for (int j = 0; j < 4; j++) {
+                datafixed[i][j] = 1.0*data[i][j];
+            }
+        }
 
         // Opens a new/existing file and dataset.
         if (firstrun) {
@@ -77,15 +90,17 @@ namespace msmrd {
 
         // Sets shape of data into dataspace
         hsize_t dims[2];               // dataset dimensions
-        dims[0] = data.size();
+        dims[0] = datasize;
         dims[1] = 4;
         DataSpace dataspace(2, dims);
 
         // Creates dataset and write data into it
         DataSet dataset = file.createDataSet(DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace);
-        for (auto row = data.begin(); row != data.end(); row++) {
-            dataset.write(&row, H5::PredType::NATIVE_DOUBLE);
-        }
+        //for(auto const &row: data) {
+        //for (auto row = data.begin(); row != data.end(); row++) {
+//            dataset.write(row, H5::PredType::NATIVE_DOUBLE);
+//        }
+        dataset.write(datafixed, H5::PredType::NATIVE_DOUBLE);
 
         /* Empties data once it has been written to file (note the capacity
          * from the reserve reamins the same) */
@@ -98,9 +113,9 @@ namespace msmrd {
      *  Implementation of trajectory class to store trajectories with 3D position and
      *  orientation given by a quaternion
      */
-    trajectoryPositionOrientation::trajectoryPositionOrientation(int Nparticles, int approx_size)
-            : trajectory(Nparticles){
-        data.reserve(Nparticles*approx_size);
+    trajectoryPositionOrientation::trajectoryPositionOrientation(int Nparticles, int bufferSize)
+            : trajectory(Nparticles, bufferSize){
+        data.reserve(Nparticles*bufferSize);
     };
 
     // Sample from list of particles and store in data

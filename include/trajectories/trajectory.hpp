@@ -22,21 +22,28 @@ namespace msmrd {
         bool firstrun = true;
     public:
         int Nparticles;
+        int bufferSize;
         /**
          * @param kB/MB, constant buffer sizes in bytes for writing data
          * @param Nparticles is the number of particles in the trajectory. In the case of relative
          * sampling of cooridnates, it should correspond to the number of all possible pairs of
          * particles.
+         * @bufferSize buffer size for data storage. Exact value if data being dumped into file;
+         * otherwise an approximated value is enough.
          * @param data (defined in child classes to avoid template) buffer to stores
          * trajectory data (time, position, and/or other variables like orientation)
          */
 
-        trajectory(int Nparticles): Nparticles(Nparticles){};
+        trajectory(int Nparticles, int bufferSize);
 
         // Virtual functions to sample from list of particles and store in data
         virtual void sample(double time, std::vector<particle> &particleList) = 0;
 
         virtual void sampleRelative(double time, std::vector<particle> &particleList) = 0;
+
+        virtual void write2file(std::string filename) = 0;
+
+        virtual void write2H5file(std::string filename) = 0;
 
 
 //        void append(sample_type sample) {
@@ -60,15 +67,15 @@ namespace msmrd {
         std::vector<std::array<double, 4>> data;
     public:
 
-        trajectoryPosition(int Nparticles, int approx_size);
+        trajectoryPosition(int Nparticles, int bufferSize);
 
         void sample(double time, std::vector<particle> &particleList) override;
 
         void sampleRelative(double time, std::vector<particle> &particleList) override;
 
-        void write2file(std::string filename);
+        void write2file(std::string filename) override;
 
-        void write2H5file(std::string filename);
+        void write2H5file(std::string filename) override;
 
         std::vector<std::array<double, 4>> getData() const { return data; };
 
@@ -83,15 +90,15 @@ namespace msmrd {
         std::vector<std::array<double, 8>> data;
     public:
 
-        trajectoryPositionOrientation(int Nparticles, int approx_size);
+        trajectoryPositionOrientation(int Nparticles, int bufferSize);
 
         void sample(double time, std::vector<particle> &particleList) override;
 
         void sampleRelative(double time, std::vector<particle> &particleList) override;
 
-        void write2file(std::string filename);
+        void write2file(std::string filename) override;
 
-        void write2H5file(std::string filename);
+        void write2H5file(std::string filename) override;
 
         std::vector<std::array<double, 8>> getData() const { return data; };
 
