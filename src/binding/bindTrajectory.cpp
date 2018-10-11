@@ -24,6 +24,8 @@ namespace msmrd {
                 .def(py::init<int &, int &>())
                 .def("sample", &trajectoryPositionOrientation::sample)
                 .def("sampleRelative", &trajectoryPositionOrientation::sampleRelative)
+                .def("write2file", &trajectoryPositionOrientation::write2file)
+                .def("write2H5file", &trajectoryPositionOrientation::write2H5file)
                 .def_property_readonly("data", &trajectoryPositionOrientation::getData);
     }
 

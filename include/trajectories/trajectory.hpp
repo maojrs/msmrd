@@ -27,7 +27,7 @@ namespace msmrd {
          * @param Nparticles is the number of particles in the trajectory. In the case of relative
          * sampling of cooridnates, it should correspond to the number of all possible pairs of
          * particles.
-         * @param data (defined in child classes to avoid template) stores
+         * @param data (defined in child classes to avoid template) buffer to stores
          * trajectory data (time, position, and/or other variables like orientation)
          */
 
@@ -68,7 +68,7 @@ namespace msmrd {
 
         void write2file(std::string filename);
 
-        void write2H5file(std::string filename, std::string datasetname);
+        void write2H5file(std::string filename);
 
         std::vector<std::array<double, 4>> getData() const { return data; };
 
@@ -88,6 +88,10 @@ namespace msmrd {
         void sample(double time, std::vector<particle> &particleList) override;
 
         void sampleRelative(double time, std::vector<particle> &particleList) override;
+
+        void write2file(std::string filename);
+
+        void write2H5file(std::string filename);
 
         std::vector<std::array<double, 8>> getData() const { return data; };
 

@@ -62,9 +62,9 @@ namespace msmrd {
     };
 
     // Writes data into HDF5 binary file
-    void trajectoryPosition::write2H5file(std::string filename, std::string datasetname) {
+    void trajectoryPosition::write2H5file(std::string filename) {
         const H5std_string FILE_NAME = filename + ".h5";
-        const H5std_string	DATASET_NAME = datasetname;
+        const H5std_string	DATASET_NAME = "dset";
         auto writetype = H5F_ACC_RDWR; // Appends data to existing file
 
         // Opens a new/existing file and dataset.
@@ -86,6 +86,10 @@ namespace msmrd {
         for (auto row = data.begin(); row != data.end(); row++) {
             dataset.write(&row, H5::PredType::NATIVE_DOUBLE);
         }
+
+        /* Empties data once it has been written to file (note the capacity
+         * from the reserve reamins the same) */
+        data.clear();
 
     };
 
@@ -135,6 +139,50 @@ namespace msmrd {
             }
         }
     };
+
+    // Writes data into normal text file
+    void trajectoryPositionOrientation::write2file(std::string filename) {
+        size_t datasize = data.size();
+        std::fstream outputfile;
+        outputfile.open(filename, std::ios::out); // |  std::ios::binary); //vstd::ios::app |
+        for(auto const& value: data)
+            outputfile << value[0] << " " << value[1] << " " << value[3] << " " << value[4] << " "
+                       << value[5] << " " << value[6] << " " << value[7] << " " << value[8] << std::endl;
+        outputfile.close();
+    };
+
+    // Writes data into HDF5 binary file and empties data buffer
+    void trajectoryPositionOrientation::write2H5file(std::string filename) {
+        const H5std_string FILE_NAME = filename + ".h5";
+        const H5std_string	DATASET_NAME = "dset";
+        auto writetype = H5F_ACC_RDWR; // Appends data to existing file
+
+        // Opens a new/existing file and dataset.
+        if (firstrun) {
+            // CHange write type to overwrite previous file/create new file
+            writetype = H5F_ACC_TRUNC;
+            firstrun = false;
+        }
+        H5File file(FILE_NAME, writetype);
+
+        // Sets shape of data into dataspace
+        hsize_t dims[2];               // dataset dimensions
+        dims[0] = data.size();
+        dims[1] = 8;
+        DataSpace dataspace(2, dims);
+
+        // Creates dataset and write data into it
+        DataSet dataset = file.createDataSet(DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace);
+        for (auto row = data.begin(); row != data.end(); row++) {
+            dataset.write(&row, H5::PredType::NATIVE_DOUBLE);
+        }
+
+        /* Empties data buffer once it has been written to file (note the capacity
+         * from the initial data.reserve() remains the same) */
+        data.clear();
+
+    };
+
 
     void trajectoryPositionOrientation::printTime() {
         std::cerr << "Number of elements: " << data.size() << std::endl;
