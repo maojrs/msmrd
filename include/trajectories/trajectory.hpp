@@ -26,7 +26,7 @@ namespace msmrd {
     protected:
         const std::size_t kB = 1024;
         const std::size_t MB = 1024 * kB;
-        double chunksWritten = 0;
+        bool firstrun = true;
     public:
         int Nparticles;
         int bufferSize;
@@ -171,12 +171,9 @@ namespace msmrd {
         DataSet dataset = file.createDataSet(DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace);
         dataset.write(datafixed, H5::PredType::NATIVE_DOUBLE);
 
-        /* Empties data buffer once it has been written to file (note the capacity
-         * from the initial data.reserve() remains the same) */
-        //data.clear();
-
     };
 
+    // MISSSING COMMENT
     template< size_t ROWDIM >
     void trajectory::writeChunk2H5file(std::string filename, std::vector<std::array<double, ROWDIM>> localdata) {
         const H5std_string FILE_NAME( filename + ".h5");
@@ -186,6 +183,8 @@ namespace msmrd {
 
         H5File file;
         DataSet dataset;
+        DataSpace dataspace;
+        hsize_t dimsFile[RANK] = {0 ,0};
 
         // Copies data into fixed size array , datafixed
         double datafixed[chunckSize][ROWDIM];
@@ -195,11 +194,11 @@ namespace msmrd {
             }
         }
 
-        if (chunksWritten == 0) {
+        if (firstrun) {
             // Create dataspace with unlimited dimensions
             hsize_t dims[2]  = {chunckSize, ROWDIM};  // dataset dimensions at creation
             hsize_t maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
-            DataSpace mspace(RANK , dims, maxdims);
+            dataspace = DataSpace(RANK , dims, maxdims);
 
             // Create H5 file. If file exists, it will be overwritten
             file = H5File(FILE_NAME, H5F_ACC_TRUNC);
@@ -215,30 +214,30 @@ namespace msmrd {
 
             /* Create a new dataset within the file using cparms
             * creation properties.  */
-            dataset = file.createDataSet( DATASET_NAME, PredType::NATIVE_DOUBLE, mspace, cparms);
+            dataset = file.createDataSet( DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace, cparms);
+
+            firstrun = false;
         }
         else {
             // Open existing dataset
             file = H5File(FILE_NAME, H5F_ACC_RDWR);
             dataset = file.openDataSet(DATASET_NAME);
-        }
+            dataspace = dataset.getSpace();
 
-//        // Get dimensions of current dataset in file
-//        hid_t dspace = H5Dget_space(0);
-//        const int ndims = H5Sget_simple_extent_ndims(dspace);
-//        hsize_t dimsFile[ndims];
-//        H5Sget_simple_extent_dims(dspace, dimsFile, NULL);
+            // Get dimensions of current dataset in file
+            const int ndims = dataspace.getSimpleExtentDims(dimsFile, NULL);
+        }
 
         // Extend the dataset by a chunk (chunkSize, ROWDIM)
         hsize_t size[2];
-        size[0] = (chunksWritten+1)*chunckSize;
+        size[0] = dimsFile[0] + chunckSize;
         size[1] = ROWDIM;
         dataset.extend( size );
 
        // Select a hyperslab.
         DataSpace fspaceChunck = dataset.getSpace ();
         hsize_t offset[2];
-        offset[0] = chunckSize*chunksWritten; //dimsFile[0];
+        offset[0] = dimsFile[0];
         offset[1] = 0;
         hsize_t dimsChunk[2] = { chunckSize, ROWDIM};            /* data1 dimensions */
         fspaceChunck.selectHyperslab( H5S_SELECT_SET, dimsChunk, offset );
@@ -249,16 +248,7 @@ namespace msmrd {
         // Write the data to the hyperslab.
         dataset.write( datafixed, PredType::NATIVE_DOUBLE, mspaceChunk, fspaceChunck );
 
-        chunksWritten++;
     }
 
 
-    //        // Opens a new/existing file and dataset.
-//        if (firstrun) {
-//            // CHange write type to overwrite previous file/create new file
-//            writetype = H5F_ACC_TRUNC;
-//            firstrun = false;
-//        }
-//        H5File file(FILE_NAME, writetype);
-
-} //namespace msmrd
+}
