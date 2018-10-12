@@ -22,7 +22,7 @@ namespace msmrd {
                 traj.sample(step, particleList);
                 if (traj.bufferSize) {
                     bufferCounter = 0;
-                    traj.write2H5file(filename);
+                    traj.write2H5file(filename, traj.data);
                 }
             }
         }

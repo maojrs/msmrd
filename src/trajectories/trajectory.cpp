@@ -3,10 +3,8 @@
 //
 
 #include <iostream>
-#include <fstream>
 #include "trajectories/trajectory.hpp"
 #include "particle.hpp"
-#include "H5Cpp.h"
 
 
 // Needed to write to HDF5 files.
@@ -14,6 +12,9 @@ using namespace H5;
 
 namespace msmrd {
 
+    /**
+     * Implementation of abstract parent trajectory class
+     */
     trajectory::trajectory(int Nparticles, int bufferSize): Nparticles(Nparticles), bufferSize(bufferSize){};
 
     /**
@@ -52,61 +53,6 @@ namespace msmrd {
         }
     };
 
-    // Writes data into normal text file
-    void trajectoryPosition::write2file(std::string filename) {
-        size_t datasize = data.size();
-        std::fstream outputfile;
-        outputfile.open(filename, std::ios::out); // |  std::ios::binary); //vstd::ios::app |
-        for(auto const& value: data)
-            outputfile << value[0] << " " << value[1] << " " << value[3] << " " << value[4] << std::endl;
-        //outputfile.write((char*)&data[0], datasize * sizeof(std::array<double, 4>));
-        //outputfile.write((char*)&data[0], kB);
-        outputfile.close();
-    };
-
-    // Writes data into HDF5 binary file
-    void trajectoryPosition::write2H5file(std::string filename) {
-        const H5std_string FILE_NAME = filename + ".h5";
-        const H5std_string	DATASET_NAME = "dset";
-        auto writetype = H5F_ACC_RDWR; // Appends data to existing file
-        int datasize = static_cast<int>(data.size());
-
-        // Copies data into fixed size array
-        double datafixed[datasize][4];          // buffer for data to write
-        for (int i = 0; i < datasize; i++)
-        {
-            for (int j = 0; j < 4; j++) {
-                datafixed[i][j] = 1.0*data[i][j];
-            }
-        }
-
-        // Opens a new/existing file and dataset.
-        if (firstrun) {
-            // CHange write type to overwrite previous file/create new file
-            writetype = H5F_ACC_TRUNC;
-            firstrun = false;
-        }
-        H5File file(FILE_NAME, writetype);
-
-        // Sets shape of data into dataspace
-        hsize_t dims[2];               // dataset dimensions
-        dims[0] = datasize;
-        dims[1] = 4;
-        DataSpace dataspace(2, dims);
-
-        // Creates dataset and write data into it
-        DataSet dataset = file.createDataSet(DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace);
-        //for(auto const &row: data) {
-        //for (auto row = data.begin(); row != data.end(); row++) {
-//            dataset.write(row, H5::PredType::NATIVE_DOUBLE);
-//        }
-        dataset.write(datafixed, H5::PredType::NATIVE_DOUBLE);
-
-        /* Empties data once it has been written to file (note the capacity
-         * from the reserve reamins the same) */
-        data.clear();
-
-    };
 
 
     /**
@@ -153,49 +99,6 @@ namespace msmrd {
                 data.push_back(sample);
             }
         }
-    };
-
-    // Writes data into normal text file
-    void trajectoryPositionOrientation::write2file(std::string filename) {
-        size_t datasize = data.size();
-        std::fstream outputfile;
-        outputfile.open(filename, std::ios::out); // |  std::ios::binary); //vstd::ios::app |
-        for(auto const& value: data)
-            outputfile << value[0] << " " << value[1] << " " << value[3] << " " << value[4] << " "
-                       << value[5] << " " << value[6] << " " << value[7] << " " << value[8] << std::endl;
-        outputfile.close();
-    };
-
-    // Writes data into HDF5 binary file and empties data buffer
-    void trajectoryPositionOrientation::write2H5file(std::string filename) {
-        const H5std_string FILE_NAME = filename + ".h5";
-        const H5std_string	DATASET_NAME = "dset";
-        auto writetype = H5F_ACC_RDWR; // Appends data to existing file
-
-        // Opens a new/existing file and dataset.
-        if (firstrun) {
-            // CHange write type to overwrite previous file/create new file
-            writetype = H5F_ACC_TRUNC;
-            firstrun = false;
-        }
-        H5File file(FILE_NAME, writetype);
-
-        // Sets shape of data into dataspace
-        hsize_t dims[2];               // dataset dimensions
-        dims[0] = data.size();
-        dims[1] = 8;
-        DataSpace dataspace(2, dims);
-
-        // Creates dataset and write data into it
-        DataSet dataset = file.createDataSet(DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace);
-        for (auto row = data.begin(); row != data.end(); row++) {
-            dataset.write(&row, H5::PredType::NATIVE_DOUBLE);
-        }
-
-        /* Empties data buffer once it has been written to file (note the capacity
-         * from the initial data.reserve() remains the same) */
-        data.clear();
-
     };
 
 

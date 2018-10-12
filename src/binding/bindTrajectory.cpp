@@ -13,8 +13,9 @@ namespace msmrd {
                 .def(py::init<int &, int &>())
                 .def("sample", &trajectoryPosition::sample)
                 .def("sampleRelative", &trajectoryPosition::sampleRelative)
-                .def("write2file", &trajectoryPosition::write2file)
-                .def("write2H5file", &trajectoryPosition::write2H5file)
+                .def("write2file", &trajectoryPosition::write2file<4>)
+                .def("write2H5file", &trajectoryPosition::write2H5file<4>)
+                .def("write2ExtendibleH5file", &trajectoryPosition::write2ExtendibleH5file<4>)
                 .def_property_readonly("data", &trajectoryPosition::getData);
 
 
@@ -24,8 +25,8 @@ namespace msmrd {
                 .def(py::init<int &, int &>())
                 .def("sample", &trajectoryPositionOrientation::sample)
                 .def("sampleRelative", &trajectoryPositionOrientation::sampleRelative)
-                .def("write2file", &trajectoryPositionOrientation::write2file)
-                .def("write2H5file", &trajectoryPositionOrientation::write2H5file)
+                .def("write2file", &trajectoryPositionOrientation::write2file<8>)
+                .def("write2H5file", &trajectoryPositionOrientation::write2H5file<8>)
                 .def_property_readonly("data", &trajectoryPositionOrientation::getData);
     }
 
