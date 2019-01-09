@@ -13,7 +13,7 @@ namespace msmrd {
     * @param sigma diameter of sphere at which patches are placed. Corresponds to the radius of the particle.
     * @param strength overall strength of the potential
     * @param patchesCoordintatesA list of patches coordinates in a unit sphere corresponding to type1 particles.
-    * @param patchesCoordintatesA list of patches coordinates in a unit sphere corresponding to type2 particles
+    * @param patchesCoordintatesB list of patches coordinates in a unit sphere corresponding to type2 particles
 
     */
     patchyProtein::patchyProtein(double sigma, double strength,
