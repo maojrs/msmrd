@@ -21,4 +21,4 @@ python setup.py install
 
 - [ ] Write tests for randgen, msm, ctmsm, odLangevin and odLangevinMarkovSwitch classes
 
-- [ ] Choose toy system with orientation dependent potential
+- [x] Choose toy system with orientation dependent potential
