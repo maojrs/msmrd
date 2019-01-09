@@ -226,8 +226,8 @@ namespace msmrd {
         }
     };
 
-    /* Calculate pairs forces and torques due to interactiion with other particles and sums it into
-     * forceField and torqueField. Note different bodytypes require different fucntion calls. Also note
+    /* Calculate pairs forces and torques due to interaction with other particles and sums it into
+     * forceField and torqueField. Note different bodytypes require different function calls. Also note
      * to avoid duplicate calls to pairPotential.forceTorque, the two loops cover all the pair interactions
      * only once. The function pairPotential.forceTorque returns the force and torque exerted on particle1
      * and the force and torque exerted on particle2 (in that order), from their mutual interaction. */
