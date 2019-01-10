@@ -78,9 +78,12 @@ namespace msmrd {
 
 
     // Evaluates potential at given positions and orientations of two particles
-    double patchyProtein::evaluate(vec3<double> pos1, vec3<double> pos2,
-                                   quaternion<double> theta1, quaternion<double> theta2,
-                                    int type1, int type2) {
+    double patchyProtein::evaluate(const particle &part1, const particle &part2) {
+        vec3<double> pos1 = part1.position;
+        vec3<double> pos2 = part2.position;
+        quaternion<double> theta1 = part1.orientation;
+        quaternion<double> theta2 = part2.orientation;
+
         std::vector<vec3<double>> patchesCoords1;
         std::vector<vec3<double>> patchesCoords2;
         double repulsivePotential;
@@ -97,8 +100,8 @@ namespace msmrd {
         attractivePotential = quadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
 
         /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
-        patchesCoords1 = assignPatches(type1);
-        patchesCoords2 = assignPatches(type2);
+        patchesCoords1 = assignPatches(part1.type);
+        patchesCoords2 = assignPatches(part2.type);
 
 
         // Interaction if particles are different
@@ -112,7 +115,7 @@ namespace msmrd {
                     patch2 = pos2 + 0.5*sigma*patchNormal2;
                     rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
                     // Assumes the first patch from type1 has a different type of interaction,
-                    if ( (i == 0 && type1 == 0) || (j == 0 && type2 == 0) ) {
+                    if ( (i == 0 && part1.type == 0) || (j == 0 && part2.type == 0) ) {
                         patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[1], aPatches[1], rstarPatches[1]);
                     }
                     // while all the other patches combinations have another type of interaction.
@@ -128,9 +131,12 @@ namespace msmrd {
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyProtein::forceTorque(vec3<double> pos1, vec3<double> pos2,
-                                                           quaternion<double> theta1, quaternion<double> theta2,
-                                                           int type1, int type2) {
+    std::array<vec3<double>, 4> patchyProtein::forceTorque(const particle &part1, const particle &part2) {
+        vec3<double> pos1 = part1.position;
+        vec3<double> pos2 = part2.position;
+        quaternion<double> theta1 = part1.orientation;
+        quaternion<double> theta2 = part2.orientation;
+
         vec3<double> force;
         vec3<double> force1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> force2 = vec3<double> (0.0, 0.0, 0.0);
@@ -157,8 +163,8 @@ namespace msmrd {
         force = (repulsiveForceNorm + attractiveForceNorm)*rvec/rvec.norm();
 
         /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
-        patchesCoords1 = assignPatches(type1);
-        patchesCoords2 = assignPatches(type2);
+        patchesCoords1 = assignPatches(part1.type);
+        patchesCoords2 = assignPatches(part2.type);
 
         // Calculate forces and torque due to patches interaction
         if (rvec.norm() <= 2*sigma) {
@@ -175,7 +181,7 @@ namespace msmrd {
                     rpatch = patch2 - patch1;
                     /* Calculate force vector between patches , correct sign of force given by rpatch/rpatch.norm().
                      * It also assumes the first patch from type = 0 has a different type of interaction. */
-                    if ( (i == 0 && type1 == 0) || (j == 0 && type2 == 0) ) {
+                    if ( (i == 0 && part1.type == 0) || (j == 0 && part2.type == 0) ) {
                         patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[1], aPatches[1], rstarPatches[1]);
                     }
                     else {

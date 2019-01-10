@@ -12,7 +12,7 @@ namespace msmrd {
      * The template <vec3<double>, vec3<double>> indicates the pair-potential depends on
      * the orientations of the two particles, each described by a vector (rod-like particles).
      */
-    class gayBerne : public pairPotential<vec3<double>, vec3<double>> {
+    class gayBerne : public pairPotential {
     private:
         double chi;
         double chip;
@@ -30,10 +30,10 @@ namespace msmrd {
          */
         gayBerne(double a, double d, double eps0, double sig0);
 
-        double evaluate(vec3<double> pos1, vec3<double> pos2, vec3<double> theta1, vec3<double> theta2) override;
+        double evaluate(const particle &part1, const particle &part2) override;
 
         std::array<vec3<double>, 4>
-        forceTorque(vec3<double> pos1, vec3<double> pos2, vec3<double> theta1, vec3<double> theta2) override;
+        forceTorque(const particle &part1, const particle &part2) override;
     };
 
 }

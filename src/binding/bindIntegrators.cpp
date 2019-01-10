@@ -22,17 +22,7 @@ namespace msmrd {
                 .def("setKbT", &overdampedLangevin::setKbT)
                 .def("setBoundary", &overdampedLangevin::setBoundary)
                 .def("setExternalPotential", &overdampedLangevin::setExternalPotential)
-                .def("setExternalMixPotential", &overdampedLangevin::setExternalMixPotential)
-                .def("setExternalRodPotential", &overdampedLangevin::setExternalRodPotential)
-                .def("setExternalRodMixPotential", &overdampedLangevin::setExternalRodMixPotential)
-                .def("setExternalRigidBodyPotential", &overdampedLangevin::setExternalRigidBodyPotential)
-                .def("setExternalRigidBodyMixPotential", &overdampedLangevin::setExternalRigidBodyMixPotential)
                 .def("setPairPotential", &overdampedLangevin::setPairPotential)
-                .def("setPairMixPotential", &overdampedLangevin::setPairMixPotential)
-                .def("setPairRodPotential", &overdampedLangevin::setPairRodPotential)
-                .def("setPairRodMixPotential", &overdampedLangevin::setPairRodMixPotential)
-                .def("setPairRigidBodyPotential", &overdampedLangevin::setPairRigidBodyPotential)
-                .def("setPairRigidBodyMixPotential", &overdampedLangevin::setPairRigidBodyMixPotential)
                 .def("integrate", &overdampedLangevin::integrate);
 
         py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch",

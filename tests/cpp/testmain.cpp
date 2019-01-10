@@ -206,8 +206,10 @@ TEST_CASE("Pair Potentials consistency", "[potentials]") {
     vec3<double> pos2 = vec3<double>(1.,0.,0.);
     vec3<double> th1 = vec3<double>(0., 1., 0);
     vec3<double> th2 = vec3<double>(std::cos(th), std::sin(th),0.);
-    forctorq1 = potentialGB.forceTorque(pos1, pos2, th1, th2);
-    forctorq2 = potentialGB.forceTorque(pos2, pos1, th2, th1);
+    particle part1 = particle(1.0, 1.0, pos1, th1);
+    particle part2 = particle(1.0, 1.0, pos2, th2);
+    forctorq1 = potentialGB.forceTorque(part1, part2);
+    forctorq2 = potentialGB.forceTorque(part2, part1);
     // Check consistency between forces
     REQUIRE(forctorq1[0] == forctorq2[2]);
     REQUIRE(forctorq2[0] == forctorq1[2]);
@@ -226,8 +228,10 @@ TEST_CASE("Pair Potentials consistency", "[potentials]") {
     pos2 = vec3<double>(1.0,-0.3,0.);
     quaternion<double> q1 = quaternion<double>(1.,0.,0., 0.);
     quaternion<double> q2 = quaternion<double>(std::cos(th/2.0), 0., 0., std::sin(th/2.0));
-    forctorq1 = potentialPatchyParticle.forceTorque(pos1, pos2, q1, q2);
-    forctorq2 = potentialPatchyParticle.forceTorque(pos2, pos1, q2, q1);
+    part1 = particle(1.0, 1.0, pos1, q1);
+    part2 = particle(1.0, 1.0, pos2, q2);
+    forctorq1 = potentialPatchyParticle.forceTorque(part1, part2);
+    forctorq2 = potentialPatchyParticle.forceTorque(part2, part1);
     // Check consistency between forces
     REQUIRE(forctorq1[0] == forctorq2[2]);
     REQUIRE(forctorq2[0] == forctorq1[2]);

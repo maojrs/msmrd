@@ -14,7 +14,7 @@ namespace msmrd{
      * potential will depend on the position of both particles, their orientation (quaternion<double>,
      * quaternion<double), and their types (int, int).
      */
-    class patchyProtein : public pairPotential<quaternion<double>, quaternion<double>, int, int> {
+    class patchyProtein : public pairPotential {
     private:
         std::vector<vec3<double>> patchesCoordinatesA;
         std::vector<vec3<double>> patchesCoordinatesB;
@@ -48,13 +48,9 @@ namespace msmrd{
                       std::vector<std::vector<double>> patchesCoordinatesA,
                       std::vector<std::vector<double>> patchesCoordinatesB);
 
-        double evaluate(vec3<double> pos1, vec3<double> pos2,
-                        quaternion<double> theta1, quaternion<double> theta2,
-                        int type1, int type2) override;
+        double evaluate(const particle &part1, const particle &part2) override;
 
-        std::array<vec3<double>, 4> forceTorque(vec3<double> pos1, vec3<double> pos2,
-                                                quaternion<double> theta1, quaternion<double> theta2,
-                                                int type1, int type2) override;
+        std::array<vec3<double>, 4> forceTorque(const particle &part1, const particle &part2) override;
 
     };
 

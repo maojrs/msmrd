@@ -11,7 +11,7 @@ namespace msmrd {
      * Harmonic repulsion pair potential declaration
      * The empty template <> indicates orientation is not taken into account by this potential.
      */
-    class harmonicRepulsion : public pairPotential<> {
+    class harmonicRepulsion : public pairPotential {
     public:
         double k;
         double range;
@@ -22,9 +22,9 @@ namespace msmrd {
          */
         harmonicRepulsion(double k, double range);
 
-        double evaluate(vec3<double> pos1, vec3<double> pos2) override;
+        double evaluate(const particle &part1, const particle &part2) override;
 
-        std::array<vec3<double>, 4> forceTorque(vec3<double> pos1, vec3<double> pos2) override;
+        std::array<vec3<double>, 4> forceTorque(const particle &part1, const particle &part2) override;
     };
 
 }

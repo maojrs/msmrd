@@ -11,7 +11,7 @@ namespace msmrd {
      * <quaternion<double>,quaternion<double>> indicates the pair potential depends on the
      * orientation of both particles, each with all its three rotational degrees of freedom.
      */
-    class patchyParticle : public pairPotential<quaternion<double>, quaternion<double>> {
+    class patchyParticle : public pairPotential {
     private:
         std::vector<vec3<double>> patchesCoordinates;
         double sigma = 1.0;
@@ -46,10 +46,10 @@ namespace msmrd {
         patchyParticle(double sigma, double strength, std::vector<std::vector<double>> patchesCoordinates);
 
 
-        double evaluate(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) override;
+        double evaluate(const particle &part1, const particle &part2) override;
 
         std::array<vec3<double>, 4>
-        forceTorque(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) override;
+        forceTorque(const particle &part1, const particle &part2) override;
 
     };
 }

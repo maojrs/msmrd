@@ -70,7 +70,7 @@ namespace msmrd{ ;
     }
 
     // Evaluates potential at given positions and orientations of two particles
-    double patchyParticle::evaluate(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) {
+    double patchyParticle::evaluate(const particle &part1, const particle &part2) {
         double repulsivePotential;
         double attractivePotential;
         double patchesPotential = 0.0;
@@ -80,6 +80,11 @@ namespace msmrd{ ;
         vec3<double> patchNormal1;
         vec3<double> patchNormal2;
         vec3<double> rpatch;
+
+        vec3<double> pos1 = part1.position;
+        vec3<double> pos2 = part2.position;
+        quaternion<double> theta1 = part1.orientation;
+        quaternion<double> theta2 = part2.orientation;
         vec3<double> rvec = pos2 - pos1;
 
         repulsivePotential = quadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
@@ -108,13 +113,19 @@ namespace msmrd{ ;
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyParticle::forceTorque(vec3<double> pos1, vec3<double> pos2, quaternion<double> theta1, quaternion<double> theta2) {
+    std::array<vec3<double>, 4> patchyParticle::forceTorque(const particle &part1, const particle &part2) {
         vec3<double> force;
         vec3<double> force1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> force2 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> torque1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> torque2 = vec3<double> (0.0, 0.0, 0.0);
+
+        vec3<double> pos1 = part1.position;
+        vec3<double> pos2 = part2.position;
+        quaternion<double> theta1 = part1.orientation;
+        quaternion<double> theta2 = part2.orientation;
         vec3<double> rvec = pos2 - pos1;
+        
         // auxiliary variables to calculate force and torque
         double repulsiveForceNorm = 0.0;
         double attractiveForceNorm = 0.0;
