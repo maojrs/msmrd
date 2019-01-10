@@ -33,15 +33,14 @@ set(SOURCES
         src/integrators/integrator.cpp
         src/integrators/overdampedLangevin.cpp
         src/integrators/overdampedLangevinMarkovSwitch.cpp
-        src/potentials/potentials.cpp
         src/potentials/dipole.cpp
         src/potentials/gaussians3D.cpp
         src/potentials/gayBerne.cpp
         src/potentials/harmonicRepulsion.cpp
         src/potentials/patchyParticle.cpp
         src/potentials/patchyProtein.cpp
-        src/trajectories/trajectory.cpp
-        )
+        src/potentials/potentials.cpp
+        src/trajectories/trajectory.cpp)
 
 set(PY_SOURCES
         src/binding/binding.hpp

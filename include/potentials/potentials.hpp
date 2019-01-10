@@ -21,6 +21,8 @@ namespace msmrd {
         virtual double evaluate(const particle &part) = 0;
 
         virtual std::array<vec3<double>, 2> forceTorque(const particle &part) = 0;
+
+        std::vector<std::vector<double>> forceTorquePyBind(const particle &part);
     };
 
 
@@ -40,6 +42,8 @@ namespace msmrd {
         virtual double evaluate(const particle &part1, const particle &part2) = 0;
 
         virtual std::array<vec3<double>, 4> forceTorque(const particle &part1, const particle &part2) = 0;
+
+        std::vector<std::vector<double>> forceTorquePyBind(const particle &part1, const particle &part2);
 
     };
 

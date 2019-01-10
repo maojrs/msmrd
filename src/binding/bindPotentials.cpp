@@ -17,25 +17,25 @@ namespace msmrd {
                                                                         "maxrad, scalefactor, seed)")
                 .def(py::init<int &, double &, double &, long &>())
                 .def("evaluate", &gaussians3D::evaluate)
-                .def("forceTorque", &gaussians3D::forceTorque);
+                .def("forceTorque", &gaussians3D::forceTorquePyBind);
 
         py::class_<dipole, externalPotential>(m, "dipole", "dipole potential (scalefactor, "
                                                                          "directionEField)")
                 .def(py::init<double &, std::vector<double> &>())
                 .def("evaluate", &dipole::evaluate)
-                .def("forceTorque", &dipole::forceTorque);
+                .def("forceTorque", &dipole::forceTorquePyBind);
 
         py::class_<gayBerne, pairPotential>(m, "gayBerne", "Gay-Berne potential "
                                                            "(a, d, eps0, sig0)")
                 .def(py::init<double &, double &, double &, double &>())
                 .def("evaluate", &gayBerne::evaluate)
-                .def("forceTorque", &gayBerne::forceTorque);
+                .def("forceTorque", &gayBerne::forceTorquePyBind);
 
         py::class_<patchyParticle, pairPotential>(m, "patchyParticle", "Patchy "
                                                      "particle potential (sigma, strength, patchesCoordinates)")
                 .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
                 .def("evaluate", &patchyParticle::evaluate)
-                .def("forceTorque", &patchyParticle::forceTorque);
+                .def("forceTorque", &patchyParticle::forceTorquePyBind);
 
         py::class_<patchyProtein, pairPotential>(m, "patchyProtein",
                                                  "Patchy protein potential (sigma, strength, patches"
@@ -44,7 +44,7 @@ namespace msmrd {
                         std::vector<std::vector<double>> &,
                         std::vector<std::vector<double>> &>())
                 .def("evaluate", &patchyProtein::evaluate)
-                .def("forceTorque", &patchyProtein::forceTorque);
+                .def("forceTorque", &patchyProtein::forceTorquePyBind);
     }
 
 }

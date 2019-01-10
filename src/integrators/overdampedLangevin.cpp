@@ -46,5 +46,4 @@ namespace msmrd {
             part.setNextOrientVector(neworientvector);
         }
     }
-
 }

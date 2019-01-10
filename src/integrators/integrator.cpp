@@ -26,10 +26,8 @@ namespace msmrd {
         if (particlesbodytype != "point") {
             rotation = true;
         }
-        if (particlesbodytype != "point" && particlesbodytype != "rod" && particlesbodytype != "rigidbody" &&
-            particlesbodytype != "pointMix" && particlesbodytype != "rodMix" && particlesbodytype != "rigidbodyMix") {
-            throw std::runtime_error("Unknown particles bodytype; it should be either point, rod, rigidbody,"
-                                     "pointMix, rodMix or rigibodyMix.");
+        if (particlesbodytype != "point" && particlesbodytype != "rod" && particlesbodytype != "rigidbody") {
+            throw std::runtime_error("Unknown particles bodytype; it should be either point, rod, rigidbody");
         }
      };
 
@@ -69,21 +67,15 @@ namespace msmrd {
     }
 
 
-    /*
-     * Integrator set potential functions for external potentials (for particles of type particle or its children
-     * like particleMS).
-     */
-
+    /* Integrator set potential functions for external potentials (for particles of type particle or its children
+     * like particleMS). */
     void integrator::setExternalPotential(externalPotential *pot) {
         externalPotentialActive = true;
         externalPot = pot;
     }
 
-    /*
-     * Integrator set potential functions for pair potentials (for particles of type particle or its children
-     * like particleMS).
-     */
-
+    /* Integrator set potential functions for pair potentials (for particles of type particle or its children
+     * like particleMS). */
     void integrator::setPairPotential(pairPotential *pot) {
         pairPotentialActive = true;
         pairPot = pot;

@@ -48,10 +48,7 @@ namespace msmrd {
         * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
         * @param particlesbodytype body type of particles to integrate. It determines rotation integrator behavior, can
         * be either point, rod or rigidbody, and it is determined by orientational degrees of freedom, points
-        * have no orientation, rods need only one vector and rigidsolid requires a complete quaternion). The particles
-        * body type can also be pointMix, rodMix or rigidbodyMix, where there are different types of
-        * particles (particleMS.type) with the same body type. This allows the integrator to pass the particle type to
-        * the potential function. Note the particlesbodytype has to match the potential used.
+        * have no orientation, rods need only one vector and rigidsolid requires a complete quaternion).
         * @param rotation boolean to indicate if rotation should be integrated
         * @param randg random number generator based in mt19937
         *
