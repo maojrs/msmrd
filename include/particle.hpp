@@ -122,7 +122,8 @@ namespace msmrd {
         int state;
         double lagtime = 0;
         double tcount = 0;
-        double propagateTMSM = true;
+        bool propagateTMSM = true;
+        bool activeMSM = true;
         /**
          * @param state particle current state
          * @param nextState particle next state given and changed by the msm/ctmsm
@@ -130,6 +131,8 @@ namespace msmrd {
          * @param tcount counts time in between MSM/CTMSM iterations
          * @param propagateTMSM determines if MSM/CTMSM should be propagated on a given timestep
          * tcount and propagateTMSM are used to synchronize TMSM with diffusion/rotation timestepping
+         * @param activeMSM determines if MSM behavior is active or dormant. Under certain conditions (bound state),
+         * maybe it is convenient to turn off the MSM behavior.
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)

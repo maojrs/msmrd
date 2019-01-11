@@ -15,7 +15,7 @@ namespace msmrd{
      * quaternion<double), and their types (int, int).
      */
     class patchyProtein : public pairPotential {
-    private:
+    protected:
         std::vector<vec3<double>> patchesCoordinatesA;
         std::vector<vec3<double>> patchesCoordinatesB;
         double sigma = 1.0;
@@ -41,6 +41,8 @@ namespace msmrd{
         double derivativeQuadraticPotential(double r, double sig, double eps, double a, double rstar);
 
     public:
+        patchyProtein() = default;
+
         patchyProtein(double sigma, double strength,
                       std::vector<vec3<double>> patchesCoordinatesA,
                       std::vector<vec3<double>> patchesCoordinatesB);

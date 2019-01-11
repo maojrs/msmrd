@@ -40,7 +40,7 @@ set(SOURCES
         src/potentials/patchyParticle.cpp
         src/potentials/patchyProtein.cpp
         src/potentials/potentials.cpp
-        src/trajectories/trajectory.cpp)
+        src/trajectories/trajectory.cpp include/potentials/patchyProteinMarkovSwitch.hpp src/potentials/patchyProteinMarkovSwitch.cpp)
 
 set(PY_SOURCES
         src/binding/binding.hpp

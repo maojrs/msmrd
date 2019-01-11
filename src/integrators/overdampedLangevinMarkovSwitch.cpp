@@ -49,8 +49,7 @@ namespace msmrd {
             while (part.tcount < timestep) {
                 // Propagates MSM only when diffusion and rotation are in sync
                 if (part.propagateTMSM) {
-                    tmsm.propagateNoUpdate(part,
-                                           1); // Diffusion coefficients don't need to be updated until dt reaches lagtime.
+                    tmsm.propagateNoUpdate(part, 1); // Diffusion coefficients don't need to be updated until dt reaches lagtime.
                 }
                 // Integrates for one lagtime as long as integration is still under dt
                 if (part.tcount + part.lagtime < timestep) {
@@ -62,7 +61,7 @@ namespace msmrd {
                     part.updateState(); // Sets calculated next state as current state
                     part.setD(tmsm.Dlist[part.state]);
                     part.setDrot(tmsm.Drotlist[part.state]);
-                    // If current lagtime overtakes dt, integrate up to dt (by resdt) and reset lagtime to remaining portion
+                // If current lagtime overtakes dt, integrate up to dt (by resdt) and reset lagtime to remaining portion
                 } else {
                     resdt = timestep - part.tcount;
                     integrateOne(partIndex, parts, resdt);
@@ -112,7 +111,12 @@ namespace msmrd {
 
         // Integrate and save next positions/orientations in parts[i].next***
         for (int i = 0; i < parts.size(); i++) {
-            integrateOneMS(i, parts, dt);
+            if (parts[i].activeMSM) {
+                integrateOneMS(i, parts, dt);
+            }
+            else {
+                integrateOne(i, parts, dt);
+            }
         }
         // Enforce boundary and set new positions into parts[i].nextPosition
         for (int i = 0; i < parts.size(); i++) {
