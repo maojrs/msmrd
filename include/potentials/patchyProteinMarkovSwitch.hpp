@@ -20,14 +20,17 @@ namespace msmrd{
 
         void setPotentialParameters() override;
 
-        void checkMSM(particle &part1, particle &part2);
+        void enableDisableMSM(particleMS &part1, particleMS &part2);
+
     public:
         // Inherit parent class constructor
         using patchyProtein::patchyProtein;
 
-        double evaluate(particle &part1, particle &part2) override;
+        double evaluate(particleMS &part1, particleMS &part2);
 
-        std::array<vec3<double>, 4> forceTorque(particle &part1, particle &part2) override;
+        std::array<vec3<double>, 4> forceTorque(particleMS &part1, particleMS &part2);
+
+        std::vector<std::vector<double>> forceTorquePyBind(particleMS &part1, particleMS &part2);
 
     };
 

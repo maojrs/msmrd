@@ -30,10 +30,10 @@ namespace msmrd {
          */
         gayBerne(double a, double d, double eps0, double sig0);
 
-        double evaluate(particle &part1, particle &part2) override;
+        double evaluate(const particle &part1, const particle &part2) override;
 
         std::array<vec3<double>, 4>
-        forceTorque(particle &part1, particle &part2) override;
+        forceTorque(const particle &part1, const particle &part2) override;
     };
 
 }

@@ -47,8 +47,27 @@ namespace msmrd {
     }
 
 
+    /* Checks is MSM must be deactivated in certain particles. In this case, if bounded or close to bounded
+     * disable MSM in particle withs type 1 and state 0. This needs to be hardcoded here for each example. */
+    void patchyProteinMarkovSwitch::enableDisableMSM(particleMS &part1, particleMS &part2) {
+        vec3<double> distance = part1.position - part2.position;
+        if (distance.norm() <= 1.2) {
+            if (part1.type == 1 && part1.state == 0) {
+                part1.activeMSM = false;
+            } else {
+                part1.activeMSM =  true;
+            }
+            if (part2.type == 1 && part2.state == 0) {
+                part2.activeMSM = false;
+            }
+            else {
+                part2.activeMSM = true;
+            }
+        }
+    }
+
     // Evaluates potential at given positions and orientations of two particles
-    double patchyProteinMarkovSwitch::evaluate(particle &part1, particle &part2) {
+    double patchyProteinMarkovSwitch::evaluate(particleMS &part1, particleMS &part2) {
         vec3<double> pos1 = part1.position;
         vec3<double> pos2 = part2.position;
         quaternion<double> theta1 = part1.orientation;
@@ -67,12 +86,20 @@ namespace msmrd {
         vec3<double> rvec = pos2 - pos1;
 
         repulsivePotential = quadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
-        attractivePotential = quadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
+        // Attractive force only on conformation state 0 from particle 2; otherwise 0
+        if (part2.state == 0) {
+            attractivePotential = quadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
+        } else {
+            attractivePotential = 0;
+        }
 
         /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
         patchesCoords1 = assignPatches(part1.type);
         patchesCoords2 = assignPatches(part2.type);
 
+        /* Enables/Disables MSM following potential hardcoded rules. In this case, if bounded or close to bounded
+         * disable the MSM on particles type 1 and state 0. */
+        enableDisableMSM(part1, part2);
 
         // Interaction if particles are different
         if (rvec.norm() <= 2*sigma) {
@@ -101,7 +128,7 @@ namespace msmrd {
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(particle &part1, particle &part2) {
+    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(particleMS &part1, particleMS &part2) {
         vec3<double> pos1 = part1.position;
         vec3<double> pos2 = part2.position;
         quaternion<double> theta1 = part1.orientation;
@@ -129,7 +156,12 @@ namespace msmrd {
         /* Calculate and add forces due to repulsive and attractive isotropic potentials.
          *  Note correct sign/direction of force given by rvec/rvec.norm*() */
         repulsiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
-        attractiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
+        // Attractive force only on conformation state 0 from particle 2; otherwise 0
+        if (part2.state == 0) {
+            attractiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
+        } else {
+            attractiveForceNorm = 0;
+        }
         force = (repulsiveForceNorm + attractiveForceNorm)*rvec/rvec.norm();
 
         /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
@@ -174,6 +206,13 @@ namespace msmrd {
             }
         }
         return {force + force1, torque1, -1.0*force + force2, torque2};
+    }
+
+    // Additional function to call forcetorque function from pybind
+    std::vector<std::vector<double>>
+    patchyProteinMarkovSwitch::forceTorquePyBind(particleMS &part1, particleMS &part2) {
+        std::array<vec3<double>, 4> forceTorquex = forceTorque(part1, part2);
+        return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
 

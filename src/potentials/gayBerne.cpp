@@ -19,7 +19,7 @@ namespace msmrd {
     }
 
     // Evaluate Gay Berne potential
-    double gayBerne::evaluate(particle &part1, particle &part2) {
+    double gayBerne::evaluate(const particle &part1, const particle &part2) {
         vec3<double> u1 = part1.orientvector;
         vec3<double> u2 = part2.orientvector;
         vec3<double> r = part1.position - part2.position;
@@ -51,7 +51,7 @@ namespace msmrd {
 
 
     // Returns force and torque exerted on the first particle by the second one.
-    std::array<vec3<double>, 4> gayBerne::forceTorque(particle &part1, particle &part2) {
+    std::array<vec3<double>, 4> gayBerne::forceTorque(const particle &part1, const particle &part2) {
         vec3<double> u1 = part1.orientvector;
         vec3<double> u2 = part2.orientvector;
         vec3<double> r = part1.position - part2.position;

@@ -105,12 +105,6 @@ namespace msmrd {
         // Potential and boundary related functions
         void setBoundary(boundary *bndry);
 
-//        void setExternalPotential(externalPotential<particle> *pot);
-//        void setExternalPotentialMS(externalPotential<particleMS> *pot);
-//        void setPairPotential(externalPotential<particle> *pot);
-//        void setPairPotentialMS(externalPotential<particleMS> *pot);
-
-
         void setExternalPotential(externalPotential *pot);
 
         void setPairPotential(pairPotential *pot);

@@ -13,7 +13,7 @@ namespace msmrd {
     harmonicRepulsion::harmonicRepulsion(double k, double range) : k(k), range(range) {}
 
     // Evaluate potential value for two given particles' positions
-    double harmonicRepulsion::evaluate(particle &part1, particle &part2) {
+    double harmonicRepulsion::evaluate(const particle &part1, const particle &part2) {
         vec3<double> d = part1.position - part2.position;
         double R = d.norm();
         if (R > range) {
@@ -24,7 +24,7 @@ namespace msmrd {
     }
 
     // Returns -gradient of potential (force)  and zero torque at position x
-    std::array<vec3<double>, 4> harmonicRepulsion::forceTorque(particle &part1, particle &part2) {
+    std::array<vec3<double>, 4> harmonicRepulsion::forceTorque(const particle &part1, const particle &part2) {
         vec3<double> force = vec3<double>(0, 0, 0);
         vec3<double> torque = vec3<double>(0, 0, 0);
         vec3<double> d = part1.position - part2.position;
