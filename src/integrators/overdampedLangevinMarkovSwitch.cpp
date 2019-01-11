@@ -113,8 +113,7 @@ namespace msmrd {
         for (int i = 0; i < parts.size(); i++) {
             if (parts[i].activeMSM) {
                 integrateOneMS(i, parts, dt);
-            }
-            else {
+            } else {
                 integrateOne(i, parts, dt);
             }
         }

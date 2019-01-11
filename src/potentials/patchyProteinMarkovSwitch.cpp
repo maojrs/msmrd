@@ -51,18 +51,10 @@ namespace msmrd {
      * disable MSM in particle withs type 1 and state 0. This needs to be hardcoded here for each example. */
     void patchyProteinMarkovSwitch::enableDisableMSM(particleMS &part1, particleMS &part2) {
         vec3<double> distance = part1.position - part2.position;
-        if (distance.norm() <= 1.2) {
-            if (part1.type == 1 && part1.state == 0) {
-                part1.activeMSM = false;
-            } else {
-                part1.activeMSM =  true;
-            }
-            if (part2.type == 1 && part2.state == 0) {
+        if (distance.norm() <= 1.2 && part2.type == 1 && part2.state == 0) {
                 part2.activeMSM = false;
-            }
-            else {
+        } else {
                 part2.activeMSM = true;
-            }
         }
     }
 
@@ -86,12 +78,7 @@ namespace msmrd {
         vec3<double> rvec = pos2 - pos1;
 
         repulsivePotential = quadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
-        // Attractive force only on conformation state 0 from particle 2; otherwise 0
-        if (part2.state == 0) {
-            attractivePotential = quadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
-        } else {
-            attractivePotential = 0;
-        }
+        attractivePotential = quadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
 
         /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
         patchesCoords1 = assignPatches(part1.type);
@@ -101,8 +88,8 @@ namespace msmrd {
          * disable the MSM on particles type 1 and state 0. */
         enableDisableMSM(part1, part2);
 
-        // Interaction if particles are different
-        if (rvec.norm() <= 2*sigma) {
+        // Interaction if particles are different and if part2 in attractive state 0
+        if (rvec.norm() <= 2*sigma && part2.state == 0) {
             // Loop over all patches
             for (int i = 0; i < patchesCoords1.size(); i++) {
                 patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], theta1);
@@ -157,19 +144,19 @@ namespace msmrd {
          *  Note correct sign/direction of force given by rvec/rvec.norm*() */
         repulsiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
         // Attractive force only on conformation state 0 from particle 2; otherwise 0
-        if (part2.state == 0) {
-            attractiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
-        } else {
-            attractiveForceNorm = 0;
-        }
+        attractiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
         force = (repulsiveForceNorm + attractiveForceNorm)*rvec/rvec.norm();
+
+        /* Enables/Disables MSM following potential hardcoded rules. In this case, if bounded or close to bounded
+         * disable the MSM on particles type 1 and state 0. */
+        enableDisableMSM(part1, part2);
 
         /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
         patchesCoords1 = assignPatches(part1.type);
         patchesCoords2 = assignPatches(part2.type);
 
-        // Calculate forces and torque due to patches interaction
-        if (rvec.norm() <= 2*sigma) {
+        // Calculate forces and torque due to patches interaction if part2 in attractive state 0
+        if (rvec.norm() <= 2*sigma && part2.state == 0) {
             // Loop over all patches of particle 1
             for (int i = 0; i < patchesCoords1.size(); i++) {
                 patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], theta1);

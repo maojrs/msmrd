@@ -37,7 +37,9 @@ namespace msmrd {
                 .def_property_readonly("state", &particleMS::getState)
                 .def_property_readonly("lagtime", &particleMS::getLagtime)
                 .def("setState", &particleMS::setState)
-                .def("setLagtime", &particleMS::setLagtime);
+                .def("setLagtime", &particleMS::setLagtime)
+                .def("setMSMoff", &particleMS::setMSMoff)
+                .def("setMSMon", &particleMS::setMSMon);
     }
 
 }

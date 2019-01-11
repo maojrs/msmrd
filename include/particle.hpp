@@ -164,6 +164,10 @@ namespace msmrd {
         void setNextType(int nexttype) { nextType = nexttype; }
 
         void setLagtime(double newlagtime) { lagtime = newlagtime; }
+
+        void setMSMoff() {activeMSM = false; }
+
+        void setMSMon() {activeMSM = true; }
     };
 
 }
