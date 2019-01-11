@@ -18,17 +18,16 @@ namespace msmrd{
     class patchyProteinMarkovSwitch : public patchyProtein {
     private:
 
-        void setPotentialParameters();
-
+        void setPotentialParameters() override;
 
         void checkMSM(particle &part1, particle &part2);
     public:
         // Inherit parent class constructor
         using patchyProtein::patchyProtein;
 
-        double evaluate(const particle &part1, const particle &part2) override;
+        double evaluate(particle &part1, particle &part2) override;
 
-        std::array<vec3<double>, 4> forceTorque(const particle &part1, const particle &part2) override;
+        std::array<vec3<double>, 4> forceTorque(particle &part1, particle &part2) override;
 
     };
 

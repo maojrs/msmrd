@@ -48,7 +48,7 @@ namespace msmrd {
 
 
     // Evaluates potential at given positions and orientations of two particles
-    double patchyProteinMarkovSwitch::evaluate(const particle &part1, const particle &part2) {
+    double patchyProteinMarkovSwitch::evaluate(particle &part1, particle &part2) {
         vec3<double> pos1 = part1.position;
         vec3<double> pos2 = part2.position;
         quaternion<double> theta1 = part1.orientation;
@@ -101,7 +101,7 @@ namespace msmrd {
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(const particle &part1, const particle &part2) {
+    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(particle &part1, particle &part2) {
         vec3<double> pos1 = part1.position;
         vec3<double> pos2 = part2.position;
         quaternion<double> theta1 = part1.orientation;

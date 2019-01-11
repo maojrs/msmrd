@@ -26,9 +26,9 @@ namespace msmrd {
         dipole(double scalefactor, std::vector<double> &directionEField);
 
 
-        double evaluate(const particle &part) override;
+        double evaluate(particle &part) override;
 
-        std::array<vec3<double>, 2> forceTorque(const particle &part) override;
+        std::array<vec3<double>, 2> forceTorque(particle &part) override;
     };
 
 }

@@ -77,13 +77,13 @@ namespace msmrd {
          * The template PARTICLE can take values of particle or particleMS or other custom defined particles.
          * This is required because vectors of child classes are not recognized as childs of vector of parents class.*/
         template< typename PARTICLE >
-        void calculateForceTorqueFields(const std::vector<PARTICLE> &parts); // external + pairs
+        void calculateForceTorqueFields(std::vector<PARTICLE> &parts); // external + pairs
 
         template< typename PARTICLE >
-        void calculateExternalForceTorques(const std::vector<PARTICLE> &parts, int numParticles);
+        void calculateExternalForceTorques(std::vector<PARTICLE> &parts, int numParticles);
 
         template< typename PARTICLE >
-        void calculatePairsForceTorques(const std::vector<PARTICLE> &parts, int numParticles);
+        void calculatePairsForceTorques(std::vector<PARTICLE> &parts, int numParticles);
 
 
     public:
@@ -127,7 +127,7 @@ namespace msmrd {
     /* Calculates the total force and torque fields experienced by all particles, including external and
      * interaction pairs potentials. Relies on two other auxiliary functions to divide the work. */
     template <typename PARTICLE>
-    void integrator::calculateForceTorqueFields(const std::vector<PARTICLE> &parts) {
+    void integrator::calculateForceTorqueFields(std::vector<PARTICLE> &parts) {
         unsigned int N = static_cast<int>(parts.size());
 
         // Resize force/torque fields array if the number of particles have changed
@@ -157,7 +157,7 @@ namespace msmrd {
     /* Calculate external forces and torques due to interactiion with an external potential and save it into
      * forceField and torqueField. Note different bodytypes require different fucntion calls */
     template <typename PARTICLE>
-    void integrator::calculateExternalForceTorques(const std::vector<PARTICLE> &parts, int numParticles) {
+    void integrator::calculateExternalForceTorques(std::vector<PARTICLE> &parts, int numParticles) {
         std::array<vec3<double>, 2> forctorq;
         for (int i = 0; i < numParticles; i++) {
             forctorq = externalPot->forceTorque(parts[i]);
@@ -172,7 +172,7 @@ namespace msmrd {
      * only once. The function pairPotential.forceTorque returns the force and torque exerted on particle1
      * and the force and torque exerted on particle2 (in that order), from their mutual interaction. */
     template <typename PARTICLE>
-    void integrator::calculatePairsForceTorques(const std::vector<PARTICLE> &parts, int numParticles) {
+    void integrator::calculatePairsForceTorques(std::vector<PARTICLE> &parts, int numParticles) {
         unsigned int N = static_cast<int>(parts.size());
         std::array<vec3<double>, 4> forctorq;
         // Calculate the forces and torque for each possible interaction

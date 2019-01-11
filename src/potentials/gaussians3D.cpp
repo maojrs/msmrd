@@ -31,7 +31,7 @@ namespace msmrd {
 
 
     // Returns value of potential at position x
-    double gaussians3D::evaluate(const particle &part) {
+    double gaussians3D::evaluate(particle &part) {
         vec3<double> x = part.position;
         double output = 0;
         double gauss;
@@ -51,7 +51,7 @@ namespace msmrd {
 
 
     // Returns minus gradient of potential (force) at position x and zero torque
-    std::array<vec3<double>, 2> gaussians3D::forceTorque(const particle &part) {
+    std::array<vec3<double>, 2> gaussians3D::forceTorque(particle &part) {
         vec3<double> x = part.position;
         vec3<double> force = vec3<double>(0, 0, 0);
         vec3<double> torque = vec3<double>(0, 0, 0);

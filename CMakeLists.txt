@@ -39,8 +39,10 @@ set(SOURCES
         src/potentials/harmonicRepulsion.cpp
         src/potentials/patchyParticle.cpp
         src/potentials/patchyProtein.cpp
+        src/potentials/patchyProteinMarkovSwitch.cpp
         src/potentials/potentials.cpp
-        src/trajectories/trajectory.cpp include/potentials/patchyProteinMarkovSwitch.hpp src/potentials/patchyProteinMarkovSwitch.cpp)
+        src/trajectories/trajectory.cpp
+        )
 
 set(PY_SOURCES
         src/binding/binding.hpp
@@ -73,6 +75,7 @@ set(PY_SOURCES
         include/potentials/harmonicRepulsion.hpp
         include/potentials/patchyParticle.hpp
         include/potentials/patchyProtein.hpp
+        include/potentials/patchyProteinMarkovSwitch.hpp
         include/trajectories/trajectory.hpp
         )
 
