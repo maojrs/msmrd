@@ -264,7 +264,7 @@ TEST_CASE("Fundamental trajectory recording", "[trajectory]") {
     overdampedLangevin integrator(0.01, 15, "rigidbody");
     simulation sim(integrator, particles);
     trajectoryPositionOrientation traj(2, 20000);
-    sim.run(10000, traj, 1);
+    sim.run(10000, traj, 1, "test.h5");
     auto data = traj.getData();
     REQUIRE(data.size() == 20000);
 }

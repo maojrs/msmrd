@@ -23,7 +23,7 @@ namespace msmrd {
 
         simulation(integrator &integ, std::vector<particle> &particleList);
 
-        void run(const int steps, trajectory& traj, int stride);
+        void run(const int steps, trajectory& traj, int stride, std::string filename);
     };
 
 }
