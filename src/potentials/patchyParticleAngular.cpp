@@ -17,7 +17,7 @@ namespace msmrd {
         double repulsivePotential;
         double attractivePotential;
         double patchesPotential = 0.0;
-        double angleModulation;
+        double angularPotential;
         vec3<double> patch1;
         vec3<double> patch2;
         vec3<double> patchNormal1;
@@ -63,11 +63,11 @@ namespace msmrd {
             plane2 = plane2/plane2.norm();
 
             // Scale patchpotential depending on how well aligned the planes are
-            patchesPotential = (plane1*plane2)*patchesPotential;
+            angularPotential = -1.0*(plane1*plane2);
         }
 
 
-        return repulsivePotential + attractivePotential + patchesPotential;
+        return repulsivePotential + attractivePotential + patchesPotential + angularPotential;
     }
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
@@ -152,11 +152,9 @@ namespace msmrd {
             plane2 = plane2/plane2.norm();
 
             // Scale patches forces and torques depending on how well aligned the planes are.
-            double scaleFactor = plane1*plane2;
-            force1 = scaleFactor*force1;
-            torque1 = scaleFactor*torque1;
-            force2 = scaleFactor*force2;
-            torque2 = scaleFactor*torque2;
+            vec3<double> derivativeAngluarPotential = plane1.cross(plane2);
+            torque1 += derivativeAngluarPotential;
+            torque2 -= derivativeAngluarPotential;
         }
 
         return {force + force1, torque1, -1.0*force + force2, torque2};
