@@ -21,6 +21,7 @@ namespace msmrd {
     void bindParticles(py::module&);
     void bindPotentials(py::module&);
     void bindTrajectories(py::module&);
+    void bindSimulation(py::module&);
 
 
     // Function template to transform vectors to numpy for pyBindings

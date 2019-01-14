@@ -2,8 +2,10 @@
 // Created by maojrs on 10/8/18.
 //
 #include "binding.hpp"
-#include "potentials/potentials.hpp"
 #include "boundaries/boundary.hpp"
+#include "integrators/integrator.hpp"
+#include "potentials/potentials.hpp"
+#include "trajectories/trajectory.hpp"
 
 
 
@@ -15,6 +17,12 @@ namespace msmrd {
 
         /* Bind boundaries parent class*/
         pybind11::class_<boundary>(m, "boundary");
+
+        /* Bind integrators parent class*/
+        pybind11::class_<integrator>(m, "integrator");
+
+        /* Bind trajectories parent class*/
+        pybind11::class_<trajectory>(m, "trajectory");
 
         /* Bind external potential parent classes as instantiated templates
          * so inheritance works correctly. */

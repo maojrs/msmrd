@@ -18,6 +18,7 @@ PYBIND11_MODULE(msmrd2binding, module) {
     msmrd::bindBoundaries(module);
     msmrd::bindMarkovModels(module);
     msmrd::bindParticles(module);
+    msmrd::bindSimulation(module);
 
     // Load main submodules
     auto integratorsSubmodule = module.def_submodule("integrators", "msmrd integrators submodule");

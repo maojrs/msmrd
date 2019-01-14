@@ -14,7 +14,7 @@ namespace msmrd {
      * pyBinders for the c++ integrators classes
      */
     void bindIntegrators(py::module &m) {
-        py::class_<overdampedLangevin>(m, "overdampedLangevin", "overdamped Langevin integrator (timestep, seed, "
+        py::class_<overdampedLangevin, integrator>(m, "overdampedLangevin", "overdamped Langevin integrator (timestep, seed, "
                                                                 "particlesbodytype (point, rod, rigidbody, "
                                                                 "pointmix, rodmix or rigidbodymix) )")
                 .def(py::init<double &, long &, std::string &>())
