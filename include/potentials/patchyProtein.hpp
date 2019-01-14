@@ -9,8 +9,8 @@ namespace msmrd{
 
     /*
      * Declaration of potential function for patchy protein model. This class is a child from the
-     * general pair potentials class that accepts quaternion-based orientation and particle types
-     * (rigidbodyMix). Some of its functionality is based on the patchy particles class. Note the
+     * general pair potentials class that accepts quaternion-based orientation (rigidBody particle type).
+     * Some of its functionality is based on the patchy particles class. Note the
      * potential will depend on the position of both particles, their orientation (quaternion<double>,
      * quaternion<double), and their types (int, int).
      */

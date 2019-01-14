@@ -5,6 +5,7 @@
 #include "potentials/harmonicRepulsion.hpp"
 #include "potentials/gayBerne.hpp"
 #include "potentials/patchyParticle.hpp"
+#include "potentials/patchyParticleAngular.hpp"
 #include "potentials/patchyProtein.hpp"
 #include "potentials/patchyProteinMarkovSwitch.hpp"
 
@@ -34,6 +35,13 @@ namespace msmrd {
 
         py::class_<patchyParticle, pairPotential>(m, "patchyParticle", "Patchy "
                                                      "particle potential (sigma, strength, patchesCoordinates)")
+                .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
+                .def("evaluate", &patchyParticle::evaluate)
+                .def("forceTorque", &patchyParticle::forceTorquePyBind);
+
+        py::class_<patchyParticleAngular, patchyParticle>(m, "patchyParticleAngular", "Patchy particle potential with"
+                                                             "explicit angular dependence(sigma, strength, "
+                                                             "patchesCoordinates)")
                 .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
                 .def("evaluate", &patchyParticle::evaluate)
                 .def("forceTorque", &patchyParticle::forceTorquePyBind);

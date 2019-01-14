@@ -7,12 +7,11 @@
 
 namespace msmrd {
     /*
-     * Declaration of potential function between patchy particles. The template
-     * <quaternion<double>,quaternion<double>> indicates the pair potential depends on the
+     * Declaration of potential function between patchy particles.This pair potential depends on the
      * orientation of both particles, each with all its three rotational degrees of freedom.
      */
     class patchyParticle : public pairPotential {
-    private:
+    protected:
         std::vector<vec3<double>> patchesCoordinates;
         double sigma = 1.0;
         double strength = 100.0;
@@ -42,6 +41,7 @@ namespace msmrd {
          * @param a*** stiffness paramaters for the same three potentials.
          * @param rstar*** range paramaters for the same three potentials.
          */
+        patchyParticle() = default;
         patchyParticle(double sigma, double strength, std::vector<vec3<double>> patchesCoordinates);
         patchyParticle(double sigma, double strength, std::vector<std::vector<double>> patchesCoordinates);
 
