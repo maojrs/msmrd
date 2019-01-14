@@ -11,6 +11,8 @@ namespace msmrd {
      * dependence.
      */
     class patchyParticleAngular : public patchyParticle {
+    private:
+        double patchPotentialScaling = 0.3;
     public:
         // Inherit parent class constructor
         using patchyParticle::patchyParticle;

@@ -42,7 +42,7 @@ namespace msmrd {
                     patchNormal2 = msmrdtools::rotateVec(patchesCoordinates[j], theta2);
                     patch2 = pos2 + 0.5*sigma*patchNormal2;
                     rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
-                    patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches, aPatches, rstarPatches);
+                    patchesPotential += patchPotentialScaling*quadraticPotential(rpatch.norm(), sigma, epsPatches, aPatches, rstarPatches);
                 }
             }
         }
@@ -62,8 +62,8 @@ namespace msmrd {
             plane1 = plane1/plane1.norm();
             plane2 = plane2/plane2.norm();
 
-            // Scale patchpotential depending on how well aligned the planes are
-            angularPotential = -1.0*(plane1*plane2);
+            // Additional rotational potential depending on how well aligned the planes are. (-cos(theta))
+            angularPotential = -0.5*sigma*(plane1*plane2)*(plane1*plane2);
         }
 
 
@@ -126,12 +126,12 @@ namespace msmrd {
                         patchForce = patchesForceNorm*rpatch/rpatch.norm();
                     }
                     // Calculate force and torque acting on particle 1 and add values to previous forces and torques
-                    force1 += patchForce;
-                    torque1 += 0.5*sigma * patchNormal1.cross(patchForce);
+                    force1 += patchPotentialScaling * patchForce;
+                    torque1 += 0.5*sigma * patchPotentialScaling * patchNormal1.cross(patchForce);
 
                     // Calculate force and torque acting on particle 2 and add values to previous forces and torques
-                    force2 += -1.0*patchForce;
-                    torque2 += 0.5*sigma * patchNormal2.cross(-1.0*patchForce);
+                    force2 += -1.0 * patchPotentialScaling * patchForce;
+                    torque2 += 0.5*sigma * patchPotentialScaling * patchNormal2.cross(-1.0*patchForce);
                 }
             }
         }
@@ -151,8 +151,8 @@ namespace msmrd {
             plane1 = plane1/plane1.norm();
             plane2 = plane2/plane2.norm();
 
-            // Scale patches forces and torques depending on how well aligned the planes are.
-            vec3<double> derivativeAngluarPotential = plane1.cross(plane2);
+            // Additional torques depending on how well aligned the planes are. (Derivative of -cos(theta))
+            vec3<double> derivativeAngluarPotential = 0.5*2.0*sigma*(plane1*plane2)*plane1.cross(plane2);
             torque1 += derivativeAngluarPotential;
             torque2 -= derivativeAngluarPotential;
         }
