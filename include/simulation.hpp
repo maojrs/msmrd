@@ -12,7 +12,7 @@ namespace msmrd {
     class simulation {
     public:
         integrator &integ;
-        std::vector<particle> &particleList;
+        //std::vector<particle> &particleList;
         /**
          * @param integ Integrator to be used for simulation, works for any integrator since they are all
          * childs from abstract class
@@ -21,9 +21,10 @@ namespace msmrd {
          * in the bindings, since custom types might not work.
          */
 
-        simulation(integrator &integ, std::vector<particle> &particleList);
+        simulation(integrator &integ);
 
-        void run(const int steps, trajectory& traj, int stride, std::string filename);
+        void run(std::vector<particle> &particleList, const int steps, trajectory& traj, int stride, std::string filename);
+
     };
 
 }

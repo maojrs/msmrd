@@ -262,9 +262,9 @@ TEST_CASE("Fundamental trajectory recording", "[trajectory]") {
     particle part2(1., 1., p2, o2);
     std::vector<particle> particles {part1, part2};
     overdampedLangevin integrator(0.01, 15, "rigidbody");
-    simulation sim(integrator, particles);
+    simulation sim(integrator);
     trajectoryPositionOrientation traj(2, 20000);
-    sim.run(10000, traj, 1, "test.h5");
+    sim.run(particles, 10000, traj, 1, "test.h5");
     auto data = traj.getData();
     REQUIRE(data.size() == 20000);
 }

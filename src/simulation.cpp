@@ -9,17 +9,17 @@
 
 namespace msmrd {
 
-    simulation::simulation(integrator &integ, std::vector<particle> &particleList)
-            : integ(integ), particleList(particleList) {};
+    simulation::simulation(integrator &integ)
+            : integ(integ) {};
 
-    void simulation::run(const int Nsteps, trajectory& traj, int stride, std::string filename) {
+    void simulation::run(std::vector<particle> &particleList, const int Nsteps, trajectory &traj, int stride, std::string filename) {
         int bufferCounter = 0;
         for (int step=0; step < Nsteps; step++) {
             integ.integrate(particleList);
             if (step % stride == 0) {
                 bufferCounter++;
                 traj.sample(step, particleList);
-                if (traj.bufferSize) {
+                if (bufferCounter == traj.bufferSize) {
                     bufferCounter = 0;
                     traj.write2H5file(filename, traj.data);
                 }
