@@ -15,12 +15,12 @@ namespace msmrd {
     /**
      * Implementation of abstract parent trajectory class
      */
-    trajectory::trajectory(int Nparticles, int bufferSize): Nparticles(Nparticles), bufferSize(bufferSize){};
+    trajectory::trajectory(unsigned long Nparticles, int bufferSize): Nparticles(Nparticles), bufferSize(bufferSize){};
 
     /**
      * Implementation of trajectory class to store full position only trajectories
      */
-    trajectoryPosition::trajectoryPosition(int Nparticles, int bufferSize) : trajectory(Nparticles, bufferSize){
+    trajectoryPosition::trajectoryPosition(unsigned long Nparticles, int bufferSize) : trajectory(Nparticles, bufferSize){
         data.resize(0);
         data.reserve(Nparticles*bufferSize);
     };
@@ -59,7 +59,7 @@ namespace msmrd {
      *  Implementation of trajectory class to store trajectories with 3D position and
      *  orientation given by a quaternion
      */
-    trajectoryPositionOrientation::trajectoryPositionOrientation(int Nparticles, int bufferSize)
+    trajectoryPositionOrientation::trajectoryPositionOrientation(unsigned long Nparticles, int bufferSize)
             : trajectory(Nparticles, bufferSize){
         data.reserve(Nparticles*bufferSize);
     };

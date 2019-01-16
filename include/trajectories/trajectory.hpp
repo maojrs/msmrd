@@ -28,7 +28,7 @@ namespace msmrd {
         const std::size_t MB = 1024 * kB;
         bool firstrun = true;
     public:
-        int Nparticles;
+        unsigned long Nparticles;
         int bufferSize;
         std::vector<std::array<double, 0>> data;
         /**
@@ -44,7 +44,7 @@ namespace msmrd {
          * value remains hidden in child classes)
          */
 
-        trajectory(int Nparticles, int bufferSize);
+        trajectory(unsigned long Nparticles, int bufferSize);
 
         // Virtual functions to sample from list of particles and store in data
         virtual void sample(double time, std::vector<particle> &particleList) = 0;
@@ -52,6 +52,8 @@ namespace msmrd {
         virtual void sampleRelative(double time, std::vector<particle> &particleList) = 0;
 
         virtual void emptyBuffer() = 0;
+
+        std::vector<std::array<double, 0>> getData(); // Must be overriden
 
         template< size_t ROWDIM>
         void write2file(std::string filename, std::vector<std::array<double, ROWDIM>> localdata);
@@ -87,7 +89,7 @@ namespace msmrd {
         std::vector<std::array<double, 4>> data;
     public:
 
-        trajectoryPosition(int Nparticles, int bufferSize);
+        trajectoryPosition(unsigned long Nparticles, int bufferSize);
 
         void sample(double time, std::vector<particle> &particleList) override;
 
@@ -108,7 +110,7 @@ namespace msmrd {
         std::vector<std::array<double, 8>> data;
     public:
 
-        trajectoryPositionOrientation(int Nparticles, int bufferSize);
+        trajectoryPositionOrientation(unsigned long Nparticles, int bufferSize);
 
         void sample(double time, std::vector<particle> &particleList) override;
 

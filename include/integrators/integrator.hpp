@@ -99,6 +99,8 @@ namespace msmrd {
 
         double getClock() const { return clock; }
 
+        std::string getParticlesBodyType() const { return particlesbodytype; }
+
         void setKbT(double kbt) { KbTemp = kbt; }
 
 
