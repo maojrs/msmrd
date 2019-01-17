@@ -24,7 +24,7 @@ namespace msmrd {
 
         simulation(std::vector<particle> &particleList, integrator &integ);
 
-        void run(const int steps, const int buffersize, int stride, std::string filename);
+        void run(const int steps, const int buffersize, const int stride, const std::string filename);
 
     };
 

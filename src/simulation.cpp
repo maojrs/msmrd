@@ -13,9 +13,8 @@ namespace msmrd {
     simulation::simulation(std::vector<particle> &particleList,  integrator &integ)
             : particleList(particleList), integ(integ) {};
 
-    void simulation::run(const int Nsteps, const int buffersize, int stride, std::string filename) {
+    void simulation::run(const int Nsteps, const int buffersize, const int stride, const std::string filename) {
         int bufferCounter = 0;
-
         auto p1 = vec3<double> {0.0, 0.0, 0.0};
         auto p2 = vec3<double> {1.0, 0.0, 0.0};
         auto o1 = quaternion<double> {1.0, 0.0, 0.0, 0.0};
@@ -45,7 +44,7 @@ namespace msmrd {
                 //}
             }
         }
-        traj->write2H5file(filename, traj->getData());
+        traj->write2H5file<8>(filename, traj->getData());
         traj->write2file(filename, traj->getData());
     }
 }

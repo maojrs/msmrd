@@ -23,14 +23,16 @@ namespace msmrd {
      * Abstract base class to store full trajectories
      */
     class trajectory {
+    private:
+        const size_t rowdim = 0;
     protected:
         const std::size_t kB = 1024;
         const std::size_t MB = 1024 * kB;
         bool firstrun = true;
+        std::vector<std::vector<double>> data;
     public:
         unsigned long Nparticles;
         int bufferSize;
-        std::vector<std::array<double, 0>> data;
         /**
          * @param kB/MB, constant buffer sizes in bytes for writing data
          * @param chunksWritten keeps track of the number of chunks written to file
@@ -53,16 +55,17 @@ namespace msmrd {
 
         virtual void emptyBuffer() = 0;
 
-        std::vector<std::array<double, 0>> getData(); // Must be overriden
+        std::vector<std::vector<double>> getData() { return data; }
+
+        const size_t getRowDim() { return rowdim; }
+
+        void write2file(std::string filename, std::vector<std::vector<double>> localdata);
 
         template< size_t ROWDIM>
-        void write2file(std::string filename, std::vector<std::array<double, ROWDIM>> localdata);
+        void write2H5file(std::string filename, std::vector<std::vector<double>> localdata);
 
         template< size_t ROWDIM>
-        void write2H5file(std::string filename, std::vector<std::array<double, ROWDIM>> localdata);
-
-        template< size_t ROWDIM>
-        void writeChunk2H5file(std::string filename, std::vector<std::array<double, ROWDIM>> localdata);
+        void writeChunk2H5file(std::string filename, std::vector<std::vector<double>> localdata);
 
 
         void createExtendibleH5File(std::string filename, hsize_t rowdim);
@@ -84,9 +87,9 @@ namespace msmrd {
     /**
      * Class to store position only trajectories
      */
-    class trajectoryPosition : public trajectory {
+    class trajectoryPosition: public trajectory {
     private:
-        std::vector<std::array<double, 4>> data;
+        const size_t rowdim = 4;
     public:
 
         trajectoryPosition(unsigned long Nparticles, int bufferSize);
@@ -97,7 +100,9 @@ namespace msmrd {
 
         void emptyBuffer() override { data.clear(); }
 
-        std::vector<std::array<double, 4>> getData() const { return data; };
+        const size_t getRowDim() { return rowdim; }
+
+        //std::vector<std::array<double, 4>> getData() const { return data; };
 
     };
 
@@ -107,7 +112,7 @@ namespace msmrd {
      */
     class trajectoryPositionOrientation : public trajectory {
     private:
-        std::vector<std::array<double, 8>> data;
+        const size_t rowdim = 8;
     public:
 
         trajectoryPositionOrientation(unsigned long Nparticles, int bufferSize);
@@ -118,39 +123,27 @@ namespace msmrd {
 
         void emptyBuffer() override { data.clear(); }
 
-        std::vector<std::array<double, 8>> getData() const { return data; };
+        const size_t getRowDim() { return rowdim; }
+
+        //std::vector<std::array<double, 8>> getData() const { return data; };
 
         void printTime();
-//        std::function<void(double, std::vector<particle>&)> f = std::bind(&trajectoryPositionOrientation::sample, this, _1, _2);
-//        std::function<void(double, std::vector<particle>&)> get_sampler() {
-//            return f;
-//        }
+
     };
 
 
     /**
-     * Templated trajcetory functions for file writing (implementations need to be in header)
+     * Templated trajectory functions for H5 file writing (implementations need to be in header)
      * @param ROWDIM gives the length of elements in each row of data to be written
      */
 
-    // Writes data into normal text file
-    template< size_t ROWDIM >
-    void trajectory::write2file(std::string filename, std::vector<std::array<double, ROWDIM>> localdata) {
-        std::ofstream outputfile(filename + ".txt");
-        std::ostream_iterator<double> output_iterator(outputfile, " ");
-        for (auto const &value: localdata) {
-            std::copy(value.begin(), value.end(), output_iterator);
-            outputfile << std::endl;
-        }
-        outputfile.close();
-    };
-
     // Writes data into HDF5 binary file
     template< size_t ROWDIM >
-    void trajectory::write2H5file(std::string filename, std::vector<std::array<double, ROWDIM>> localdata) {
+    void trajectory::write2H5file(std::string filename, std::vector<std::vector<double>> localdata) {
         const H5std_string FILE_NAME = filename + ".h5";
         const H5std_string	DATASET_NAME = "msmrd_data";
         int datasize = static_cast<int>(localdata.size());
+
 
         // Copies data into fixed size array , datafixed
         double datafixed[datasize][ROWDIM];
@@ -175,9 +168,9 @@ namespace msmrd {
 
     };
 
-    // MISSSING COMMENT
+    // NOTE THIS FUNCTION HASN"T BEEN TESTED, MAY BE INCOMPLETE OR NONFUNCTIONAL
     template< size_t ROWDIM >
-    void trajectory::writeChunk2H5file(std::string filename, std::vector<std::array<double, ROWDIM>> localdata) {
+    void trajectory::writeChunk2H5file(std::string filename, std::vector<std::vector<double>> localdata) {
         const H5std_string FILE_NAME( filename + ".h5");
         const H5std_string DATASET_NAME( "msmrd_data" );
         hsize_t chunckSize = localdata.size();
