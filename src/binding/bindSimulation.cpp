@@ -9,7 +9,7 @@ namespace msmrd {
 
 void bindSimulation(py::module &m) {
         py::class_<simulation>(m, "simulation")
-                .def(py::init< integrator &>())
+                .def(py::init<integrator &>())
                 .def("run", &simulation::run);
         }
 }
