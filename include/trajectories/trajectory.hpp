@@ -23,8 +23,6 @@ namespace msmrd {
      * Abstract base class to store full trajectories
      */
     class trajectory {
-    private:
-        const size_t rowdim = 0;
     protected:
         const std::size_t kB = 1024;
         const std::size_t MB = 1024 * kB;
@@ -42,8 +40,8 @@ namespace msmrd {
          * @bufferSize buffer size for data storage. Exact value if data being dumped into file;
          * otherwise an approximated value is enough.
          * @param data buffer to store trajectory data (time, position, and/or other variables
-         * like orientation). It will be redefined in child classes to avoid template, so this
-         * value remains hidden in child classes)
+         * like orientation). Defined as a vector of vectors instead of vector of arrays for binding
+         * to work.
          */
 
         trajectory(unsigned long Nparticles, int bufferSize);
@@ -57,39 +55,22 @@ namespace msmrd {
 
         std::vector<std::vector<double>> getData() { return data; }
 
-        const size_t getRowDim() { return rowdim; }
-
         void write2file(std::string filename, std::vector<std::vector<double>> localdata);
 
-        template< size_t ROWDIM>
+        template< size_t NUMCOL>
         void write2H5file(std::string filename, std::vector<std::vector<double>> localdata);
 
-        template< size_t ROWDIM>
+        template< size_t NUMCOL>
         void writeChunk2H5file(std::string filename, std::vector<std::vector<double>> localdata);
 
+        //void createExtendibleH5File(std::string filename, hsize_t numcol);
 
-        void createExtendibleH5File(std::string filename, hsize_t rowdim);
-
-
-//        void append(sample_type sample) {
-//            data.push_back(sample);
-//        };
-//
-//        sample_type operator[](std::size_t i) const {
-//            return data.at(i);
-//        };
-//
-//        sample_type &operator[](std::size_t i) {
-//            return data.at(i);
-//        };
     };
 
     /**
      * Class to store position only trajectories
      */
     class trajectoryPosition: public trajectory {
-    private:
-        const size_t rowdim = 4;
     public:
 
         trajectoryPosition(unsigned long Nparticles, int bufferSize);
@@ -100,10 +81,6 @@ namespace msmrd {
 
         void emptyBuffer() override { data.clear(); }
 
-        const size_t getRowDim() { return rowdim; }
-
-        //std::vector<std::array<double, 4>> getData() const { return data; };
-
     };
 
 
@@ -111,8 +88,6 @@ namespace msmrd {
      * Class to store trajectories with position and orientation (given by a quaternion)
      */
     class trajectoryPositionOrientation : public trajectory {
-    private:
-        const size_t rowdim = 8;
     public:
 
         trajectoryPositionOrientation(unsigned long Nparticles, int bufferSize);
@@ -123,10 +98,6 @@ namespace msmrd {
 
         void emptyBuffer() override { data.clear(); }
 
-        const size_t getRowDim() { return rowdim; }
-
-        //std::vector<std::array<double, 8>> getData() const { return data; };
-
         void printTime();
 
     };
@@ -134,11 +105,11 @@ namespace msmrd {
 
     /**
      * Templated trajectory functions for H5 file writing (implementations need to be in header)
-     * @param ROWDIM gives the length of elements in each row of data to be written
+     * @param NUMCOL gives the length of elements in each row of data to be written (number of columns)
      */
 
     // Writes data into HDF5 binary file
-    template< size_t ROWDIM >
+    template< size_t NUMCOL >
     void trajectory::write2H5file(std::string filename, std::vector<std::vector<double>> localdata) {
         const H5std_string FILE_NAME = filename + ".h5";
         const H5std_string	DATASET_NAME = "msmrd_data";
@@ -146,9 +117,9 @@ namespace msmrd {
 
 
         // Copies data into fixed size array , datafixed
-        double datafixed[datasize][ROWDIM];
+        double datafixed[datasize][NUMCOL];
         for (int i = 0; i < datasize; i++) {
-            for (int j = 0; j < ROWDIM; j++) {
+            for (int j = 0; j < NUMCOL; j++) {
                 datafixed[i][j] = 1.0*localdata[i][j];
             }
         }
@@ -159,7 +130,7 @@ namespace msmrd {
         // Sets shape of data into dataspace
         hsize_t dims[2];               // dataset dimensions
         dims[0] = localdata.size();
-        dims[1] = ROWDIM;
+        dims[1] = NUMCOL;
         DataSpace dataspace(2, dims);
 
         // Creates dataset and write data into it
@@ -169,7 +140,7 @@ namespace msmrd {
     };
 
     // NOTE THIS FUNCTION HASN"T BEEN TESTED, MAY BE INCOMPLETE OR NONFUNCTIONAL
-    template< size_t ROWDIM >
+    template< size_t NUMCOL >
     void trajectory::writeChunk2H5file(std::string filename, std::vector<std::vector<double>> localdata) {
         const H5std_string FILE_NAME( filename + ".h5");
         const H5std_string DATASET_NAME( "msmrd_data" );
@@ -182,16 +153,16 @@ namespace msmrd {
         hsize_t dimsFile[RANK] = {0 ,0};
 
         // Copies data into fixed size array , datafixed
-        double datafixed[chunckSize][ROWDIM];
+        double datafixed[chunckSize][NUMCOL];
         for (int i = 0; i < chunckSize; i++) {
-            for (int j = 0; j < ROWDIM; j++) {
+            for (int j = 0; j < NUMCOL; j++) {
                 datafixed[i][j] = 1.0*localdata[i][j];
             }
         }
 
         if (firstrun) {
             // Create dataspace with unlimited dimensions
-            hsize_t dims[2]  = {chunckSize, ROWDIM};  // dataset dimensions at creation
+            hsize_t dims[2]  = {chunckSize, NUMCOL};  // dataset dimensions at creation
             hsize_t maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
             dataspace = DataSpace(RANK , dims, maxdims);
 
@@ -200,7 +171,7 @@ namespace msmrd {
 
             // Modify dataset creation properties, i.e. enable chunking.
             DSetCreatPropList cparms;
-            hsize_t chunk_dims[2] ={chunckSize, ROWDIM};
+            hsize_t chunk_dims[2] ={chunckSize, NUMCOL};
             cparms.setChunk( RANK, chunk_dims );
 
             // Set fill value for the dataset
@@ -223,10 +194,10 @@ namespace msmrd {
             const int ndims = dataspace.getSimpleExtentDims(dimsFile, NULL);
         }
 
-        // Extend the dataset by a chunk (chunkSize, ROWDIM)
+        // Extend the dataset by a chunk (chunkSize, NUMCOL)
         hsize_t size[2];
         size[0] = dimsFile[0] + chunckSize;
-        size[1] = ROWDIM;
+        size[1] = NUMCOL;
         dataset.extend( size );
 
        // Select a hyperslab.
@@ -234,7 +205,7 @@ namespace msmrd {
         hsize_t offset[2];
         offset[0] = dimsFile[0];
         offset[1] = 0;
-        hsize_t dimsChunk[2] = { chunckSize, ROWDIM};            /* data1 dimensions */
+        hsize_t dimsChunk[2] = { chunckSize, NUMCOL};            /* data1 dimensions */
         fspaceChunck.selectHyperslab( H5S_SELECT_SET, dimsChunk, offset );
 
         //Define memory space

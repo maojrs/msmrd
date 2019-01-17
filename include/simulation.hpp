@@ -26,6 +26,8 @@ namespace msmrd {
 
         void run(const int steps, const int buffersize, const int stride, const std::string filename);
 
+        void write2H5file(int numcols, std::string filename, bool chunked); // Wrapper for traj.write2H5file
+
     };
 
 }
