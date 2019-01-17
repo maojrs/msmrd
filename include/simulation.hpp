@@ -27,15 +27,16 @@ namespace msmrd {
 
         simulation(integrator &integ);
 
-        void run(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize, const std::string &filename,
-                 bool outputTxt, bool outputH5, bool outputChunked);
+        void run(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
+                 const std::string &filename, bool outputTxt, bool outputH5, bool outputChunked);
 
     private:
 
-        void runNoutputChunks(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize, const std::string &filename, bool chunked);
+        void runNoutputChunks(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
+                              const std::string &filename, bool chunked);
 
-        void runNoutput(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize, const std::string &filename,
-                        bool outputTxt, bool H5output, bool chunked);
+        void runNoutput(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
+                        const std::string &filename, bool outputTxt, bool H5output, bool chunked);
 
         void write2H5file(int numcols, std::string filename, bool chunked); // Wrapper for traj.write2H5file
 

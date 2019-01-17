@@ -13,8 +13,8 @@ namespace msmrd {
     simulation::simulation(integrator &integ)
             : integ(integ){};
 
-    void simulation::run(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize, const std::string &filename,
-                         bool outputTxt, bool outputH5, bool outputChunked) {
+    void simulation::run(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
+                         const std::string &filename, bool outputTxt, bool outputH5, bool outputChunked) {
 
 
         if (outputTxt && outputChunked){
@@ -50,7 +50,8 @@ namespace msmrd {
 
 
     // Runs simulation while outputing chunked data into H5 file and freeing up memory
-    void simulation::runNoutputChunks(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize, const std::string &filename, bool chunked){
+    void simulation::runNoutputChunks(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
+                                      const std::string &filename, bool chunked){
         int bufferCounter = 0;
         // Main simulation loop (integration and writing to file)
         for (int tstep=0; tstep < Nsteps; tstep++) {
@@ -74,8 +75,8 @@ namespace msmrd {
     }
 
     // Runs simulation, when done outputs data into H5 file , text file or both. Memory is not freed up.
-    void simulation::runNoutput(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize, const std::string &filename,
-                             bool outputTxt, bool outputH5, bool chunked){
+    void simulation::runNoutput(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
+                                const std::string &filename, bool outputTxt, bool outputH5, bool chunked){
         // Main simulation loop (integration and writing to file)
         for (int tstep=0; tstep < Nsteps; tstep++) {
             integ.integrate(particleList);
