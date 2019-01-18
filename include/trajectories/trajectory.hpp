@@ -53,10 +53,13 @@ namespace msmrd {
 
         virtual void emptyBuffer() = 0;
 
+
+        // Functions used by all child classes
         std::vector<std::vector<double>> getData() { return data; }
 
         void write2file(std::string filename, std::vector<std::vector<double>> localdata);
 
+        // Templated functions for writing to H5 file (datasize needs to be known at runtime)
         template< size_t NUMCOL>
         void write2H5file(std::string filename, std::vector<std::vector<double>> localdata);
 

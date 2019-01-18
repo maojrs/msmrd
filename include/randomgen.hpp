@@ -4,7 +4,7 @@
 #pragma once
 #include <random>
 #include "vec3.hpp"
-
+#include <chrono>
 
 namespace msmrd {
     /**

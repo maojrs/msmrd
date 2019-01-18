@@ -55,7 +55,6 @@ namespace msmrd {
         int bufferCounter = 0;
         // Main simulation loop (integration and writing to file)
         for (int tstep=0; tstep < Nsteps; tstep++) {
-            integ.integrate(particleList);
             if (tstep % stride == 0) {
                 bufferCounter++;
                 traj->sample(tstep, particleList);
@@ -65,6 +64,7 @@ namespace msmrd {
                     traj->emptyBuffer();
                 }
             }
+            integ.integrate(particleList);
         }
 
         // Empty remaining data in buffer into H5 file
@@ -79,10 +79,10 @@ namespace msmrd {
                                 const std::string &filename, bool outputTxt, bool outputH5, bool chunked){
         // Main simulation loop (integration and writing to file)
         for (int tstep=0; tstep < Nsteps; tstep++) {
-            integ.integrate(particleList);
             if (tstep % stride == 0) {
                 traj->sample(tstep, particleList);
             }
+            integ.integrate(particleList);
         }
         // Writes into H5 file
         if (outputH5){
