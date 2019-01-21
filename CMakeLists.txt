@@ -12,12 +12,9 @@ use_cxx14()
 FIND_PROGRAM(PYTHON "python")
 
 # Find and add headers location of HDF5 library
-#find_package(HDF5 COMPONENTS HL C CXX REQUIRED)
-find_package(HDF5 REQUIRED COMPONENTS C CXX)
+FIND_PACKAGE(HDF5 COMPONENTS C CXX HL REQUIRED)
 message(STATUS "HDF5_FOUND: ${HDF5_FOUND}, version ${HDF5_VERSION}")
-include_directories(${HDF5_INCLUDE_DIR})
-
-#include_directories("${HDF5_INCLUDE_DIR}")
+include_directories(${HDF5_INCLUDE_DIRS})
 
 # Set include and source
 include_directories(include)
