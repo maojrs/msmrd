@@ -13,6 +13,7 @@ namespace msmrd {
     simulation::simulation(integrator &integ)
             : integ(integ){};
 
+    // Note the folder where the data is saved should already exist
     void simulation::run(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
                          const std::string &filename, bool outputTxt, bool outputH5, bool outputChunked) {
 
