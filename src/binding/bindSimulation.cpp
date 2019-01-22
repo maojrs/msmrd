@@ -1,5 +1,4 @@
 #include "binding.hpp"
-#include "particle.hpp"
 #include "simulation.hpp"
 
 namespace msmrd {

@@ -12,9 +12,11 @@ use_cxx14()
 FIND_PROGRAM(PYTHON "python")
 
 # Find and add headers location of HDF5 library
-FIND_PACKAGE(HDF5 COMPONENTS C CXX HL REQUIRED)
-message(STATUS "HDF5_FOUND: ${HDF5_FOUND}, version ${HDF5_VERSION}")
-include_directories(${HDF5_INCLUDE_DIRS})
+# Uncomment to manually specify HDF5 installation directory (useful when multiple installations available)
+#set(ENV{HDF5_DIR} "/srv/public/maojrs/miniconda3/envs/msmrd-dev/include/") 
+find_package(HDF5 COMPONENTS CXX)
+message(STATUS "HDF5_FOUND: ${HDF5_FOUND}, version ${HDF5_VERSION}, directory ${HDF5_INCLUDE_DIRS}")
+include_directories(${HDF5_INCLUDE_DIR})
 
 # Set include and source
 include_directories(include)

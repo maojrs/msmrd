@@ -7,6 +7,14 @@
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
+#include "particle.hpp"
+
+/* Needed to connect lists/arrays of particles in python with cpp integrator methods.
+ * PyBind classes defined at end of bindIntegrators.cpp*/
+using particle = msmrd::particle;
+using particleMS = msmrd::particleMS;
+PYBIND11_MAKE_OPAQUE(std::vector<particle>);
+PYBIND11_MAKE_OPAQUE(std::vector<particleMS>);
 
 namespace py = pybind11;
 
