@@ -17,7 +17,7 @@ namespace msmrd {
                 .def("write2H5file", &trajectoryPosition::write2H5file<4>)
                 .def("writeChunk2H5file", &trajectoryPosition::writeChunk2H5file<4>)
                 .def("emptyBuffer", &trajectoryPosition::emptyBuffer)
-                .def_property_readonly("data", &trajectoryPosition::getData);
+                .def_property_readonly("data", &trajectoryPosition::getTrajectoryData);
 
 
         py::class_<trajectoryPositionOrientation, trajectory>(m, "trajectoryPositionOrientation", "position and orientation "
@@ -30,7 +30,7 @@ namespace msmrd {
                 .def("write2H5file", &trajectoryPositionOrientation::write2H5file<8>)
                 .def("writeChunk2H5file", &trajectoryPositionOrientation::writeChunk2H5file<8>)
                 .def("emptyBuffer", &trajectoryPositionOrientation::emptyBuffer)
-                .def_property_readonly("data", &trajectoryPositionOrientation::getData);
+                .def_property_readonly("data", &trajectoryPositionOrientation::getTrajectoryData);
     }
 
 }

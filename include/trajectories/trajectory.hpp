@@ -27,7 +27,8 @@ namespace msmrd {
         const std::size_t kB = 1024;
         const std::size_t MB = 1024 * kB;
         bool firstrun = true;
-        std::vector<std::vector<double>> data;
+        std::vector<std::vector<double>> trajectoryData;
+        std::vector<int> discreteTrajectoryData;
     public:
         unsigned long Nparticles;
         int bufferSize;
@@ -39,14 +40,16 @@ namespace msmrd {
          * particles.
          * @bufferSize buffer size for data storage. Exact value if data being dumped into file;
          * otherwise an approximated value is enough.
-         * @param data buffer to store trajectory data (time, position, and/or other variables
+         * @param trajectoryData buffer to store trajectory data (time, position, and/or other variables
          * like orientation). Defined as a vector of vectors instead of vector of arrays for binding
          * to work.
+         * @param discreteTrajectoryData buffer to store the discretized trajectory data (usually in the form
+         * of states given by integers). Therefore, defined as a vector of integers.
          */
 
         trajectory(unsigned long Nparticles, int bufferSize);
 
-        // Virtual functions to sample from list of particles and store in data
+        // Virtual functions to sample from list of particles, store in trajectoryData, and empty data buffer
         virtual void sample(double time, std::vector<particle> &particleList) = 0;
 
         virtual void sampleRelative(double time, std::vector<particle> &particleList) = 0;
@@ -55,11 +58,13 @@ namespace msmrd {
 
 
         // Functions used by all child classes
-        std::vector<std::vector<double>> getData() { return data; }
+        std::vector<std::vector<double>> getTrajectoryData() { return trajectoryData; }
+
+        std::vector<int> getDiscreteTrajectoryData() { return discreteTrajectoryData; }
 
         void write2file(std::string filename, std::vector<std::vector<double>> localdata);
 
-        // Templated functions for writing to H5 file (datasize needs to be known at runtime)
+        // Templated functions for writing to H5 file (template useful since datasize needs to be known at runtime)
         template< size_t NUMCOL>
         void write2H5file(std::string filename, std::vector<std::vector<double>> localdata);
 
@@ -82,7 +87,7 @@ namespace msmrd {
 
         void sampleRelative(double time, std::vector<particle> &particleList) override;
 
-        void emptyBuffer() override { data.clear(); }
+        void emptyBuffer() override { trajectoryData.clear(); }
 
     };
 
@@ -99,7 +104,7 @@ namespace msmrd {
 
         void sampleRelative(double time, std::vector<particle> &particleList) override;
 
-        void emptyBuffer() override { data.clear(); }
+        void emptyBuffer() override { trajectoryData.clear(); }
 
         void printTime();
 

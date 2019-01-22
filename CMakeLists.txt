@@ -41,6 +41,7 @@ set(SOURCES
         src/potentials/patchyProtein.cpp
         src/potentials/patchyProteinMarkovSwitch.cpp
         src/potentials/potentials.cpp
+        src/trajectories/patchyDimer.cpp
         src/trajectories/trajectory.cpp
         )
 
@@ -77,6 +78,7 @@ set(PY_SOURCES
         include/potentials/patchyParticleAngular.hpp
         include/potentials/patchyProtein.hpp
         include/potentials/patchyProteinMarkovSwitch.hpp
+        include/trajectories/patchyDimer.hpp
         include/trajectories/trajectory.hpp
         )
 
