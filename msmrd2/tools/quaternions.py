@@ -40,6 +40,19 @@ def multiply(q1,q2):
     qout = np.insert(p,0,s)
     return qout
 
+def conjugate(q):
+    '''Return the conjugate of a quaternion'''
+    s = q[0]
+    p = -q[1:]
+    qout = np.insert(p,0,s)
+    return qout
+
+def relativeOrientation(q1,q2):
+    '''Return relative quaternion between q1 and q2, measured from q1'''
+    q1conj = conjugate(q1)
+    qout = multiply(q2,q1conj)
+    return qout
+
 def angle2quat(phi):
     ''' Transform from angle-axis representation (w*dt) to quaternion representation. '''
     phinorm = np.linalg.norm(phi)
@@ -48,6 +61,15 @@ def angle2quat(phi):
     p = np.sin(0.5*phinorm)*phiunit
     qout = np.insert(p,0,s)
     return qout
+
+def quat2angle(q):
+    ''' Transform from quaternion representation to angle-axis representation. '''
+    phi = q[1:]
+    qnorm = np.linalg.norm(phi)
+    phi = phi/qnorm
+    theta = 2*np.arctan2(qnorm,q[0])
+    phi = phi*theta
+    return phi
 
 def renormalize(q):
     ''' Renormalize quaternion. '''

@@ -16,17 +16,13 @@ def runParallelSims(simnumber):
     Drot = 1
     position1 =  np.random.uniform(-1,1,3)
     position2 =  np.random.uniform(-1,1,3)
-    position3 =  np.random.uniform(-1,1,3)
     orientation1 = np.random.uniform(-1,1,4)
     orientation2 = np.random.uniform(-1,1,4)
-    orientation3 = np.random.uniform(-1,1,4)
     orientation1 = orientation1/np.linalg.norm(orientation1)
     orientation2 = orientation2/np.linalg.norm(orientation2)
-    orientation3 = orientation3/np.linalg.norm(orientation3)
     part1 = msmrd2.particle(D, Drot, position1, orientation1)
     part2 = msmrd2.particle(D, Drot, position2, orientation2)
-    part3 = msmrd2.particle(D, Drot, position3, orientation3)
-    partlist = msmrd2.integrators.particleList([part1, part2, part3])
+    partlist = msmrd2.integrators.particleList([part1, part2])
     Nparticles = np.size(partlist)
 
     # Integrator definition
@@ -42,7 +38,7 @@ def runParallelSims(simnumber):
 
     # Patchy Particle potential with angular dependence definition
     sigma = 1.0
-    strength = 200.0
+    strength = 160.0
     patch1 = np.array([1.,0.,0.])
     patch2 = np.array([np.cos(3*np.pi/5.0),np.sin(3*np.pi/5.0),0.])
     patchesCoordinates = [patch1, patch2]
@@ -52,13 +48,13 @@ def runParallelSims(simnumber):
     # Creates simulation
     sim = msmrd2.simulation(integrator)
     # Simulation parameters
-    timesteps = 10000000 #5000
+    timesteps = 200000000 #5000
     bufferSize = 1024
-    stride = 2500 #1
+    stride = 5000 #1
     outTxt = False
     outH5 = True
     outChunked = True
-    filename = "../data/trimer/simTrimer" + "{:04d}".format(simnumber)
+    filename = "../data/dimer/simDimer" + "{:04d}".format(simnumber)
 
     # Runs simulation
     sim.run(partlist, timesteps, stride, bufferSize, filename, outTxt, outH5, outChunked)
