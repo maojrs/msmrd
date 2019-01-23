@@ -9,10 +9,14 @@
 
 
 namespace msmrd {
+    /*
+     * Simulation main class declaration.
+     * @param &integ reference to integrator to be used for simulation, works for any integrator since they are all
+     * childs from abstract class.
+     */
+    simulation::simulation(integrator &integ) : integ(integ){};
 
-    simulation::simulation(integrator &integ)
-            : integ(integ){};
-
+    // Note the folder where the data is saved should already exist
     void simulation::run(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
                          const std::string &filename, bool outputTxt, bool outputH5, bool outputChunked) {
 
@@ -90,7 +94,7 @@ namespace msmrd {
         }
         // writes into normal textfile
         if (outputTxt) {
-            traj->write2file(filename, traj->getData());
+            traj->write2file(filename, traj->getTrajectoryData());
         }
     }
 
@@ -99,9 +103,9 @@ namespace msmrd {
     void simulation::write2H5file(int numcols, std::string filename, bool chunked ) {
         if (chunked) {
             if (numcols == 4) {
-                traj->writeChunk2H5file<4>(filename, traj->getData());
+                traj->writeChunk2H5file<4>(filename, traj->getTrajectoryData());
             } else if (numcols == 8) {
-                traj->writeChunk2H5file<8>(filename, traj->getData());
+                traj->writeChunk2H5file<8>(filename, traj->getTrajectoryData());
             } else {
                 throw std::range_error("Numcols needs to be 4 or 8. Custom number of columns per row "
                                        "can be used but needs to be explicitly modified in "
@@ -109,9 +113,9 @@ namespace msmrd {
             }
         } else {
             if (numcols == 4) {
-                traj->write2H5file<4>(filename, traj->getData());
+                traj->write2H5file<4>(filename, traj->getTrajectoryData());
             } else if (numcols == 8) {
-                traj->write2H5file<8>(filename, traj->getData());
+                traj->write2H5file<8>(filename, traj->getTrajectoryData());
             } else {
                 throw std::range_error("Numcols needs to be 4 or 8. Custom number of columns per row "
                                        "can be used but needs to be explicitly modified in "

@@ -14,6 +14,10 @@ namespace msmrd {
 
     /**
      * Implementation of abstract parent trajectory class
+     * @param Nparticles number of particles in the simulation that need to be saved in the trajectory
+     * @param bufferSize buffer size (per particle) for the trajectoryData array. If not using H5, it will be
+     * used as first estimate to initialize the trajectoryData array (recommended == timeIterations/stride). If
+     * using H5, it will determine the size stored in memory before flushing data into file and emptyinf buffer.
      */
     trajectory::trajectory(unsigned long Nparticles, int bufferSize): Nparticles(Nparticles), bufferSize(bufferSize){};
 
@@ -33,11 +37,11 @@ namespace msmrd {
      * Implementation of trajectory class to store full position only trajectories
      */
     trajectoryPosition::trajectoryPosition(unsigned long Nparticles, int bufferSize) : trajectory(Nparticles, bufferSize){
-        data.resize(0);
-        data.reserve(Nparticles*bufferSize);
+        trajectoryData.resize(0);
+        trajectoryData.reserve(Nparticles*bufferSize);
     };
 
-    // Sample from list of particles and store in data
+    // Sample from list of particles and store in trajectoryData
     void trajectoryPosition::sample(double time, std::vector<particle> &particleList) {
         std::vector<double> sample(4);
         for (int i = 0; i < particleList.size(); i++) {
@@ -45,11 +49,11 @@ namespace msmrd {
             for (int k = 1; k < 4; k++) {
                 sample[k] = particleList[i].position[k];
             }
-            data.push_back(sample);
+            trajectoryData.push_back(sample);
         }
     }
 
-    // Sample relative positions and orientations from list of particles and store in data
+    // Sample relative positions and orientations from list of particles and store in trajectoryData
     void trajectoryPosition::sampleRelative(double time, std::vector<particle> &particleList) {
         std::vector<double> sample(4);
         // Loops over all possible pairs
@@ -60,7 +64,7 @@ namespace msmrd {
                 for (int k = 0; k < 3; k++) {
                     sample[k+1] = particleList[j].position[k] - particleList[i].position[k];
                 }
-                data.push_back(sample);
+                trajectoryData.push_back(sample);
             }
         }
     };
@@ -73,10 +77,10 @@ namespace msmrd {
      */
     trajectoryPositionOrientation::trajectoryPositionOrientation(unsigned long Nparticles, int bufferSize)
             : trajectory(Nparticles, bufferSize){
-        data.reserve(Nparticles*bufferSize);
+        trajectoryData.reserve(Nparticles*bufferSize);
     };
 
-    // Sample from list of particles and store in data
+    // Sample from list of particles and store in trajectoryData
     void trajectoryPositionOrientation::sample(double time, std::vector<particle> &particleList) {
         std::vector<double> sample(8);
         for (int i = 0; i < particleList.size(); i++) {
@@ -87,11 +91,11 @@ namespace msmrd {
             for (int k = 0; k < 4; k++) {
                 sample[k+4] = particleList[i].orientation[k];
             }
-            data.push_back(sample);
+            trajectoryData.push_back(sample);
         }
     };
 
-    // Sample relative positiona and orientation from list of particles and store in data
+    // Sample relative positiona and orientation from list of particles and store in trajectoryData
     void trajectoryPositionOrientation::sampleRelative(double time, std::vector<particle> &particleList) {
         std::vector<double> sample(8);
         quaternion<double> relativeOrientation;
@@ -108,16 +112,16 @@ namespace msmrd {
                 for (int k = 0; k < 4; k++) {
                     sample[k+4] = relativeOrientation[k];
                 }
-                data.push_back(sample);
+                trajectoryData.push_back(sample);
             }
         }
     };
 
 
     void trajectoryPositionOrientation::printTime() {
-        std::cerr << "Number of elements: " << data.size() << std::endl;
-        for (int i=0; i<data.size(); i++) {
-            std::cerr << data[i][0] << data[i][1] << data[i][2] << data[i][3] << std::endl;
+        std::cerr << "Number of elements: " << trajectoryData.size() << std::endl;
+        for (int i=0; i<trajectoryData.size(); i++) {
+            std::cerr << trajectoryData[i][0] << trajectoryData[i][1] << trajectoryData[i][2] << trajectoryData[i][3] << std::endl;
         }
     };
 
