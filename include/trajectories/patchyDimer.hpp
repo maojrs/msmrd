@@ -4,6 +4,7 @@
 
 #pragma once
 #include "trajectory.hpp"
+#include "tools.hpp"
 
 namespace msmrd {
     /**
@@ -13,12 +14,20 @@ namespace msmrd {
      * specific for each example/application.
      */
     class patchyDimer : public trajectoryPositionOrientation {
+    private:
+        /*
+         * @param rotMetastableStates[X] correspond to the list of equivalent rotations that yield a certain
+         * metastable state/region X. Each rotation is represented by a quaternion
+         */
+        std::vector<std::vector<quaternion<double>>> rotMetastableStates;
     public:
 
         // Inherit constructor from parent class
         using trajectoryPositionOrientation::trajectoryPositionOrientation;
 
         void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList);
+
+        void setMetastableRegions();
     };
 
 }
