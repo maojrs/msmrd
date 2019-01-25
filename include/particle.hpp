@@ -29,6 +29,7 @@ namespace msmrd {
         vec3<double> nextPosition;
         vec3<double> nextOrientvector;
         quaternion<double> nextOrientation;
+        std::vector<quaternion<double>> symmetryQuaternions;
         /**
          * @param D diffusion constant
          * @param Drot rotational diffusion constant
@@ -40,6 +41,7 @@ namespace msmrd {
          * @param nextPosition saves next position for integrator to update
          * @param nextOrientvector saves next orientation vector for integrator to update
          * @param nextOrientation saves next orientation quaternions for integrator to update
+         * @param symmetryQuats list of quaternions that represent symmetry rotations for the particle.
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
@@ -51,6 +53,7 @@ namespace msmrd {
             nextPosition = 1.0 * position;
             nextOrientation = 1.0 * orientation;
             nextOrientvector = 1.0 * orientvector;
+            symmetryQuaternions.resize(0);
         };
 
         particle(double D, double Drot, std::vector<double> &position,
@@ -62,6 +65,7 @@ namespace msmrd {
             std::vector<double> nextPosition(position);
             std::vector<double> nextOrientation(orientation);
             nextOrientvector = 1.0 * orientvector;
+            symmetryQuaternions.resize(0);
         };
 
         /* Additional functions and getters and setters. Some used by c++ and python,
@@ -108,6 +112,13 @@ namespace msmrd {
         void setOrientationPyBind(std::vector<double> neworientation) {
             quaternion<double> quat(neworientation);
             orientation = quat;
+        }
+
+        void setSymmetryQuaternions(int numQuats, std::vector<std::vector<double>> &symQuaternionsList) {
+            symmetryQuaternions.resize(numQuats);
+            for (int i = 0; i < numQuats; i ++){
+                symmetryQuaternions[i] = symQuaternionsList[i];
+            }
         }
     };
 

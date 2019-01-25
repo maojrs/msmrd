@@ -29,7 +29,9 @@ namespace msmrd {
                 .def("setType", &particleMS::setType)
                 .def("setPosition", &particle::setPositionPyBind)
                 .def("setOrientVector", &particle::setOrientVectorPyBind)
-                .def("setOrientation", &particle::setOrientationPyBind);
+                .def("setOrientation", &particle::setOrientationPyBind)
+                .def("setSymmetryQuaternions", &particle::setSymmetryQuaternions);
+
 
         py::class_<particleMS, particle>(m, "particleMS", "particle with Markovian switch (type, state, "
                                                           "D, Drot, position, orientation (quaternion))")
