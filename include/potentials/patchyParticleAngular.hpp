@@ -11,11 +11,20 @@ namespace msmrd {
      * dependence.
      */
     class patchyParticleAngular : public patchyParticle {
-    private:
+    protected:
         double patchPotentialScaling = 0.3;
+        double angularStrength = 2.0;
     public:
         // Inherit parent class constructor
         using patchyParticle::patchyParticle;
+
+        // Additionals constructors in case angular strength is provided
+        patchyParticleAngular(double sigma, double strength, double angularStrength,
+                              std::vector<std::vector<double>> patchesCoordinates);
+
+        patchyParticleAngular(double sigma, double strength, double angularStrength,
+                              std::vector<vec3<double>> patchesCoordinates);
+
 
         double evaluate(const particle &part1, const particle &part2) override;
 

@@ -23,7 +23,8 @@ namespace msmrd {
         long seed;
         std::string particlesbodytype;
         bool rotation = false;
-        randomgen randg;
+        randomgen randg = randomgen();
+        ;
 
         std::vector<vec3<double>> forceField;
         std::vector<vec3<double>> torqueField;

@@ -14,7 +14,10 @@ namespace msmrd {
      * Implementation of integrator abstract class inherited by all child classes, note some of its methods
      * are templates and therefore are implemented in the header file
      * @param dt time step
-     * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
+     * @param seed variable for random number generation (Note seed = -1 corresponds to random device).
+     * @param particlesbodytype body type of particles to integrate. It determines rotation integrator behavior, can
+     * be either point, rod or rigidbody, and it is determined by orientational degrees of freedom, points
+     * have no orientation, rods need only one vector and rigidsolid requires a complete quaternion).
      * @param randg random number generator based in mt19937
      */
     integrator::integrator(double dt, long seed, std::string particlesbodytype)

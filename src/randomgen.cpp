@@ -14,7 +14,7 @@ namespace msmrd {
     void randomgen::setSeed(long newseed) {
         if (newseed == -1) {
             mt_rand = std::mt19937_64(rd()); //random device seed
-        } if (newseed < -1) {
+        } else if (newseed < -1) {
             mt_rand = std::mt19937_64(-newseed*rd()); //random device and time used as random seed
         } else {
             mt_rand = std::mt19937_64(newseed); //fixed seed

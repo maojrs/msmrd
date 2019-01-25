@@ -9,8 +9,17 @@
 
 namespace msmrd {
     /*
-     * Constructors inherited from patchyParticle
+     * Constructors inherited from patchyParticle. Added additional constructor to incorporate
+     * angular potential strength
      */
+    patchyParticleAngular::patchyParticleAngular(double sigma, double strength, double angularStrength,
+                                                 std::vector<std::vector<double>> patchesCoordinates) :
+    angularStrength(angularStrength), patchyParticle(sigma, strength, patchesCoordinates) {};
+
+    patchyParticleAngular::patchyParticleAngular(double sigma, double strength, double angularStrength,
+                                                 std::vector<vec3<double>> patchesCoordinates) :
+            angularStrength(angularStrength), patchyParticle(sigma, strength, patchesCoordinates) {};
+
 
     // Evaluates potential at given positions and orientations of two particles
     double patchyParticleAngular::evaluate(const particle &part1, const particle &part2) {
@@ -62,8 +71,9 @@ namespace msmrd {
             plane1 = plane1/plane1.norm();
             plane2 = plane2/plane2.norm();
 
-            // Additional rotational potential depending on how well aligned the planes are. (-cos(theta))
-            angularPotential = -0.5*sigma*(plane1*plane2)*(plane1*plane2);
+            // Additional rotational potential depending on how well aligned the planes are. (-cos(theta)^8)
+            double cosSquared = (plane1*plane2)*(plane1*plane2);
+            angularPotential = -0.5*sigma*angularStrength*cosSquared*cosSquared*cosSquared*cosSquared;
         }
 
 
@@ -151,8 +161,10 @@ namespace msmrd {
             plane1 = plane1/plane1.norm();
             plane2 = plane2/plane2.norm();
 
-            // Additional torques depending on how well aligned the planes are. (Derivative of -cos(theta))
-            vec3<double> derivativeAngluarPotential = 0.5*2.0*sigma*(plane1*plane2)*plane1.cross(plane2);
+            // Additional torques depending on how well aligned the planes are. (Derivative of -cos(theta)^8)
+            double cosSquared = (plane1*plane2)*(plane1*plane2);
+            double cosSeventh = cosSquared*cosSquared*cosSquared*(plane1*plane2);
+            vec3<double> derivativeAngluarPotential = 0.5*angularStrength*sigma*8*cosSeventh*plane1.cross(plane2);
             torque1 += derivativeAngluarPotential;
             torque2 -= derivativeAngluarPotential;
         }
