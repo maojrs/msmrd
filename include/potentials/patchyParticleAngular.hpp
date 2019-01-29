@@ -4,6 +4,8 @@
 
 #pragma once
 #include "potentials/patchyParticle.hpp"
+#include "quaternion.hpp"
+#include "tools.hpp"
 
 namespace msmrd {
     /*

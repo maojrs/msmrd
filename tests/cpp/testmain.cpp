@@ -12,6 +12,7 @@
 #include "particle.hpp"
 #include "quaternion.hpp"
 #include "randomgen.hpp"
+#include "tools.hpp"
 #include "vec3.hpp"
 
 using namespace msmrd;
@@ -266,4 +267,22 @@ TEST_CASE("Fundamental trajectory recording", "[trajectory]") {
     sim.run(particles, 10000, 10, 1024, "test.h5", false, false, false);
     auto data = sim.traj->getTrajectoryData();
     REQUIRE(data.size() == 2000);
+}
+
+TEST_CASE("Spherical partition", "[tools]") {
+    int numPartitions = 15;
+    auto spherePartition = msmrdtools::partitionSphere(numPartitions);
+    auto regionsPerCollar = std::get<0>(spherePartition);
+    auto phis = std::get<1>(spherePartition);
+    auto thetas = std::get<2>(spherePartition);
+    std::vector<int> regionsPerCollarRef{1, 6, 7, 1};
+    std::vector<double> phisRef{0.0, 0.52231482, 1.50408018, 2.61927783};
+    std::vector<std::vector<double>> thetasRef;
+    thetasRef.resize(2);
+    thetasRef[0] = std::vector<double> {0.0, 1.04719755, 2.0943951 , 3.14159265, 4.1887902 , 5.23598776};
+    thetasRef[1] = std::vector<double> {0.0, 0.8975979 , 1.7951958 , 2.6927937 , 3.5903916 , 4.48798951, 5.38558741};
+    REQUIRE(regionsPerCollar == regionsPerCollarRef);
+    REQUIRE(msmrdtools::stdvecNorm(phis, phisRef) <= 0.000001);
+    REQUIRE(msmrdtools::stdvecNorm(thetas[0], thetasRef[0]) <= 0.000001);
+    REQUIRE(msmrdtools::stdvecNorm(thetas[1], thetasRef[1]) <= 0.000001);
 }

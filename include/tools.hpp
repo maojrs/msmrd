@@ -4,16 +4,18 @@
 
 #pragma once
 #include <vector>
+#include <tuple>
 #include "quaternion.hpp"
 #include "vec3.hpp"
 
 namespace msmrdtools {
 
     /*
-     * Useful vector conversions.
+     * Useful vector tools.
      */
 
-    /* From an array of N vectors (vec3) returns a vector of vectors (std::vector) with the same dimension. */
+    /* From an array of N vectors (vec3) returns a vector of vectors (std::vector) with the same dimension.
+     * (template must be implemented in header.) */
     template<long unsigned int N>
     std::vector<std::vector<double>> array2Dtovec2D(std::array<vec3<double>, N> forceTorque) {
         std::vector<std::vector<double>> output;
@@ -27,35 +29,36 @@ namespace msmrdtools {
         return output;
     }
 
+    // Calculates norm between two vectors of the same size
+    double stdvecNorm(std::vector<double> a, std::vector<double> b);
+
 
     /*
-     * Useful quaternion functions.
+     * Useful quaternion functions definitions.
      */
 
+    /* Converts vector defining axis of rotation with length equal
+     * to angle of rotation to its quaternion representation. */
+    quaternion<double> axisangle2quaternion(const vec3<double> &phi);
 
-    template<typename scalar=double>
-    quaternion<scalar> axisangle2quaternion(const vec3<double> &phi) {
-        double phinorm = phi.norm();
-        if (phinorm != 0) {
-            vec3<double> phiunit = phi / phinorm;
-            double s = cos(0.5 * phinorm);
-            double p = sin(0.5 * phinorm);
-            return {s, p * phiunit[0], p * phiunit[1], p * phiunit[2]};
-        } else {
-            //returns unit quaternion (no rotation)
-            return {1, 0, 0, 0};
-        }
-    };
+    // Rotates vector p by rotation represented by quaternion q.
+    vec3<double> rotateVec(vec3<double> p, quaternion<double> q);
 
-    template<typename scalar=double>
-    vec3<double> rotateVec(vec3<double> p, quaternion<double> q) {
-        vec3<double> result;
-        quaternion<double> resultquat = 1.0*quaternion<double>(p);
-        resultquat = q*(resultquat*q.conj());
-        result[0] = resultquat[1];
-        result[1] = resultquat[2];
-        result[2] = resultquat[3];
-        return result;
-    };
+
+    /*
+     * C++ version of functions (only definitions) to create sphere partition of equal area.
+     */
+
+    // Calculates area of cap given polar angle
+    double angle_to_cap_area(double phi);
+
+    // Calculates polar angle corresponding to a given cap area
+    double cap_area_to_angle(double area);
+
+    // Calculates equal area sphere partition
+    std::tuple< std::vector<int>, std::vector<double>,
+            std::vector<std::vector<double>> > partitionSphere(int num_partitions);
+
+
 }
 

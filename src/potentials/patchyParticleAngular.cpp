@@ -4,8 +4,7 @@
 
 #include <utility>
 #include "potentials/patchyParticleAngular.hpp"
-#include "quaternion.hpp"
-#include "tools.hpp"
+
 
 namespace msmrd {
     /*

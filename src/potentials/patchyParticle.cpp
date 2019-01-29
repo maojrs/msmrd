@@ -111,6 +111,7 @@ namespace msmrd{ ;
         return repulsivePotential + attractivePotential + patchesPotential;
     }
 
+
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
     std::array<vec3<double>, 4> patchyParticle::forceTorque(const particle &part1, const particle &part2) {
