@@ -271,7 +271,7 @@ TEST_CASE("Fundamental trajectory recording", "[trajectory]") {
 
 TEST_CASE("Spherical partition", "[tools]") {
     int numPartitions = 15;
-    auto spherePartition = msmrdtools::partitionSphere(numPartitions);
+    auto spherePartition = msmrdtools::spherePartition::partitionSphere(numPartitions);
     auto regionsPerCollar = std::get<0>(spherePartition);
     auto phis = std::get<1>(spherePartition);
     auto thetas = std::get<2>(spherePartition);
@@ -285,4 +285,8 @@ TEST_CASE("Spherical partition", "[tools]") {
     REQUIRE(msmrdtools::stdvecNorm(phis, phisRef) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(thetas[0], thetasRef[0]) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(thetas[1], thetasRef[1]) <= 0.000001);
+    // Now test getSectionNumber function
+    vec3<double> coordinate1{1.0, 2.0, 0.0};
+    int secNum1 = msmrdtools::spherePartition::getSectionNumber(coordinate1, numPartitions);
+    REQUIRE(secNum1 == 3);
 }
