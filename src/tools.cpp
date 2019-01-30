@@ -190,58 +190,56 @@ namespace msmrdtools {
             return sectionNum;
         }
 
-//                def
-//        getAngles(secNumber, numPartitions = None
-//        ):
-//        '''
-//        Return angles[phi1, phi2]
-//        and [theta1, theta2]
-//        of a
-//        given section
-//        number
-//                in
-//        the spherical
-//        partition
-//        '''
-//        if numPartitions == None:
-//        numPartitions == 20
-//        if secNumber > numPartitions:
-//        print("Error: section number is larger than number of partitions")
-//        return
-//        numRegionsCollar, phis,
-//        thetas = partitionSphere(numPartitions)
-//        collar = 0
-//        while (
-//        sum(numRegionsCollar[0
-//        :collar+1])) < secNumber:
-//        collar += 1
-//        phi1 = phis[collar]
-//        if collar+1 <
-//        len(numRegionsCollar)
-//        :
-//        phi2 = phis[collar + 1]
-//        else:
-//        phi2 = np.pi
-//# Find thetas
-//        prevStates = sum(numRegionsCollar
-//        [0:collar])
-//        if ((prevStates == 0) or (prevStates == numPartitions -1)):
-//        theta1 = 0
-//        theta2 = 2 * np.pi
-//        else:
-//        thetasCollar = thetas[collar - 1]
-//        statesInCollar = secNumber - prevStates
-//        theta1 = thetasCollar[statesInCollar - 1]
-//        if statesInCollar ==
-//        len(thetasCollar)
-//        :
-//        theta2 = 2 * np.pi
-//        else:
-//        theta2 = thetasCollar[statesInCollar]
-//        phiInterval = [phi1, phi2]
-//        thetaInterval = [theta1, theta2]
-//        return phiInterval, thetaInterval
-//
+        std::tuple<std::vector<double>, std::vector<double>> getAngles(int secNumber, int numPartitions) {
+            if (secNumber > numPartitions) {
+                std::range_error("Error: section number is larger than number of partitions");
+            }
+            // Get sphere partition
+            auto spherePartition = msmrdtools::spherePartition::partitionSphere(numPartitions);
+            auto numRegionsCollar = std::get<0>(spherePartition);
+            auto phis = std::get<1>(spherePartition);
+            auto thetas = std::get<2>(spherePartition);
+            // Get collar
+            int collar = 0;
+            int sections = 1;
+            while (sections < secNumber) {
+                collar += 1;
+                sections = std::accumulate(std::begin(numRegionsCollar),
+                                           std::next(std::begin(numRegionsCollar), collar+1), 0);
+            }
+            // Find phis
+            double phi1 = phis[collar];
+            double phi2;
+            if (collar + 1 < numRegionsCollar.size()) {
+                phi2 = phis[collar + 1];
+            } else {
+                phi2 = M_PI;
+            }
+            // Find thetas
+            double theta1;
+            double theta2;
+            std::vector<double> thetasCollar;
+            int statesInCollar;
+            int prevStates = std::accumulate(std::begin(numRegionsCollar),
+                                             std::next(std::begin(numRegionsCollar), collar), 0);
+            if ((prevStates == 0) or (prevStates == numPartitions - 1)) {
+                theta1 = 0;
+                theta2 = 2 * M_PI;
+            } else {
+                thetasCollar = thetas[collar - 1];
+                statesInCollar = secNumber - prevStates;
+                theta1 = thetasCollar[statesInCollar - 1];
+                if (statesInCollar == thetasCollar.size()) {
+                    theta2 = 2 * M_PI;
+                } else {
+                    theta2 = thetasCollar[statesInCollar];
+                }
+            }
+            std::vector<double> phiInterval{phi1, phi2};
+            std::vector<double> thetaInterval{theta1, theta2};
+            return std::make_tuple(phiInterval, thetaInterval);
+        }
+
     }
 
 }

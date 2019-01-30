@@ -269,7 +269,7 @@ TEST_CASE("Fundamental trajectory recording", "[trajectory]") {
     REQUIRE(data.size() == 2000);
 }
 
-TEST_CASE("Spherical partition", "[tools]") {
+TEST_CASE("Spherical partition", "[partitionSphere]") {
     int numPartitions = 15;
     auto spherePartition = msmrdtools::spherePartition::partitionSphere(numPartitions);
     auto regionsPerCollar = std::get<0>(spherePartition);
@@ -301,4 +301,31 @@ TEST_CASE("Spherical partition", "[tools]") {
     REQUIRE(secNum1 == 9);
     REQUIRE(secNum2 == 3);
     REQUIRE(secNum3 == 11);
+    // Now test getAngles function
+    auto anglesUp = msmrdtools::spherePartition::getAngles(secNumUp, numPartitions);
+    auto anglesDown = msmrdtools::spherePartition::getAngles(secNumDown, numPartitions);
+    auto angles1 = msmrdtools::spherePartition::getAngles(secNum1, numPartitions);
+    auto angles2 = msmrdtools::spherePartition::getAngles(secNum2, numPartitions);
+    auto angles3 = msmrdtools::spherePartition::getAngles(secNum3, numPartitions);
+    auto phiIntervalUp = std::get<0>(anglesUp);
+    auto thetaIntervalUp = std::get<1>(anglesUp);
+    auto phiIntervalDown = std::get<0>(anglesDown);
+    auto thetaIntervalDown = std::get<1>(anglesDown);
+    auto phiInterval1 = std::get<0>(angles1);
+    auto thetaInterval1 = std::get<1>(angles1);
+    auto phiInterval2 = std::get<0>(angles2);
+    auto thetaInterval2 = std::get<1>(angles2);
+    auto phiInterval3 = std::get<0>(angles3);
+    auto thetaInterval3 = std::get<1>(angles3);
+    REQUIRE(phiIntervalUp == std::vector<double>{0.0, 0.5223148218060486} );
+    REQUIRE(thetaIntervalUp == std::vector<double>{0, 6.283185307179586} );
+    REQUIRE(phiIntervalDown == std::vector<double>{2.6192778317837444, 3.141592653589793} );
+    REQUIRE(thetaIntervalDown == std::vector<double>{0, 6.283185307179586} );
+    REQUIRE(phiInterval1 == std::vector<double>{1.5040801783846711, 2.6192778317837444} );
+    REQUIRE(thetaInterval1 == std::vector<double>{0.8975979010256552, 1.7951958020513104} );
+    REQUIRE(phiInterval2 == std::vector<double>{0.5223148218060486, 1.5040801783846711} );
+    REQUIRE(thetaInterval2 == std::vector<double>{1.0471975511965976, 2.0943951023931953} );
+    REQUIRE(phiInterval3 == std::vector<double>{1.5040801783846711, 2.6192778317837444} );
+    REQUIRE(thetaInterval3 == std::vector<double>{2.6927937030769655, 3.5903916041026207} );
+
 }
