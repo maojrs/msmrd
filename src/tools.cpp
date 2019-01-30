@@ -163,7 +163,7 @@ namespace msmrdtools {
             int sectionNum;
             int numCollars = phis.size();
             for (int i = 0; i < numCollars; i++){
-                if (phi >= phis[numCollars-1-i]){
+                if (phi >= phis[numCollars - 1 - i]){
                     currentCollarIndex = numCollars-1-i;
                     break;
                 }
@@ -180,11 +180,12 @@ namespace msmrdtools {
             int numThetaCuts = collarThetas.size();
             for (int i = 0; i < numThetaCuts; i++){
                 if(theta >= collarThetas[numThetaCuts - 1 - i]){
-                    currentThetaIndex = numThetaCuts - i;
+                    currentThetaIndex = numThetaCuts - i - 1;
+                    break;
                 }
             }
             sectionNum = std::accumulate(std::begin(numRegionsCollar),
-                    std::next(std::begin(numRegionsCollar), currentCollarIndex), 0) + currentThetaIndex;
+                    std::next(std::begin(numRegionsCollar), currentCollarIndex), 0) + currentThetaIndex + 1;
 
             return sectionNum;
         }

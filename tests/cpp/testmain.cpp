@@ -286,7 +286,19 @@ TEST_CASE("Spherical partition", "[tools]") {
     REQUIRE(msmrdtools::stdvecNorm(thetas[0], thetasRef[0]) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(thetas[1], thetasRef[1]) <= 0.000001);
     // Now test getSectionNumber function
+    vec3<double> coordinateUp{0.0, 0.0, 1.0};
+    vec3<double> coordinateDown{0.0, 0.0, -1.0};
     vec3<double> coordinate1{1.0, 2.0, 0.0};
+    vec3<double> coordinate2{0.5, 3.5, 0.3};
+    vec3<double> coordinate3{-2.5, -1, -0.8};
+    int secNumUp = msmrdtools::spherePartition::getSectionNumber(coordinateUp, numPartitions);
+    int secNumDown = msmrdtools::spherePartition::getSectionNumber(coordinateDown, numPartitions);
     int secNum1 = msmrdtools::spherePartition::getSectionNumber(coordinate1, numPartitions);
-    REQUIRE(secNum1 == 3);
+    int secNum2 = msmrdtools::spherePartition::getSectionNumber(coordinate2, numPartitions);
+    int secNum3 = msmrdtools::spherePartition::getSectionNumber(coordinate3, numPartitions);
+    REQUIRE(secNumUp == 1);
+    REQUIRE(secNumDown == 15);
+    REQUIRE(secNum1 == 9);
+    REQUIRE(secNum2 == 3);
+    REQUIRE(secNum3 == 11);
 }
