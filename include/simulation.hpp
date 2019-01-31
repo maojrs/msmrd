@@ -14,6 +14,7 @@ namespace msmrd {
         integrator &integ;
         std::unique_ptr<trajectory> traj;
         int numcols = 4;
+        bool outputDiscreteTraj = false;
         /**
          * @param integ Integrator to be used for simulation, works for any integrator since they are all
          * childs from abstract class.
@@ -22,13 +23,16 @@ namespace msmrd {
          * @param numcols Number of columns in each row of data to be written into HD5 file. It can be 4 or 8.
          * A custom value can also be used, but it has to be explicitly written in the template
          * function write2H5file<rowdim> before compiling.
+         * @param outputDiscreteTraj if true, outputs discrete trajectory. Only available for certain
+         * trajectory classes.
          */
 
 
         simulation(integrator &integ);
 
         void run(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
-                 const std::string &filename, bool outputTxt, bool outputH5, bool outputChunked);
+                 const std::string &filename, bool outputTxt, bool outputH5, bool outputChunked,
+                 std::string trajtype);
 
     private:
 

@@ -14,8 +14,8 @@ namespace msmrd {
                 .def("sample", &trajectoryPosition::sample)
                 .def("sampleRelative", &trajectoryPosition::sampleRelative)
                 .def("write2file", &trajectoryPosition::write2file)
-                .def("write2H5file", &trajectoryPosition::write2H5file<4>)
-                .def("writeChunk2H5file", &trajectoryPosition::writeChunk2H5file<4>)
+                .def("write2H5file", &trajectoryPosition::write2H5file<double,4>)
+                .def("writeChunk2H5file", &trajectoryPosition::writeChunk2H5file<double,4>)
                 .def("emptyBuffer", &trajectoryPosition::emptyBuffer)
                 .def_property_readonly("data", &trajectoryPosition::getTrajectoryData);
 
@@ -27,8 +27,8 @@ namespace msmrd {
                 .def("sample", &trajectoryPositionOrientation::sample)
                 .def("sampleRelative", &trajectoryPositionOrientation::sampleRelative)
                 .def("write2file", &trajectoryPositionOrientation::write2file)
-                .def("write2H5file", &trajectoryPositionOrientation::write2H5file<8>)
-                .def("writeChunk2H5file", &trajectoryPositionOrientation::writeChunk2H5file<8>)
+                .def("write2H5file", &trajectoryPositionOrientation::write2H5file<double,8>)
+                .def("writeChunk2H5file", &trajectoryPositionOrientation::writeChunk2H5file<double,8>)
                 .def("emptyBuffer", &trajectoryPositionOrientation::emptyBuffer)
                 .def_property_readonly("data", &trajectoryPositionOrientation::getTrajectoryData);
     }

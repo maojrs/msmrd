@@ -49,12 +49,14 @@ namespace msmrd {
 
         trajectory(unsigned long Nparticles, int bufferSize);
 
+        void emptyBuffer();
+
         // Virtual functions to sample from list of particles, store in trajectoryData, and empty data buffer
         virtual void sample(double time, std::vector<particle> &particleList) = 0;
 
         virtual void sampleRelative(double time, std::vector<particle> &particleList) = 0;
 
-        virtual void emptyBuffer() = 0;
+        virtual void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) = 0;
 
 
         // Functions used by all child classes
@@ -65,11 +67,11 @@ namespace msmrd {
         void write2file(std::string filename, std::vector<std::vector<double>> localdata);
 
         // Templated functions for writing to H5 file (template useful since datasize needs to be known at runtime)
-        template< size_t NUMCOL>
-        void write2H5file(std::string filename, std::vector<std::vector<double>> localdata);
+        template< typename scalar, size_t NUMCOL>
+        void write2H5file(std::string filename, std::vector<std::vector<scalar>> localdata);
 
-        template< size_t NUMCOL>
-        void writeChunk2H5file(std::string filename, std::vector<std::vector<double>> localdata);
+        template< typename scalar, size_t NUMCOL>
+        void writeChunk2H5file(std::string filename, std::vector<std::vector<scalar>> localdata);
 
         //void createExtendibleH5File(std::string filename, hsize_t numcol);
 
@@ -87,7 +89,8 @@ namespace msmrd {
 
         void sampleRelative(double time, std::vector<particle> &particleList) override;
 
-        void emptyBuffer() override { trajectoryData.clear(); }
+        // Empty function to be overwritten by child classes if neccesary
+        void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override {};
 
     };
 
@@ -104,7 +107,8 @@ namespace msmrd {
 
         void sampleRelative(double time, std::vector<particle> &particleList) override;
 
-        void emptyBuffer() override { trajectoryData.clear(); }
+        // Empty function to be overwritten by child classes if neccesary
+        void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override {};
 
         void printTime();
 
@@ -117,8 +121,8 @@ namespace msmrd {
      */
 
     // Writes data into HDF5 binary file
-    template< size_t NUMCOL >
-    void trajectory::write2H5file(std::string filename, std::vector<std::vector<double>> localdata) {
+    template< typename scalar, size_t NUMCOL>
+    void trajectory::write2H5file(std::string filename, std::vector<std::vector<scalar>> localdata) {
         const H5std_string FILE_NAME = filename + ".h5";
         const H5std_string	DATASET_NAME = "msmrd_data";
         int datasize = static_cast<int>(localdata.size());
@@ -148,8 +152,8 @@ namespace msmrd {
     };
 
     // NOTE THIS FUNCTION HASN"T BEEN TESTED, MAY BE INCOMPLETE OR NONFUNCTIONAL
-    template< size_t NUMCOL >
-    void trajectory::writeChunk2H5file(std::string filename, std::vector<std::vector<double>> localdata) {
+    template< typename scalar, size_t NUMCOL >
+    void trajectory::writeChunk2H5file(std::string filename, std::vector<std::vector<scalar>> localdata) {
         const H5std_string FILE_NAME( filename + ".h5");
         const H5std_string DATASET_NAME( "msmrd_data" );
         hsize_t chunckSize = localdata.size();

@@ -21,6 +21,13 @@ namespace msmrd {
      */
     trajectory::trajectory(unsigned long Nparticles, int bufferSize): Nparticles(Nparticles), bufferSize(bufferSize){};
 
+    // Empties trajectories data buffers
+    void trajectory::emptyBuffer() {
+        trajectoryData.clear();
+        discreteTrajectoryData.clear();
+    }
+
+
     // Implementation of write2file function: writes data into normal text file
     void trajectory::write2file(std::string filename, std::vector<std::vector<double>> localdata) {
         std::ofstream outputfile(filename + ".txt");
@@ -38,8 +45,8 @@ namespace msmrd {
      */
     trajectoryPosition::trajectoryPosition(unsigned long Nparticles, int bufferSize) : trajectory(Nparticles, bufferSize){
         trajectoryData.resize(0);
-        discreteTrajectoryData.resize(0);
         trajectoryData.reserve(Nparticles*bufferSize);
+        discreteTrajectoryData.resize(0);
         discreteTrajectoryData.reserve(bufferSize);
     };
 
