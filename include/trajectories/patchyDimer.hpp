@@ -23,22 +23,30 @@ namespace msmrd {
     class patchyDimer : public trajectoryPositionOrientation {
     private:
 
-        std::vector<std::vector<quaternion<double>>> rotMetastableStates;
+        std::vector<quaternion<double>> rotMetastableStates;
+        quaternion<double> symmetryQuaternion{1,0,0,0};
         std::unique_ptr<spherePartition> spherePart;
         int angularStates;
+        double tolerance = 0.2;
         /*
-         * @param rotMetastableStates[X] correspond to the list of equivalent rotations that yield a certain
-         * metastable state/region X. Each rotation is represented by a quaternion
+         * @param rotMetastableStates[X] correspond to the list of relative rotations that correspond to a
+         * metastable state/region X. Each rotation is represented by a quaternion.
+         * @symmetryQuaternion rotation that represents the structural symmetry of the patchy particle.
          * @param spherePart pointer to equal area spherical partition class with relevant functions
          * @param number of angularStates for discretization
+         * @ param tolerance is the maximum distance away from metastable state to still be considered metastable.
          */
     public:
+
 
         patchyDimer(unsigned long Nparticles, int bufferSize, int numPartitions);
 
         void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList);
 
         void setMetastableRegions();
+
+        int getBoundState(quaternion<double> q1, quaternion<double> q2);
+
     };
 
 }

@@ -14,6 +14,7 @@ namespace msmrd {
     trajectoryPositionOrientation(Nparticles, bufferSize) {
         spherePart = std::make_unique<spherePartition>(numSections);
         angularStates = numSections*(numSections + 1)/2;
+        setMetastableRegions();
     };
 
 
@@ -41,48 +42,64 @@ namespace msmrd {
                 // Rotate the relative position vector to the frame of reference fixed in each of the two particles.
                 rotatedRij = msmrdtools::rotateVec(relativePosition, orientation1);
                 rotatedRji = msmrdtools::rotateVec(-1*relativePosition, orientation2);
-                // Get corresponding section numbers from spherical partition to classify its state
-                secNum1 = spherePart->getSectionNumber(rotatedRij);
-                secNum2 = spherePart->getSectionNumber(rotatedRji);
-                //relativeOrientation = orientation2 * orientation1.conj();
                 // Evaluate if the two particles are in a bound state
                 if (relativePosition.norm() <= 1.1) {
-                    sample = 1;
+                    sample = getBoundState(orientation1, orientation2);
+                } else if (relativePosition.norm() <= 2.1) {
+                    // Get corresponding section numbers from spherical partition to classify its state
+                    secNum1 = spherePart->getSectionNumber(rotatedRij);
+                    secNum2 = spherePart->getSectionNumber(rotatedRji);
+                    sample  = secNum1*10 + secNum2;
                 }
-                // Relative orientation to particleList[j] measured from particleList[i]
                 discreteTrajectoryData.push_back(sample);
             }
         }
     };
 
+    /* Given two orientations, return either bound state A (1) or bound state B (2).
+     * Note it needs to take into account all the symmetries. */
+    int patchyDimer::getBoundState(quaternion<double> q1, quaternion<double> q2) {
+        std::array<quaternion<double>,8> relOrientations;
+        // Calculate equivalent relative orientations, measured from particle 1
+        relOrientations[0] = q2 * q1.conj();
+        relOrientations[1] = (q2*symmetryQuaternion) * q1.conj();
+        relOrientations[2] = q2 * (q1*symmetryQuaternion).conj();
+        relOrientations[3] = (q2*symmetryQuaternion) * (q1*symmetryQuaternion).conj();
+        // Calculate equivalent relative orientations, measured from particle 2
+        relOrientations[4] = relOrientations[0].conj();
+        relOrientations[5] = relOrientations[1].conj();
+        relOrientations[6] = relOrientations[2].conj();
+        relOrientations[7] = relOrientations[3].conj();
 
-    /* MAYBE NOT USEFUL, WORK IN PROGRESS
-     * Define metastable relative orientations (including symmetric representations)
+        // Looping over all equivalent relative prientations, determins if it is in state A (1) or B (2)
+        for (auto &relOrient : relOrientations) {
+            if (msmrdtools::quaternionDistance(relOrient, rotMetastableStates[0]) < tolerance) {
+                return 1;
+            }
+            if (msmrdtools::quaternionDistance(relOrient, rotMetastableStates[1]) < tolerance) {
+                return 2;
+            }
+        }
+        return 0;
+    };
+
+    /*
+     * Define metastable relative orientations (including symmetric quaternion)
      */
     void patchyDimer::setMetastableRegions() {
-        int numStates = 4;
-        int numSymmetries = 4;
-        // Define 4 main rotation quaternions, q1, q2, q3 and q4, each defining a possible different  metstable state
-        vec3<double> axisAngleRot1 = vec3<double>(0, 0, M_PI - 3.0*M_PI/5);
-        vec3<double> axisAngleRot2 = vec3<double>(0, 0, -M_PI);
-        vec3<double> axisAngleRot3 = vec3<double>(0, 0, 3.0*M_PI/5);
-        vec3<double> axisAngleRot4 = vec3<double>(0, 0, 3.0*M_PI/5);
-        quaternion<double> q1 = msmrdtools::axisangle2quaternion(axisAngleRot1);
-        quaternion<double> q2;
-        quaternion<double> q3;
-        quaternion<double> q4;
+        // Define symmetry quaternion that denotes rotational symmetry of particle
+        vec3<double> axisAngleRotSym = vec3<double>(M_PI, 0, 0);
+        symmetryQuaternion = msmrdtools::axisangle2quaternion(axisAngleRotSym);
+        // Define 2 main rotation quaternions, qmetaA and qmetaB, defining bound state A and B state.
+        int numStates = 2;
+        vec3<double> axisAngleRotA = vec3<double>(0, 0, M_PI - 3.0*M_PI/5);
+        vec3<double> axisAngleRotB = vec3<double>(0, 0, M_PI);
+        quaternion<double> qmetaA = msmrdtools::axisangle2quaternion(axisAngleRotA);
+        quaternion<double> qmetaB = msmrdtools::axisangle2quaternion(axisAngleRotB);
 
         rotMetastableStates.resize(numStates);
-        for (auto rotMstate : rotMetastableStates) {
-            rotMstate.resize(numSymmetries);
-            // Define equivalent rotations
-            q1 = quaternion<double> ();
-            q2 = quaternion<double> ();
-            q3 = quaternion<double> ();
-            q4 = quaternion<double> ();
-            // Save equivalent rotation in corresponding list element
-            rotMstate = std::vector<quaternion<double>> {q1, q2, q3, q4};
-        }
+        rotMetastableStates[0] = 1*qmetaA;
+        rotMetastableStates[1] = 1*qmetaB;
     }
 
 }

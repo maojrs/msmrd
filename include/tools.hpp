@@ -43,5 +43,8 @@ namespace msmrdtools {
 
     // Rotates vector p by rotation represented by quaternion q.
     vec3<double> rotateVec(vec3<double> p, quaternion<double> q);
+
+    // Calculate distance between quaternions/rotations
+    double quaternionDistance(quaternion<double> q1, quaternion<double> q2);
 }
 

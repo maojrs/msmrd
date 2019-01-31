@@ -50,4 +50,11 @@ namespace msmrdtools {
         return result;
     }
 
+    /* Calculate distance between quaternions/rotations. Gives 0 when rotations are the same
+     * and 1 when represent rotations 180 degress apart. */
+    double quaternionDistance(quaternion<double> q1, quaternion<double> q2) {
+        double innerProduct = q1[0]*q2[0] + q1[1]*q2[1] + q1[2]*q2[2] + q1[3]*q2[3];
+        return 1.0 - innerProduct*innerProduct;
+    }
+
 }
