@@ -3,28 +3,38 @@
 //
 
 #pragma once
+#include <memory>
 #include "trajectory.hpp"
+#include "spherePartition.hpp"
 #include "tools.hpp"
 
 namespace msmrd {
     /**
      * Trajectory class for patchy  dimer trajectories. Patchy dimer here refers to two
      * patchy particles with two patches. The main difference with the general class
-     * trajectoryPositionOrientation is the sampling of the discrete trajectory that is
-     * specific for each example/application.
+     * trajectoryPositionOrientation is that this class can sample the discrete trajectory that is
+     * specific for each example/application. In short words,  it chooses how to discretize the full
+     * trajectory into a discretized trajectory to be analyzed and extracted into
+     * a Markov state model.
+     *
+     * Patchy dimer will have one unbound state (0), two bound states (1,2) and
+     * angularStates = numSections(numSections+1)/2 angular discrete states (3-3+angularStates).
      */
     class patchyDimer : public trajectoryPositionOrientation {
     private:
+
+        std::vector<std::vector<quaternion<double>>> rotMetastableStates;
+        std::unique_ptr<spherePartition> spherePart;
+        int angularStates;
         /*
          * @param rotMetastableStates[X] correspond to the list of equivalent rotations that yield a certain
          * metastable state/region X. Each rotation is represented by a quaternion
+         * @param spherePart pointer to equal area spherical partition class with relevant functions
+         * @param number of angularStates for discretization
          */
-        std::vector<std::vector<quaternion<double>>> rotMetastableStates;
-
     public:
 
-        // Inherit constructor from parent class
-        using trajectoryPositionOrientation::trajectoryPositionOrientation;
+        patchyDimer(unsigned long Nparticles, int bufferSize, int numPartitions);
 
         void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList);
 

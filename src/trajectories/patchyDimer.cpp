@@ -10,20 +10,42 @@ namespace msmrd {
      * to be analyzed and extracted into a Markov state model. This specific discretization will follow
      * the core MSM approach
      */
+    patchyDimer::patchyDimer(unsigned long Nparticles, int bufferSize, int numSections) :
+    trajectoryPositionOrientation(Nparticles, bufferSize) {
+        spherePart = std::make_unique<spherePartition>(numSections);
+        angularStates = numSections*(numSections + 1)/2;
+    };
+
 
     void patchyDimer::sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) {
         int sample;
-        vec3<double> relativePosition;
-        quaternion<double> relativeOrientation;
-
+        vec3<double> relativePosition; // Measured from i to j
+        quaternion<double> orientation1;
+        quaternion<double> orientation2;
+        //quaternion<double> relativeOrientation; // Measured from i to j
+        // Rotated relative position vectors w/respect to each particle
+        vec3<double> rotatedRij;
+        vec3<double> rotatedRji;
+        // Section numbers corresponding to the relative orientations in the sphere Partition
+        int secNum1;
+        int secNum2;
 
         // Loops over all possible pairs (only one in this case)
         for (int i = 0; i < particleList.size(); i++) {
             for (int j = i + 1; j < particleList.size(); j++) {
                 sample = 0;
-                // Evaluate if the two particles are in a bound state
+                // Extract info from two rlevant particles in list
+                orientation1 = particleList[i].orientation;
+                orientation2 = particleList[j].orientation;
                 relativePosition = particleList[j].position - particleList[i].position;
-                relativeOrientation = particleList[j].orientation * particleList[i].orientation.conj();
+                // Rotate the relative position vector to the frame of reference fixed in each of the two particles.
+                rotatedRij = msmrdtools::rotateVec(relativePosition, orientation1);
+                rotatedRji = msmrdtools::rotateVec(-1*relativePosition, orientation2);
+                // Get corresponding section numbers from spherical partition to classify its state
+                secNum1 = spherePart->getSectionNumber(rotatedRij);
+                secNum2 = spherePart->getSectionNumber(rotatedRji);
+                //relativeOrientation = orientation2 * orientation1.conj();
+                // Evaluate if the two particles are in a bound state
                 if (relativePosition.norm() <= 1.1) {
                     sample = 1;
                 }

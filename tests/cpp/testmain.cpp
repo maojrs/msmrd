@@ -271,8 +271,8 @@ TEST_CASE("Fundamental trajectory recording", "[trajectory]") {
 }
 
 TEST_CASE("Spherical partition", "[spherePartition]") {
-    int numPartitions = 15;
-    auto spherePart = spherePartition(numPartitions);
+    int numSections = 15;
+    auto spherePart = spherePartition(numSections);
     auto regionsPerCollar = spherePart.regionsPerCollar;
     auto phis = spherePart.phis;
     auto thetas = spherePart.thetas;
@@ -292,22 +292,22 @@ TEST_CASE("Spherical partition", "[spherePartition]") {
     vec3<double> coordinate1{1.0, 2.0, 0.0};
     vec3<double> coordinate2{0.5, 3.5, 0.3};
     vec3<double> coordinate3{-2.5, -1, -0.8};
-    int secNumUp = spherePart.getSectionNumber(coordinateUp, numPartitions);
-    int secNumDown = spherePart.getSectionNumber(coordinateDown, numPartitions);
-    int secNum1 = spherePart.getSectionNumber(coordinate1, numPartitions);
-    int secNum2 = spherePart.getSectionNumber(coordinate2, numPartitions);
-    int secNum3 = spherePart.getSectionNumber(coordinate3, numPartitions);
+    int secNumUp = spherePart.getSectionNumber(coordinateUp);
+    int secNumDown = spherePart.getSectionNumber(coordinateDown);
+    int secNum1 = spherePart.getSectionNumber(coordinate1);
+    int secNum2 = spherePart.getSectionNumber(coordinate2);
+    int secNum3 = spherePart.getSectionNumber(coordinate3);
     REQUIRE(secNumUp == 1);
     REQUIRE(secNumDown == 15);
     REQUIRE(secNum1 == 9);
     REQUIRE(secNum2 == 3);
     REQUIRE(secNum3 == 11);
     // Now test getAngles function
-    auto anglesUp = spherePart.getAngles(secNumUp, numPartitions);
-    auto anglesDown = spherePart.getAngles(secNumDown, numPartitions);
-    auto angles1 = spherePart.getAngles(secNum1, numPartitions);
-    auto angles2 = spherePart.getAngles(secNum2, numPartitions);
-    auto angles3 = spherePart.getAngles(secNum3, numPartitions);
+    auto anglesUp = spherePart.getAngles(secNumUp);
+    auto anglesDown = spherePart.getAngles(secNumDown);
+    auto angles1 = spherePart.getAngles(secNum1);
+    auto angles2 = spherePart.getAngles(secNum2);
+    auto angles3 = spherePart.getAngles(secNum3);
     auto phiIntervalUp = std::get<0>(anglesUp);
     auto thetaIntervalUp = std::get<1>(anglesUp);
     auto phiIntervalDown = std::get<0>(anglesDown);
