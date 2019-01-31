@@ -40,8 +40,9 @@ def runParallelSims(simnumber):
     sigma = 1.0
     strength = 160.0
     angularStrength = 20.0
-    patch1 = np.array([1.,0.,0.])
-    patch2 = np.array([np.cos(3*np.pi/5.0),np.sin(3*np.pi/5.0),0.])
+    angleDiff = 3*np.pi/5.0
+    patch1 = np.array([np.cos(angleDiff/2),np.sin(angleDiff/2),0.])
+    patch2 = np.array([np.cos(-angleDiff/2),np.sin(-angleDiff/2),0.])
     patchesCoordinates = [patch1, patch2]
     potentialPatchyParticleAngular = patchyParticleAngular(sigma, strength, angularStrength, patchesCoordinates)
     integrator.setPairPotential(potentialPatchyParticleAngular)

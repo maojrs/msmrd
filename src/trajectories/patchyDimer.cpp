@@ -25,7 +25,6 @@ namespace msmrd {
                 relativePosition = particleList[j].position - particleList[i].position;
                 relativeOrientation = particleList[j].orientation * particleList[i].orientation.conj();
                 if (relativePosition.norm() <= 1.1) {
-
                     sample = 1;
                 }
                 // Relative orientation to particleList[j] measured from particleList[i]

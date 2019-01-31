@@ -38,7 +38,9 @@ namespace msmrd {
      */
     trajectoryPosition::trajectoryPosition(unsigned long Nparticles, int bufferSize) : trajectory(Nparticles, bufferSize){
         trajectoryData.resize(0);
+        discreteTrajectoryData.resize(0);
         trajectoryData.reserve(Nparticles*bufferSize);
+        discreteTrajectoryData.reserve(bufferSize);
     };
 
     // Sample from list of particles and store in trajectoryData

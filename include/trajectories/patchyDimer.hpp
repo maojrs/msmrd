@@ -20,6 +20,7 @@ namespace msmrd {
          * metastable state/region X. Each rotation is represented by a quaternion
          */
         std::vector<std::vector<quaternion<double>>> rotMetastableStates;
+
     public:
 
         // Inherit constructor from parent class

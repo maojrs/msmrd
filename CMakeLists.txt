@@ -26,6 +26,7 @@ set(SOURCES
         src/msm.cpp
         src/randomgen.cpp
         src/simulation.cpp
+        src/spherePartition.cpp
         src/boundaries/boundary.cpp
         src/boundaries/box.cpp
         src/boundaries/sphere.cpp
@@ -43,7 +44,7 @@ set(SOURCES
         src/potentials/potentials.cpp
         src/trajectories/patchyDimer.cpp
         src/tools.cpp
-        src/trajectories/trajectory.cpp)
+        src/trajectories/trajectory.cpp )
 
 set(PY_SOURCES
         src/binding/binding.hpp
@@ -61,6 +62,7 @@ set(PY_SOURCES
         include/quaternion.hpp
         include/randomgen.hpp
         include/simulation.hpp
+        include/spherePartition.hpp
         include/tools.hpp
         include/vec3.hpp
         include/boundaries/boundary.hpp
