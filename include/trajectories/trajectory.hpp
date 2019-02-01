@@ -28,7 +28,7 @@ namespace msmrd {
         const std::size_t MB = 1024 * kB;
         bool firstrun = true;
         std::vector<std::vector<double>> trajectoryData;
-        std::vector<int> discreteTrajectoryData;
+        std::vector<std::vector<int>> discreteTrajectoryData;
     public:
         unsigned long Nparticles;
         int bufferSize;
@@ -59,10 +59,10 @@ namespace msmrd {
         virtual void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) = 0;
 
 
-        // Functions used by all child classes
+        // Functions used by child classes
         std::vector<std::vector<double>> getTrajectoryData() { return trajectoryData; }
 
-        std::vector<int> getDiscreteTrajectoryData() { return discreteTrajectoryData; }
+        std::vector<std::vector<int>> getDiscreteTrajectoryData() { return discreteTrajectoryData; }
 
         void write2file(std::string filename, std::vector<std::vector<double>> localdata);
 
@@ -72,8 +72,6 @@ namespace msmrd {
 
         template< typename scalar, size_t NUMCOL>
         void writeChunk2H5file(std::string filename, std::vector<std::vector<scalar>> localdata);
-
-        //void createExtendibleH5File(std::string filename, hsize_t numcol);
 
     };
 
@@ -151,7 +149,7 @@ namespace msmrd {
 
     };
 
-    // NOTE THIS FUNCTION HASN"T BEEN TESTED, MAY BE INCOMPLETE OR NONFUNCTIONAL
+    // Writes data into HDF5 binary file in chunks of size bufferSize/bufferSize*Nparticles
     template< typename scalar, size_t NUMCOL >
     void trajectory::writeChunk2H5file(std::string filename, std::vector<std::vector<scalar>> localdata) {
         const H5std_string FILE_NAME( filename + ".h5");

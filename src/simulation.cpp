@@ -116,9 +116,10 @@ namespace msmrd {
     void simulation::write2H5file(int numcols, std::string filename, bool chunked ) {
         if (chunked) {
             // Write discrete trajectory chunked
-//            if (outputDiscreteTraj) {
-//                traj->writeChunk2H5file<int, 1>(filename + "_discrete", traj->getDiscreteTrajectoryData());
-//            }
+            if (outputDiscreteTraj) {
+                traj->writeChunk2H5file<int, 1>(filename + "_discrete",
+                                                std::vector<std::vector<int>> {traj->getDiscreteTrajectoryData()});
+            }
             // Write the continuous trajectory chunked
             if (numcols == 4) {
                 traj->writeChunk2H5file<double, 4>(filename, traj->getTrajectoryData());
@@ -131,9 +132,10 @@ namespace msmrd {
             }
         } else {
             // Write discrete trajectory
-//            if (outputDiscreteTraj) {
-//                traj->write2H5file<int, 1>(filename + "_discrete", traj->getDiscreteTrajectoryData());
-//            }
+            if (outputDiscreteTraj) {
+                traj->write2H5file<int, 1>(filename + "_discrete",
+                                           std::vector<std::vector<int>> {traj->getDiscreteTrajectoryData()} );
+            }
             // Write the continuous trajectory
             if (numcols == 4) {
                 traj->write2H5file<double, 4>(filename, traj->getTrajectoryData());

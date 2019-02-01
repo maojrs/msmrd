@@ -19,7 +19,7 @@ namespace msmrd {
 
 
     void patchyDimer::sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) {
-        int sample;
+        std::vector<int> sample;
         vec3<double> relativePosition; // Measured from i to j
         quaternion<double> orientation1;
         quaternion<double> orientation2;
@@ -34,7 +34,7 @@ namespace msmrd {
         // Loops over all possible pairs (only one in this case)
         for (int i = 0; i < particleList.size(); i++) {
             for (int j = i + 1; j < particleList.size(); j++) {
-                sample = 0;
+                sample = std::vector<int>{0};
                 // Extract info from two rlevant particles in list
                 orientation1 = particleList[i].orientation;
                 orientation2 = particleList[j].orientation;
@@ -44,12 +44,12 @@ namespace msmrd {
                 rotatedRji = msmrdtools::rotateVec(-1*relativePosition, orientation2);
                 // Evaluate if the two particles are in a bound state
                 if (relativePosition.norm() <= 1.1) {
-                    sample = getBoundState(orientation1, orientation2);
+                    sample = std::vector<int>{ getBoundState(orientation1, orientation2) };
                 } else if (relativePosition.norm() <= 2.1) {
                     // Get corresponding section numbers from spherical partition to classify its state
                     secNum1 = spherePart->getSectionNumber(rotatedRij);
                     secNum2 = spherePart->getSectionNumber(rotatedRji);
-                    sample  = secNum1*10 + secNum2;
+                    sample  = std::vector<int>{ secNum1*10 + secNum2 };
                 }
                 discreteTrajectoryData.push_back(sample);
             }

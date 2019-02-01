@@ -16,7 +16,11 @@ FIND_PROGRAM(PYTHON "python")
 #set(ENV{HDF5_DIR} "/srv/public/maojrs/miniconda3/envs/msmrd-dev/include/") 
 find_package(HDF5 COMPONENTS CXX)
 message(STATUS "HDF5_FOUND: ${HDF5_FOUND}, version ${HDF5_VERSION}, directory ${HDF5_INCLUDE_DIRS}")
+
+# The first one
 include_directories(${HDF5_INCLUDE_DIR})
+include_directories(${HDF5_INCLUDE_DIRS})
+
 
 # Set include and source
 include_directories(include)
