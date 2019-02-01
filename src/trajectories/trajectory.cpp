@@ -27,19 +27,6 @@ namespace msmrd {
         discreteTrajectoryData.clear();
     }
 
-
-    // Implementation of write2file function: writes data into normal text file
-    void trajectory::write2file(std::string filename, std::vector<std::vector<double>> localdata) {
-        std::ofstream outputfile(filename + ".txt");
-        std::ostream_iterator<double> output_iterator(outputfile, " ");
-
-        for (auto const &value: localdata) {
-            std::copy(value.begin(), value.end(), output_iterator);
-            outputfile << std::endl;
-        }
-        outputfile.close();
-    };
-
     /**
      * Implementation of trajectory class to store full position only trajectories
      */

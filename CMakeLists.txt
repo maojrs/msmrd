@@ -13,13 +13,14 @@ FIND_PROGRAM(PYTHON "python")
 
 # Find and add headers location of HDF5 library
 # Uncomment to manually specify HDF5 installation directory (useful when multiple installations available)
-#set(ENV{HDF5_DIR} "/srv/public/maojrs/miniconda3/envs/msmrd-dev/include/") 
+#set(ENV{HDF5_DIR} "/srv/public/maojrs/miniconda3/envs/msmrd-dev/include/")
+set(ENV{HDF5_DIR} "/home/maojrs/miniconda2/envs/msmrd-dev/include")
 find_package(HDF5 COMPONENTS CXX)
 message(STATUS "HDF5_FOUND: ${HDF5_FOUND}, version ${HDF5_VERSION}, directory ${HDF5_INCLUDE_DIRS}")
 
-# The first one
+# Try using the second one for newer version of HDF5
 include_directories(${HDF5_INCLUDE_DIR})
-include_directories(${HDF5_INCLUDE_DIRS})
+#include_directories(${HDF5_INCLUDE_DIRS})
 
 
 # Set include and source

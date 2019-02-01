@@ -4,7 +4,6 @@ import numpy as np
 import h5py
 from msmrd2.integrators import overdampedLangevin as odLangevin
 from msmrd2.potentials import patchyParticleAngular
-#from joblib import Parallel, delayed
 import multiprocessing
 from pathos.multiprocessing import ProcessingPool as Pool
 from functools import partial
@@ -50,20 +49,21 @@ def runParallelSims(simnumber):
     # Creates simulation
     sim = msmrd2.simulation(integrator)
     # Simulation parameters
-    timesteps = 200000000 #5000
+    timesteps = 2000000 # 200000000 #5000
     bufferSize = 1024
     stride = 5000 #1
     outTxt = False
     outH5 = True
     outChunked = True
     filename = "../data/dimer/simDimer" + "{:04d}".format(simnumber)
+    trajtype = "patchyDimer"
 
     # Runs simulation
-    sim.run(partlist, timesteps, stride, bufferSize, filename, outTxt, outH5, outChunked)
+    sim.run(partlist, timesteps, stride, bufferSize, filename, outTxt, outH5, outChunked, trajtype)
     print("Simulation " + str(simnumber) + ", done.")
 
 # Runs several simulations in parallel
-Nsimulations = 100
+Nsimulations = 10
 num_cores = multiprocessing.cpu_count()
 pool = Pool(processes=num_cores)
 iterator = [i for i in range(Nsimulations)]
