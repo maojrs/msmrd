@@ -12,6 +12,7 @@
 #include "particle.hpp"
 #include "quaternion.hpp"
 #include "randomgen.hpp"
+#include "spherePartition.hpp"
 #include "tools.hpp"
 #include "vec3.hpp"
 
@@ -264,17 +265,18 @@ TEST_CASE("Fundamental trajectory recording", "[trajectory]") {
     std::vector<particle> particles {part1, part2};
     overdampedLangevin integrator(0.01, 15, "rigidbody");
     simulation sim(integrator);
-    sim.run(particles, 10000, 10, 1024, "test.h5", false, false, false);
+    std::string trajtype = "positionOrientation";
+    sim.run(particles, 10000, 10, 1024, "test.h5", false, false, false, trajtype);
     auto data = sim.traj->getTrajectoryData();
     REQUIRE(data.size() == 2000);
 }
 
-TEST_CASE("Spherical partition", "[partitionSphere]") {
-    int numPartitions = 15;
-    auto spherePartition = msmrdtools::spherePartition::partitionSphere(numPartitions);
-    auto regionsPerCollar = std::get<0>(spherePartition);
-    auto phis = std::get<1>(spherePartition);
-    auto thetas = std::get<2>(spherePartition);
+TEST_CASE("Spherical partition", "[spherePartition]") {
+    int numSections = 15;
+    auto spherePart = spherePartition(numSections);
+    auto regionsPerCollar = spherePart.regionsPerCollar;
+    auto phis = spherePart.phis;
+    auto thetas = spherePart.thetas;
     std::vector<int> regionsPerCollarRef{1, 6, 7, 1};
     std::vector<double> phisRef{0.0, 0.52231482, 1.50408018, 2.61927783};
     std::vector<std::vector<double>> thetasRef;
@@ -291,22 +293,22 @@ TEST_CASE("Spherical partition", "[partitionSphere]") {
     vec3<double> coordinate1{1.0, 2.0, 0.0};
     vec3<double> coordinate2{0.5, 3.5, 0.3};
     vec3<double> coordinate3{-2.5, -1, -0.8};
-    int secNumUp = msmrdtools::spherePartition::getSectionNumber(coordinateUp, numPartitions);
-    int secNumDown = msmrdtools::spherePartition::getSectionNumber(coordinateDown, numPartitions);
-    int secNum1 = msmrdtools::spherePartition::getSectionNumber(coordinate1, numPartitions);
-    int secNum2 = msmrdtools::spherePartition::getSectionNumber(coordinate2, numPartitions);
-    int secNum3 = msmrdtools::spherePartition::getSectionNumber(coordinate3, numPartitions);
+    int secNumUp = spherePart.getSectionNumber(coordinateUp);
+    int secNumDown = spherePart.getSectionNumber(coordinateDown);
+    int secNum1 = spherePart.getSectionNumber(coordinate1);
+    int secNum2 = spherePart.getSectionNumber(coordinate2);
+    int secNum3 = spherePart.getSectionNumber(coordinate3);
     REQUIRE(secNumUp == 1);
     REQUIRE(secNumDown == 15);
     REQUIRE(secNum1 == 9);
     REQUIRE(secNum2 == 3);
     REQUIRE(secNum3 == 11);
     // Now test getAngles function
-    auto anglesUp = msmrdtools::spherePartition::getAngles(secNumUp, numPartitions);
-    auto anglesDown = msmrdtools::spherePartition::getAngles(secNumDown, numPartitions);
-    auto angles1 = msmrdtools::spherePartition::getAngles(secNum1, numPartitions);
-    auto angles2 = msmrdtools::spherePartition::getAngles(secNum2, numPartitions);
-    auto angles3 = msmrdtools::spherePartition::getAngles(secNum3, numPartitions);
+    auto anglesUp = spherePart.getAngles(secNumUp);
+    auto anglesDown = spherePart.getAngles(secNumDown);
+    auto angles1 = spherePart.getAngles(secNum1);
+    auto angles2 = spherePart.getAngles(secNum2);
+    auto angles3 = spherePart.getAngles(secNum3);
     auto phiIntervalUp = std::get<0>(anglesUp);
     auto thetaIntervalUp = std::get<1>(anglesUp);
     auto phiIntervalDown = std::get<0>(anglesDown);

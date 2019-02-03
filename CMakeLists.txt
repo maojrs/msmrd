@@ -20,8 +20,9 @@ if(DEFINED ENV{CONDA_PREFIX})
 endif()
 find_package(HDF5 COMPONENTS CXX)
 message(STATUS "HDF5_FOUND: ${HDF5_FOUND}, version ${HDF5_VERSION}, include directory ${HDF5_INCLUDE_DIRS}, library directory ${HDF5_LIBRARIES}, C++ library directory ${HDF5_CXX_LIBRARIES}")
-# this had to be changed in order for this to work
+# Try using the second one for older version of HDF5
 include_directories(${HDF5_INCLUDE_DIRS}) 
+#include_directories(${HDF5_INCLUDE_DIR})
 # Set include and source
 include_directories(include)
 add_subdirectory(libraries/pybind11)
@@ -30,6 +31,7 @@ set(SOURCES
         src/msm.cpp
         src/randomgen.cpp
         src/simulation.cpp
+        src/spherePartition.cpp
         src/boundaries/boundary.cpp
         src/boundaries/box.cpp
         src/boundaries/sphere.cpp
@@ -47,7 +49,7 @@ set(SOURCES
         src/potentials/potentials.cpp
         src/trajectories/patchyDimer.cpp
         src/tools.cpp
-        src/trajectories/trajectory.cpp)
+        src/trajectories/trajectory.cpp )
 
 set(PY_SOURCES
         src/binding/binding.hpp
@@ -65,6 +67,7 @@ set(PY_SOURCES
         include/quaternion.hpp
         include/randomgen.hpp
         include/simulation.hpp
+        include/spherePartition.hpp
         include/tools.hpp
         include/vec3.hpp
         include/boundaries/boundary.hpp

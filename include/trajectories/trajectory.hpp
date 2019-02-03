@@ -8,7 +8,7 @@
 #include <vector>
 #include <fstream>
 #include <iterator>
-#include <H5f90i.h>
+//#include <H5f90i.h>
 #include "H5Cpp.h"
 #include "particle.hpp"
 
@@ -28,7 +28,7 @@ namespace msmrd {
         const std::size_t MB = 1024 * kB;
         bool firstrun = true;
         std::vector<std::vector<double>> trajectoryData;
-        std::vector<int> discreteTrajectoryData;
+        std::vector<std::vector<int>> discreteTrajectoryData;
     public:
         unsigned long Nparticles;
         int bufferSize;
@@ -49,29 +49,36 @@ namespace msmrd {
 
         trajectory(unsigned long Nparticles, int bufferSize);
 
+        void emptyBuffer();
+
         // Virtual functions to sample from list of particles, store in trajectoryData, and empty data buffer
         virtual void sample(double time, std::vector<particle> &particleList) = 0;
 
         virtual void sampleRelative(double time, std::vector<particle> &particleList) = 0;
 
-        virtual void emptyBuffer() = 0;
+        virtual void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) = 0;
 
 
-        // Functions used by all child classes
+        // Functions used by child classes
         std::vector<std::vector<double>> getTrajectoryData() { return trajectoryData; }
 
-        std::vector<int> getDiscreteTrajectoryData() { return discreteTrajectoryData; }
+        std::vector<std::vector<int>> getDiscreteTrajectoryData() { return discreteTrajectoryData; }
 
-        void write2file(std::string filename, std::vector<std::vector<double>> localdata);
+        /* Templated functions for writing to text and H5 file (template for H5 useful since datasize
+         * needs to be known at runtime) */
+        template< typename scalar>
+        void write2file(std::string filename, std::vector<std::vector<scalar>> localdata);
 
-        // Templated functions for writing to H5 file (template useful since datasize needs to be known at runtime)
-        template< size_t NUMCOL>
-        void write2H5file(std::string filename, std::vector<std::vector<double>> localdata);
+        template< typename scalar, size_t NUMCOL>
+        void write2H5file(std::string filename, std::string datasetName, std::vector<std::vector<scalar>> localdata);
 
-        template< size_t NUMCOL>
-        void writeChunk2H5file(std::string filename, std::vector<std::vector<double>> localdata);
+        template< typename scalar, size_t NUMCOL>
+        void createChunkedH5file(std::string filename, std::string datasetName,
+                                 std::vector<std::vector<scalar>> localdata);
 
-        //void createExtendibleH5File(std::string filename, hsize_t numcol);
+        template< typename scalar, size_t NUMCOL>
+        void writeChunk2H5file(std::string filename, std::string datasetName,
+                               std::vector<std::vector<scalar>> localdata);
 
     };
 
@@ -87,7 +94,8 @@ namespace msmrd {
 
         void sampleRelative(double time, std::vector<particle> &particleList) override;
 
-        void emptyBuffer() override { trajectoryData.clear(); }
+        // Empty function to be overwritten by child classes if neccesary
+        void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override {};
 
     };
 
@@ -104,10 +112,26 @@ namespace msmrd {
 
         void sampleRelative(double time, std::vector<particle> &particleList) override;
 
-        void emptyBuffer() override { trajectoryData.clear(); }
+        // Empty function to be overwritten by child classes if neccesary
+        void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override {};
 
         void printTime();
 
+    };
+
+
+
+    // Templated implementation of write2file function: writes data into normal text file
+    template< typename scalar>
+    void trajectory::write2file(std::string filename, std::vector<std::vector<scalar>> localdata) {
+        std::ofstream outputfile(filename + ".txt");
+        std::ostream_iterator<scalar> output_iterator(outputfile, " ");
+
+        for (auto const &value: localdata) {
+            std::copy(value.begin(), value.end(), output_iterator);
+            outputfile << std::endl;
+        }
+        outputfile.close();
     };
 
 
@@ -117,10 +141,10 @@ namespace msmrd {
      */
 
     // Writes data into HDF5 binary file
-    template< size_t NUMCOL >
-    void trajectory::write2H5file(std::string filename, std::vector<std::vector<double>> localdata) {
+    template< typename scalar, size_t NUMCOL>
+    void trajectory::write2H5file(std::string filename, std::string datasetName, std::vector<std::vector<scalar>> localdata) {
         const H5std_string FILE_NAME = filename + ".h5";
-        const H5std_string	DATASET_NAME = "msmrd_data";
+        const H5std_string	DATASET_NAME = datasetName;
         int datasize = static_cast<int>(localdata.size());
 
 
@@ -147,11 +171,48 @@ namespace msmrd {
 
     };
 
-    // NOTE THIS FUNCTION HASN"T BEEN TESTED, MAY BE INCOMPLETE OR NONFUNCTIONAL
-    template< size_t NUMCOL >
-    void trajectory::writeChunk2H5file(std::string filename, std::vector<std::vector<double>> localdata) {
+    template< typename scalar, size_t NUMCOL >
+    void trajectory::createChunkedH5file(std::string filename, std::string datasetName,
+                                         std::vector<std::vector<scalar>> localdata){
         const H5std_string FILE_NAME( filename + ".h5");
-        const H5std_string DATASET_NAME( "msmrd_data" );
+        const H5std_string DATASET_NAME( datasetName );
+        hsize_t chunckSize = localdata.size(); 
+        const int RANK = 2;
+
+        H5File file;
+        DataSet dataset;
+        DataSpace dataspace;
+        hsize_t dimsFile[RANK] = {0 ,0};
+
+        // Create dataspace with unlimited dimensions
+        hsize_t dims[2]  = {chunckSize, NUMCOL};  // dataset dimensions at creation
+        hsize_t maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
+        dataspace = DataSpace(RANK , dims, maxdims);
+
+        // Create H5 file. If file exists, it will be overwritten
+        file = H5File(FILE_NAME, H5F_ACC_TRUNC);
+
+        // Modify dataset creation properties, i.e. enable chunking.
+        DSetCreatPropList cparms;
+        hsize_t chunk_dims[2] ={chunckSize, NUMCOL};
+        cparms.setChunk( RANK, chunk_dims );
+
+        // Set fill value for the dataset
+        double fill_val = 0;
+        cparms.setFillValue( PredType::NATIVE_DOUBLE, &fill_val);
+
+        /* Create a new dataset within the file using cparms
+        * creation properties.  */
+        dataset = file.createDataSet( DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace, cparms);
+
+    };
+
+    // Writes data into HDF5 binary file in chunks of size bufferSize/bufferSize*Nparticles
+    template< typename scalar, size_t NUMCOL >
+    void trajectory::writeChunk2H5file(std::string filename, std::string datasetName,
+                                       std::vector<std::vector<scalar>> localdata) {
+        const H5std_string FILE_NAME( filename + ".h5");
+        const H5std_string DATASET_NAME( datasetName );
         hsize_t chunckSize = localdata.size();
         const int RANK = 2;
 
@@ -168,31 +229,31 @@ namespace msmrd {
             }
         }
 
-        if (firstrun) {
-            // Create dataspace with unlimited dimensions
-            hsize_t dims[2]  = {chunckSize, NUMCOL};  // dataset dimensions at creation
-            hsize_t maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
-            dataspace = DataSpace(RANK , dims, maxdims);
-
-            // Create H5 file. If file exists, it will be overwritten
-            file = H5File(FILE_NAME, H5F_ACC_TRUNC);
-
-            // Modify dataset creation properties, i.e. enable chunking.
-            DSetCreatPropList cparms;
-            hsize_t chunk_dims[2] ={chunckSize, NUMCOL};
-            cparms.setChunk( RANK, chunk_dims );
-
-            // Set fill value for the dataset
-            double fill_val = 0;
-            cparms.setFillValue( PredType::NATIVE_DOUBLE, &fill_val);
-
-            /* Create a new dataset within the file using cparms
-            * creation properties.  */
-            dataset = file.createDataSet( DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace, cparms);
-
-            firstrun = false;
-        }
-        else {
+//        if (firstrun) {
+//            // Create dataspace with unlimited dimensions
+//            hsize_t dims[2]  = {chunckSize, NUMCOL};  // dataset dimensions at creation
+//            hsize_t maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
+//            dataspace = DataSpace(RANK , dims, maxdims);
+//
+//            // Create H5 file. If file exists, it will be overwritten
+//            file = H5File(FILE_NAME, H5F_ACC_TRUNC);
+//
+//            // Modify dataset creation properties, i.e. enable chunking.
+//            DSetCreatPropList cparms;
+//            hsize_t chunk_dims[2] ={chunckSize, NUMCOL};
+//            cparms.setChunk( RANK, chunk_dims );
+//
+//            // Set fill value for the dataset
+//            double fill_val = 0;
+//            cparms.setFillValue( PredType::NATIVE_DOUBLE, &fill_val);
+//
+//            /* Create a new dataset within the file using cparms
+//            * creation properties.  */
+//            dataset = file.createDataSet( DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace, cparms);
+//
+//            firstrun = false;
+//        }
+//        else {
             // Open existing dataset
             file = H5File(FILE_NAME, H5F_ACC_RDWR);
             dataset = file.openDataSet(DATASET_NAME);
@@ -200,7 +261,7 @@ namespace msmrd {
 
             // Get dimensions of current dataset in file
             const int ndims = dataspace.getSimpleExtentDims(dimsFile, NULL);
-        }
+//        }
 
         // Extend the dataset by a chunk (chunkSize, NUMCOL)
         hsize_t size[2];
