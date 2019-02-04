@@ -55,6 +55,8 @@ def runParallelSims(simnumber):
     outTxt = False
     outH5 = True
     outChunked = True
+    # Folder included in filename must exist (and preferably empty), otherwise H5
+    # fails (might fail with parallel python) to write the data.
     filename = "../data/dimer/simDimer" + "{:04d}".format(simnumber)
     trajtype = "patchyDimer"
 

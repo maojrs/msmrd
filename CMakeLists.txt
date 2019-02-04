@@ -12,17 +12,18 @@ use_cxx14()
 FIND_PROGRAM(PYTHON "python")
 
 # Find and add headers location of HDF5 library
-# Uncomment to manually specify HDF5 installation directory (useful when multiple installations available)
-# Set HDF5 root dir to conda prefix if it is set. This avoids conflicts if there is a system and a conda installation of HDF5.
+# Set HDF5 root dir to conda prefix if it is set. This avoids conflicts if there is a system and a conda
+# installation of HDF5.
 if(DEFINED ENV{CONDA_PREFIX})
+    cmake_policy(SET CMP0074 NEW) # Set policy to not ignore root environment variables.
 	message(STATUS "Found active Conda environment. Setting HDF5_ROOT to conda prefix")
 	set(ENV{HDF5_ROOT} $ENV{CONDA_PREFIX})
 endif()
 find_package(HDF5 COMPONENTS CXX)
-message(STATUS "HDF5_FOUND: ${HDF5_FOUND}, version ${HDF5_VERSION}, include directory ${HDF5_INCLUDE_DIRS}, library directory ${HDF5_LIBRARIES}, C++ library directory ${HDF5_CXX_LIBRARIES}")
-# Try using the second one for older version of HDF5
-include_directories(${HDF5_INCLUDE_DIRS}) 
-#include_directories(${HDF5_INCLUDE_DIR})
+message(STATUS "HDF5_FOUND: ${HDF5_FOUND}, version ${HDF5_VERSION}, include directory ${HDF5_INCLUDE_DIRS},
+library directory ${HDF5_LIBRARIES}, C++ library directory ${HDF5_CXX_LIBRARIES}")
+include_directories(${HDF5_INCLUDE_DIRS})
+
 # Set include and source
 include_directories(include)
 add_subdirectory(libraries/pybind11)
@@ -98,7 +99,6 @@ pybind11_add_module(msmrd2binding MODULE ${PY_SOURCES})
 
 #target_include_directories(msmrd2 PUBLIC include libraries/pybind11/include)
 target_link_libraries(msmrd2binding PUBLIC msmrd2core)
-
 
 #EXECUTE_PROCESS(COMMAND git submodule update --init WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 

@@ -185,7 +185,7 @@ namespace msmrd {
         hsize_t dimsFile[RANK] = {0 ,0};
 
         // Create dataspace with unlimited dimensions
-        hsize_t dims[2]  = {chunckSize, NUMCOL};  // dataset dimensions at creation
+        hsize_t dims[2]  = {0,0};  // dataset dimensions at creation
         hsize_t maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
         dataspace = DataSpace(RANK , dims, maxdims);
 
@@ -229,39 +229,13 @@ namespace msmrd {
             }
         }
 
-//        if (firstrun) {
-//            // Create dataspace with unlimited dimensions
-//            hsize_t dims[2]  = {chunckSize, NUMCOL};  // dataset dimensions at creation
-//            hsize_t maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
-//            dataspace = DataSpace(RANK , dims, maxdims);
-//
-//            // Create H5 file. If file exists, it will be overwritten
-//            file = H5File(FILE_NAME, H5F_ACC_TRUNC);
-//
-//            // Modify dataset creation properties, i.e. enable chunking.
-//            DSetCreatPropList cparms;
-//            hsize_t chunk_dims[2] ={chunckSize, NUMCOL};
-//            cparms.setChunk( RANK, chunk_dims );
-//
-//            // Set fill value for the dataset
-//            double fill_val = 0;
-//            cparms.setFillValue( PredType::NATIVE_DOUBLE, &fill_val);
-//
-//            /* Create a new dataset within the file using cparms
-//            * creation properties.  */
-//            dataset = file.createDataSet( DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace, cparms);
-//
-//            firstrun = false;
-//        }
-//        else {
-            // Open existing dataset
-            file = H5File(FILE_NAME, H5F_ACC_RDWR);
-            dataset = file.openDataSet(DATASET_NAME);
-            dataspace = dataset.getSpace();
+        // Open existing dataset
+        file = H5File(FILE_NAME, H5F_ACC_RDWR);
+        dataset = file.openDataSet(DATASET_NAME);
+        dataspace = dataset.getSpace();
 
-            // Get dimensions of current dataset in file
-            const int ndims = dataspace.getSimpleExtentDims(dimsFile, NULL);
-//        }
+        // Get dimensions of current dataset in file
+        const int ndims = dataspace.getSimpleExtentDims(dimsFile, NULL);
 
         // Extend the dataset by a chunk (chunkSize, NUMCOL)
         hsize_t size[2];

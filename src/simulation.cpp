@@ -72,9 +72,9 @@ namespace msmrd {
         for (int tstep=0; tstep < Nsteps; tstep++) {
             if (tstep % stride == 0) {
                 bufferCounter++;
-                traj->sample(tstep, particleList);
+                traj->sample(integ.clock, particleList);
                 if (outputDiscreteTraj) {
-                    traj->sampleDiscreteTrajectory(tstep, particleList);
+                    traj->sampleDiscreteTrajectory(integ.clock, particleList);
                 }
                 if (tstep == 0) {
                     createChunkedH5files(numcols, filename);
@@ -103,7 +103,7 @@ namespace msmrd {
         // Main simulation loop (integration and writing to file)
         for (int tstep=0; tstep < Nsteps; tstep++) {
             if (tstep % stride == 0) {
-                traj->sample(tstep, particleList);
+                traj->sample(integ.clock, particleList);
             }
             integ.integrate(particleList);
         }
@@ -122,7 +122,12 @@ namespace msmrd {
 
     // Wrapper for creating chunkedH5files
     void simulation::createChunkedH5files(int numcols, std::string filename) {
-        // Create H5 files to refill by chunks
+        // Create H5 files to refill discrete trajectory by chunks
+        if (outputDiscreteTraj) {
+            traj->createChunkedH5file<int, 1>(filename + "_discrete", "msmrd_discrete_data",
+                                              traj->getDiscreteTrajectoryData());
+        }
+        // Create H5 files to refill trajectory by chunks
         if (numcols == 4) {
             traj->createChunkedH5file<double, 4>(filename, "msmrd_data", traj->getTrajectoryData());
         } else if (numcols == 8) {
@@ -131,10 +136,6 @@ namespace msmrd {
             throw std::range_error("Numcols needs to be 4 or 8. Custom number of columns per row "
                                    "can be used but needs to be explicitly modified in "
                                    "simulation.cpp, write2H5file<numcols> ");
-        }
-        if (outputDiscreteTraj) {
-            traj->createChunkedH5file<int, 1>(filename + "_discrete", "msmrd_discrete_data",
-                                              traj->getDiscreteTrajectoryData());
         }
     }
 
