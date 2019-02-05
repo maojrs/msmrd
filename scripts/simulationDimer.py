@@ -57,7 +57,8 @@ def runParallelSims(simnumber):
     outChunked = True
     # Folder included in filename must exist (and preferably empty), otherwise H5
     # fails (might fail with parallel python) to write the data.
-    filename = "../data/dimer/simDimer" + "{:04d}".format(simnumber)
+    #filename = "../data/dimer/simDimer" + "{:04d}".format(simnumber)
+    filename = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer_discrete/simDimer" + "{:04d}".format(simnumber)
     trajtype = "patchyDimer"
 
     # Runs simulation
