@@ -49,7 +49,7 @@ namespace msmrd {
                     // Get corresponding section numbers from spherical partition to classify its state
                     secNum1 = spherePart->getSectionNumber(rotatedRij);
                     secNum2 = spherePart->getSectionNumber(rotatedRji);
-                    sample  = std::vector<int>{ secNum1*10 + secNum2 };
+                    sample  = std::vector<int>{ std::min(secNum1,secNum2)*10 + std::max(secNum1,secNum2) };
                 }
                 discreteTrajectoryData.push_back(sample);
             }
