@@ -1,6 +1,6 @@
 # Sample functions to generate tcl files and visualize in vmd
 
-def generateTCL_multiRotParticleMS(numparticles = 1, outfname = "testRotMulti", tclfname = "../data/vmd/out2vmd.tcl"):
+def generateTCL_multiRotParticleMS(numparticles = 1, outfname = "testRotMulti", tclfname = "../../data/vmd/out2vmd.tcl"):
     file = open(tclfname, 'w')
     file.write('set name ' + outfname + '\n')
     file.write('mol load xyz ./$name.xyz  \n \n')
@@ -99,7 +99,7 @@ def generateTCL_dipole(frame, numparticles = 36, outfname = "odLangevinDipole", 
         file.close()
 
 
-def generateTCL_gayBerne(numparticles = 10, outfname = "gayBerne", tclfname = "../data/vmd/gayBerne2vmd.tcl"):
+def generateTCL_gayBerne(numparticles = 10, outfname = "gayBerne", tclfname = "../../data/vmd/gayBerne2vmd.tcl"):
     file = open(tclfname, 'w')
     file.write('set name ' + outfname + '\n')
     file.write('mol load xyz ./$name.xyz  \n \n')
@@ -136,7 +136,7 @@ def generateTCL_gayBerne(numparticles = 10, outfname = "gayBerne", tclfname = ".
     file.close()
 
 
-def generateTCL_patchyParticles(numparticles = 10, outfname = "patchyParticles", tclfname = "../data/vmd/patchyParticles2vmd.tcl"):
+def generateTCL_patchyParticles(numparticles = 10, outfname = "patchyParticles", tclfname = "../../data/vmd/patchyParticles2vmd.tcl"):
     file = open(tclfname, 'w')
     file.write('set name ' + outfname + '\n')
     file.write('mol load xyz ./$name.xyz  \n \n')
@@ -173,7 +173,7 @@ def generateTCL_patchyParticles(numparticles = 10, outfname = "patchyParticles",
     file.write('display rendermode GLSL \n')
     file.close()
 
-def generateTCL_patchyProteins(numparticles = 2, outfname = "patchyProteins", tclfname = "../data/vmd/patchyProteins2vmd.tcl"):
+def generateTCL_patchyProteins(numparticles = 2, outfname = "patchyProteins", tclfname = "../../data/vmd/patchyProteins2vmd.tcl"):
     file = open(tclfname, 'w')
     file.write('set name ' + outfname + '\n')
     file.write('mol load xyz ./$name.xyz  \n \n')
@@ -217,7 +217,7 @@ def generateTCL_patchyProteins(numparticles = 2, outfname = "patchyProteins", tc
     file.close()
 
 
-def generateTCL_patchyProteinsMS(numparticles = 2, outfname = "patchyProteinsMS", tclfname = "../data/vmd/patchyProteinsMS2vmd.tcl"):
+def generateTCL_patchyProteinsMS(numparticles = 2, outfname = "patchyProteinsMS", tclfname = "../../data/vmd/patchyProteinsMS2vmd.tcl"):
     file = open(tclfname, 'w')
     file.write('set name ' + outfname + '\n')
     file.write('mol load xyz ./$name.xyz  \n \n')

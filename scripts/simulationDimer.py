@@ -57,8 +57,8 @@ def runParallelSims(simnumber):
     outChunked = True
     # Folder included in filename must exist (and preferably empty), otherwise H5
     # fails (might fail with parallel python) to write the data.
-    #filename = "../data/dimer/simDimer" + "{:04d}".format(simnumber)
-    filename = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer_discrete/simDimer" + "{:04d}".format(simnumber)
+    filename = "../data/dimer/simDimer" + "{:04d}".format(simnumber)
+    #filename = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer_discrete/simDimer" + "{:04d}".format(simnumber)
     trajtype = "patchyDimer"
 
     # Runs simulation
@@ -66,7 +66,7 @@ def runParallelSims(simnumber):
     print("Simulation " + str(simnumber) + ", done.")
 
 # Runs several simulations in parallel
-Nsimulations = 100
+Nsimulations = 10 #200
 num_cores = multiprocessing.cpu_count()
 pool = Pool(processes=num_cores)
 iterator = [i for i in range(Nsimulations)]
