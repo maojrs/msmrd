@@ -95,20 +95,36 @@ def extractRates(discreteTrajectories, timecountDict, eventcountDict):
     for dtraj in discreteTrajectories:
         # Loop over one trajectory values
         for i in range(len(dtraj)-1):
-            
-            if (dtraj[i+1] == 1 and dtraj[i] != 1 and dtraj[i] != 0):
-                state = dtraj[i]
+            # Make sure there is a transition and that neither the current state nor the endstate are zero
+            state = dtraj[i]
+            endstate = dtraj[i+1]
+            if (state != endstate) and (state != 0) and (endstate != 0):
+                # If neither the current state nor the end state is one, don't store transition (skip one cycle in loop).
+                if (state != 1 and endstate != 1 and state != 2 and endstate !=2):
+                    continue
+                # Count how many timesteps the trajectory remained in current state before transitioning to endstate
                 prevstate = state
                 tstep = 1
                 while (prevstate == state):
                     prevstate = dtraj[i-tstep]
                     if (prevstate == state):
                         tstep += 1
-                # Update dictionaries
+                # Update number of events and accumulated time (timesteps) in dictionaries
                 if (state == 1 or state == 2) :
-                    dictkey = 'b' + str(state)
+                    dictkey1 = 'b' + str(state)
                 else:
-                    dictkey = str(state)
+                    dictkey1 = str(state)
+                if (endstate ==1 or endstate == 2):
+                    dictkey2 = 'b' + str(endstate)
+                else:
+                    dictkey2 = str(endstate)
+                dictkey = dictkey1 + '->' + dictkey2
                 timecountDict[dictkey] += tstep
                 eventcountDict[dictkey] += 1
-    return timecountDict, eventcountDict
+    # Scale by the number of events and save in rate Dictionary (note rates need to be scaled by dt)
+    rateDict = {}
+    for key in timecountDict:
+        if eventcountDict[key] != 0:
+            rateDict[key] = timecountDict[key]/eventcountDict[key]
+
+    return rateDict, timecountDict, eventcountDict

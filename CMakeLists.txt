@@ -19,6 +19,7 @@ if(DEFINED ENV{CONDA_PREFIX})
 	message(STATUS "Found active Conda environment. Setting HDF5_ROOT to conda prefix")
 	set(ENV{HDF5_ROOT} $ENV{CONDA_PREFIX})
 endif()
+#find_package(HDF5 1.10.2 REQUIRED COMPONENTS CXX)
 find_package(HDF5 COMPONENTS CXX)
 message(STATUS "HDF5_FOUND: ${HDF5_FOUND}, version ${HDF5_VERSION}, include directory ${HDF5_INCLUDE_DIRS},
 library directory ${HDF5_LIBRARIES}, C++ library directory ${HDF5_CXX_LIBRARIES}")
