@@ -1,7 +1,5 @@
-# Tests writing trajectory to .txt and .H5 file format
 import msmrd2
 import numpy as np
-import h5py
 from msmrd2.integrators import overdampedLangevin as odLangevin
 from msmrd2.potentials import patchyParticleAngular
 import multiprocessing

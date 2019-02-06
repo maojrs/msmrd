@@ -8,7 +8,8 @@ namespace msmrd{
     /**
     * Implementation of discrete-time msm (msm) class, see msmbase parent class for parameter description.
     */
-    discreteTimeMarkovStateModel::discreteTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
+    discreteTimeMarkovStateModel::discreteTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix,
+                                                               double lagtime, long seed)
             : markovModel(msmid, tempmatrix, lagtime, seed) {
         // Verify MSM transition matrix rows sum to 1 and components between 0 and 1
         double rowsum;
@@ -30,5 +31,5 @@ namespace msmrd{
     void discreteTimeMarkovStateModel::propagate(particleMS &part, int ksteps) {
 
     };
-    
+
 }
