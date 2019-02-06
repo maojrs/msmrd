@@ -3,8 +3,6 @@
 //
 
 #include "integrators/overdampedLangevinMarkovSwitch.hpp"
-#include "particle.hpp"
-#include "msm.hpp"
 
 namespace msmrd {
    /**

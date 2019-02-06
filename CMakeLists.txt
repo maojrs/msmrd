@@ -30,7 +30,6 @@ include_directories(include)
 add_subdirectory(libraries/pybind11)
 set(bindings_python_version 3.6)
 set(SOURCES
-        src/msm.cpp
         src/randomgen.cpp
         src/simulation.cpp
         src/spherePartition.cpp
@@ -38,8 +37,12 @@ set(SOURCES
         src/boundaries/box.cpp
         src/boundaries/sphere.cpp
         src/integrators/integrator.cpp
+        src/integrators/msmrdIntegrator.cpp
         src/integrators/overdampedLangevin.cpp
         src/integrators/overdampedLangevinMarkovSwitch.cpp
+        src/markovModels/continuousTimeMarkovModel.cpp
+        src/markovModels/discreteTimeMarkovModel.cpp
+        src/markovModels/markovModel.cpp
         src/potentials/dipole.cpp
         src/potentials/gaussians3D.cpp
         src/potentials/gayBerne.cpp
@@ -64,7 +67,6 @@ set(PY_SOURCES
         src/binding/bindPotentials.cpp
         src/binding/bindSimulation.cpp
         src/binding/bindTrajectory.cpp
-        include/msm.hpp
         include/particle.hpp
         include/quaternion.hpp
         include/randomgen.hpp
@@ -76,8 +78,12 @@ set(PY_SOURCES
         include/boundaries/box.hpp
         include/boundaries/sphere.hpp
         include/integrators/integrator.hpp
+        include/integrators/msmrdIntegrator.hpp
         include/integrators/overdampedLangevin.hpp
         include/integrators/overdampedLangevinMarkovSwitch.hpp
+        include/markovModels/continuousTimeMarkovModel.hpp
+        include/markovModels/discreteTimeMarkovModel.hpp
+        include/markovModels/markovModel.hpp
         include/potentials/potentials.hpp
         include/potentials/dipole.hpp
         include/potentials/gaussians3D.hpp

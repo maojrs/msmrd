@@ -43,9 +43,9 @@ namespace msmrd {
                 rotatedRij = msmrdtools::rotateVec(relativePosition, orientation1);
                 rotatedRji = msmrdtools::rotateVec(-1*relativePosition, orientation2);
                 // Evaluate if the two particles are in a bound state
-                if (relativePosition.norm() <= 1.1) {
+                if (relativePosition.norm() < 1.1) {
                     sample = std::vector<int>{ getBoundState(orientation1, orientation2) };
-                } else if (relativePosition.norm() <= 2.1) {
+                } else if (relativePosition.norm() < 2.1) {
                     // Get corresponding section numbers from spherical partition to classify its state
                     secNum1 = spherePart->getSectionNumber(rotatedRij);
                     secNum2 = spherePart->getSectionNumber(rotatedRji);

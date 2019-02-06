@@ -12,7 +12,8 @@ namespace msmrd {
     /**
      * Abstract base class for Markov state models of particles
      */
-    class baseMarkovStateModel {
+    class markovModel {
+
     protected:
         int msmid;
         const long double tolerance = 1 * pow(10.0L, -10);
@@ -37,7 +38,7 @@ namespace msmrd {
          */
 
         // Base constructor, can receive std::vectior matrix or numpy array matrix (through pybind)
-        baseMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed);
+        markovModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed);
 
         // Main functions definitions (=0 for abstract class)
         virtual void propagate(particleMS &part, int ksteps) = 0;
@@ -62,40 +63,6 @@ namespace msmrd {
         }
     };
 
-
-    /**
-     * Discrete-time Markov state model class declaration
-     */
-    class discreteTimeMarkovStateModel : public baseMarkovStateModel {
-    public:
-        discreteTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed);
-
-        void propagate(particleMS &part, int ksteps) override;
-    };
-
-
-    /**
-     * Continuous time Markov state model (ctmsm) class declaration
-     */
-    class continuousTimeMarkovStateModel : public baseMarkovStateModel {
-    private:
-        std::vector<double> lambda0;
-        std::vector<std::vector<double>> ratescumsum;
-
-        void calculateParameters();
-
-    public:
-        continuousTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, long seed);
-
-        void propagate(particleMS &part, int ksteps) override;
-
-        void propagateNoUpdate(particleMS &part, int ksteps);
-
-        // Getters for testing purposes
-        std::vector<double> getLambda0() const { return lambda0; };
-
-        std::vector<std::vector<double>> getRatescumsum() const { return ratescumsum; };
-    };
 
 }
 

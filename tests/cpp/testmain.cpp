@@ -5,7 +5,8 @@
 #include <catch2/catch.hpp>
 #include "potentials/gayBerne.hpp"
 #include "potentials/patchyParticle.hpp"
-#include "msm.hpp"
+#include "markovModels/discreteTimeMarkovModel.hpp"
+#include "markovModels/continuousTimeMarkovModel.hpp"
 #include "integrators/overdampedLangevin.hpp"
 #include "simulation.hpp"
 #include "trajectories/trajectory.hpp"

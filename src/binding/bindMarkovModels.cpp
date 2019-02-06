@@ -2,7 +2,8 @@
 // Created by maojrs on 9/7/18.
 //
 #include "binding.hpp"
-#include "msm.hpp"
+#include "markovModels/discreteTimeMarkovModel.hpp"
+#include "markovModels/continuousTimeMarkovModel.hpp"
 
 namespace msmrd {
     // Aliases for classes with long names.
@@ -12,7 +13,7 @@ namespace msmrd {
      * pyBinders for the c++ Markov state models (MSMs) classes
      */
     void bindMarkovModels(py::module &m) {
-        py::class_<msm>(m, "discreteTimeMarkovStateModel", "discrete time Markov state model (MSM ID, "
+        py::class_<msm, markovModel>(m, "discreteTimeMarkovStateModel", "discrete time Markov state model (MSM ID, "
                                                            "transition matrix, lagtime, seed)")
                 .def(py::init<int &, std::vector<std::vector<double>> &, double &, long &>())
                 .def_property_readonly("ID", &msm::getID)
@@ -29,7 +30,7 @@ namespace msmrd {
                 .def("setDrot", &msm::setDrot)
                 .def("propagate", &msm::propagate);
 
-        py::class_<ctmsm>(m, "continuousTimeMarkovStateModel", "continuous time Markov state model (MSM ID, "
+        py::class_<ctmsm, markovModel>(m, "continuousTimeMarkovStateModel", "continuous time Markov state model (MSM ID, "
                                                                "transition rate matrix, seed)")
                 .def(py::init<int &, std::vector<std::vector<double>> &, long &>())
                 .def_property_readonly("ID", &ctmsm::getID)

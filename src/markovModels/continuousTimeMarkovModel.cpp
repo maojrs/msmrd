@@ -1,82 +1,16 @@
 //
-// Created by maojrs on 7/4/18.
+// Created by maojrs on 2/6/19.
 //
-#include <iostream>
-#include <cstdlib>
-#include <ctime>
-#include "particle.hpp"
-#include "msm.hpp"
 
+#include "markovModels/continuousTimeMarkovModel.hpp"
 
 
 namespace msmrd {
-    using msmbase = baseMarkovStateModel;
-    using msm = discreteTimeMarkovStateModel;
-    using ctmsm = continuousTimeMarkovStateModel;
-
-    /**
-     *  Implementations for abstract msm class inherited by all child classes
-     *  @msmid Id of the Markov model to match with particle types in simulations
-     *  @param tempmatrix reference to the transition rate/transition probability matrix
-     *  @param lagtime lagtime used by Markov model, in the case of MSMs it will be a fixed
-     *  value, for CTMSM it will change in each iteration.
-     *  @param seed variable for random number generation (Note seed = -1 corresponds to random device)
-     */
-    baseMarkovStateModel::baseMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
-            : msmid(msmid), lagtime(lagtime), seed(seed) {
-
-        // Resize vectors by input matrix size and set seed of random number generator
-        nstates = static_cast<int>(tempmatrix.size());
-        Dlist.resize(nstates);
-        Drotlist.resize(nstates);
-        tmatrix.resize(nstates);
-        randg.setSeed(seed);
-
-        // Verify input 2D vector is a square matrix and fill tmatrix
-        for (const auto &row : tempmatrix) {
-            if (tempmatrix.size() != row.size()) {
-                throw std::range_error("MSM matrix must be a square matrix");
-            }
-        }
-        for (int i = 0; i < nstates; i++) {
-            tmatrix[i].resize(nstates);
-            std::copy_n(tempmatrix[i].begin(), nstates, tmatrix[i].begin());
-        }
-    };
-
-
-    /**
-     * Implementation of discrete-time msm (msm) class, see msmbase parent class for parameter description.
-     */
-    discreteTimeMarkovStateModel::discreteTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
-            : baseMarkovStateModel(msmid, tempmatrix, lagtime, seed) {
-        // Verify MSM transition matrix rows sum to 1 and components between 0 and 1
-        double rowsum;
-        for (const auto &row : tempmatrix) {
-            rowsum = 0;
-            for (auto &n : row) { rowsum += n; }
-            if (std::abs(rowsum - 1) > tolerance) {
-                throw std::range_error("Discrete-time MSM transition matrix rows should sum to 1");
-            }
-            for (const auto &element : row) {
-                if (element < 0 || element > 1) {
-                    throw std::range_error("Elements of transition matrix must be probabilities (between 0 and 1)");
-                }
-            }
-        }
-    };
-
-    // MISSING IMPLEMENTATION
-    void discreteTimeMarkovStateModel::propagate(particleMS &part, int ksteps) {
-
-    };
-
-
     /**
      * Implementation of continuous-time msm (ctmsm) class, see msmbase parent class for parameter description.
      */
     continuousTimeMarkovStateModel::continuousTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, long seed)
-            : baseMarkovStateModel(msmid, tempmatrix, 0.0, seed) {
+            : markovModel(msmid, tempmatrix, 0.0, seed) {
         // Verify CTMSM transition rate matrix rows sum to 0
         double long rowsum;
         for (const auto &row : tempmatrix) {
@@ -171,6 +105,6 @@ namespace msmrd {
             lagtime = lagt;
         }
     }
-
+    
 }
 

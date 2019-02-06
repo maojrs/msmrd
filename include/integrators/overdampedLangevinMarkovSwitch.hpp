@@ -5,7 +5,9 @@
 #pragma once
 #include "integrators/overdampedLangevin.hpp"
 #include "particle.hpp"
-#include "msm.hpp"
+#include "markovModels/discreteTimeMarkovModel.hpp"
+#include "markovModels/continuousTimeMarkovModel.hpp"
+
 
 namespace msmrd {
     using msm = msmrd::discreteTimeMarkovStateModel;
