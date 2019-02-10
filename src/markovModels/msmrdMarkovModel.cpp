@@ -9,10 +9,20 @@ namespace msmrd{
     * Implementation of Markov model class specializes for MSM/RD.
     * @param rateDict
     */
-    msmrdMarkovModel::msmrdMarkovModel(int msmid, std::vector<std::vector<double>> &tempmatrix, long seed,
-                                       std::map<std::string, float> &rateDictionary)
-            : ctmsm::continuousTimeMarkovStateModel(msmid, tempmatrix, seed), rateDictionary(rateDictionary) {};
+    msmrdMarkovModel::msmrdMarkovModel(unsigned int nstates, unsigned int numDiscreteOrientations,
+                                       long seed, std::map<std::string, float> &rateDictionary)
+            : nstates(nstates), numDiscreteOrientations(numDiscreteOrientations),
+              seed(seed), rateDictionary(rateDictionary) {
+        randg.setSeed(seed);
+        generateMarkovModels();
+    };
 
-    // Need smart and fast way to load transition rates into class from dictionary.
+    /* Generates several continuous times Markov models each representing a discretization of
+     * the relative orientation */
+    void msmrdMarkovModel::generateMarkovModels() {
+        int numBoundStates = nstates - 1;
+        int numMSMs = numBoundStates*(numBoundStates - 1) + (numDiscreteOrientations)*(numDiscreteOrientations + 1);
+        ctmsmDictionary;
 
+    }
 }
