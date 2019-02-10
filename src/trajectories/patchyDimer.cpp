@@ -57,14 +57,14 @@ namespace msmrd {
     };
 
     /* Given two orientations, return either bound state A (1) or bound state B (2).
-     * Note it needs to take into account all the symmetries. */
+     * Note it can be modified to take into account symmetries, using the symmetryQuaternions. */
     int patchyDimer::getBoundState(quaternion<double> q1, quaternion<double> q2) {
         std::array<quaternion<double>,8> relOrientations;
         // Calculate equivalent relative orientations, measured from particle 1
         relOrientations[0] = q2 * q1.conj();
-        relOrientations[1] = (q2*symmetryQuaternion) * q1.conj();
-        relOrientations[2] = q2 * (q1*symmetryQuaternion).conj();
-        relOrientations[3] = (q2*symmetryQuaternion) * (q1*symmetryQuaternion).conj();
+        relOrientations[1] = (q2*symmetryQuaternions[0]) * q1.conj();
+        relOrientations[2] = q2 * (q1*symmetryQuaternions[0]).conj();
+        relOrientations[3] = (q2*symmetryQuaternions[0]) * (q1*symmetryQuaternions[0]).conj();
         // Calculate equivalent relative orientations, measured from particle 2
         relOrientations[4] = relOrientations[0].conj();
         relOrientations[5] = relOrientations[1].conj();
@@ -87,19 +87,18 @@ namespace msmrd {
      * Define metastable relative orientations (including symmetric quaternion)
      */
     void patchyDimer::setMetastableRegions() {
-        // Define symmetry quaternion that denotes rotational symmetry of particle
-        vec3<double> axisAngleRotSym = vec3<double>(M_PI, 0, 0);
-        symmetryQuaternion = msmrdtools::axisangle2quaternion(axisAngleRotSym);
-        // Define 2 main rotation quaternions, qmetaA and qmetaB, defining bound state A and B state.
-        int numStates = 2;
-        vec3<double> axisAngleRotA = vec3<double>(0, 0, M_PI - 3.0*M_PI/5);
-        vec3<double> axisAngleRotB = vec3<double>(0, 0, M_PI);
-        quaternion<double> qmetaA = msmrdtools::axisangle2quaternion(axisAngleRotA);
-        quaternion<double> qmetaB = msmrdtools::axisangle2quaternion(axisAngleRotB);
-
+        // Define symmetry quaternions that denotes rotational symmetry of particle, if needed
+        //symmetryQuaternions.resize(1); //resize if needed
+        symmetryQuaternions[0] = msmrdtools::axisangle2quaternion(vec3<double>(M_PI, 0, 0));
+        // Define 2 main relative rotations (quaternions) that define bounds states A and B.
+        const int numStates = 2;
+        std::array<vec3<double>, numStates> axisAngleVecs;
         rotMetastableStates.resize(numStates);
-        rotMetastableStates[0] = 1*qmetaA;
-        rotMetastableStates[1] = 1*qmetaB;
+        axisAngleVecs[0] = vec3<double>(0, 0, M_PI - 3.0*M_PI/5);
+        axisAngleVecs[1] = vec3<double>(0, 0, M_PI);
+        for (int i = 1; i < numStates; i++){
+            rotMetastableStates[i] = msmrdtools::axisangle2quaternion(axisAngleVecs[i]);
+        }
     }
 
 }

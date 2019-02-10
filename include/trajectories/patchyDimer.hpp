@@ -24,14 +24,15 @@ namespace msmrd {
     private:
 
         std::vector<quaternion<double>> rotMetastableStates;
-        quaternion<double> symmetryQuaternion{1,0,0,0};
+        std::vector<quaternion<double>> symmetryQuaternions{{1,0,0,0}};
         std::unique_ptr<spherePartition> spherePart;
         int angularStates;
         double tolerance = 0.2;
         /*
          * @param rotMetastableStates[X] correspond to the list of relative rotations that correspond to a
          * metastable state/region X. Each rotation is represented by a quaternion.
-         * @symmetryQuaternion rotation that represents the structural symmetry of the patchy particle.
+         * @symmetryQuaternions list of rotation that represents the structural symmetries of the patchy particle if
+         * needed to define the states.
          * @param spherePart pointer to equal area spherical partition class with relevant functions
          * @param number of angularStates for discretization
          * @ param tolerance is the maximum distance away from metastable state to still be considered metastable.
