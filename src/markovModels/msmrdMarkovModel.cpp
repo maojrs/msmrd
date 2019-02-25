@@ -23,6 +23,5 @@ namespace msmrd{
         int numBoundStates = nstates - 1;
         int numMSMs = numBoundStates*(numBoundStates - 1) + (numDiscreteOrientations)*(numDiscreteOrientations + 1);
         ctmsmDictionary;
-
     }
 }

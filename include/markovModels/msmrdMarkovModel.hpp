@@ -11,7 +11,9 @@ namespace msmrd {
     /*
      * Base Markov state model class used for MSM/RD algorithm. Although, it is based on the continuous-time
      * Markov state model class, its functionality and construction differs enough such that it is not convenient to
-     * inherit from the main class. The Markov model is completely constructed with the rate dictionary.
+     * inherit from the main class. Actually the Markov model is completely constructed with the rate dictionary, and
+     * it defines a large list/dicitionary of ctmsms, one for each discrete region in order to emulate the spatially
+     * dependent rates.
      */
     class msmrdMarkovModel {
     protected:
