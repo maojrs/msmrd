@@ -12,16 +12,15 @@ namespace msmrd {
      * Base Markov state model class used for MSM/RD algorithm. Although, it is based on the continuous-time
      * Markov state model class, its functionality and construction differs enough such that it is not convenient to
      * inherit from the main class. Actually the Markov model is completely constructed with the rate dictionary, and
-     * it defines a large list/dicitionary of ctmsms, one for each discrete region in order to emulate the spatially
+     * it defines a large list/dictionary of ctmsms, one for each discrete region in order to emulate the spatially
      * dependent rates.
      */
     class msmrdMarkovModel {
     protected:
         const long double tolerance = 1 * pow(10.0L, -10);
         long seed;
-        randomgen randg;
         std::map<std::string, float> rateDictionary;
-        std::map<std::string, ctmsm> ctmsmDictionary;
+        std::map<std::string, ctmsm> ctmsmDictionary = {};
         //std::vector<ctmsm> ctmsmList = {};
     public:
         unsigned int nstates;
@@ -30,7 +29,6 @@ namespace msmrd {
         /**
         * @param msmid ID of the msm, corresponds to the particle type
         * @param tolerance tolerance limit for MSM integrity check
-        * @param seed variable for random number generation; seed = -1 corresponds to random_device;
         * @param randg random number generator class based on mt19937
         * @param rateDictionary dictionary relating transitions to its corresponding rates. The keys
         * are strings of the form "state1->state2". The bound states hava b before the number, and the transition
@@ -46,6 +44,8 @@ namespace msmrd {
                          long seed, std::map<std::string, float> &rateDictionary);
 
         void generateMarkovModels();
+
+        float getRate(std::string key) {return rateDictionary[key];}
 
     };
 

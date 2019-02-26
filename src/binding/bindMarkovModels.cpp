@@ -4,6 +4,7 @@
 #include "binding.hpp"
 #include "markovModels/discreteTimeMarkovModel.hpp"
 #include "markovModels/continuousTimeMarkovModel.hpp"
+#include "markovModels/msmrdMarkovModel.hpp"
 
 namespace msmrd {
     // Aliases for classes with long names.
@@ -46,6 +47,12 @@ namespace msmrd {
                 .def("setD", &ctmsm::setD)
                 .def("setDrot", &ctmsm::setDrot)
                 .def("propagate", &ctmsm::propagate);
+
+        py::class_<msmrdMarkovModel>(m, "msmrdMarkovModel", "continuous time Markov state model specialized to use with"
+                                                            "MSM/RD integration (num. of states, num. discrete "
+                                                            "orientations, seed, rate dictionary")
+                .def(py::init<unsigned int &, unsigned int &, long &, std::map<std::string, float> &>())
+                .def("getRate", &msmrdMarkovModel::getRate);
     }
 
 }
