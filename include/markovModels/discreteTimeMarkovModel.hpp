@@ -16,6 +16,9 @@ namespace msmrd {
 
         void propagate(particleMS &part, int ksteps) override;
 
+        void propagateNoUpdate(particleMS &part, int ksteps);
+
+
     };
 
 }
