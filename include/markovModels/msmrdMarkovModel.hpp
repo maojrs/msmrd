@@ -17,26 +17,21 @@ namespace msmrd {
      */
     class msmrdMarkovModel {
     protected:
-        const long double tolerance = 1 * pow(10.0L, -10);
         long seed;
         std::map<std::string, float> rateDictionary;
         std::map<std::string, ctmsm> ctmsmDictionary = {};
     public:
         unsigned int nstates;
         unsigned int numDiscreteOrientations;
-        double lagtime = 0;
         /**
-        * @param msmid ID of the msm, corresponds to the particle type
-        * @param tolerance tolerance limit for MSM integrity check
-        * @param randg random number generator class based on mt19937
+        * @param seed variable for random number generation (Note values of seed <= -1 correspond to random device)
         * @param rateDictionary dictionary relating transitions to its corresponding rates. The keys
         * are strings of the form "state1->state2". The bound states hava b before the number, and the transition
         * states are denoted with duple integers.
         * @param ctmsmDictionary dicitionary mapping keys of relevant transitions to the corresponding
-        * Markov model.
+        * continuous time Markov model.
         * @param nstates number of states in the msm (including unbound state)
         * @param numDiscreteOrientations number of Galerkin discrete orientations of one particle.
-        * @param lagtime msm lagtime (in ctmsm it is calculated after each propagation step)
         */
 
         msmrdMarkovModel(unsigned int nstates, unsigned int numDiscreteOrientations,
@@ -44,15 +39,9 @@ namespace msmrd {
 
         void generateMarkovModels();
 
-        float getRate(std::string key) {
-            auto search = rateDictionary.find(key);
-            return search->second;
-        }
+        float getRate(std::string key);
 
-        ctmsm getMSM(std::string key) {
-            auto search = ctmsmDictionary.find(key);
-            return search->second;
-        }
+        ctmsm getMSM(std::string key);
 
     };
 

@@ -15,7 +15,7 @@ namespace msmrd {
      *  @param tempmatrix reference to the transition rate/transition probability matrix
      *  @param lagtime lagtime used by Markov model, in the case of MSMs it will be a fixed
      *  value, for CTMSM it will change in each iteration.
-     *  @param seed variable for random number generation (Note seed = -1 corresponds to random device)
+     *  @param seed variable for random number generation (Note values of seed <= -1 correspond to random device)
      */
     markovModel::markovModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed)
             : msmid(msmid), lagtime(lagtime), seed(seed) {

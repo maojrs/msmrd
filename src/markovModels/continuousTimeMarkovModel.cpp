@@ -9,7 +9,9 @@ namespace msmrd {
     /**
      * Implementation of continuous-time msm (ctmsm) class, see msmbase parent class for parameter description.
      */
-    continuousTimeMarkovStateModel::continuousTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, long seed)
+    continuousTimeMarkovStateModel::continuousTimeMarkovStateModel(int msmid,
+                                                                   std::vector<std::vector<double>> &tempmatrix,
+                                                                   long seed)
             : markovModel(msmid, tempmatrix, 0.0, seed) {
         // Verify CTMSM transition rate matrix rows sum to 0
         double long rowsum;

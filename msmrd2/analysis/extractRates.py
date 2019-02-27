@@ -88,9 +88,12 @@ def extractRates(discreteTrajectories, timecountDict, eventcountDict):
     Calculates rates from discrete trajectories. Verify convention used with corresponding trajectory class,
     in this case: 0-unbound, 1-first bound state, 2-second bound state, ij orientation transition state (patchyDimer)
     :param discreteTrajectories: list of discrete trajectories, i.e. each element is one discrete trajectory
-    :return: {timecountDict, eventcountDict} dictionaries that maps state label to accumulated time
-    to transition and to number of events found for that particular transition. The dictionary keys
-    have the form stateA->stateB
+    :return: {rateDict, timecountDict, eventcountDict} the second two dictionaries map state label to accumulated time
+    to transition and to number of events found for that particular transition. The first dictionary returns the
+    rates corresponding to each transition. The dictionary keys have the form stateA->stateB; if the state is a bound
+    state, the key is a "b" followed by the state number. For the transision states composed by two integers,
+    correspond to the two closest orientational discrete states of each of the two particles (touched by a line
+    between the two centers of mass).
     '''
     for dtraj in discreteTrajectories:
         # Loop over one trajectory values

@@ -206,7 +206,9 @@ TEST_CASE("Initialization of ctmsm dictionary in msmrdMarkovModel class", "[msmr
                                                     {"12->b1", 4.0}, {"12->b2", 12.0} };
     std::vector<std::vector<double>> tmatrix1 = { {-8, 5, 3}, {0, 0, 0}, {0, 0, 0} };
     std::vector<std::vector<double>> tmatrix2 = { {-16, 4, 12}, {0, 0, 0}, {0, 0, 0} };
+    // Create an msmMarkovModel
     auto myMSM = msmrdMarkovModel(nstates, numDiscreteOrientations, -1, rateDictionary);
+    // Check if the initialization of ctmsms in msmrdMarkovmodel is done correctly.
     auto extractedMSM1 = myMSM.getMSM("11");
     auto extractedMSM2 = myMSM.getMSM("12");
     auto extractedTmatrix1 = extractedMSM1.getTmatrix();
