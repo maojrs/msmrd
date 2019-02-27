@@ -4,9 +4,11 @@
 
 #pragma once
 #include "integrators/integrator.hpp"
+#include "markovModels/msmrdMarkovModel.hpp"
 #include "overdampedLangevinMarkovSwitch.hpp"
 
 namespace msmrd {
+    using msmrdMSM = msmrd::msmrdMarkovModel;
     /**
      * Base class for msmrd integration (coupling MSM and reaction-diffusion)
      */
@@ -18,7 +20,7 @@ namespace msmrd {
         msmrdIntegrator(double dt, long seed, std::string particlesbodytype);
 
         // Redefine integrate function
-        void integrate(std::vector<particle> &parts);
+        void integrate(std::vector<particle> &parts, msmrdMSM &masterMSM);
     };
 
 
