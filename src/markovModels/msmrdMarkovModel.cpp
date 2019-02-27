@@ -29,9 +29,9 @@ namespace msmrd{
         int msmid = 0;
         for (int i = 1; i <= numDiscreteOrientations; i++){
             for (int j = i; j <= numDiscreteOrientations; j++){
+                // Reste values of transitio matrix to zero.
+                transitionMatrix = std::vector<std::vector<double>> (nstates, std::vector<double> (nstates, 0));
                 for (int k = 1; k <= numBoundStates; k++) {
-                    // Reste values of transitio matrix to zero.
-                    transitionMatrix = std::vector<std::vector<double>> (nstates, std::vector<double> (nstates, 0));
                     // Extract on rates to bound states
                     auto key = std::to_string(i) + std::to_string(j) + "->b" + std::to_string(k);
                     auto search = rateDictionary.find(key);

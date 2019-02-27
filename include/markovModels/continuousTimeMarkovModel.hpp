@@ -27,5 +27,6 @@ namespace msmrd {
         std::vector<double> getLambda0() const { return lambda0; };
 
         std::vector<std::vector<double>> getRatescumsum() const { return ratescumsum; };
+
     };
 }

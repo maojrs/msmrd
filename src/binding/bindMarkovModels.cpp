@@ -29,6 +29,7 @@ namespace msmrd {
                 })
                 .def("setD", &msm::setD)
                 .def("setDrot", &msm::setDrot)
+                .def("getTransitionMatrix", &ctmsm::getTmatrix)
                 .def("propagate", &msm::propagate);
 
         py::class_<ctmsm, markovModel>(m, "continuousTimeMarkovStateModel", "continuous time Markov state model (MSM ID, "
@@ -46,13 +47,15 @@ namespace msmrd {
                 })
                 .def("setD", &ctmsm::setD)
                 .def("setDrot", &ctmsm::setDrot)
+                .def("getTransitionMatrix", &ctmsm::getTmatrix)
                 .def("propagate", &ctmsm::propagate);
 
         py::class_<msmrdMarkovModel>(m, "msmrdMarkovModel", "continuous time Markov state model specialized to use with"
                                                             "MSM/RD integration (num. of states, num. discrete "
                                                             "orientations, seed, rate dictionary")
                 .def(py::init<unsigned int &, unsigned int &, long &, std::map<std::string, float> &>())
-                .def("getRate", &msmrdMarkovModel::getRate);
+                .def("getRate", &msmrdMarkovModel::getRate)
+                .def("getMSM", &msmrdMarkovModel::getMSM);
     }
 
 }

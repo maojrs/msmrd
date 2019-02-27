@@ -7,6 +7,7 @@
 #include "potentials/patchyParticle.hpp"
 #include "markovModels/discreteTimeMarkovModel.hpp"
 #include "markovModels/continuousTimeMarkovModel.hpp"
+#include "markovModels/msmrdMarkovModel.hpp"
 #include "integrators/overdampedLangevin.hpp"
 #include "simulation.hpp"
 #include "trajectories/trajectory.hpp"
@@ -196,6 +197,22 @@ TEST_CASE("Fundamental CTMSM parameters and propagation test", "[ctmsm]") {
         partMS2.updateState();
         REQUIRE(partMS.getState() == partMS2.getState());
     }
+}
+
+TEST_CASE("Initialization of ctmsm dictionary in msmrdMarkovModel class", "[msmrdMarkovModel]") {
+    int nstates = 3;
+    int numDiscreteOrientations = 6;
+    std::map<std::string, float> rateDictionary = { {"11->b1", 5.0}, {"11->b2", 3.0},
+                                                    {"12->b1", 4.0}, {"12->b2", 12.0} };
+    std::vector<std::vector<double>> tmatrix1 = { {-8, 5, 3}, {0, 0, 0}, {0, 0, 0} };
+    std::vector<std::vector<double>> tmatrix2 = { {-16, 4, 12}, {0, 0, 0}, {0, 0, 0} };
+    auto myMSM = msmrdMarkovModel(nstates, numDiscreteOrientations, -1, rateDictionary);
+    auto extractedMSM1 = myMSM.getMSM("11");
+    auto extractedMSM2 = myMSM.getMSM("12");
+    auto extractedTmatrix1 = extractedMSM1.getTmatrix();
+    auto extractedTmatrix2= extractedMSM2.getTmatrix();
+    REQUIRE(extractedTmatrix1 == tmatrix1);
+    REQUIRE(extractedTmatrix2 == tmatrix2);
 }
 
 TEST_CASE("Pair Potentials consistency", "[potentials]") {

@@ -21,7 +21,6 @@ namespace msmrd {
         long seed;
         std::map<std::string, float> rateDictionary;
         std::map<std::string, ctmsm> ctmsmDictionary = {};
-        //std::vector<ctmsm> ctmsmList = {};
     public:
         unsigned int nstates;
         unsigned int numDiscreteOrientations;
@@ -45,7 +44,15 @@ namespace msmrd {
 
         void generateMarkovModels();
 
-        float getRate(std::string key) {return rateDictionary[key];}
+        float getRate(std::string key) {
+            auto search = rateDictionary.find(key);
+            return search->second;
+        }
+
+        ctmsm getMSM(std::string key) {
+            auto search = ctmsmDictionary.find(key);
+            return search->second;
+        }
 
     };
 

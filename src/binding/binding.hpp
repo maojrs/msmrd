@@ -7,6 +7,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
+#include <markovModels/continuousTimeMarkovModel.hpp>
 #include "particle.hpp"
 
 /* Needed to connect lists/arrays of particles in python with cpp integrator methods.
@@ -15,6 +16,7 @@ using myParticle = msmrd::particle;
 using myParticleMS = msmrd::particleMS;
 PYBIND11_MAKE_OPAQUE(std::vector<myParticle>);
 PYBIND11_MAKE_OPAQUE(std::vector<myParticleMS>);
+
 
 namespace py = pybind11;
 

@@ -15,6 +15,7 @@ namespace msmrd {
                                      long seed);
 
         void propagate(particleMS &part, int ksteps) override;
+
     };
 
 }
