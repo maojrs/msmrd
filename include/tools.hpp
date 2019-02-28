@@ -41,10 +41,16 @@ namespace msmrdtools {
      * to angle of rotation to its quaternion representation. */
     quaternion<double> axisangle2quaternion(const vec3<double> &phi);
 
+    // Converts quaternion to axis-angle representation.
+    vec3<double> quaternion2axisangle(const quaternion<double> q);
+
     // Rotates vector p by rotation represented by quaternion q.
     vec3<double> rotateVec(vec3<double> p, quaternion<double> q);
 
     // Calculate distance between quaternions/rotations
     double quaternionDistance(quaternion<double> q1, quaternion<double> q2);
+
+    // Calculate minimum rotation angle along some axis to reach q2 from q1.
+    double quaternionAngleDistance(quaternion<double> q1, quaternion<double> q2);
 }
 

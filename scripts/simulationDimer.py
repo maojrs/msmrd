@@ -49,13 +49,14 @@ def runParallelSims(simnumber):
     # Simulation parameters
     timesteps = 20000000 # 200000000 #5000
     bufferSize = 1024
-    stride = 2500 #1
+    stride = 250 #1
     outTxt = False
     outH5 = True
     outChunked = True
     # Folder included in filename must exist (and preferably empty), otherwise H5
     # fails (might fail with parallel python) to write the data.
-    filename = "../data/dimer/simDimer" + "{:04d}".format(simnumber)
+    filename = "../data/dimer/simDimer_t" + "{:.2E}".format(timesteps)  \
+               + "_s{:d}".format(stride) + "_{:04d}".format(simnumber)
     #filename = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer_discrete/simDimer" + "{:04d}".format(simnumber)
     trajtype = "patchyDimer"
 
@@ -64,7 +65,7 @@ def runParallelSims(simnumber):
     print("Simulation " + str(simnumber) + ", done.")
 
 # Runs several simulations in parallel
-Nsimulations = 10 #200
+Nsimulations = 100 #200
 num_cores = multiprocessing.cpu_count()
 pool = Pool(processes=num_cores)
 iterator = [i for i in range(Nsimulations)]

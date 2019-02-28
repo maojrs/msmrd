@@ -39,6 +39,17 @@ namespace msmrdtools {
         }
     }
 
+    /* Converts quaternion to angle-axis representation, where
+     * the vector indicates axis of rotation and length indicate degrees of rotation. */
+    vec3<double> quaternion2axisangle(const quaternion<double> q) {
+        vec3<double> phi = {q[1], q[2], q[3]};
+        double qnorm = phi.norm();
+        phi = phi / qnorm;
+        double theta = 2 * std::atan2(qnorm, q[0]);
+        phi = phi * theta;
+        return phi;
+    }
+
     // Rotates vector p by rotation represented by quaternion q.
     vec3<double> rotateVec(vec3<double> p, quaternion<double> q) {
         vec3<double> result;
@@ -55,6 +66,14 @@ namespace msmrdtools {
     double quaternionDistance(quaternion<double> q1, quaternion<double> q2) {
         double innerProduct = q1[0]*q2[0] + q1[1]*q2[1] + q1[2]*q2[2] + q1[3]*q2[3];
         return 1.0 - innerProduct*innerProduct;
+    }
+
+    /* Calculate minimum rotation angle along some axis to reach q2 from q1.
+     * Output between 0 and 2pi. */
+    double quaternionAngleDistance(quaternion<double> q1, quaternion<double> q2) {
+        quaternion<double> relquat = q2 * q1.conj();
+        vec3<double> relangle = quaternion2axisangle(relquat);
+        return relangle.norm();
     }
 
 }
