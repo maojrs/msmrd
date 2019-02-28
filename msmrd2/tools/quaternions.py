@@ -77,3 +77,7 @@ def renormalize(q):
     newq = q/qnorm
     return newq
 
+def quaternionDistance(q1, q2):
+    innerProduct = q1[0]*q2[0] + q1[1]*q2[1] + q1[2]*q2[2] + q1[3]*q2[3]
+    return 1.0 - innerProduct*innerProduct;
+

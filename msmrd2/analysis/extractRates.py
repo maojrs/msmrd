@@ -86,7 +86,8 @@ def createStatesDictionaries(boundstates, orientations):
 def extractRates(discreteTrajectories, timecountDict, eventcountDict):
     '''
     Calculates rates from discrete trajectories. Verify convention used with corresponding trajectory class,
-    in this case: 0-unbound, 1-first bound state, 2-second bound state, ij orientation transition state (patchyDimer)
+    in this case: 0-unbound, 1-first bound state, 2-second bound state, 3 is a transition state, not relevant for
+    this calculation, ij orientation transition state (patchyDimer)
     :param discreteTrajectories: list of discrete trajectories, i.e. each element is one discrete trajectory
     :return: {rateDict, timecountDict, eventcountDict} the second two dictionaries map state label to accumulated time
     to transition and to number of events found for that particular transition. The first dictionary returns the
@@ -101,7 +102,7 @@ def extractRates(discreteTrajectories, timecountDict, eventcountDict):
             # Make sure there is a transition and that neither the current state nor the endstate are zero
             state = dtraj[i]
             endstate = dtraj[i+1]
-            if (state != endstate) and (state != 0) and (endstate != 0):
+            if (state != endstate) and (state != 0) and (endstate != 0) and (state != 3) and (endstate != 3):
                 # If neither the current state nor the end state is one, don't store transition (skip one cycle in loop).
                 if (state != 1 and endstate != 1 and state != 2 and endstate !=2):
                     continue
@@ -131,3 +132,45 @@ def extractRates(discreteTrajectories, timecountDict, eventcountDict):
             rateDict[key] = timecountDict[key]/eventcountDict[key]
 
     return rateDict, timecountDict, eventcountDict
+
+
+def listIndexSplit(inputList, *args):
+    '''
+    Function that splits inputList into smaller list by slicing in the indexes given by *args.
+    :param inputList:
+    :param args: int indexes where list should be splitted (Note to convert a
+    list "mylist" into *args just do: *mylist)
+    :return: list of sliced lists
+    If extra arguments were passed prepend the 0th index and append the final
+    # index of the passed list, in order toa v check for oid checking the start
+    # and end of args in the loop. Also, add one in args for correct indexing.
+    '''
+    if args:
+        args = (0,) + tuple(data+1 for data in args) + (len(inputList)+1,)
+    # Slice list and return list of lists.
+    slicedLists = []
+    for start, end in zip(args, args[1:]):
+        slicedLists.append(inputList[start:end-1])
+    return slicedLists
+
+def splitDiscreteTrajs(discreteTrajs, unboundStateIndex = 0):
+    '''
+    :param discreteTrajs: list of discrete trajectories
+    :param unboundStateIndex: index of the unbound state used to
+    decide where to cut the trajectories, normally we choose it to be
+    zero.
+    :return: List of sliced trajectories
+    '''
+    slicedDtrajs = []
+    trajnum = 0
+    for dtraj in discreteTrajs:
+        # Slice trajectory using zeros as reference point
+        indexZeros = np.where(dtraj==unboundStateIndex)
+        slicedlist = listIndexSplit(dtraj, *indexZeros[0])
+        # Remove the empty arrays
+        for array in slicedlist:
+            if array.size > 1:
+                slicedDtrajs.append(array)
+        trajnum += 1
+        print("Trajectory ", trajnum, " of ", len(discreteTrajs), " done.", end="\r")
+    return slicedDtrajs
