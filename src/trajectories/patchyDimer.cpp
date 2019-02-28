@@ -71,7 +71,7 @@ namespace msmrd {
         relOrientations[6] = relOrientations[2].conj();
         relOrientations[7] = relOrientations[3].conj();
 
-        // Looping over all equivalent relative prientations, determins if it is in state A (1) or B (2)
+        // Looping over all equivalent relative orientations, determines if it is in state A (1) or B (2)
         for (auto &relOrient : relOrientations) {
             if (msmrdtools::quaternionDistance(relOrient, rotMetastableStates[0]) < tolerance) {
                 return 1;
@@ -96,7 +96,7 @@ namespace msmrd {
         rotMetastableStates.resize(numStates);
         axisAngleVecs[0] = vec3<double>(0, 0, M_PI - 3.0*M_PI/5);
         axisAngleVecs[1] = vec3<double>(0, 0, M_PI);
-        for (int i = 1; i < numStates; i++){
+        for (int i = 0; i < numStates; i++){
             rotMetastableStates[i] = msmrdtools::axisangle2quaternion(axisAngleVecs[i]);
         }
     }
