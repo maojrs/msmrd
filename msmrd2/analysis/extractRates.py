@@ -2,6 +2,9 @@ import h5py
 import numpy as np
 import msmrd2.tools as msmrdtls
 import itertools
+import pyemma
+import msmtools.analysis
+
 
 
 def loadTrajectory(fnamebase, fnumber):
@@ -92,7 +95,7 @@ def extractRates(discreteTrajectories, timecountDict, eventcountDict):
     :return: {rateDict, timecountDict, eventcountDict} the second two dictionaries map state label to accumulated time
     to transition and to number of events found for that particular transition. The first dictionary returns the
     rates corresponding to each transition. The dictionary keys have the form stateA->stateB; if the state is a bound
-    state, the key is a "b" followed by the state number. For the transision states composed by two integers,
+    state, the key is a "b" followed by the state number. For the transition states composed by two integers,
     correspond to the two closest orientational discrete states of each of the two particles (touched by a line
     between the two centers of mass).
     '''
@@ -129,9 +132,49 @@ def extractRates(discreteTrajectories, timecountDict, eventcountDict):
     rateDict = {}
     for key in timecountDict:
         if eventcountDict[key] != 0:
-            rateDict[key] = timecountDict[key]/eventcountDict[key]
+            rateDict[key] = 1.0/(timecountDict[key]/eventcountDict[key])
 
     return rateDict, timecountDict, eventcountDict
+
+
+def extractRatesMSM(discreteTrajectories, lagtime, boundstates):
+    '''
+    Construct an MSM and extract rates from it using pyemma and msmtools. These rates differ from the ones
+    obtained with extractRates due to the fact that this takes all possible transmission pathways within a discrete
+    time MSM (see transition path theory (TPT) to understand one possible way of obtaing these mfpts).
+    :param discreteTrajectories: raw discrete trajectories including the unbound state.
+    :param lagtime: preferred lagtime chose for MSM (might need tweaking for each case)
+    :param boundstates: numbe of boundstates
+    :return rateDict: dictionary that maps transition with rates. The dictionary keys have the form
+    "stateA->stateB"; if the state is a bound state, the key is a "b" followed by the state number.
+    For the transition states composed by two integers, they correspond to the two closest orientational
+    discrete states of each of the two particles (touched by a line between the two centers of mass). Also
+    note rates need to be scale by dt.
+    '''
+    unboundStateIndex = 0
+    # Slice trajectories getting rid of the unbound state 0
+    slicedDtrajs = splitDiscreteTrajs(discreteTrajectories, unboundStateIndex)
+    # Create MSM between transision states and bound states
+    mainmsm = pyemma.msm.estimate_markov_model(slicedDtrajs, lagtime, reversible=True)
+    # The active set keep track of the indexes used by pyemma and the ones used to describe the state in our model.
+    activeSet = mainmsm.active_set
+    rateDict = {}
+    # Loop over active set, where "i" is the index in pyemma for state "state".
+    for i, originState in enumerate(activeSet):
+        for j, transitionState in enumerate(activeSet):
+            if i != j:
+                originKey = str(originState)
+                transitionKey = str(transitionState)
+                if (i < boundstates):
+                    originKey = 'b' + originKey
+                if (j < boundstates):
+                    transitionKey = 'b' + transitionKey
+                key = originKey + '->' + transitionKey
+                mfpt = msmtools.analysis.mfpt(mainmsm.transition_matrix, i, j)
+                rateDict[key] = 1.0/mfpt # Scaling by dt*stride not taken into account.
+    return rateDict
+
+
 
 
 def listIndexSplit(inputList, *args):

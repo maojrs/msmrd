@@ -27,7 +27,7 @@ namespace msmrd {
         std::vector<quaternion<double>> symmetryQuaternions{{1,0,0,0}};
         std::unique_ptr<spherePartition> spherePart;
         int angularStates;
-        double tolerance = 0.2;
+        double tolerance = 0.25;
         /*
          * @param rotMetastableStates[X] correspond to the list of relative rotations that correspond to a
          * metastable state/region X. Each rotation is represented by a quaternion.
