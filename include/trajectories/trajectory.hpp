@@ -8,6 +8,7 @@
 #include <vector>
 #include <fstream>
 #include <iterator>
+#include<iostream>
 //#include <H5f90i.h>
 #include "H5Cpp.h"
 #include "particle.hpp"
@@ -81,44 +82,6 @@ namespace msmrd {
                                std::vector<std::vector<scalar>> localdata);
 
     };
-
-    /**
-     * Class to store position only trajectories
-     */
-    class trajectoryPosition: public trajectory {
-    public:
-
-        trajectoryPosition(unsigned long Nparticles, int bufferSize);
-
-        void sample(double time, std::vector<particle> &particleList) override;
-
-        void sampleRelative(double time, std::vector<particle> &particleList) override;
-
-        // Empty function to be overwritten by child classes if neccesary
-        void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override {};
-
-    };
-
-
-    /**
-     * Class to store trajectories with position and orientation (given by a quaternion)
-     */
-    class trajectoryPositionOrientation : public trajectory {
-    public:
-
-        trajectoryPositionOrientation(unsigned long Nparticles, int bufferSize);
-
-        void sample(double time, std::vector<particle> &particleList) override;
-
-        void sampleRelative(double time, std::vector<particle> &particleList) override;
-
-        // Empty function to be overwritten by child classes if neccesary
-        void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override {};
-
-        void printTime();
-
-    };
-
 
 
     // Templated implementation of write2file function: writes data into normal text file

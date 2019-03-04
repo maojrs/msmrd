@@ -4,7 +4,7 @@
 
 #pragma once
 #include <memory>
-#include "trajectory.hpp"
+#include "trajectoryPositionOrientation.hpp"
 #include "spherePartition.hpp"
 #include "tools.hpp"
 

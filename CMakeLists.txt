@@ -54,8 +54,11 @@ set(SOURCES
         src/potentials/patchyProteinMarkovSwitch.cpp
         src/potentials/potentials.cpp
         src/trajectories/patchyDimer.cpp
+        src/trajectories/trajectory.cpp
+        src/trajectories/trajectoryPosition.cpp
+        src/trajectories/trajectoryPositionOrientation.cpp
         src/tools.cpp
-        src/trajectories/trajectory.cpp )
+        )
 
 set(PY_SOURCES
         src/binding/binding.hpp
@@ -97,6 +100,8 @@ set(PY_SOURCES
         include/potentials/patchyProteinMarkovSwitch.hpp
         include/trajectories/patchyDimer.hpp
         include/trajectories/trajectory.hpp
+        include/trajectories/trajectoryPosition.hpp
+        include/trajectories/trajectoryPositionOrientation.hpp
         )
 
 add_library(msmrd2core SHARED ${SOURCES})

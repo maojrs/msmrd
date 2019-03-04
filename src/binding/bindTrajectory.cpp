@@ -1,5 +1,6 @@
 #include "binding.hpp"
-#include "trajectories/trajectory.hpp"
+#include "trajectories/trajectoryPosition.hpp"
+#include "trajectories/trajectoryPositionOrientation.hpp"
 
 
 namespace msmrd {
