@@ -86,12 +86,16 @@ def createStatesDictionaries(boundstates, orientations):
     return timecountDict, eventcountDict
 
 
-def extractRates(discreteTrajectories, timecountDict, eventcountDict):
+def extractRates(discreteTrajectories, boundstates, orientations):
     '''
     Calculates rates from discrete trajectories. Verify convention used with corresponding trajectory class,
     in this case: 0-unbound, 1-first bound state, 2-second bound state, 3 is a transition state, not relevant for
     this calculation, ij orientation transition state (patchyDimer)
     :param discreteTrajectories: list of discrete trajectories, i.e. each element is one discrete trajectory
+    :param boundstates: number of bound states. They will be labelled as b0, b1, .... (up to 9 supported
+    with current indexing implementation. Simple modification can support more).
+    :param orientations: number of discrete orientations (e.g. 3), which determine the number of possible
+    transition states between relative orientations (e.g. 11, 12, 13, 22, 23, 33).
     :return: {rateDict, timecountDict, eventcountDict} the second two dictionaries map state label to accumulated time
     to transition and to number of events found for that particular transition. The first dictionary returns the
     rates corresponding to each transition. The dictionary keys have the form stateA->stateB; if the state is a bound
@@ -99,19 +103,24 @@ def extractRates(discreteTrajectories, timecountDict, eventcountDict):
     correspond to the two closest orientational discrete states of each of the two particles (touched by a line
     between the two centers of mass).
     '''
+    # Create dictionaries to count events and times, and list with bound states.
+    timecountDict, eventcountDict = createStatesDictionaries(boundstates, orientations)
+    boundstatesList = np.arange(0, boundstates, 1) + 1
+    tstep = 1
+
+    # Extract rates counting transitions and the times each transition takes
     for dtraj in discreteTrajectories:
         # Loop over one trajectory values
         for i in range(len(dtraj)-1):
             # Make sure there is a transition and that neither the current state nor the endstate are zero
             state = dtraj[i]
             endstate = dtraj[i+1]
-            if (state != endstate) and (state != 0) and (endstate != 0) and (state != 3) and (endstate != 3):
-                # If neither the current state nor the end state is one, don't store transition (skip one cycle in loop).
-                if (state != 1 and endstate != 1 and state != 2 and endstate !=2):
+            if (state != endstate) and (state != 0) and (endstate != 0): # and (state != 3) and (endstate != 3):
+                # If neither the current state nor the end state is a boundstate, don't store transition (skip one cycle in loop).
+                if ((state not in boundstatesList) and (endstate not in boundstatesList)):
                     continue
                 # Count how many timesteps the trajectory remained in current state before transitioning to endstate
                 prevstate = state
-                tstep = 1
                 while (prevstate == state):
                     prevstate = dtraj[i-tstep]
                     if (prevstate == state):
@@ -155,7 +164,7 @@ def extractRatesMSM(discreteTrajectories, lagtime, boundstates):
     # Slice trajectories getting rid of the unbound state 0
     slicedDtrajs = splitDiscreteTrajs(discreteTrajectories, unboundStateIndex)
     # Create MSM between transision states and bound states
-    mainmsm = pyemma.msm.estimate_markov_model(slicedDtrajs, lagtime, reversible=True)
+    mainmsm = pyemma.msm.estimate_markov_model(slicedDtrajs, lagtime, reversible=False)
     # The active set keep track of the indexes used by pyemma and the ones used to describe the state in our model.
     activeSet = mainmsm.active_set
     rateDict = {}
@@ -170,7 +179,9 @@ def extractRatesMSM(discreteTrajectories, lagtime, boundstates):
                 if (j < boundstates):
                     transitionKey = 'b' + transitionKey
                 key = originKey + '->' + transitionKey
-                mfpt = msmtools.analysis.mfpt(mainmsm.transition_matrix, i, j)
+                # These two are equivalent statements
+                #mfpt = msmtools.analysis.mfpt(mainmsm.transition_matrix, i, j, tau = lagtime)
+                mfpt = mainmsm.mfpt(i, j) # already takes lagtime into consideration
                 rateDict[key] = 1.0/mfpt # Scaling by dt*stride not taken into account.
     return rateDict
 

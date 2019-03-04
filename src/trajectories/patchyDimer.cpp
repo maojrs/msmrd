@@ -31,29 +31,29 @@ namespace msmrd {
         int secNum1;
         int secNum2;
 
-        // Loops over all possible pairs (only one in this case)
-        for (int i = 0; i < particleList.size(); i++) {
-            for (int j = i + 1; j < particleList.size(); j++) {
-                sample = std::vector<int>{0};
-                // Extract info from two rlevant particles in list
-                orientation1 = particleList[i].orientation;
-                orientation2 = particleList[j].orientation;
-                relativePosition = particleList[j].position - particleList[i].position;
-                // Rotate the relative position vector to the frame of reference fixed in each of the two particles.
-                rotatedRij = msmrdtools::rotateVec(relativePosition, orientation1);
-                rotatedRji = msmrdtools::rotateVec(-1*relativePosition, orientation2);
-                // Evaluate if the two particles are in a bound state
-                if (relativePosition.norm() < 1.25) {
-                    sample = std::vector<int>{ getBoundState(orientation1, orientation2) };
-                } else if (relativePosition.norm() < 2.25) {
-                    // Get corresponding section numbers from spherical partition to classify its state
-                    secNum1 = spherePart->getSectionNumber(rotatedRij);
-                    secNum2 = spherePart->getSectionNumber(rotatedRji);
-                    sample  = std::vector<int>{ std::min(secNum1,secNum2)*10 + std::max(secNum1,secNum2) };
-                }
-                discreteTrajectoryData.push_back(sample);
-            }
+        // Extract discrete trajectory from 2 particle simulation
+        int i = 0; // index of particle 1
+        int j = 1; // index of particle 2
+        sample = std::vector<int>{0};
+        // Extract info from two rlevant particles in list
+        orientation1 = particleList[i].orientation;
+        orientation2 = particleList[j].orientation;
+        relativePosition = particleList[j].position - particleList[i].position;
+        // Rotate the relative position vector to the frame of reference fixed in each of the two particles.
+        rotatedRij = msmrdtools::rotateVec(relativePosition, orientation1);
+        rotatedRji = msmrdtools::rotateVec(-1*relativePosition, orientation2);
+        // Evaluate if the two particles are in a bound state
+        if (relativePosition.norm() < 1.25) {
+            sample = std::vector<int>{ getBoundState(orientation1, orientation2) };
+        } else if (relativePosition.norm() < 2.25) {
+            // Get corresponding section numbers from spherical partition to classify its state
+            secNum1 = spherePart->getSectionNumber(rotatedRij);
+            secNum2 = spherePart->getSectionNumber(rotatedRji);
+            sample  = std::vector<int>{ std::min(secNum1,secNum2)*10 + std::max(secNum1,secNum2) };
         }
+        prevsample = sample[0];
+        discreteTrajectoryData.push_back(sample);
+
     };
 
     /* Given two orientations, return either bound state A (1) or bound state B (2).
@@ -80,7 +80,7 @@ namespace msmrd {
                 return 2;
             }
         }
-        return 3;
+        return prevsample;
     };
 
     /*

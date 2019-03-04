@@ -13,12 +13,13 @@ namespace msmrd {
      * Trajectory class for patchy  dimer trajectories. Patchy dimer here refers to two
      * patchy particles with two patches. The main difference with the general class
      * trajectoryPositionOrientation is that this class can sample the discrete trajectory that is
-     * specific for each example/application. In short words,  it chooses how to discretize the full
-     * trajectory into a discretized trajectory to be analyzed and extracted into
+     * specific for the patchy dimer application. In short words,  it chooses how to discretize the full
+     * trajectory of two particle into a discretized trajectory to be analyzed and extracted into
      * a Markov state model.
      *
-     * Patchy dimer will have one unbound state (0), two bound states (1,2) and
+     * Patchy dimer will have one unbound state (0), two (or more) bound states (1,2) and
      * angularStates = numSections(numSections+1)/2 angular discrete states (3-3+angularStates).
+     * Note in the current indexing implementation only up to 9 bound states are supported.
      */
     class patchyDimer : public trajectoryPositionOrientation {
     private:
@@ -27,6 +28,7 @@ namespace msmrd {
         std::vector<quaternion<double>> symmetryQuaternions{{1,0,0,0}};
         std::unique_ptr<spherePartition> spherePart;
         int angularStates;
+        int prevsample = 0;
         double tolerance = 0.25;
         /*
          * @param rotMetastableStates[X] correspond to the list of relative rotations that correspond to a
