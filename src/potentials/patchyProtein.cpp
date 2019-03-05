@@ -94,9 +94,9 @@ namespace msmrd {
         vec3<double> patchNormal1;
         vec3<double> patchNormal2;
         vec3<double> rpatch;
-        std::tuple<vec3<double>, vec3<double>> relPosTuple = relativePositionComplete(pos1, pos2);
-        vec3<double> pos1virtual = std::get<0>(relPosTuple); // virtual pos1 if periodic boundary; otherwise pos1.
-        vec3<double> rvec = std::get<1>(relPosTuple); //pos2 - pos1;
+        std::array<vec3<double>, 2> relPos = relativePositionComplete(pos1, pos2);
+        vec3<double> pos1virtual = relPos[0]; // virtual pos1 if periodic boundary; otherwise pos1.
+        vec3<double> rvec = relPos[1]; //pos2 - pos1;
 
         repulsivePotential = quadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
         attractivePotential = quadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
@@ -144,9 +144,9 @@ namespace msmrd {
         vec3<double> force2 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> torque1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> torque2 = vec3<double> (0.0, 0.0, 0.0);
-        std::tuple<vec3<double>, vec3<double>> relPosTuple = relativePositionComplete(pos1, pos2);
-        vec3<double> pos1virtual = std::get<0>(relPosTuple); // virtual pos1 if periodic boundary; otherwise pos1.
-        vec3<double> rvec = std::get<1>(relPosTuple); //pos2 - pos1;
+        std::array<vec3<double>, 2> relPos = relativePositionComplete(pos1, pos2);
+        vec3<double> pos1virtual = relPos[0]; // virtual pos1 if periodic boundary; otherwise pos1.
+        vec3<double> rvec = relPos[1]; //pos2 - pos1;
 
         std::vector<vec3<double>> patchesCoords1;
         std::vector<vec3<double>> patchesCoords2;

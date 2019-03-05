@@ -29,7 +29,7 @@ def runParallelSims(simnumber):
     integrator = odLangevin(dt, seed, bodytype)
 
     # Define boundary (choose either spherical or box)
-    edge = 4
+    edge = 5
     boxBoundary = msmrd2.box(edge, edge, edge,'periodic')
     integrator.setBoundary(boxBoundary)
 

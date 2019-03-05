@@ -60,7 +60,7 @@ namespace msmrd {
 
         vec3<double> relativePosition(vec3<double> p1, vec3<double> p2);
 
-        std::tuple<vec3<double>, vec3<double>> relativePositionComplete(vec3<double> p1, vec3<double> p2);
+        std::array<vec3<double>, 2> relativePositionComplete(vec3<double> p1, vec3<double> p2);
 
     };
 

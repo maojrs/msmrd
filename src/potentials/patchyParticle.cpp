@@ -85,9 +85,9 @@ namespace msmrd{ ;
         vec3<double> pos2 = part2.position;
         quaternion<double> theta1 = part1.orientation;
         quaternion<double> theta2 = part2.orientation;
-        std::tuple<vec3<double>, vec3<double>> relPosTuple = relativePositionComplete(pos1, pos2);
-        vec3<double> pos1virtual = std::get<0>(relPosTuple); // virtual pos1 if periodic boundary; otherwise pos1.
-        vec3<double> rvec = std::get<1>(relPosTuple); //pos2 - pos1;
+        std::array<vec3<double>, 2> relPos = relativePositionComplete(pos1, pos2);
+        vec3<double> pos1virtual = relPos[0]; // virtual pos1 if periodic boundary; otherwise pos1.
+        vec3<double> rvec = relPos[1]; //pos2 - pos1;
 
 
 
@@ -129,9 +129,9 @@ namespace msmrd{ ;
         vec3<double> pos2 = part2.position;
         quaternion<double> theta1 = part1.orientation;
         quaternion<double> theta2 = part2.orientation;
-        std::tuple<vec3<double>, vec3<double>> relPosTuple = relativePositionComplete(pos1, pos2);
-        vec3<double> pos1virtual = std::get<0>(relPosTuple); // virtual pos1 if periodic boundary; otherwise pos1.
-        vec3<double> rvec = std::get<1>(relPosTuple); //pos2 - pos1;
+        std::array<vec3<double>, 2> relPos = relativePositionComplete(pos1, pos2);
+        vec3<double> pos1virtual = relPos[0]; // virtual pos1 if periodic boundary; otherwise pos1.
+        vec3<double> rvec = relPos[1]; //pos2 - pos1;
         
         // auxiliary variables to calculate force and torque
         double repulsiveForceNorm = 0.0;
