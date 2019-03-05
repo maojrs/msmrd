@@ -14,7 +14,7 @@ namespace msmrd {
 
     // Evaluate potential value for two given particles' positions
     double harmonicRepulsion::evaluate(const particle &part1, const particle &part2) {
-        vec3<double> d = part1.position - part2.position;
+        vec3<double> d = relativePosition(part2.position, part1.position); //part1.position - part2.position;
         double R = d.norm();
         if (R > range) {
             return 0;
@@ -27,7 +27,7 @@ namespace msmrd {
     std::array<vec3<double>, 4> harmonicRepulsion::forceTorque(const particle &part1, const particle &part2) {
         vec3<double> force = vec3<double>(0, 0, 0);
         vec3<double> torque = vec3<double>(0, 0, 0);
-        vec3<double> d = part1.position - part2.position;
+        vec3<double> d = relativePosition(part2.position, part1.position); //part1.position - part2.position;
         double R = d.norm();
         if (R > range) {
             force = 0. * d;

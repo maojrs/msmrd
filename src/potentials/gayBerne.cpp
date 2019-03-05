@@ -22,7 +22,7 @@ namespace msmrd {
     double gayBerne::evaluate(const particle &part1, const particle &part2) {
         vec3<double> u1 = part1.orientvector;
         vec3<double> u2 = part2.orientvector;
-        vec3<double> r = part1.position - part2.position;
+        vec3<double> r = relativePosition(part2.position, part1.position); //part1.position - part2.position;
         double rabs = r.norm();
         vec3<double> rhat = r / rabs;
         double ru1 = rhat * u1;
@@ -54,7 +54,7 @@ namespace msmrd {
     std::array<vec3<double>, 4> gayBerne::forceTorque(const particle &part1, const particle &part2) {
         vec3<double> u1 = part1.orientvector;
         vec3<double> u2 = part2.orientvector;
-        vec3<double> r = part1.position - part2.position;
+        vec3<double> r = relativePosition(part2.position, part1.position); //part1.position - part2.position;
         double rabs = r.norm();
         vec3<double> rhat = r / rabs;
         double ru1 = rhat * u1;

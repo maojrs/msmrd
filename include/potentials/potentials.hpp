@@ -6,6 +6,7 @@
 #include "randomgen.hpp"
 #include "quaternion.hpp"
 #include "vec3.hpp"
+#include "boundaries/boundary.hpp"
 
 namespace msmrd {
     /**
@@ -31,7 +32,16 @@ namespace msmrd {
      * particle class like particleMS)
      */
     class pairPotential {
+    protected:
+        boundary *domainBoundary;
+        bool boundaryActive = false;
+        /*
+        * @param *domainBoundary pointer to the boundary object to be used. Useful to compute potentials
+        * in periodic domains. It must point to the same boundary as the integrator.
+        * @param boundaryActive true is boundary is active in the system.
+        */
     public:
+
         pairPotential() = default;
 
         /* Virtual functions to calculate value of potential and force/torque at positions "pos1" and "pos2".
@@ -44,6 +54,13 @@ namespace msmrd {
         virtual std::array<vec3<double>, 4> forceTorque(const particle &part1, const particle &part2) = 0;
 
         std::vector<std::vector<double>> forceTorquePyBind(const particle &part1, const particle &part2);
+
+        // Additional useful functions so potentials can deal with possible periodic boundaries.
+        void setBoundary(boundary *bndry);
+
+        vec3<double> relativePosition(vec3<double> p1, vec3<double> p2);
+
+        std::tuple<vec3<double>, vec3<double>> relativePositionComplete(vec3<double> p1, vec3<double> p2);
 
     };
 

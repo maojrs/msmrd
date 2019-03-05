@@ -55,5 +55,11 @@ namespace msmrdtools {
 
     // Calculates relative distance of two vectors (p1, p2) in a periodic box
     vec3<double> distancePeriodicBox(vec3<double> p1, vec3<double> p2, vec3<double> edgeslength);
+
+    /* Calculates relative distance of two vectors (p1, p2) in a periodic box and returns
+     * virtual position of p1 + relative distance */
+    std::tuple<vec3<double>, vec3<double>> distancePeriodicBoxComplete(vec3<double> p1, vec3<double> p2,
+                                                                       vec3<double> edgeslength);
+
 }
 

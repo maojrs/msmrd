@@ -67,6 +67,9 @@ namespace msmrd {
     void integrator::setBoundary(boundary *bndry) {
         boundaryActive = true;
         domainBoundary = bndry;
+        if (pairPotentialActive) {
+            pairPot->setBoundary(bndry);
+        }
     }
 
 
@@ -82,6 +85,9 @@ namespace msmrd {
     void integrator::setPairPotential(pairPotential *pot) {
         pairPotentialActive = true;
         pairPot = pot;
+        if (boundaryActive) {
+            pairPot->setBoundary( domainBoundary );
+        }
     }
 
 }

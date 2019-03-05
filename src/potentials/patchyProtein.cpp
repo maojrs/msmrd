@@ -94,7 +94,9 @@ namespace msmrd {
         vec3<double> patchNormal1;
         vec3<double> patchNormal2;
         vec3<double> rpatch;
-        vec3<double> rvec = pos2 - pos1;
+        std::tuple<vec3<double>, vec3<double>> relPosTuple = relativePositionComplete(pos1, pos2);
+        vec3<double> rvec = std::get<0>(relPosTuple); //pos2 - pos1;
+        vec3<double> pos1virtual = std::get<1>(relPosTuple); // virtual pos1 if periodic boundary; otherwise pos1.
 
         repulsivePotential = quadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
         attractivePotential = quadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
@@ -109,7 +111,7 @@ namespace msmrd {
             // Loop over all patches
             for (int i = 0; i < patchesCoords1.size(); i++) {
                 patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], theta1);
-                patch1 = pos1 + 0.5*sigma*patchNormal1;
+                patch1 = pos1virtual + 0.5*sigma*patchNormal1;
                 for (int j = 0; j < patchesCoords2.size(); j++) {
                     patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], theta2);
                     patch2 = pos2 + 0.5*sigma*patchNormal2;
@@ -142,7 +144,10 @@ namespace msmrd {
         vec3<double> force2 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> torque1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> torque2 = vec3<double> (0.0, 0.0, 0.0);
-        vec3<double> rvec = pos2 - pos1;
+        std::tuple<vec3<double>, vec3<double>> relPosTuple = relativePositionComplete(pos1, pos2);
+        vec3<double> rvec = std::get<0>(relPosTuple); //pos2 - pos1;
+        vec3<double> pos1virtual = std::get<1>(relPosTuple); // virtual pos1 if periodic boundary; otherwise pos1.
+
         std::vector<vec3<double>> patchesCoords1;
         std::vector<vec3<double>> patchesCoords2;
         // auxiliary variables to calculate force and torque
@@ -172,7 +177,7 @@ namespace msmrd {
             for (int i = 0; i < patchesCoords1.size(); i++) {
                 patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], theta1);
                 patchNormal1 = patchNormal1/patchNormal1.norm();
-                patch1 = pos1 + 0.5*sigma*patchNormal1;
+                patch1 = pos1virtual + 0.5*sigma*patchNormal1;
                 // Loop over all patches of particle 2
                 for (int j = 0; j < patchesCoords2.size(); j++) {
                     patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], theta2);

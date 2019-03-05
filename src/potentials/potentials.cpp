@@ -24,4 +24,33 @@ namespace msmrd {
         return msmrdtools::array2Dtovec2D(forceTorquex);
     }
 
+    // Incorporates integrator's boundary into potential
+    void pairPotential::setBoundary(boundary *bndry) {
+        boundaryActive = true;
+        domainBoundary = bndry;
+    }
+
+    // Calculates relative distance (p2-p1) of two vectors, p1, p2, taking into account possible periodic boundary
+    vec3<double> pairPotential::relativePosition(vec3<double> p1, vec3<double> p2) {
+        // Calculate relative distance. If box periodic boundary, take that into account.
+        if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {
+            auto boxsize = domainBoundary->boxsize;
+            return msmrdtools::distancePeriodicBox(p2, p1, boxsize);
+        } else {
+            return p2 - p1;
+        }
+    };
+
+    /* Calculates relative distance (p2-p1) of two vectors, p1, p2, taking into account possible periodic boundary and
+     * returns virtual position of p1 as well as the relative distance */
+    std::tuple<vec3<double>, vec3<double>> pairPotential::relativePositionComplete(vec3<double> p1, vec3<double> p2){
+        // Calculate relative distance. If box periodic boundary, take that into account.
+        if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {
+            auto boxsize = domainBoundary->boxsize;
+            return msmrdtools::distancePeriodicBoxComplete(p2, p1, boxsize);
+        } else {
+            std::make_tuple(p1, p2 - p1);
+        }
+    };
+
 }
