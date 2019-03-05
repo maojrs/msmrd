@@ -107,16 +107,17 @@ def extractRates(discreteTrajectories, boundstates, orientations):
     # Create dictionaries to count events and times, and list with bound states.
     timecountDict, eventcountDict = createStatesDictionaries(boundstates, orientations)
     boundstatesList = np.arange(0, boundstates, 1) + 1
-    tstep = 1
 
     # Extract rates counting transitions and the times each transition takes
     for dtraj in discreteTrajectories:
+        # Counter for number of steps before transition
+        tstep = 1
         # Loop over one trajectory values
         for i in range(len(dtraj)-1):
             # Make sure there is a transition and that neither the current state nor the endstate are zero
             state = dtraj[i]
             endstate = dtraj[i+1]
-            if (state != endstate) and (state != 0) and (endstate != 0): # and (state != 3) and (endstate != 3):
+            if (state != endstate) and (state != 0) and (endstate != 0):
                 # If neither the current state nor the end state is a boundstate, don't store transition (skip one cycle in loop).
                 if ((state not in boundstatesList) and (endstate not in boundstatesList)):
                     continue
@@ -138,6 +139,7 @@ def extractRates(discreteTrajectories, boundstates, orientations):
                 dictkey = dictkey1 + '->' + dictkey2
                 timecountDict[dictkey] += tstep
                 eventcountDict[dictkey] += 1
+                tstep = 1
     # Scale by the number of events and save in rate Dictionary (note rates need to be scaled by dt)
     rateDict = {}
     for key in timecountDict:
