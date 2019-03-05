@@ -24,8 +24,6 @@ namespace msmrd {
         void enforceOpenBoundary(particle &part) override;
 
     public:
-        vec3<double> boxsize;
-
         /**
          * @param xx box length in x-axis from -x/2 to x/2
          * @param yy box length in y-axis from -y/2 to y2

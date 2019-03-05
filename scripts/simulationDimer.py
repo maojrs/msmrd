@@ -29,9 +29,9 @@ def runParallelSims(simnumber):
     integrator = odLangevin(dt, seed, bodytype)
 
     # Define boundary (choose either spherical or box)
-    radius = 3
-    sphereBoundary = msmrd2.sphere(radius,'reflective')
-    integrator.setBoundary(sphereBoundary)
+    edge = 4
+    boxBoundary = msmrd2.box(edge, edge, edge,'periodic')
+    integrator.setBoundary(boxBoundary)
 
     # Patchy Particle potential with angular dependence definition
     sigma = 1.0

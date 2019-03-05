@@ -11,7 +11,9 @@
 #include<iostream>
 //#include <H5f90i.h>
 #include "H5Cpp.h"
+#include "boundaries/boundary.hpp"
 #include "particle.hpp"
+
 
 
 using namespace std::placeholders;
@@ -30,6 +32,8 @@ namespace msmrd {
         bool firstrun = true;
         std::vector<std::vector<double>> trajectoryData;
         std::vector<std::vector<int>> discreteTrajectoryData;
+        boundary *domainBoundary;
+        bool boundaryActive = false;
     public:
         unsigned long Nparticles;
         int bufferSize;
@@ -46,11 +50,16 @@ namespace msmrd {
          * to work.
          * @param discreteTrajectoryData buffer to store the discretized trajectory data (usually in the form
          * of states given by integers). Therefore, defined as a vector of integers.
+         * @param *domainBoundary pointer to the boundary object to be used. Useful to compute trajectories
+         * in periodic domains. It mus point to the same boundary as the integrator.
+         * @param boundaryActive true is boundary is active in the system.
          */
 
         trajectory(unsigned long Nparticles, int bufferSize);
 
         void emptyBuffer();
+
+        void setBoundary(boundary *bndry);
 
         // Virtual functions to sample from list of particles, store in trajectoryData, and empty data buffer
         virtual void sample(double time, std::vector<particle> &particleList) = 0;

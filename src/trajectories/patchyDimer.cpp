@@ -38,14 +38,20 @@ namespace msmrd {
         // Extract info from two rlevant particles in list
         orientation1 = particleList[i].orientation;
         orientation2 = particleList[j].orientation;
-        relativePosition = particleList[j].position - particleList[i].position;
+        // Calculate relative distance. If box periodic boundary, take that into account.
+        if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {
+            auto boxsize = domainBoundary->boxsize;
+            relativePosition = msmrdtools::distancePeriodicBox(particleList[j].position, particleList[i].position, boxsize);
+        } else {
+            relativePosition = particleList[j].position - particleList[i].position;
+        }
         // Rotate the relative position vector to the frame of reference fixed in each of the two particles.
         rotatedRij = msmrdtools::rotateVec(relativePosition, orientation1);
         rotatedRji = msmrdtools::rotateVec(-1*relativePosition, orientation2);
         // Evaluate if the two particles are in a bound state
-        if (relativePosition.norm() < 1.25) {
+        if (relativePosition.norm() < 1.2) {
             sample = std::vector<int>{ getBoundState(orientation1, orientation2) };
-        } else if (relativePosition.norm() < 2.25) {
+        } else if (relativePosition.norm() < 2.0) {
             // Get corresponding section numbers from spherical partition to classify its state
             secNum1 = spherePart->getSectionNumber(rotatedRij);
             secNum2 = spherePart->getSectionNumber(rotatedRji);

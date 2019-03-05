@@ -64,6 +64,7 @@ namespace msmrd {
         * Note all following potentials default to zero and not every integrator will make use of all this potentials
         * @param *externalPot pointer to external potential
         * @param *pairPot pointer to pair potential between two particles
+        * @param clock keeps track of global time
         */
 
         // Protected abstract functions required by main integrate public routine
@@ -89,28 +90,31 @@ namespace msmrd {
 
     public:
         double clock;
-        /**
-         * @param clock keeps track of global time
-         */
+
 
         integrator(double dt, long seed, std::string particlesbodytype);
 
         // Main public functions definitions
         void integrate(std::vector<particle> &parts);
 
-        double getClock() const { return clock; }
 
-        std::string getParticlesBodyType() const { return particlesbodytype; }
-
-        void setKbT(double kbt) { KbTemp = kbt; }
-
-
-        // Potential and boundary related functions
+        // Getters and setters
         void setBoundary(boundary *bndry);
 
         void setExternalPotential(externalPotential *pot);
 
         void setPairPotential(pairPotential *pot);
+
+        void setKbT(double kbt) { KbTemp = kbt; }
+
+        double getClock() const { return clock; }
+
+        std::string getParticlesBodyType() const { return particlesbodytype; }
+
+        bool isBoundaryActive() { return boundaryActive; }
+
+        boundary* getBoundary() { return domainBoundary; }
+
 
     };
 

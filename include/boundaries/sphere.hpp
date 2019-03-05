@@ -12,8 +12,6 @@ namespace msmrd{
      */
     class sphere : public boundary {
     private:
-        double radius;
-
         void enforcePeriodicBoundary(particle &part) override;
 
         void enforceReflectiveBoundary(particle &part) override;

@@ -12,7 +12,9 @@ namespace msmrd {
      * @param y box length in y-axis from -y/2 to y2
      * @param z box length in z-axis from -z/2 to z/2
      */
-    sphere::sphere(double radius, std::string boundarytype) : radius(radius), boundary(boundarytype) {};
+    sphere::sphere(double newradius, std::string boundarytype) : boundary(boundarytype) {
+        radius = newradius;
+    };
 
     // Enforces periodic box boundary condition
     void sphere::enforcePeriodicBoundary(particle &part) {

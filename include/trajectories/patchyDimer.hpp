@@ -29,7 +29,7 @@ namespace msmrd {
         std::unique_ptr<spherePartition> spherePart;
         int angularStates;
         int prevsample = 0;
-        double tolerance = 0.25;
+        double tolerance = 0.2;
         /*
          * @param rotMetastableStates[X] correspond to the list of relative rotations that correspond to a
          * metastable state/region X. Each rotation is represented by a quaternion.

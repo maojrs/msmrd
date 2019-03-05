@@ -17,7 +17,8 @@ namespace msmrd {
         boxsize = vec3<double>{xx, yy, zz};
     };
 
-    box::box(vec3<double> boxsize, std::string boundarytype) : boxsize(boxsize), boundary(boundarytype) {
+    box::box(vec3<double> newboxsize, std::string boundarytype) : boundary(boundarytype) {
+        boxsize = newboxsize;
         xx = boxsize[0];
         yy = boxsize[1];
         zz = boxsize[2];

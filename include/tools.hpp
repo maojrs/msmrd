@@ -52,5 +52,8 @@ namespace msmrdtools {
 
     // Calculate minimum rotation angle along some axis to reach q2 from q1.
     double quaternionAngleDistance(quaternion<double> q1, quaternion<double> q2);
+
+    // Calculates relative distance of two vectors (p1, p2) in a periodic box
+    vec3<double> distancePeriodicBox(vec3<double> p1, vec3<double> p2, vec3<double> edgeslength);
 }
 

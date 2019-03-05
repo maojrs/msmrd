@@ -53,8 +53,9 @@ def createStatesDictionaries(boundstates, orientations):
     creates two dictionaries to count events and accumulated time for all relevant transitions.
     This is required to obtain the rates from the discrete trajectories.
     :param boundstates: number of bound states. They will be labelled as b0, b1, ....
-    :param orientations: number of discrete orientations (e.g. 3), which determine the number of possible
-    transition states between relative orientations (e.g. 11, 12, 13, 22, 23, 33).
+    :param orientations: number of discrete orientations of one particle, i.e the number of partitions in the
+    sphere around one particle, which determine the number of possible transition states between
+    relative orientations (e.g. for 3 => 11, 12, 13, 22, 23, 33).
     :return: {timecountDict, eventcountDict} empty dictionaries with defined keys that map state label
     to accumulated time to transition and to number of events found for that particular transition.
     The dictionary keys have the form stateA->stateB

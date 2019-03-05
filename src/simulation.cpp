@@ -37,9 +37,12 @@ namespace msmrd {
 
         // Choose correct child class of trajectory given the current type of particles
         if (trajtype == "patchyDimer") {
-            int numSections = 6;
+            int numSections = 7;
             outputDiscreteTraj = true;
-            traj = std::make_unique<patchyDimer>(particleList.size(), bufferSize, 6);
+            traj = std::make_unique<patchyDimer>(particleList.size(), bufferSize, numSections);
+            if (integ.isBoundaryActive()) {
+                traj->setBoundary(integ.getBoundary());
+            }
             numcols = 8;
         } else if (trajtype == "position"){
             traj = std::make_unique<trajectoryPosition>(particleList.size(), bufferSize);

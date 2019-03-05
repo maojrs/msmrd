@@ -27,4 +27,9 @@ namespace msmrd {
         discreteTrajectoryData.clear();
     }
 
+    // Incorporates custom boundary into integrator
+    void trajectory::setBoundary(boundary *bndry) {
+        boundaryActive = true;
+        domainBoundary = bndry;
+    }
 }

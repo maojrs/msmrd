@@ -16,6 +16,8 @@ namespace msmrd {
         std::string boundarytype;
        /*
         * @param boundarytype can be periodic, reflective or open
+        * @param radius size of boundary in case of spherical boundary (simplifies code to have it in parent class)
+        * @param boxsize boundary size in case of box boundary (simplifies code to have it in parent class)
         */
 
         virtual void enforcePeriodicBoundary(particle &part) = 0;
@@ -25,9 +27,16 @@ namespace msmrd {
         virtual void enforceOpenBoundary(particle &part) = 0;
 
     public:
+
+        double radius = 0;
+
+        vec3<double> boxsize = {0, 0, 0};
+
         boundary(std::string boundarytype);
 
         void enforceBoundary(particle &part);
+
+        std::string getBoundaryType() { return boundarytype; }
 
         /** Function to reflect vector
          * @param dr vector pointing from previous position to current position
