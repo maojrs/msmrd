@@ -32,10 +32,11 @@ set(bindings_python_version 3.6)
 set(SOURCES
         src/randomgen.cpp
         src/simulation.cpp
-        src/spherePartition.cpp
         src/boundaries/boundary.cpp
         src/boundaries/box.cpp
         src/boundaries/sphere.cpp
+        src/discretizations/quaternionPartition.cpp
+        src/discretizations/spherePartition.cpp
         src/integrators/integrator.cpp
         src/integrators/msmrdIntegrator.cpp
         src/integrators/overdampedLangevin.cpp
@@ -75,12 +76,13 @@ set(PY_SOURCES
         include/quaternion.hpp
         include/randomgen.hpp
         include/simulation.hpp
-        include/spherePartition.hpp
         include/tools.hpp
         include/vec3.hpp
         include/boundaries/boundary.hpp
         include/boundaries/box.hpp
         include/boundaries/sphere.hpp
+        include/discretizations/quaternionPartition.hpp
+        include/discretizations/spherePartition.hpp
         include/integrators/integrator.hpp
         include/integrators/msmrdIntegrator.hpp
         include/integrators/overdampedLangevin.hpp

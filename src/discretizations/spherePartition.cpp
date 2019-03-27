@@ -1,7 +1,7 @@
 //
 // Created by maojrs on 1/31/19.
 //
-#include "spherePartition.hpp"
+#include "discretizations/spherePartition.hpp"
 
 namespace msmrd{
 
