@@ -86,7 +86,7 @@ def createStatesDictionaries(boundstates, orientations):
             eventcountDict[stateStr] = 0
     return timecountDict, eventcountDict
 
-
+# THIS FUNCTION IS NOT QUITE CORRECT, DO CORRECT IMPLEMENTATION OR DELETE. KEPT FOR NOW AS REFERENCE
 def extractRates(discreteTrajectories, boundstates, orientations):
     '''
     Calculates rates from discrete trajectories. Verify convention used with corresponding trajectory class,
@@ -128,11 +128,11 @@ def extractRates(discreteTrajectories, boundstates, orientations):
                     if (prevstate == state):
                         tstep += 1
                 # Update number of events and accumulated time (timesteps) in dictionaries
-                if (state == 1 or state == 2) :
+                if (state in boundstatesList) :
                     dictkey1 = 'b' + str(state)
                 else:
                     dictkey1 = str(state)
-                if (endstate ==1 or endstate == 2):
+                if (endstate in boundstatesList):
                     dictkey2 = 'b' + str(endstate)
                 else:
                     dictkey2 = str(endstate)
@@ -151,8 +151,8 @@ def extractRates(discreteTrajectories, boundstates, orientations):
 
 def extractRatesMSM(discreteTrajectories, lagtime, boundstates):
     '''
-    Construct an MSM and extract rates from it using pyemma and msmtools. These rates differ from the ones
-    obtained with extractRates due to the fact that this takes all possible transmission pathways within a discrete
+    Construct an MSM and extract rates from it using pyemma and msmtools. These rates differ from the rates in a
+    rate transition matrix due to the fact that this takes all possible transmission pathways within a discrete
     time MSM (see transition path theory (TPT) to understand one possible way of obtaing these mfpts).
     :param discreteTrajectories: raw discrete trajectories including the unbound state.
     :param lagtime: preferred lagtime chose for MSM (might need tweaking for each case)
@@ -208,10 +208,14 @@ def listIndexSplit(inputList, *args):
     slicedLists = []
     for start, end in zip(args, args[1:]):
         slicedLists.append(inputList[start:end-1])
+    if slicedLists == []:
+        return [np.array(inputList)]
     return slicedLists
 
 def splitDiscreteTrajs(discreteTrajs, unboundStateIndex = 0):
     '''
+    Splits trajectories into smaller trajectories by cutting out
+    all the states unboundStateindex (0)
     :param discreteTrajs: list of discrete trajectories
     :param unboundStateIndex: index of the unbound state used to
     decide where to cut the trajectories, normally we choose it to be
