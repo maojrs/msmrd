@@ -16,7 +16,7 @@
 #include "quaternion.hpp"
 #include "randomgen.hpp"
 #include "simulation.hpp"
-#include "spherePartition.hpp"
+#include "discretizations/spherePartition.hpp"
 #include "tools.hpp"
 #include "vec3.hpp"
 

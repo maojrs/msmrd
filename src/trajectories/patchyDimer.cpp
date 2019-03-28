@@ -51,6 +51,11 @@ namespace msmrd {
         // Evaluate if the two particles are in a bound state
         if (relativePosition.norm() < 1.2) {
             sample = std::vector<int>{ getBoundState(orientation1, orientation2) };
+            if (sample[0] == -1) {
+                secNum1 = spherePart->getSectionNumber(rotatedRij);
+                secNum2 = spherePart->getSectionNumber(rotatedRji);
+                sample  = std::vector<int>{ 1000 + std::min(secNum1,secNum2)*10 + std::max(secNum1,secNum2) };
+            }
         } else if (relativePosition.norm() < 2.0) {
             // Get corresponding section numbers from spherical partition to classify its state
             secNum1 = spherePart->getSectionNumber(rotatedRij);
@@ -63,7 +68,7 @@ namespace msmrd {
     };
 
     /* Given two orientations, return either bound state A (1) or bound state B (2).
-     * Note it can be modified to take into account symmetries, using the symmetryQuaternions. */
+ * Note it can be modified to take into account symmetries, using the symmetryQuaternions. */
     int patchyDimer::getBoundState(quaternion<double> q1, quaternion<double> q2) {
         std::array<quaternion<double>,8> relOrientations;
         // Calculate equivalent relative orientations, measured from particle 1
@@ -86,8 +91,79 @@ namespace msmrd {
                 return 2;
             }
         }
-        return prevsample;
+        return -1; //prevsample;
     };
+
+//    void patchyDimer::sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) {
+//        std::vector<int> sample;
+//        vec3<double> relativePosition; // Measured from i to j
+//        quaternion<double> orientation1;
+//        quaternion<double> orientation2;
+//        //quaternion<double> relativeOrientation; // Measured from i to j
+//        // Rotated relative position vectors w/respect to each particle
+//        vec3<double> rotatedRij;
+//        vec3<double> rotatedRji;
+//        // Section numbers corresponding to the relative orientations in the sphere Partition
+//        int secNum1;
+//        int secNum2;
+//
+//        // Extract discrete trajectory from 2 particle simulation
+//        int i = 0; // index of particle 1
+//        int j = 1; // index of particle 2
+//        sample = std::vector<int>{0};
+//        // Extract info from two rlevant particles in list
+//        orientation1 = particleList[i].orientation;
+//        orientation2 = particleList[j].orientation;
+//        // Calculate relative distance. If box periodic boundary, take that into account.
+//        if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {
+//            auto boxsize = domainBoundary->boxsize;
+//            relativePosition = msmrdtools::distancePeriodicBox(particleList[j].position, particleList[i].position, boxsize);
+//        } else {
+//            relativePosition = particleList[j].position - particleList[i].position;
+//        }
+//        // Rotate the relative position vector to the frame of reference fixed in each of the two particles.
+//        rotatedRij = msmrdtools::rotateVec(relativePosition, orientation1);
+//        rotatedRji = msmrdtools::rotateVec(-1*relativePosition, orientation2);
+//        // Evaluate if the two particles are in a bound state
+//        if (relativePosition.norm() < 1.2) {
+//            sample = std::vector<int>{ getBoundState(orientation1, orientation2) };
+//        } else if (relativePosition.norm() < 2.0) {
+//            // Get corresponding section numbers from spherical partition to classify its state
+//            secNum1 = spherePart->getSectionNumber(rotatedRij);
+//            secNum2 = spherePart->getSectionNumber(rotatedRji);
+//            sample  = std::vector<int>{ std::min(secNum1,secNum2)*10 + std::max(secNum1,secNum2) };
+//        }
+//        prevsample = sample[0];
+//        discreteTrajectoryData.push_back(sample);
+//
+//    };
+
+//    /* Given two orientations, return either bound state A (1) or bound state B (2).
+//     * Note it can be modified to take into account symmetries, using the symmetryQuaternions. */
+//    int patchyDimer::getBoundState(quaternion<double> q1, quaternion<double> q2) {
+//        std::array<quaternion<double>,8> relOrientations;
+//        // Calculate equivalent relative orientations, measured from particle 1
+//        relOrientations[0] = q2 * q1.conj();
+//        relOrientations[1] = (q2*symmetryQuaternions[0]) * q1.conj();
+//        relOrientations[2] = q2 * (q1*symmetryQuaternions[0]).conj();
+//        relOrientations[3] = (q2*symmetryQuaternions[0]) * (q1*symmetryQuaternions[0]).conj();
+//        // Calculate equivalent relative orientations, measured from particle 2
+//        relOrientations[4] = relOrientations[0].conj();
+//        relOrientations[5] = relOrientations[1].conj();
+//        relOrientations[6] = relOrientations[2].conj();
+//        relOrientations[7] = relOrientations[3].conj();
+//
+//        // Looping over all equivalent relative orientations, determines if it is in state A (1) or B (2)
+//        for (auto &relOrient : relOrientations) {
+//            if (msmrdtools::quaternionAngleDistance(relOrient, rotMetastableStates[0]) < 2*M_PI*tolerance) {
+//                return 1;
+//            }
+//            if (msmrdtools::quaternionAngleDistance(relOrient, rotMetastableStates[1]) < 2*M_PI*tolerance) {
+//                return 2;
+//            }
+//        }
+//        return prevsample;
+//    };
 
     /*
      * Define metastable relative orientations (including symmetric quaternion)

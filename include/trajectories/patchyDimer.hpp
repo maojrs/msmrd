@@ -5,7 +5,7 @@
 #pragma once
 #include <memory>
 #include "trajectoryPositionOrientation.hpp"
-#include "spherePartition.hpp"
+#include "discretizations/spherePartition.hpp"
 #include "tools.hpp"
 
 namespace msmrd {
@@ -29,7 +29,7 @@ namespace msmrd {
         std::unique_ptr<spherePartition> spherePart;
         int angularStates;
         int prevsample = 0;
-        double tolerance = 0.2;
+        double tolerance = 0.1;
         /*
          * @param rotMetastableStates[X] correspond to the list of relative rotations that correspond to a
          * metastable state/region X. Each rotation is represented by a quaternion.
