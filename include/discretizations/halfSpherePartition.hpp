@@ -10,7 +10,14 @@ namespace msmrd {
      * of the python code in module msmrd2.tools.spherePartition.
      */
     class halfSpherePartition : public spherePartition {
+    private:
+        double scaling = 2; // Scales to half a sphere, other scalings must be carefully handled
     public:
         explicit halfSpherePartition(int numSections);
+
+        // Given a section number give, phi and theta angles that define the section.
+        std::tuple<std::vector<double>, std::vector<double>> getAnglesHalf(int secNumber);
+
+
     };
 }

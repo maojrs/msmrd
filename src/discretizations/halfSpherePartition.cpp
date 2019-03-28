@@ -11,11 +11,16 @@ namespace msmrd {
      */
     halfSpherePartition::halfSpherePartition(int numSecs) {
         numSections = numSecs;
-        double scaling = 2; // Scales to half a sphere, other scaling must be carefully handled
         auto partition = partitionSphere(numSections, scaling);
         regionsPerCollar = std::get<0>(partition);
         phis = std::get<1>(partition);
         thetas = std::get<2>(partition);
     }
+
+    // Given a section number give, phi and theta angles that define the section.
+    std::tuple<std::vector<double>, std::vector<double>> halfSpherePartition::getAnglesHalf(int secNumber) {
+        auto angles = getAngles(secNumber, scaling);
+        return angles;
+    };
 
 }
