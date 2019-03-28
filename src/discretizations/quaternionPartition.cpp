@@ -12,16 +12,16 @@ namespace msmrd {
      */
     quaternionPartition::quaternionPartition(int numRadialSections, int numSphericalSections):
             numRadialSections(numRadialSections), numSphericalSections(numSphericalSections){
-        sphericalPartition = std::make_unique<spherePartition>(numSphericalSections);
+        halfSphericalPartition = std::make_unique<halfSpherePartition>(numSphericalSections);
     };
 
     std::tuple<std::vector<int>, std::vector<double> > quaternionPartition::makePartition() {
-        double dtheta = 2*M_PI/numRadialSections;
+        double dtheta = 2*M_PI/numRadialSections; // from the vector part of the quaternion u*sin(theta/2)
         std::vector<double> radialSections;
-
+        double drQuaternion;
         for (int i=0; i<numRadialSections; i++){
             // Transform to quaternion scaling
-            double drQuaternion = 2*std::asin(i*dtheta);
+            drQuaternion = 2*std::asin(i*dtheta); // rescaling with vector part of quaternion u*sin(theta/2)
             radialSections.push_back(drQuaternion);
         }
 

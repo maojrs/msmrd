@@ -338,16 +338,8 @@ def plotPartitionedHalfSphere(numPartitions = None, save = None):
     minth = 0
     maxth = np.pi
 
-    # Plot inner white sphere
-    r=1
-    # u = np.linspace(0, np.pi, 400)
-    # v = np.linspace(0, np.pi, 400)
-    # xx = r * np.outer(np.cos(u), np.sin(v))
-    # yy = r * np.outer(np.sin(u), np.sin(v))
-    # zz = r * np.outer(np.ones(np.size(u)), np.cos(v))
-    # ax.plot_surface(xx, yy, zz, color='white', linewidth=0, antialiased=False, alpha = 1.0)
-
     # Plot collars
+    r=1
     for phi in phis:
         theta = np.linspace(minth,maxth, 50)
         x = r * np.cos(theta) * np.sin(phi)
@@ -369,7 +361,6 @@ def plotPartitionedHalfSphere(numPartitions = None, save = None):
                     ax.plot(x, y, z, '-k')
 
     # Plot the surface
-    #ax.set_aspect('equal')
     ax.view_init(0,270)
     ax.dist = 5.65
     if save:

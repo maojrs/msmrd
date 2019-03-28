@@ -17,14 +17,19 @@ namespace msmrd{
     }
 
     // Calculates area of cap given polar angle
-    double spherePartition::angle_to_cap_area(double phi) {
-        return 4 * M_PI * (std::sin(phi / 2.0)) * (std::sin(phi / 2.0));
+    double spherePartition::angle2CapArea(double phi, double scaling) {
+        return (4 / scaling) * M_PI * (std::sin(phi / 2.0)) * (std::sin(phi / 2.0));
     }
 
     // Calculates polar angle corresponding to a given cap area
-    double spherePartition::cap_area_to_angle(double area) {
-        return 2.0 * std::asin(std::sqrt(area / (4.0 * M_PI)));
+    double spherePartition::capArea2Angle(double area, double scaling) {
+        return 2.0 * std::asin(std::sqrt(area / (4.0 * M_PI / scaling)));
     }
+
+    // Calculates state area (area of each region)
+    double spherePartition::stateArea(double scaling) {
+        return (4*M_PI/numSections) / scaling;
+    };
 
     /* Calculate equal area partition of unit sphere with "num_partitions" partitions.
      *  Returns list of three vectors. The first vector indicates number of sections in each
@@ -33,10 +38,10 @@ namespace msmrd{
      *  as a vector for each collar std::vector<std::vector<double>>> .
      *  */
     std::tuple<std::vector<int>, std::vector<double>,
-            std::vector<std::vector<double>>> spherePartition::partitionSphere(int num_partitions) {
+            std::vector<std::vector<double>>> spherePartition::partitionSphere(int num_partitions, double scaling) {
         //Calculate areas of each state and polar caps angle (phi0 and pi-phi0)
-        double state_area = 4 * M_PI / num_partitions;
-        double phi0 = cap_area_to_angle(state_area);
+        double state_area = stateArea(scaling);
+        double phi0 = capArea2Angle(state_area, scaling);
         // Calculate the number of collars between the polar caps
         double ideal_collar_angle = std::sqrt(state_area);
         double ideal_num_collars = (M_PI - 2 * phi0) / ideal_collar_angle;
@@ -67,8 +72,8 @@ namespace msmrd{
         std::vector<int>::iterator it;
         for (int i = 0; i < num_collars; i++) {
             // Calculate num of regions in collar i
-            cap_area_phi1 = angle_to_cap_area(phi0 + i * collar_angle);
-            cap_area_phi2 = angle_to_cap_area(phi0 + (i + 1) * collar_angle);
+            cap_area_phi1 = angle2CapArea(phi0 + i * collar_angle, scaling);
+            cap_area_phi2 = angle2CapArea(phi0 + (i + 1) * collar_angle, scaling);
             ideal_regionsPerCollar[i] = (cap_area_phi2 - cap_area_phi1) / state_area;
             regionsPerCollar[i] = static_cast<int>(std::round(ideal_regionsPerCollar[i] + a[i]));
             // Correct values of phi around collar i
@@ -81,7 +86,7 @@ namespace msmrd{
             for (int j = 0; j < i; j++) {
                 summ = summ + regionsPerCollar[j];
             }
-            phis[i + 1] = cap_area_to_angle(summ * state_area);
+            phis[i + 1] = capArea2Angle(summ * state_area, scaling);
             phis[num_collars + 1] = M_PI - phi0;
             // Obtain list of thetas for a given collar
             regsPerCollar_i = static_cast<unsigned long>(regionsPerCollar[i]);

@@ -35,6 +35,7 @@ set(SOURCES
         src/boundaries/boundary.cpp
         src/boundaries/box.cpp
         src/boundaries/sphere.cpp
+        src/discretizations/halfSpherePartition.cpp
         src/discretizations/quaternionPartition.cpp
         src/discretizations/spherePartition.cpp
         src/integrators/integrator.cpp
@@ -81,6 +82,7 @@ set(PY_SOURCES
         include/boundaries/boundary.hpp
         include/boundaries/box.hpp
         include/boundaries/sphere.hpp
+        include/discretizations/halfSpherePartition.hpp
         include/discretizations/quaternionPartition.hpp
         include/discretizations/spherePartition.hpp
         include/integrators/integrator.hpp

@@ -4,7 +4,7 @@
 #include <memory>
 #include "vec3.hpp"
 #include "quaternion.hpp"
-#include "spherePartition.hpp"
+#include "halfSpherePartition.hpp"
 
 
 namespace msmrd {
@@ -18,7 +18,7 @@ namespace msmrd {
     public:
         int numRadialSections;
         int numSphericalSections;
-        std::unique_ptr<spherePartition> sphericalPartition;
+        std::unique_ptr<halfSpherePartition> halfSphericalPartition;
 
         quaternionPartition(int numRadialSections, int numSphericalSections);
 
