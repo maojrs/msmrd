@@ -209,7 +209,7 @@ def listIndexSplit(inputList, *args):
     for start, end in zip(args, args[1:]):
         slicedLists.append(inputList[start:end-1])
     if slicedLists == []:
-        return [np.array(inputList)]
+        slicedLists.append(inputList)
     return slicedLists
 
 def splitDiscreteTrajs(discreteTrajs, unboundStateIndex = 0):
