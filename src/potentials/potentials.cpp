@@ -1,10 +1,7 @@
 //
 // Created by maojrs on 8/21/18.
 //
-#include <tuple>
 #include "potentials/potentials.hpp"
-#include "tools.hpp"
-#include "vec3.hpp"
 
 namespace msmrd {
     /**

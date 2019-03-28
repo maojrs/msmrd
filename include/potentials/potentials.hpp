@@ -5,6 +5,7 @@
 #include "particle.hpp"
 #include "randomgen.hpp"
 #include "quaternion.hpp"
+#include "tools.hpp"
 #include "vec3.hpp"
 #include "boundaries/boundary.hpp"
 
