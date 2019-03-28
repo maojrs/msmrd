@@ -367,6 +367,30 @@ def plotPartitionedHalfSphere(numPartitions = None, save = None):
         plt.savefig('spherePartion_' + str(numPartitions) + '.png')
 
 
+def getSectionNumberHalf(coords, numPartitions = 20):
+    '''
+    Given some coordinates, returns corresponding section number in
+    half spherical partition (from 1 to numPartitions). Only gives
+    valid results for positive values of y coordinate.
+    '''
+    numRegionsCollar, phis, thetas = partitionHalfSphere(numPartitions)
+    theta = np.arctan2(coords[1], coords[0])
+    if theta < 0:
+        theta += 2*np.pi
+    r = np.linalg.norm(coords)
+    phi = np.arccos(coords[2]/r)
+    currentCollarIndex = sum(phis<=phi) - 1
+    if currentCollarIndex == 0:
+        sectionNum = 1
+        return sectionNum
+    if currentCollarIndex == len(numRegionsCollar) - 1:
+        sectionNum = numPartitions
+        return sectionNum
+    collarThetas = thetas[currentCollarIndex - 1]
+    currentThetaIndex = sum(collarThetas<=theta)
+    sectionNum = sum(numRegionsCollar[0:currentCollarIndex]) + currentThetaIndex
+    return sectionNum
+
 def getAnglesHalf(secNumber, numPartitions = None):
     """
     Return angles [phi1, phi2] and [theta1, theta2] of a given section number

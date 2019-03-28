@@ -15,8 +15,15 @@ namespace msmrd {
     public:
         explicit halfSpherePartition(int numSections);
 
-        // Given a section number give, phi and theta angles that define the section.
-        std::tuple<std::vector<double>, std::vector<double>> getAnglesHalf(int secNumber);
+        // Wrappers for parent functions:
+
+        /* Given a section number give, phi and theta angles that define the section.
+         * Note it may hide the parent function. */
+        std::tuple<std::vector<double>, std::vector<double>> getAngles(int secNumber);
+
+        /* Given a coordinate return corresponding section number.
+         * Note it may hide the parent function. */
+        int getSectionNumber(vec3<double> coordinate);
 
 
     };
