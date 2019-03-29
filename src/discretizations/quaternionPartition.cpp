@@ -12,23 +12,75 @@ namespace msmrd {
      */
     quaternionPartition::quaternionPartition(int numRadialSections, int numSphericalSections):
             numRadialSections(numRadialSections), numSphericalSections(numSphericalSections){
-        halfSphericalPartition = std::make_unique<halfSpherePartition>(numSphericalSections);
+        sphericalPartition = std::make_unique<spherePartition>(numSphericalSections);
+        radialSections.resize(numRadialSections+1);
+        numTotalSections = numSphericalSections*(numRadialSections -1) + 1;
+        makeRadialPartition();
     };
 
-    std::tuple<std::vector<int>, std::vector<double> > quaternionPartition::makePartition() {
-        double dtheta = 2*M_PI/numRadialSections; // from the vector part of the quaternion u*sin(theta/2)
-        std::vector<double> radialSections;
-        double drQuaternion;
-        for (int i=0; i<numRadialSections; i++){
-            // Transform to quaternion scaling
-            drQuaternion = 2*std::asin(i*dtheta); // rescaling with vector part of quaternion u*sin(theta/2)
-            radialSections.push_back(drQuaternion);
+    // Defines the location of the radial cuts between the origin and r=1.
+    void quaternionPartition::makeRadialPartition() {
+        double dr = 1.0/numRadialSections;
+        radialSections[0] = 0.0;
+        for (int i=1; i<=numRadialSections; i++){
+            radialSections[i] = radialSections[i-1] + dr;
         }
-
-
-
-
     };
 
+    // Obtains the section number in volumetric half sphere partition, given a coordinate within the half unit sphere.
+    int quaternionPartition::getSectionNumber(vec3<double> coordinate) {
+        int sectionNumber;
+        double r = coordinate.norm();
+        if (r > 1) {
+            throw std::range_error("Coordinate of vector part of unit quaternion cannot be larger than one");
+        }
+        for (int i = 0; i < numRadialSections; i++){
+            if (r <= radialSections[i+1]){
+                if (i == 0) {
+                    sectionNumber = 1;
+                    break;
+                } else {
+                    sectionNumber = numSphericalSections*(i-1) + 1;
+                    sectionNumber += sphericalPartition->getSectionNumber(coordinate);
+                    break;
+                }
+
+            }
+        }
+        return sectionNumber;
+    };
+
+    /* Gets volumetric interval delimiter of the section corresponding to secNumber. The function return three
+     * intervals, one in the r direction, one in the phi angle (polar) and one in the theta angle (azimuthal). */
+    std::tuple<std::vector<double>, std::vector<double>,
+            std::vector<double>> quaternionPartition::getSectionIntervals(int secNumber) {
+        std::vector<double> rInterval(2, 0);
+        std::vector<double> phiInterval(2,0);
+        std::vector<double> thetaInterval(2,0);
+        // If on first section, return the full inner sphere interval limits.
+        if (secNumber == 1) {
+            rInterval = {0.0, radialSections[1]};
+            phiInterval = {0.0, M_PI};
+            thetaInterval = {0, 2*M_PI};
+
+        } else {
+            /* Otherwise, find on which shell is the particle and use the halSphericalPartition to obtain
+             * the correct angular intervals */
+            std::tuple<std::vector<double>, std::vector<double>> angles;
+            double rindex = -1;
+            int sectionNumModule = (secNumber - 1) % numSphericalSections;
+            if (sectionNumModule == 0) {
+                rindex = static_cast<int> (std::floor((secNumber - 1) / numSphericalSections));
+                angles = sphericalPartition->getAngles(numSphericalSections);
+            } else {
+                rindex = static_cast<int> (std::floor((secNumber - 1) / numSphericalSections) + 1);
+                angles = sphericalPartition->getAngles(sectionNumModule);
+            }
+            rInterval = {radialSections[rindex], radialSections[rindex + 1]};
+            phiInterval = std::get<0>(angles);
+            thetaInterval = std::get<1>(angles);
+        }
+        return std::make_tuple(rInterval, phiInterval, thetaInterval);
+    };
 
 }
