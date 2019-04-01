@@ -32,7 +32,6 @@ namespace msmrd {
         int numRadialSectionsQuat;
         int numSphericalSectionsQuat;
         int numTotalSections = 0;
-        int sectionNumberingMultiplier = 1000;
         std::unique_ptr<spherePartition> sphericalPartition;
         std::unique_ptr<quaternionPartition> quatPartition;
         /**
@@ -55,11 +54,11 @@ namespace msmrd {
                                      int numRadialSectionsQuat, int numSphericalSectionsQuat);
 
         /* Gets the section number in this partition given a relative position and relative orientation.
-         * Note in order to get consistent results relativePosition should be rotated by particle1.quat.conjugated().
-         * This is equivalent to fixing the spherical surface partition to particle1, so they rotate together.
-         *  */
-        int getSectionNumber(vec3<double> position1, vec3<double> position2,
-                             quaternion<double> orientation1, quaternion<double> orientation2);
+         * Note in order to get consistent results relativePosition should be rotated by particle1.quat.conjugated(),
+         * which is passed in as quaternionReference. This is equivalent to fixing the spherical surface partition
+         * to particle1, so they rotate together. */
+        int getSectionNumber(vec3<double> relativePosition, quaternion<double> relativeQuaternion,
+                             quaternion<double> quaternionReference = {1,0,0,0});
 
         /* Gets interval delimiters of the phase space section corresponding to a given section number.
          * The function returns a tuple (secNumRelativePos, secNumRelativeQuat): the section number corresponding
