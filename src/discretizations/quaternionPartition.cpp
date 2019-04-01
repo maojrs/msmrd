@@ -7,8 +7,7 @@
 namespace msmrd {
 
     /*
-     * Constructor creates a spherical equal area partition on the surface of a sphere.
-     * @param numSections the number of sections that the sphere should be partioned in.
+     * Constructor creates a volumetric partition of the unit sphere in 3D that discretizes a unit quaternion.
      */
     quaternionPartition::quaternionPartition(int numRadialSections, int numSphericalSections):
             numRadialSections(numRadialSections), numSphericalSections(numSphericalSections){

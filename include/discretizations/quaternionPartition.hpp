@@ -2,9 +2,9 @@
 #include <vector>
 #include <tuple>
 #include <memory>
-#include "vec3.hpp"
 #include "quaternion.hpp"
 #include "spherePartition.hpp"
+#include "vec3.hpp"
 
 
 namespace msmrd {
@@ -32,8 +32,8 @@ namespace msmrd {
         std::unique_ptr<spherePartition> sphericalPartition;
         std::vector<double> radialSections;
         /**
-         * @param numRadialSections number of radial sections in volumetric unit half sphere partition
-         * @param numSphericalSections number of spherical section in surface of sphere. Each radial shell in
+         * @param numRadialSections number of radial sections in volumetric 3D sphere partition
+         * @param numSphericalSections number of spherical sections in surface of sphere. Each radial shell in
          * the partition has numSphericalShells section in it.
          * @param numTotalSections total number of sections in partition
          * @param sphericalPartition pointer to pherical partition on the surface. Along with the
@@ -47,7 +47,7 @@ namespace msmrd {
         // Defines the location of the radial cuts in partition.
         void makeRadialPartition();
 
-        /* Gets the section number in the volumetri partition of the half sphere given a coordinate
+        /* Gets the section number in the volumetric partition of the half sphere given a coordinate
          * inside the half unit sphere. Uses (s,x,z) as reduce coordinate */
         int getSectionNumber(quaternion<double> quatCoordinate);
 
