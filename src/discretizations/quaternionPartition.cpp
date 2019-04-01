@@ -28,20 +28,24 @@ namespace msmrd {
     };
 
     // Obtains the section number in volumetric half sphere partition, given a coordinate within the half unit sphere.
-    int quaternionPartition::getSectionNumber(vec3<double> coordinate) {
+    int quaternionPartition::getSectionNumber(quaternion<double> quatCoordinate) {
         int sectionNumber;
-        double r = coordinate.norm();
-        if (r > 1) {
-            throw std::range_error("Coordinate of vector part of unit quaternion cannot be larger than one");
+        double r = quatCoordinate.norm();
+        if (r > 1.0005) {
+            throw std::range_error("Unit quaternion cannot be larger than one");
         }
+        // Reduce quaternion coordinate from (s,x,y,z) to (s,x,z)
+        vec3<double> reducedCoordinate{quatCoordinate[0], quatCoordinate[1], quatCoordinate[3]};
+        double rReduced = reducedCoordinate.norm();
+
         for (int i = 0; i < numRadialSections; i++){
-            if (r <= radialSections[i+1]){
+            if (rReduced <= radialSections[i+1]){
                 if (i == 0) {
                     sectionNumber = 1;
                     break;
                 } else {
                     sectionNumber = numSphericalSections*(i-1) + 1;
-                    sectionNumber += sphericalPartition->getSectionNumber(coordinate);
+                    sectionNumber += sphericalPartition->getSectionNumber(reducedCoordinate);
                     break;
                 }
 

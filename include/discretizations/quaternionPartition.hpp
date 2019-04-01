@@ -4,7 +4,7 @@
 #include <memory>
 #include "vec3.hpp"
 #include "quaternion.hpp"
-#include "halfSpherePartition.hpp"
+#include "spherePartition.hpp"
 
 
 namespace msmrd {
@@ -48,8 +48,8 @@ namespace msmrd {
         void makeRadialPartition();
 
         /* Gets the section number in the volumetri partition of the half sphere given a coordinate
-         * inside the half unit sphere. Recommended to use (s,x,z)  */
-        int getSectionNumber(vec3<double> coordinate);
+         * inside the half unit sphere. Uses (s,x,z) as reduce coordinate */
+        int getSectionNumber(quaternion<double> quatCoordinate);
 
         /* Gets volumetric interval delimiter of the section corresponding to secNumber. The function return three
         * intervals, one in the r direction, one in the phi angle (polar) and one in the theta angle (azimuthal). */

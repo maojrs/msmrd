@@ -5,7 +5,7 @@
 #pragma once
 #include <memory>
 #include "trajectoryPositionOrientation.hpp"
-#include "discretizations/spherePartition.hpp"
+#include "discretizations/quaternionPartition.hpp"
 #include "tools.hpp"
 
 namespace msmrd {
@@ -27,6 +27,7 @@ namespace msmrd {
         std::vector<quaternion<double>> rotMetastableStates;
         std::vector<quaternion<double>> symmetryQuaternions{{1,0,0,0}};
         std::unique_ptr<spherePartition> spherePart;
+        std::unique_ptr<quaternionPartition> quaternionPart;
         int angularStates;
         int prevsample = 0;
         double tolerance = 0.1;
@@ -36,6 +37,7 @@ namespace msmrd {
          * @symmetryQuaternions list of rotation that represents the structural symmetries of the patchy particle if
          * needed to define the states.
          * @param spherePart pointer to equal area spherical partition class with relevant functions
+         * @param quaternionPart pointer to volumetric spherical partition class to discretize quaternion space.
          * @param number of angularStates for discretization
          * @ param tolerance is the maximum distance away from metastable state to still be considered metastable.
          */
