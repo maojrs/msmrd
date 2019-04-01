@@ -13,8 +13,8 @@ namespace msmrd {
      * orientation phase space. Note the magnitude of the relative position is only discretized by the relative
      * distance cut off value.
      */
-    positionOrientationPartition::positionOrientationPartition(int numSphericalSectionsPos,
-                                                               double relativeDistanceCutOff,
+    positionOrientationPartition::positionOrientationPartition(double relativeDistanceCutOff,
+                                                               int numSphericalSectionsPos,
                                                                int numRadialSectionsQuat,
                                                                int numSphericalSectionsQuat) :
             numSphericalSectionsPos(numSphericalSectionsPos),
@@ -37,13 +37,16 @@ namespace msmrd {
     int positionOrientationPartition::getSectionNumber(vec3<double> relativePosition,
                                                        quaternion<double> relativeOrientation,
                                                        quaternion<double> quaternionReference) {
+        if (relativePosition.norm() > relativeDistanceCutOff) {
+            return 0;
+        }
         // Rotate relative position back to original frame of reference of particle 1
         vec3<double> fixedRelativePosition = msmrdtools::rotateVec(relativePosition, quaternionReference.conj());
         // Calculate section numbers given by sphere partition and quaternion partition.
         int secNumRelativePos = sphericalPartition->getSectionNumber(fixedRelativePosition);
         int secNumRelativeQuat = quatPartition->getSectionNumber(relativeOrientation);
         // Generate section number for positionOrientationPartition from these previous section numbers
-        int sectionNumber = (secNumRelativePos - 1) * numSphericalSectionsQuat + secNumRelativeQuat;
+        int sectionNumber = (secNumRelativePos - 1) * quatPartition->numTotalSections + secNumRelativeQuat;
         return sectionNumber;
     };
 

@@ -50,7 +50,7 @@ namespace msmrd {
          * in the volume of a unit sphere.
          */
 
-        positionOrientationPartition(int numSphericalSectionsPos, double relativeDistanceCutOff,
+        positionOrientationPartition(double relativeDistanceCutOff, int numSphericalSectionsPos,
                                      int numRadialSectionsQuat, int numSphericalSectionsQuat);
 
         /* Gets the section number in this partition given a relative position and relative orientation.

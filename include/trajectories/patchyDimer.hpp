@@ -6,6 +6,7 @@
 #include <memory>
 #include "trajectoryPositionOrientation.hpp"
 #include "discretizations/quaternionPartition.hpp"
+#include "discretizations/positionOrientationPartition.hpp"
 #include "tools.hpp"
 
 namespace msmrd {
@@ -28,6 +29,7 @@ namespace msmrd {
         std::vector<quaternion<double>> symmetryQuaternions{{1,0,0,0}};
         std::unique_ptr<spherePartition> spherePart;
         std::unique_ptr<quaternionPartition> quaternionPart;
+        std::unique_ptr<positionOrientationPartition> positionOrientationPart;
         int angularStates;
         int prevsample = 0;
         double tolerance = 0.1;
