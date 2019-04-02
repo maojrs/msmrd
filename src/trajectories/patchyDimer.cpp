@@ -22,40 +22,44 @@ namespace msmrd {
 
 
     void patchyDimer::sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) {
-        std::vector<int> sample;
-        vec3<double> relativePosition; // Measured from i to j
-        quaternion<double> orientation1;
-        quaternion<double> orientation2;
-        quaternion<double> relativeOrientation; // Measured from i to j
-        // Section number corresponding to the relative orientations in the quaternion partition
+        // Initialize sample with value zero
+        std::vector<int> sample{0};
+
+        // Relative position and orientation measured from i to j (gets you from i to j)
+        vec3<double> relativePosition;
+        quaternion<double> relativeOrientation;
+
+        // Section number in positionOrientationPartition
         int secNum;
 
-        // Extract discrete trajectory from 2 particle simulation
-        int i = 0; // index of particle 1
-        int j = 1; // index of particle 2
-        sample = std::vector<int>{0};
-        // Extract info from two relevant particles in list
-        orientation1 = particleList[i].orientation;
-        orientation2 = particleList[j].orientation;
-        relativeOrientation = orientation2*orientation1.conj(); // Gets from orientation1 to 2
-        // Calculate relative distance. If box periodic boundary, take that into account.
+        // Extract discrete trajectory from 2 particle simulation, i = particle 1, j = particle 2
+        int i = 0;
+        int j = 1;
+
+        // Calculate relative orientation
+        auto orientation1 = particleList[i].orientation;
+        auto orientation2 = particleList[j].orientation;
+        relativeOrientation = orientation2*orientation1.conj();
+
+        // Calculate relative distance. If particle within periodic boundary, take that into account.
         if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {
             auto boxsize = domainBoundary->boxsize;
             relativePosition = msmrdtools::distancePeriodicBox(particleList[j].position, particleList[i].position, boxsize);
         } else {
             relativePosition = particleList[j].position - particleList[i].position;
         }
-        // Evaluate if the two particles are in a bound state
-        if (relativePosition.norm() < 1.2) {
+
+        // Extract current state, save into sample and push sample to discreteTrajectoryData.
+        if (relativePosition.norm() < 1.25) {
             sample = std::vector<int>{ getBoundState(orientation1, orientation2) };
-            if (sample[0] == -1) {
-                secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, orientation1);
-                sample  = std::vector<int>{ 10 + secNum };
-            }
-        } else if (relativePosition.norm() < 2.0) {
+//            if (sample[0] == -1) {
+//                secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, orientation1);
+//                sample  = std::vector<int>{ 10 + secNum };
+//            }
+        } else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
             // Get corresponding section numbers from spherical partition to classify its state
             secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, orientation1);
-            sample  = std::vector<int>{ positionOrientationPart->numTotalSections + 10 + secNum };
+            sample  = std::vector<int>{10 + secNum};
         }
         prevsample = sample[0];
         discreteTrajectoryData.push_back(sample);
@@ -86,50 +90,9 @@ namespace msmrd {
                 return 2;
             }
         }
-        return -1; //prevsample; //-1;
+        return prevsample; //-1;
     };
 
-//    void patchyDimer::sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) {
-//        std::vector<int> sample;
-//        vec3<double> relativePosition; // Measured from i to j
-//        quaternion<double> orientation1;
-//        quaternion<double> orientation2;
-//        quaternion<double> relativeOrientation; // Measured from i to j
-//        // Section number corresponding to the relative orientations in the quaternion partition
-//        int secNum;
-//
-//        // Extract discrete trajectory from 2 particle simulation
-//        int i = 0; // index of particle 1
-//        int j = 1; // index of particle 2
-//        sample = std::vector<int>{0};
-//        // Extract info from two relevant particles in list
-//        orientation1 = particleList[i].orientation;
-//        orientation2 = particleList[j].orientation;
-//        relativeOrientation = orientation1*orientation2.conj(); // Gets from orientation2 to orientation1
-//        // Calculate relative distance. If box periodic boundary, take that into account.
-//        if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {
-//            auto boxsize = domainBoundary->boxsize;
-//            relativePosition = msmrdtools::distancePeriodicBox(particleList[j].position, particleList[i].position, boxsize);
-//        } else {
-//            relativePosition = particleList[j].position - particleList[i].position;
-//        }
-//        // Evaluate if the two particles are in a bound state
-//        if (relativePosition.norm() < 1.2) {
-//            sample = std::vector<int>{ getBoundState(orientation1, orientation2) };
-////            if (sample[0] == -1) {
-////                secNum = quaternionPart->getSectionNumber(relativeOrientation);
-////                sample  = std::vector<int>{ 1000 + secNum };
-////            }
-//        } else if (relativePosition.norm() < 2.0) {
-//            // Get corresponding section numbers from spherical partition to classify its state
-//            secNum = quaternionPart->getSectionNumber(relativeOrientation);
-//            sample  = std::vector<int>{ 2000 + secNum };
-//        }
-//        prevsample = sample[0];
-//        discreteTrajectoryData.push_back(sample);
-//    };
-//
-//
 //    /* Given two orientations, return either bound state A (1) or bound state B (2).
 //     * Note it can be modified to take into account symmetries, using the symmetryQuaternions. */
 //    int patchyDimer::getBoundState(quaternion<double> q1, quaternion<double> q2) {

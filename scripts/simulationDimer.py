@@ -47,7 +47,7 @@ def runParallelSims(simnumber):
     # Creates simulation
     sim = msmrd2.simulation(integrator)
     # Simulation parameters
-    timesteps = 50000000 #20000000 # 200000000 #5000
+    timesteps = 20000000 #20000000 # 200000000 #5000
     bufferSize = 1024
     stride = 250 #1
     outTxt = False
