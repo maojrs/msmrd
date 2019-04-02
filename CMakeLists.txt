@@ -67,6 +67,7 @@ set(PY_SOURCES
         src/binding/binding.hpp
         src/binding/binding.cpp
         src/binding/bindBoundaries.cpp
+        src/binding/bindDiscretizations.cpp
         src/binding/bindIntegrators.cpp
         src/binding/bindInternal.cpp
         src/binding/bindMarkovModels.cpp

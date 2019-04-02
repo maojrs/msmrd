@@ -7,7 +7,6 @@
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
-#include <markovModels/continuousTimeMarkovModel.hpp>
 #include "particle.hpp"
 
 /* Needed to connect lists/arrays of particles in python with cpp integrator methods.
@@ -25,6 +24,7 @@ namespace msmrd {
      * Define functions to bind modules and submodules (implemented in src/binding/bind****.py)
      */
     void bindBoundaries(py::module&);
+    void bindDiscretizations(py::module&);
     void bindIntegrators(py::module&);
     void bindInternal(py::module&);
     void bindMarkovModels(py::module&);

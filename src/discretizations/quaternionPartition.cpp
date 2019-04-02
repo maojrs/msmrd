@@ -67,7 +67,7 @@ namespace msmrd {
             thetaInterval = {0, 2*M_PI};
 
         } else {
-            /* Otherwise, find on which shell is the particle and use the halSphericalPartition to obtain
+            /* Otherwise, find on which shell is the particle and use the sphericalPartition to obtain
              * the correct angular intervals */
             std::tuple<std::vector<double>, std::vector<double>> angles;
             double rindex = -1;
@@ -85,5 +85,19 @@ namespace msmrd {
         }
         return std::make_tuple(rInterval, phiInterval, thetaInterval);
     };
+
+    // Gets full partition: radialSections, regionsPerCollar, phis and thetas
+    std::tuple<std::vector<double>, std::vector<int>,
+            std::vector<double>, std::vector<std::vector<double>>> quaternionPartition::getPartition() {
+        auto regionsPerCollar = sphericalPartition->regionsPerCollar;
+        auto phis = sphericalPartition->phis;
+        auto thetas = sphericalPartition->thetas;
+        return std::make_tuple(radialSections, regionsPerCollar , phis, thetas);
+    };
+
+    // Pybind version of getSectionNumber, uses arbitrary vectors instead of vec3.
+    int quaternionPartition::getSectionNumberPyBind(std::vector<double> coord) {
+        return getSectionNumber(quaternion<double>{coord[0], coord[1], coord[2], coord[3]});
+    }
 
 }

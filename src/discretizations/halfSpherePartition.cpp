@@ -11,24 +11,8 @@ namespace msmrd {
      */
     halfSpherePartition::halfSpherePartition(int numSecs) {
         numSections = numSecs;
-        auto partition = partitionSphere(numSections, scaling);
-        regionsPerCollar = std::get<0>(partition);
-        phis = std::get<1>(partition);
-        thetas = std::get<2>(partition);
+        scaling = 2;
+        partitionSphere();
     }
-
-    /* Given a section number give, phi and theta angles that define the section.
-     * Note it may hide parent function. It calls the parent function with a different scaling. */
-    std::tuple<std::vector<double>, std::vector<double>> halfSpherePartition::getAngles(int secNumber) {
-        auto angles = spherePartition::getAngles(secNumber, scaling);
-        return angles;
-    };
-
-    /* Given a coordinate return corresponding section number.
-     * Note it may hide parent function. It calls the parent function with a different scaling. */
-    int halfSpherePartition::getSectionNumber(vec3<double> coordinate) {
-        auto secNum = spherePartition::getSectionNumber(coordinate, scaling);
-        return secNum;
-    };
 
 }

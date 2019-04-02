@@ -21,6 +21,8 @@ PYBIND11_MODULE(msmrd2binding, module) {
     msmrd::bindSimulation(module);
 
     // Load main submodules
+    auto discretizationsSubmodule = module.def_submodule("discretizations", "msmrd discretizations submodule");
+    msmrd::bindDiscretizations(discretizationsSubmodule);
     auto integratorsSubmodule = module.def_submodule("integrators", "msmrd integrators submodule");
     msmrd::bindIntegrators(integratorsSubmodule);
     auto potentialsSubmodule = module.def_submodule("potentials", "msmrd potentials submodule");

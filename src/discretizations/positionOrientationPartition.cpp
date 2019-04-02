@@ -50,11 +50,21 @@ namespace msmrd {
         return sectionNumber;
     };
 
+
     std::tuple<int, int> positionOrientationPartition::getSection(int secNumber){
         int secNumRelativePos = static_cast<int>(std::ceil(1.0*secNumber/numSphericalSectionsQuat));
         int secNumRelativeQuat = secNumber % numSphericalSectionsQuat + 1;
         return std::make_tuple(secNumRelativePos, secNumRelativeQuat);
     };
+
+    // Gets section number version PyBind
+    int positionOrientationPartition::getSectionNumberPyBind(std::vector<double> relpos,
+                                                             std::vector<double> relquat, std::vector<double> qref ){
+        vec3<double> relposition{relpos[0], relpos[1], relpos[2]};
+        quaternion<double> relquaternion{relquat[0], relquat[1], relquat[2], relquat[3]};
+        quaternion<double> quaternionref{qref[0], qref[1], qref[2], qref[3]};
+        return getSectionNumber(relposition, relquaternion, quaternionref);
+    }
 
 
 }

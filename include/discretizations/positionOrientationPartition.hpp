@@ -67,6 +67,17 @@ namespace msmrd {
          * spherePartition->getAngles(secNumRelativePos) and quaternion->getSectionintervals(secNumRelativeQuat)*/
         std::tuple<int, int> getSection(int secNumber);
 
+
+        /* Other not so important functions (mostly for PyBindings)*/
+
+        // Returns total number of sections, num radial sections and number of spherical sections (for pybind)
+        std::vector<int> getNumSections(){
+            return std::vector<int>{numTotalSections, numSphericalSectionsPos,
+                                    numRadialSectionsQuat, numSphericalSectionsQuat};
+        }
+
+        int getSectionNumberPyBind(std::vector<double> relpos, std::vector<double> relquat, std::vector<double> qref );
+
     };
 
 }

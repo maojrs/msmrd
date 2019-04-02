@@ -10,55 +10,48 @@ namespace msmrd{
      * @param numSections the number of sections that the sphere should be partioned in.
      */
     spherePartition::spherePartition(int numSections): numSections(numSections){
-        auto partition = partitionSphere(numSections);
-        regionsPerCollar = std::get<0>(partition);
-        phis = std::get<1>(partition);
-        thetas = std::get<2>(partition);
+        partitionSphere();
     }
 
     // Calculates area of cap given polar angle
-    double spherePartition::angle2CapArea(double phi, double scaling) {
+    double spherePartition::angle2CapArea(double phi) {
         return (4 / scaling) * M_PI * (std::sin(phi / 2.0)) * (std::sin(phi / 2.0));
     }
 
     // Calculates polar angle corresponding to a given cap area
-    double spherePartition::capArea2Angle(double area, double scaling) {
+    double spherePartition::capArea2Angle(double area) {
         return 2.0 * std::asin(std::sqrt(area / (4.0 * M_PI / scaling)));
     }
 
     // Calculates state area (area of each region)
-    double spherePartition::stateArea(double scaling) {
+    double spherePartition::stateArea() {
         return (4*M_PI/numSections) / scaling;
     };
 
-    /* Calculate equal area partition of unit sphere with "num_partitions" partitions.
-     *  Returns list of three vectors. The first vector indicates number of sections in each
-     *  collar (int). The second one indicates location of cuts that define collars in the polar
-     *  angle std::vector<double>. The third one denotes the location of azimutal cuts as for each collar,
+    /* Calculate equal area partition of unit sphere with "num_sections" sections in partition.
+     *  Calculates three vectors. "regionsPerCollar" indicates number of sections in each
+     *  collar (int). "phis" indicates location of cuts that define collars in the polar
+     *  angle std::vector<double>. "thetas" denotes the location of azimutal cuts as for each collar,
      *  as a vector for each collar std::vector<std::vector<double>>> .
      *  */
-    std::tuple<std::vector<int>, std::vector<double>,
-            std::vector<std::vector<double>>> spherePartition::partitionSphere(int num_partitions, double scaling) {
+     void spherePartition::partitionSphere() {
         //Calculate areas of each state and polar caps angle (phi0 and pi-phi0)
-        double state_area = stateArea(scaling);
-        double phi0 = capArea2Angle(state_area, scaling);
+        double state_area = stateArea();
+        double phi0 = capArea2Angle(state_area);
         // Calculate the number of collars between the polar caps
         double ideal_collar_angle = std::sqrt(state_area);
         double ideal_num_collars = (M_PI - 2 * phi0) / ideal_collar_angle;
         int num_collars = static_cast<int>(std::max(1.0, std::round(ideal_num_collars)));
-        if (num_partitions == 2) {
+        if (numSections == 2) {
             num_collars = 0;
         }
         double collar_angle = (M_PI - 2 * phi0) / num_collars;
         // Initialize variables for number of regions in each collar
         std::vector<double> ideal_regionsPerCollar;
         ideal_regionsPerCollar.resize(num_collars);
-        std::vector<double> phis;
         phis.resize(num_collars + 2);
         phis[0] = 0;
-        std::vector<int> regionsPerCollar;
         regionsPerCollar.resize(num_collars);
-        std::vector<std::vector<double>> thetas;
         thetas.resize(0);
         std::vector<double> a{0};
         /* Iterate over each collar to get right number of regions per collar
@@ -72,8 +65,8 @@ namespace msmrd{
         std::vector<int>::iterator it;
         for (int i = 0; i < num_collars; i++) {
             // Calculate num of regions in collar i
-            cap_area_phi1 = angle2CapArea(phi0 + i * collar_angle, scaling);
-            cap_area_phi2 = angle2CapArea(phi0 + (i + 1) * collar_angle, scaling);
+            cap_area_phi1 = angle2CapArea(phi0 + i * collar_angle);
+            cap_area_phi2 = angle2CapArea(phi0 + (i + 1) * collar_angle);
             ideal_regionsPerCollar[i] = (cap_area_phi2 - cap_area_phi1) / state_area;
             regionsPerCollar[i] = static_cast<int>(std::round(ideal_regionsPerCollar[i] + a[i]));
             // Correct values of phi around collar i
@@ -86,7 +79,7 @@ namespace msmrd{
             for (int j = 0; j < i; j++) {
                 summ = summ + regionsPerCollar[j];
             }
-            phis[i + 1] = capArea2Angle(summ * state_area, scaling);
+            phis[i + 1] = capArea2Angle(summ * state_area);
             phis[num_collars + 1] = M_PI - phi0;
             // Obtain list of thetas for a given collar
             regsPerCollar_i = static_cast<unsigned long>(regionsPerCollar[i]);
@@ -101,14 +94,11 @@ namespace msmrd{
         regionsPerCollar.push_back(1);
         it = regionsPerCollar.begin();
         regionsPerCollar.insert(it, 1);
-        // return number of regions for all collars,
-        // phi angles of collars and theta angles for each collar
-        return std::make_tuple(regionsPerCollar, phis, thetas);
     }
 
     /* Assuming partioned sphere sits in origin, given a vector coordinate, find section number
      * that corresponds to section that the line generated by the vector intersects. */
-    int spherePartition::getSectionNumber(vec3<double> coordinate, double scaling) {
+    int spherePartition::getSectionNumber(vec3<double> coordinate) {
         if (scaling == 2 and coordinate[1] < 0) {
             std::range_error("Error: y coordinate must be positive in half sphere discretization");
         }
@@ -154,7 +144,7 @@ namespace msmrd{
 
     /* Returns phi-angles (polar) and theta-angles (azimuthal) that correspond to the sectionnumber
      * in the sphere partition */
-    std::tuple<std::vector<double>, std::vector<double>> spherePartition::getAngles(int secNumber, double scaling) {
+    std::tuple<std::vector<double>, std::vector<double>> spherePartition::getAngles(int secNumber) {
         if (secNumber > numSections) {
             std::range_error("Error: section number is larger than number of partitions");
         }
@@ -197,5 +187,19 @@ namespace msmrd{
         std::vector<double> phiInterval{phi1, phi2};
         std::vector<double> thetaInterval{theta1, theta2};
         return std::make_tuple(phiInterval, thetaInterval);
+    }
+
+    /*  Returns list of three vectors that define the partition and calculate with partionSphere functions.
+     * The first vector indicates number of sections in each collar (int). The second one indicates location
+     * of cuts that define collars in the polar angle std::vector<double>. The third one denotes the location
+     * of azimutal cuts as for each collar, as a vector for each collar std::vector<std::vector<double>>> */
+    std::tuple<std::vector<int>, std::vector<double>,
+            std::vector<std::vector<double>>> spherePartition::getPartition() {
+        return std::make_tuple(regionsPerCollar, phis, thetas);
+    };
+
+    // Pybind version of getSectionNumber, uses arbitrary vectors instead of vec3.
+    int spherePartition::getSectionNumberPyBind(std::vector<double> coord) {
+        return getSectionNumber(vec3<double>{coord[0], coord[1], coord[2]});
     }
 }

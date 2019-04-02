@@ -162,14 +162,14 @@ TEST_CASE("Quaternion partition", "[quaternionPartition]") {
     REQUIRE(msmrdtools::stdvecNorm(thetas[1], thetasRef[1]) <= 0.000001);
 
     // Test getSectionNumber from coordinate (s,x,z)
-    vec3<double> coordinate1{0.0, 0.0, 0.1};
-    vec3<double> coordinate2{0.0, 0.0, 0.25};
-    vec3<double> coordinate3{0.0, 0.0, -0.25};
-    vec3<double> coordinate4{0.0, 0.0, 0.85};
-    vec3<double> coordinate5{0.0, 0.0, -0.85};
-    vec3<double> coordinate6{1.0, 2.0, 0.0};
-    vec3<double> coordinate7{0.5, 3.5, 0.3};
-    vec3<double> coordinate8{-2.5, -1, -0.8};
+    quaternion<double> coordinate1{0.0, 0.0, 0.0, 0.1};
+    quaternion<double> coordinate2{0.0, 0.0, 0.0, 0.25};
+    quaternion<double> coordinate3{0.0, 0.0, 0.0, -0.25};
+    quaternion<double> coordinate4{0.0, 0.0, 0.0, 0.85};
+    quaternion<double> coordinate5{0.0, 0.0, 0.0, -0.85};
+    quaternion<double> coordinate6{1.0, 2.0, 0.0, 0.0};
+    quaternion<double> coordinate7{0.5, 3.5, 0.0, 0.3};
+    quaternion<double> coordinate8{-2.5, -1, 0.0, -0.8};
     coordinate6 = 0.65*coordinate6/coordinate6.norm();
     coordinate7 = 0.43*coordinate7/coordinate7.norm();
     coordinate8 = 0.82*coordinate8/coordinate8.norm();
