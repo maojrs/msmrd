@@ -26,8 +26,8 @@ namespace msmrd {
         /**
         * @param seed variable for random number generation (Note values of seed <= -1 correspond to random device)
         * @param rateDictionary dictionary relating transitions to its corresponding rates. The keys
-        * are strings of the form "state1->state2". The bound states hava b before the number, and the transition
-        * states are denoted with duple integers.
+        * are strings of the form "state1->state2". The bound states have "b" before the number, and the transition
+        * states are denoted by integers.
         * @param ctmsmDictionary dicitionary mapping keys of relevant transitions to the corresponding
         * continuous time Markov model.
         * @param nstates number of states in the msm (including unbound state)

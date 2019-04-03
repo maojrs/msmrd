@@ -47,7 +47,7 @@ def runParallelSims(simnumber):
     # Creates simulation
     sim = msmrd2.simulation(integrator)
     # Simulation parameters
-    timesteps = 20000000 #20000000 # 200000000 #5000
+    timesteps = 200000000 #20000000 # 200000000 #5000
     bufferSize = 1024
     stride = 250 #1
     outTxt = False
@@ -66,7 +66,7 @@ def runParallelSims(simnumber):
     print("Simulation " + str(simnumber) + ", done.")
 
 # Runs several simulations in parallel
-Nsimulations = 20 #200
+Nsimulations = 200 #20 #200
 num_cores = multiprocessing.cpu_count()
 pool = Pool(processes=num_cores)
 iterator = [i for i in range(Nsimulations)]
