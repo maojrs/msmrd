@@ -5,7 +5,6 @@
 #pragma once
 #include <memory>
 #include "trajectoryPositionOrientation.hpp"
-#include "discretizations/quaternionPartition.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
 #include "tools.hpp"
 
@@ -31,8 +30,8 @@ namespace msmrd {
         std::unique_ptr<quaternionPartition> quaternionPart;
         std::unique_ptr<positionOrientationPartition> positionOrientationPart;
         int angularStates;
+        double tolerance = 0.15;
         int prevsample = 0;
-        double tolerance = 0.1;
         /*
          * @param rotMetastableStates[X] correspond to the list of relative rotations that correspond to a
          * metastable state/region X. Each rotation is represented by a quaternion.
@@ -40,8 +39,10 @@ namespace msmrd {
          * needed to define the states.
          * @param spherePart pointer to equal area spherical partition class with relevant functions
          * @param quaternionPart pointer to volumetric spherical partition class to discretize quaternion space.
-         * @param number of angularStates for discretization
+         * @param angularStates number of angular states for discretization
          * @ param tolerance is the maximum distance away from metastable state to still be considered metastable.
+        * @param prevsample keeps calue of previous sample when sampling discrete trajectory, useful for
+         * coreMSM approach
          */
     public:
 

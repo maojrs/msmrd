@@ -57,6 +57,7 @@ set(SOURCES
         src/potentials/patchyProteinMarkovSwitch.cpp
         src/potentials/potentials.cpp
         src/trajectories/patchyDimer.cpp
+        src/trajectories/patchyProtein.cpp
         src/trajectories/trajectory.cpp
         src/trajectories/trajectoryPosition.cpp
         src/trajectories/trajectoryPositionOrientation.cpp
@@ -106,6 +107,7 @@ set(PY_SOURCES
         include/potentials/patchyProtein.hpp
         include/potentials/patchyProteinMarkovSwitch.hpp
         include/trajectories/patchyDimer.hpp
+        include/trajectories/patchyProtein.hpp
         include/trajectories/trajectory.hpp
         include/trajectories/trajectoryPosition.hpp
         include/trajectories/trajectoryPositionOrientation.hpp

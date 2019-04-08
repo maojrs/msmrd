@@ -13,9 +13,11 @@ namespace msmrd {
     patchyDimer::patchyDimer(unsigned long Nparticles, int bufferSize, int numSections) :
     trajectoryPositionOrientation(Nparticles, bufferSize) {
         double numRadialSections = 5;
+        double radialCutOff = 2.0;
         spherePart = std::make_unique<spherePartition>(numSections);
         quaternionPart = std::make_unique<quaternionPartition>(numRadialSections, numSections);
-        positionOrientationPart = std::make_unique<positionOrientationPartition>(2.0, 7, numRadialSections, numSections);
+        positionOrientationPart = std::make_unique<positionOrientationPartition>(radialCutOff, numSections,
+                numRadialSections, numSections);
         angularStates = numSections*(numSections + 1)/2;
         setMetastableRegions();
     };
