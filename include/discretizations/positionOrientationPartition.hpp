@@ -27,18 +27,18 @@ namespace msmrd {
      */
     class positionOrientationPartition {
     public:
-        int numSphericalSectionsPos;
         double relativeDistanceCutOff;
+        int numSphericalSectionsPos;
         int numRadialSectionsQuat;
         int numSphericalSectionsQuat;
         int numTotalSections = 0;
         std::unique_ptr<spherePartition> sphericalPartition;
         std::unique_ptr<quaternionPartition> quatPartition;
         /**
-         * @param numSphericalSectionsPos number of sections in the surface partition of the unit sphere to discretize
-         * the direction of the relative position.
          * @param reltiveDistanceCutOff determines the cutoff for the relative position, after this value is exceeded,
          * the partition is no longer effective and the getSectionNumber function returns 0 (unbound state)
+         * @param numSphericalSectionsPos number of sections in the surface partition of the unit sphere to discretize
+         * the direction of the relative position.
          * @param numRadialSectionsQuat number of radial sections in volumetric 3D sphere partition used to
          * discretize the relative orientation quaternion
          * @param numSphericalSectionsQuat number of spherical sections in each shell of the quaternion discretization.

@@ -13,16 +13,13 @@ namespace msmrd {
      * (rotations), which corresponds to a unit four-dimensional half sphere. This space can be projected into a 3D
      * volume inside the unit sphere for easier discretization (similar to a stereographic projection on the top half
      * 3D sphere). It uses spherePartition.hpp to divide the 3d sphere. In order to obtain the half unit quaternion
-     * sphere projection of (s,ix,jy,kz), one of the imaginary variables must be flattened (x, y or z); e.g. the new
-     * coordinates could simply be (s,x,z) and recover y with y=+sqrt(1-ss-xx-zz). If the s variable is flatten,
-     * important information about the rotation would be lost. On the other hand any quaternion with negative y
-     * (x or z), can be rewritten as a quaternion with positive y (x or z), so no information of the rotation is
-     * lost when cutting negative values of y (x or z). (Quaternion symmetries only along imaginary variables)
+     * sphere projection of (s,ix,jy,kz), one of the variables must be flattened (s, x, y or z); e.g. the new
+     * coordinates could simply be (x,y,z) and recover s with s=+sqrt(1-xx-yy-zz). This uses the fact that the
+     * quaternion q represents the same rotation as quaternion -q.
      *
-     * The recommended quaternion coordinates to do the 3D discretization are (s,x,z), while the y coordinate is
-     * flattened. Half sphere lives in y>=0, while negative y values should be rewritten as rotations with y>0 (always
-     * possible). The y coordinate is recovered as y=+sqrt(1-s*s-x*x-z*z). Note the choice of y was arbitrary. it could
-     * have been x or z as well.
+     * The recommended quaternion coordinates to do the 3D discretization are (x,y,z), while the s coordinate is
+     * flattened. Half sphere lives in s>=0, while negative s values should be rewritten as rotations with s>0 (always
+     * possible). Note the choice of s was arbitrary. it could have been x,y or z as well.
      */
     class quaternionPartition {
     protected:

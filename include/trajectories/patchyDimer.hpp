@@ -30,7 +30,7 @@ namespace msmrd {
         std::unique_ptr<quaternionPartition> quaternionPart;
         std::unique_ptr<positionOrientationPartition> positionOrientationPart;
         int angularStates;
-        double tolerance = 0.15;
+        double tolerance = 0.1;
         int prevsample = 0;
         /*
          * @param rotMetastableStates[X] correspond to the list of relative rotations that correspond to a

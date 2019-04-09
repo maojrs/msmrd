@@ -33,8 +33,14 @@ namespace msmrd {
         if (r > 1.0005) {
             throw std::range_error("Unit quaternion cannot be larger than one");
         }
-        // Reduce quaternion coordinate from (s,x,y,z) to (s,x,z)
-        vec3<double> reducedCoordinate{quatCoordinate[0], quatCoordinate[1], quatCoordinate[3]};
+        /* Reduce quaternion coordinate from (s,x,y,z) to (x,y,z), uses the fact
+         * that rotation of q = rotation of -q */
+        vec3<double> reducedCoordinate;
+        if (quatCoordinate[0] >= 0) {
+            reducedCoordinate = {quatCoordinate[1], quatCoordinate[2], quatCoordinate[3]};
+        } else {
+            reducedCoordinate = {-1.0*quatCoordinate[1], -1.0*quatCoordinate[2], -1.0*quatCoordinate[3]};
+        }
         double rReduced = reducedCoordinate.norm();
 
         for (int i = 0; i < numRadialSections; i++){
@@ -47,7 +53,6 @@ namespace msmrd {
                     sectionNumber += sphericalPartition->getSectionNumber(reducedCoordinate);
                     break;
                 }
-
             }
         }
         return sectionNumber;
