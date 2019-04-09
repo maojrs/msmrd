@@ -47,7 +47,7 @@ namespace msmrd {
     public:
 
 
-        patchyDimer(unsigned long Nparticles, int bufferSize, int numPartitions);
+        patchyDimer(unsigned long Nparticles, int bufferSize);
 
         void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override;
 

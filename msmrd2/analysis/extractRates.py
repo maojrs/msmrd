@@ -235,3 +235,32 @@ def splitDiscreteTrajs(discreteTrajs, unboundStateIndex = 0):
         trajnum += 1
         print("Trajectory ", trajnum, " of ", len(discreteTrajs), " done.", end="\r")
     return slicedDtrajs
+
+def stitchTrajs(slicedDtrajs, minlength = 1000):
+    '''
+    Joins splitted trajectories into long trajectories of at least minlength. The trajectories that cannot
+    be joined are left as they were.
+    :param slicedDtrajs: list of discrete trajectories. Each discrete trajectory is a numpy array
+    :param minlength: minimum length of stitched trajectory if any stititching is possible
+    :return: list of stitched trajectories
+    '''
+    myslicedDtrajs = slicedDtrajs.copy()
+    stitchedTrajs = []
+    # Stitch trajectories until original sliced trajectory is empty
+    while len(myslicedDtrajs) > 0:
+        traj = myslicedDtrajs[0]
+        del myslicedDtrajs[0]
+        # Keep trajectories under a certain length min length
+        while traj.size <= minlength:
+            foundTrajs = False
+            for i in reversed(range(len(myslicedDtrajs))):
+                # If end point and start point match, join trajectories
+                if traj[-1] == myslicedDtrajs[i][0]:
+                    foundTrajs = True
+                    traj = np.concatenate([traj, myslicedDtrajs[i]])
+                    del myslicedDtrajs[i]
+            # If no possible trajectory to join is found, save trajectory and continue.
+            if foundTrajs == False:
+                break;
+        stitchedTrajs.append(traj)
+    return stitchedTrajs

@@ -10,15 +10,18 @@ namespace msmrd {
      * to be analyzed and extracted into a Markov state model. This specific discretization will follow
      * the core MSM approach
      */
-    patchyDimer::patchyDimer(unsigned long Nparticles, int bufferSize, int numSections) :
+    patchyDimer::patchyDimer(unsigned long Nparticles, int bufferSize) :
     trajectoryPositionOrientation(Nparticles, bufferSize) {
-        double numRadialSections = 5;
         double radialCutOff = 2.2;
-        spherePart = std::make_unique<spherePartition>(numSections);
-        quaternionPart = std::make_unique<quaternionPartition>(numRadialSections, numSections);
-        positionOrientationPart = std::make_unique<positionOrientationPartition>(radialCutOff, numSections,
-                numRadialSections, numSections);
-        angularStates = numSections*(numSections + 1)/2;
+        int numSphericalSectionsPos = 7;
+        int numRadialSectionsQuat = 5;
+        int numSphericalSectionsQuat = numSphericalSectionsPos;
+        spherePart = std::make_unique<spherePartition>(numSphericalSectionsPos);
+        quaternionPart = std::make_unique<quaternionPartition>(numRadialSectionsQuat, numSphericalSectionsPos);
+        positionOrientationPart = std::make_unique<positionOrientationPartition>(radialCutOff, numSphericalSectionsPos,
+                                                                                 numRadialSectionsQuat,
+                                                                                 numSphericalSectionsQuat);
+        angularStates = numSphericalSectionsPos*(numSphericalSectionsPos + 1)/2;
         setMetastableRegions();
     };
 

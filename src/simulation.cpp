@@ -37,12 +37,8 @@ namespace msmrd {
 
         // Choose correct child class of trajectory given the current type of particles
         if (trajtype == "patchyDimer") {
-            int numSections = 7;
             outputDiscreteTraj = true;
-            traj = std::make_unique<patchyDimer>(particleList.size(), bufferSize, numSections);
-            if (integ.isBoundaryActive()) {
-                traj->setBoundary(integ.getBoundary());
-            }
+            traj = std::make_unique<patchyDimer>(particleList.size(), bufferSize);
             numcols = 8;
         } else if (trajtype == "position"){
             traj = std::make_unique<trajectoryPosition>(particleList.size(), bufferSize);
@@ -53,6 +49,11 @@ namespace msmrd {
         } else { // Otherwise use trajectoryPositionOrientation as default class
             traj = std::make_unique<trajectoryPositionOrientation>(particleList.size(), bufferSize);
             numcols = 8;
+        }
+
+        // Set boundary in trajectory class
+        if (integ.isBoundaryActive()) {
+            traj->setBoundary(integ.getBoundary());
         }
 
         /* Main simulation loop. Simulation method depends on output method. If H5 and chunked outputs are chosen
