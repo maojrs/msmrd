@@ -24,7 +24,6 @@ namespace msmrd {
     public:
         unsigned int numBoundStates;
         unsigned int numTransitionStates;
-        //unsigned int numDiscreteOrientations;
         /**
         * @param seed variable for random number generation (Note values of seed <= -1 correspond to random device)
         * @param rateDictionary dictionary relating transitions to its corresponding rates. The keys

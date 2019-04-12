@@ -51,11 +51,12 @@ namespace msmrd {
                 .def("propagate", &ctmsm::propagate);
 
         py::class_<msmrdMarkovModel>(m, "msmrdMarkovModel", "continuous time Markov state model specialized to use with"
-                                                            "MSM/RD integration (num. of states, num. discrete "
-                                                            "orientations, seed, rate dictionary")
+                                                            "MSM/RD integration (num. of bound states, num. transition"
+                                                            "states, seed, rate dictionary")
                 .def(py::init<unsigned int &, unsigned int &, long &, std::map<std::string, float> &>())
                 .def("getRate", &msmrdMarkovModel::getRate)
-                .def("getMSM", &msmrdMarkovModel::getMSM);
+                .def("computeTransition", &msmrdMarkovModel::computeTransition);
+
     }
 
 }

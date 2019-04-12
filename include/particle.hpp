@@ -77,7 +77,11 @@ namespace msmrd {
             orientation = 1 * nextOrientation;
         };
 
+        void activate() { active = true; }
+
         void deactivate() { active = false; }
+
+        bool isActive() { return active; }
 
         int getID() const { return pid; }
 
