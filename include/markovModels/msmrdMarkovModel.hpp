@@ -42,8 +42,6 @@ namespace msmrd {
 
         float getRate(std::string key);
 
-        ctmsm getMSM(std::string key);
-
     };
 
 }

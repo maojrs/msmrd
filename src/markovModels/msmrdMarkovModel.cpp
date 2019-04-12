@@ -19,9 +19,9 @@ namespace msmrd{
     /* Computes transition time and end state starting from a given transition step. The end states correspond
      * to one of the bound states (indexing of bound states begins in 1)*/
     std::tuple<double, int> msmrdMarkovModel::computeTransition(int transitionState) {
-        std::array<double, numBoundStates> rates;
+        std::vector<float> rates(numBoundStates);
         double transitionTime;
-        int endState;
+        int endState = 0;
 
         // Get rates to all bound states from dictionary
         std::string key;
@@ -32,8 +32,6 @@ namespace msmrd{
 
         // Calculate lambda0  and ratescumsum for SSA/Gillespie algorithm
         double lambda0 = 0;
-        std::array<double, numBoundStates> ratescumsum;
-        ratescumsum[0] = rates[0];
         for(const auto& rate: rates) {
             lambda0 += rate;
         }
@@ -66,18 +64,6 @@ namespace msmrd{
     float msmrdMarkovModel::getRate(std::string key) {
         auto search = rateDictionary.find(key);
         if (search != rateDictionary.end()) {
-            return search->second;
-        } else {
-            throw std::range_error("Key does not exist in dictionary");
-        }
-    }
-
-    /* @param key is in the form of "transition_region", e.g. "14" or "32", which correspond to the two closest
-     * orientational discrete states of each of the two particles (touched by a line)
-    between the two centers of mass)*/
-    ctmsm msmrdMarkovModel::getMSM(std::string key) {
-        auto search = ctmsmDictionary.find(key);
-        if (search != ctmsmDictionary.end()) {
             return search->second;
         } else {
             throw std::range_error("Key does not exist in dictionary");
