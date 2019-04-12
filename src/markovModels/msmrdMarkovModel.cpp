@@ -8,65 +8,54 @@ namespace msmrd{
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
     /**
     * Implementation of Markov model class specializes for MSM/RD.
-    * @param nstates number of states in the msm (including unbound state)
-    * @param numDiscreteOrientations number of Galerkin discrete orientations of one particle.
-    * @param seed variable for random number generation (Note values of seed <= -1 correspond to random device)
-    * @param rateDictionary dictionary relating transitions to its corresponding rates. The keys
-    * are strings of the form "state1->state2". The bound states hava b before the number, and the transition
-    * states are denoted with duple integers.
     */
-    msmrdMarkovModel::msmrdMarkovModel(unsigned int nstates, unsigned int numDiscreteOrientations,
+    msmrdMarkovModel::msmrdMarkovModel(unsigned int numBoundStates, unsigned int numTransitionStates,
                                        long seed, std::map<std::string, float> &rateDictionary)
-            : nstates(nstates), numDiscreteOrientations(numDiscreteOrientations),
+            : numBoundStates(numBoundStates), numTransitionStates(numTransitionStates),
               seed(seed), rateDictionary(rateDictionary) {
-        generateMarkovModels();
+        randg.setSeed(seed);
     };
 
-    /* Generates several continuous-time Markov models each representing a discretization of
-     * the relative orientation */
-    void msmrdMarkovModel::generateMarkovModels() {
-        int numBoundStates = nstates - 1;
-        // Create all MSMs corresponding to different orientations
-        float rate;
-        std::vector<std::vector<double>> transitionMatrix;
-        int msmid = 0;
-        for (int i = 1; i <= numDiscreteOrientations; i++){
-            for (int j = i; j <= numDiscreteOrientations; j++){
-                // Reset values of transition matrix to zero.
-                transitionMatrix = std::vector<std::vector<double>> (nstates, std::vector<double> (nstates, 0));
-                // Extract on rates from off-transition state ij to all bound states
-                for (int k = 1; k <= numBoundStates; k++) {
-                    auto key = std::to_string(i) + std::to_string(j) + "->b" + std::to_string(k);
-                    auto search = rateDictionary.find(key);
-                    if (search != rateDictionary.end()) {
-                        rate = search->second;
-                    } else {
-                        rate = 0;
-                    }
-                    transitionMatrix[0][k] = rate;
-                    transitionMatrix[0][0] -= rate;
-                }
-                // Create ctmsm and insert it into dictionary with key 'ij'.
-                ctmsm ctmsm_ij = ctmsm(msmid, transitionMatrix, seed*(msmid+1));
-                msmid += 1;
-                auto newkey = std::to_string(i) + std::to_string(j);
-                ctmsmDictionary.insert ( std::pair<std::string, ctmsm>(newkey, ctmsm_ij) );
+    /* Computes transition time and end state starting from a given transition step. The end states correspond
+     * to one of the bound states (indexing of bound states begins in 1)*/
+    std::tuple<double, int> msmrdMarkovModel::computeTransition(int transitionState) {
+        std::array<double, numBoundStates> rates;
+        double transitionTime;
+        int endState;
+
+        // Get rates to all bound states from dictionary
+        std::string key;
+        for (int i = 0; i < numBoundStates; i++) {
+            key = std::to_string(transitionState) + "->b" + std::to_string(i+1);
+            rates[i] = getRate(key);
+        }
+
+        // Calculate lambda0  and ratescumsum for SSA/Gillespie algorithm
+        double lambda0 = 0;
+        std::array<double, numBoundStates> ratescumsum;
+        ratescumsum[0] = rates[0];
+        for(const auto& rate: rates) {
+            lambda0 += rate;
+        }
+
+        // Calculate time for transition
+        double r1 = randg.uniformRange(0, 1);
+        transitionTime = std::log(1.0/r1)/lambda0;
+
+        // Calculate end state
+        double r2lam0 = randg.uniformRange(0, 1)*lambda0;
+        double cumsum = 0;
+        for (int i=0; i< numBoundStates; i++){
+            cumsum += rates[i];
+            if (r2lam0 <= cumsum) {
+                endState = i+1;
+                break;
             }
         }
 
-
-//        // Extract off rates to unbound transition states
-//        auto key2 = "b" + std::to_string(k) + "->" + std::to_string(i) + std::to_string(j);
-//        auto search2 = rateDictionary.find(key2);
-//        if (search2 != rateDictionary.end()) {
-//            rate = search2->second;
-//        } else {
-//            rate = 0;
-//        }
-//        transitionMatrix[k][0] = rate;
-//        transitionMatrix[k][0] -= rate;
-
+        return std::make_tuple(transitionTime, endState);
     }
+
 
     /* Getter functions for dictionary, a bit too long to leave in headers.
      * Better than simply calling dicionary[key] since that might create a new key with empty

@@ -28,7 +28,9 @@ namespace msmrd {
     }
 
 
-    void patchyProtein::sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) {}
+    void patchyProtein::sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) {
+
+    }
 
     /*
      * Define metastable relative orientations (including symmetric quaternion)
