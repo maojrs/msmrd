@@ -4,37 +4,41 @@
 
 #pragma once
 #include "discretizations/positionOrientationPartition.hpp"
-#include "integrators/integrator.hpp"
+#include "integrators/overdampedLangevinMarkovSwitch.hpp"
 #include "markovModels/msmrdMarkovModel.hpp"
-#include "overdampedLangevinMarkovSwitch.hpp"
+#include "tools.hpp"
 
 namespace msmrd {
-    using msmrdMSM = msmrd::msmrdMarkovModel;
+    using msm = msmrd::discreteTimeMarkovStateModel;
+    using ctmsm = msmrd::continuousTimeMarkovStateModel;
+    using msmrdMSM = msmrd::msmrdMarkovStateModel;
     using fullPartition = msmrd::positionOrientationPartition;
 
     /**
      * Base class for msmrd integration (coupling MSM and reaction-diffusion)
+     * @tparam templateMSM template can be an msm or a ctmsm
      */
-    class msmrdIntegrator : public overdampedLangevin {
+    template <typename templateMSM>
+    class msmrdIntegrator : public overdampedLangevinMarkovSwitch<templateMSM> {
     private:
         msmrdMSM &markovModel;
         fullPartition &positionOrientationPart;
 
-        void integrateOne(int partIndex, std::vector<particle> &parts, double timestep) override;
-
-        vec3<double> calculateRelativePosition(particle &p1, particle &p2);
     public:
         /**
         * @param markovModel pointer to class msmrdMarkovModel, which is the markovModel class specialized for
         * the MSM/RD scheme.
+        * @param positionOrientationPart pointer to full partition of relative distance and relative orientation,
+        * a.k.a positionOrientationPartition.
         */
-
-        msmrdIntegrator(double dt, long seed, std::string particlesbodytype, msmrdMSM markovModel,
-                        fullPartition positionOrientationPart);
+        msmrdIntegrator(double dt, long seed, std::string particlesbodytype, std::vector<templateMSM> MSMlist,
+                msmrdMSM markovModel, fullPartition positionOrientationPart);
 
         // Redefine integrate function
-        void integrate(std::vector<particle> &parts, msmrdMSM &masterMSM);
+        void integrate(std::vector<particleMS> &parts);
     };
+
+
 
 
 }

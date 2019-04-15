@@ -8,29 +8,25 @@
 namespace msmrd {
 
     /**
-     * Implementation of base class for MSM/RD integration... to be filled
+     * Constructor for MSM/RD integration class, can take discrete time MSM (msm) or a continous-time MSM.
      */
-    msmrdIntegrator::msmrdIntegrator(double dt, long seed, std::string particlesbodytype, msmrdMSM markovModel,
-                                     fullPartition positionOrientationPart) :
-            overdampedLangevin(dt, seed, particlesbodytype), markovModel(markovModel),
+    template<>
+    msmrdIntegrator<ctmsm>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
+                                                  std::vector<ctmsm> MSMlist, msmrdMSM markovModel,
+                                                  fullPartition positionOrientationPart) :
+            overdampedLangevinMarkovSwitch(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
             positionOrientationPart(positionOrientationPart) { };
 
-
-    /* Integrate one particle from the particle list main routine (visible only inside the class), only used
-     * if particles are far away. */
-    void msmrdIntegrator::integrateOne(int partIndex, std::vector<particle> &parts, double timestep) {
-        vec3<double> force = {0.0, 0.0, 0.0};
-        vec3<double> torque = {0.0, 0.0, 0.0};
-        if ( parts[partIndex].isActive() ) {
-            translate(parts[partIndex], force, timestep);
-            if (rotation) {
-                rotate(parts[partIndex], torque, timestep);
-            }
-        }
-    }
+    template<>
+    msmrdIntegrator<msm>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
+                                            std::vector<msm> MSMlist, msmrdMSM markovModel,
+                                            fullPartition positionOrientationPart) :
+            overdampedLangevinMarkovSwitch(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
+            positionOrientationPart(positionOrientationPart) { };
 
     // Main integrate function
-    void msmrdIntegrator::integrate(std::vector<particle> &parts, msmrdMSM &masterMSM) {
+    template<>
+    void msmrdIntegrator<ctmsm>::integrate(std::vector<particleMS> &parts) {
 
 
         // Integrate only active particles and save next positions/orientations in parts[i].next***
@@ -54,7 +50,9 @@ namespace msmrd {
         int nextState;
         for (int i = 0; i < parts.size(); i++) {
             for (int j = i + 1; j < parts.size(); j++) {
-                relativePosition = calculateRelativePosition(parts[i], parts[j]);
+                relativePosition = msmrdtools::calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition,
+                                                                         boundaryActive, domainBoundary->getBoundaryType(),
+                                                                         domainBoundary->boxsize);
 
                 if (relativePosition.norm() <= 2.2) {
                     relativeOrientation = parts[j].nextOrientation * parts[i].nextOrientation.conj();
@@ -81,16 +79,5 @@ namespace msmrd {
         clock += dt;
     }
 
-
-    vec3<double> msmrdIntegrator::calculateRelativePosition(particle &p1, particle &p2){
-        vec3<double> relPosition;
-        if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {
-            auto boxsize = domainBoundary->boxsize;
-            relPosition = msmrdtools::distancePeriodicBox(p2.nextPosition, p1.nextPosition, boxsize);
-        } else {
-            relPosition = p2.nextPosition - p1.nextPosition;
-        }
-        return relPosition;
-    }
 
 }

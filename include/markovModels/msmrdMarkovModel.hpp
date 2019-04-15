@@ -16,7 +16,7 @@ namespace msmrd {
      * feature is optional for alternative formulations of the scheme. In general the rate dictionary of transitions
      * between transition and bound states will be enough.
      */
-    class msmrdMarkovModel {
+    class msmrdMarkovStateModel {
     protected:
         long seed;
         std::map<std::string, float> rateDictionary;
@@ -34,7 +34,7 @@ namespace msmrd {
         * @param numTransitionStates number of transition states
         */
 
-        msmrdMarkovModel(unsigned int numBoundStates, unsigned int numTransitionStates,
+        msmrdMarkovStateModel(unsigned int numBoundStates, unsigned int numTransitionStates,
                          long seed, std::map<std::string, float> &rateDictionary);
 
         std::tuple<double, int> computeTransition(int transitionState);

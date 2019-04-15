@@ -109,4 +109,16 @@ namespace msmrdtools {
         }
         return {p1Periodic, p2 - p1Periodic};
     }
+
+    // Calculates relative position between two particles taking into account possible periodic boundary.
+    vec3<double> calculateRelativePosition(vec3<double> pos1, vec3<double> pos2, bool boundaryActive,
+                                           std::string boundaryType, vec3<double> boxsize){
+        vec3<double> relPosition;
+        if (boundaryActive and boundaryType == "periodic") {
+            relPosition = distancePeriodicBox(pos2, pos1, boxsize);
+        } else {
+            relPosition = pos2 - pos1;
+        }
+        return relPosition;
+    }
 }

@@ -37,6 +37,7 @@ namespace msmrd {
     template<>
     void overdampedLangevinMarkovSwitch<ctmsm>::integrateOneMS(int partIndex, std::vector<particleMS> &parts, double timestep) {
         auto &part = parts[partIndex];
+        auto tmsm = MSMlist[part.type];
         // Do diffusion/rotation propagation taking MSM/CTMSM into account
         double resdt;
         // propagate CTMSM when synchronized and update diffusion coefficients

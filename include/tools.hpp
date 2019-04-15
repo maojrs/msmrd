@@ -61,5 +61,9 @@ namespace msmrdtools {
     std::array<vec3<double>, 2> distancePeriodicBoxComplete(vec3<double> p1, vec3<double> p2,
                                                                        vec3<double> edgeslength);
 
+    // Calculates relative position between two particles taking into account possible periodic boundary
+    vec3<double> calculateRelativePosition(vec3<double> pos1, vec3<double> pos2, bool boundaryActive,
+                                           std::string boundaryType, vec3<double> boxsize);
+
 }
 

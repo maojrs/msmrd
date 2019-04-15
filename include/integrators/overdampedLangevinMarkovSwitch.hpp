@@ -14,11 +14,11 @@ namespace msmrd {
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
     /**
      * Over-damped Langevin with Markovian Switch integrator
-     * @tparam TMSM template can be an msm or a ctmsm
+     * @tparam templateMSM template can be an msm or a ctmsm
      */
-    template<typename TMSM>
+    template<typename templateMSM>
     class overdampedLangevinMarkovSwitch : public overdampedLangevin {
-    private:
+    protected:
         std::string msmtype;
 
         void integrateOne(int partIndex, std::vector<particleMS> &parts, double timestep);
@@ -26,21 +26,33 @@ namespace msmrd {
         void integrateOneMS(int partIndex, std::vector<particleMS> &parts, double timestep);
 
     public:
-        TMSM tmsm;
+        std::vector<templateMSM> MSMlist;
         /**
          * @param msmtype string to distinguish between msm and ctmsm
-         * @param tmsm object variable, can be either an msm or a ctmsm
+         * @param MSMlist can be either a vector of msms or of ctmsms. It is possible to provide only one msm/ctmsm
+         * in constructor instead of a vector.
          */
 
         /* Constructors need to be defined in headers for template w/pybind, see parent
-         * class odLangevin for details on constructor parameters */
-        overdampedLangevinMarkovSwitch(ctmsm &tmsm, double dt, long seed, std::string particlesbodytype)
-                : tmsm(tmsm), overdampedLangevin(dt, seed, particlesbodytype) {
+         * class overdampedLangevin for details on constructor parameters */
+
+        overdampedLangevinMarkovSwitch(std::vector<ctmsm> &MSMlist, double dt, long seed, std::string particlesbodytype)
+                : MSMlist(MSMlist), overdampedLangevin(dt, seed, particlesbodytype) {
             msmtype = "continuous-time";
         };
 
-        overdampedLangevinMarkovSwitch(msm &tmsm, double dt, long seed, std::string particlesbodytype)
-                : tmsm(tmsm), overdampedLangevin(dt, seed, particlesbodytype) {
+        overdampedLangevinMarkovSwitch(std::vector<msm> &MSMlist, double dt, long seed, std::string particlesbodytype)
+                : MSMlist(MSMlist), overdampedLangevin(dt, seed, particlesbodytype) {
+            msmtype = "discrete-time";
+        };
+
+        overdampedLangevinMarkovSwitch(ctmsm &MSMlist, double dt, long seed, std::string particlesbodytype)
+                : MSMlist(std::vector<ctmsm>{MSMlist}), overdampedLangevin(dt, seed, particlesbodytype) {
+            msmtype = "continuous-time";
+        };
+
+        overdampedLangevinMarkovSwitch(msm &MSMlist, double dt, long seed, std::string particlesbodytype)
+                : MSMlist(std::vector<msm>{MSMlist}), overdampedLangevin(dt, seed, particlesbodytype) {
             msmtype = "discrete-time";
         };
 

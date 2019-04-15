@@ -9,7 +9,7 @@ namespace msmrd{
     /**
     * Implementation of Markov model class specializes for MSM/RD.
     */
-    msmrdMarkovModel::msmrdMarkovModel(unsigned int numBoundStates, unsigned int numTransitionStates,
+    msmrdMarkovStateModel::msmrdMarkovStateModel(unsigned int numBoundStates, unsigned int numTransitionStates,
                                        long seed, std::map<std::string, float> &rateDictionary)
             : numBoundStates(numBoundStates), numTransitionStates(numTransitionStates),
               seed(seed), rateDictionary(rateDictionary) {
@@ -18,7 +18,7 @@ namespace msmrd{
 
     /* Computes transition time and end state starting from a given transition step. The end states correspond
      * to one of the bound states (indexing of bound states begins in 1)*/
-    std::tuple<double, int> msmrdMarkovModel::computeTransition(int transitionState) {
+    std::tuple<double, int> msmrdMarkovStateModel::computeTransition(int transitionState) {
         std::vector<float> rates(numBoundStates);
         double transitionTime;
         int endState = 0;
@@ -61,7 +61,7 @@ namespace msmrd{
 
     /* @param key is in the form of "state1->state2", e.g. "b1->14" or "32->b2",
      * where the states starting with "b" are bound states and the rest correspond to transition states*/
-    float msmrdMarkovModel::getRate(std::string key) {
+    float msmrdMarkovStateModel::getRate(std::string key) {
         auto search = rateDictionary.find(key);
         if (search != rateDictionary.end()) {
             return search->second;
