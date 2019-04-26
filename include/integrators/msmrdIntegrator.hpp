@@ -23,6 +23,7 @@ namespace msmrd {
     private:
         msmrdMSM &markovModel;
         fullPartition &positionOrientationPart;
+        std::vector<particleMS> boundParticles{};
 
     public:
         /**
@@ -30,6 +31,8 @@ namespace msmrd {
         * the MSM/RD scheme.
         * @param positionOrientationPart pointer to full partition of relative distance and relative orientation,
         * a.k.a positionOrientationPartition.
+        * @param boundParticles vector of particles, where each particle represents the bound state between
+         * two particles from the main particle list being integrated.
         */
         msmrdIntegrator(double dt, long seed, std::string particlesbodytype, std::vector<templateMSM> MSMlist,
                 msmrdMSM markovModel, fullPartition positionOrientationPart);

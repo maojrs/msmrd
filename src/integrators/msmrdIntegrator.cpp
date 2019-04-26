@@ -15,7 +15,7 @@ namespace msmrd {
                                                   std::vector<ctmsm> MSMlist, msmrdMSM markovModel,
                                                   fullPartition positionOrientationPart) :
             overdampedLangevinMarkovSwitch(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
-            positionOrientationPart(positionOrientationPart) { };
+            positionOrientationPart(positionOrientationPart) {};
 
     template<>
     msmrdIntegrator<msm>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
@@ -29,15 +29,24 @@ namespace msmrd {
     void msmrdIntegrator<ctmsm>::integrate(std::vector<particleMS> &parts) {
 
 
-        // Integrate only active particles and save next positions/orientations in parts[i].next***
+        /* Integrate only active particles and save next positions/orientations in parts[i].next***.
+         * Non-active particles will usually correspond to bound particles */
         for (int i = 0; i < parts.size(); i++) {
-            integrateOne(i, parts, dt);
+            if (parts[i].isActive()) {
+                if (parts[i].activeMSM) {
+                    integrateOneMS(i, parts, dt);
+                } else {
+                    integrateOne(i, parts, dt);
+                }
+            }
         }
 
-        // Enforce boundary and set new positions into parts[i].nextPosition
+        // Enforce boundary and set new positions into parts[i].nextPosition, only if particle is active.
         for (auto &part : parts) {
-            if (boundaryActive) {
-                domainBoundary->enforceBoundary(part);
+            if (part.isActive()) {
+                if (boundaryActive) {
+                    domainBoundary->enforceBoundary(part);
+                }
             }
         }
 
@@ -64,6 +73,11 @@ namespace msmrd {
                     transitionTime = std::get<0>(transition);
                     nextState = std::get<1>(transition);
                     // STILL MISSING A BUNCH OF THINGS
+
+//                    parts[i].deactivate();
+//                    parts[j].deactivate();
+//                    particleMS boundParticle = particleMS();
+//                    boundParticles.push_back();
                 }
             }
         }

@@ -17,7 +17,8 @@ namespace msmrd {
 
     /* Integrates diffusion and rotation of one particle, called by the integrateOneMS (visible only
      * inside the class). Note it cannot be inherited from overdampedLangevin::integrateOne since it
-     * uses a particleMS list instead of a particle list */
+     * uses a particleMS list instead of a particle list. Using list of pointers possible but not ideal
+     * due to dependencies. */
     template<>
     void overdampedLangevinMarkovSwitch<ctmsm>::integrateOne(int partIndex, std::vector<particleMS> &parts, double timestep) {
         vec3<double> force;
