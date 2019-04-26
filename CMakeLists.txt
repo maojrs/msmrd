@@ -30,8 +30,10 @@ include_directories(include)
 add_subdirectory(libraries/pybind11)
 set(bindings_python_version 3.6)
 set(SOURCES
+        src/eventManager.cpp
         src/randomgen.cpp
         src/simulation.cpp
+        src/tools.cpp
         src/boundaries/boundary.cpp
         src/boundaries/box.cpp
         src/boundaries/sphere.cpp
@@ -61,7 +63,6 @@ set(SOURCES
         src/trajectories/trajectory.cpp
         src/trajectories/trajectoryPosition.cpp
         src/trajectories/trajectoryPositionOrientation.cpp
-        src/tools.cpp
         )
 
 set(PY_SOURCES
@@ -76,6 +77,7 @@ set(PY_SOURCES
         src/binding/bindPotentials.cpp
         src/binding/bindSimulation.cpp
         src/binding/bindTrajectory.cpp
+        include/eventManager.hpp
         include/particle.hpp
         include/quaternion.hpp
         include/randomgen.hpp
