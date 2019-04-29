@@ -68,7 +68,7 @@ namespace msmrd {
                 auto transition = markovModel.computeTransition2UnboundState(parts[i].state);
                 transitionTime = std::get<0>(transition);
                 nextState = std::get<1>(transition);
-                eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, "in");
+                eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, "out");
             }
         }
     }
@@ -78,7 +78,6 @@ namespace msmrd {
     /* Main integrate function */
     template<>
     void msmrdIntegrator<ctmsm>::integrate(std::vector<particleMS> &parts) {
-
 
         /* Integrate only active particles and save next positions/orientations in parts[i].next***.
          * Non-active particles will usually correspond to bound particles */
@@ -107,6 +106,36 @@ namespace msmrd {
         // Check for transitions to unbound states from particles bound to each other.
         computeTransitions2UnboundStates(parts);
 
+        // Sort list and check for events that will happen
+        eventMgr.sort();
+        int numEvents = eventMgr.getNumEvents();
+        for (int i = 0; i < numEvents; i++) {
+            if (eventMgr.getEventTime(i) > 0) {
+                break;
+            }
+            else {
+                auto event = eventMgr.getEvent(i);
+                auto residualTime = std::get<0>(event);
+                auto endState = std::get<1>(event);
+                auto iIndex = std::get<2>(event)[0];
+                auto jIndex = std::get<2>(event)[1];
+                auto inORout = std::get<3>(event);
+                if (inORout == "in") {
+                    //Make transition to bound state happen (smaller index remains the active particle)
+                    parts[iIndex].boundTo = jIndex;
+                    parts[jIndex].boundTo = iIndex;
+                    parts[iIndex].state = endState;
+                    parts[jIndex].state = endState;
+                    parts[iIndex].position = 0.5*(parts[iIndex].position + parts[jIndex].position);
+                    //parts[iIndex].orientation =
+                    parts[jIndex].deactivate();
+                }
+                else if (inORout == "out") {
+                    //Make transition to unbound state happen
+                }
+            }
+        }
+
         // STILL MISSING A BUNCH OF THINGS
 
 //                    parts[i].deactivate();
@@ -122,7 +151,10 @@ namespace msmrd {
                 part.updateOrientation();
             }
         }
+
+        // Advance global time and time in event manager
         clock += dt;
+        eventMgr.advanceTime(dt);
     }
 
 
