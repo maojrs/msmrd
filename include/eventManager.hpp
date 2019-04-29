@@ -37,6 +37,8 @@ namespace msmrd {
 
         double getEventTime(int index);
 
+        void advanceTime(double timeStep);
+
         void sort();
     };
 }
