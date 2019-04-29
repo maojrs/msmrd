@@ -10,17 +10,18 @@ namespace msmrd {
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
     /*
      * Base Markov state model class used for MSM/RD algorithm. This Markov model is completely constructed from the
-     * rate dictionary. By default the rate dictionary passes only the rates from transition states to bound states.
-     * However, if all the rates between all the states is specified, it can further define a large list/dictionary
-     * of ctmsms, one for each discrete region in order to emulate the spatially dependent rates. However, this latter
-     * feature is optional for alternative formulations of the scheme. In general the rate dictionary of transitions
-     * between transition and bound states will be enough.
+     * rate dictionary. By default the rate dictionary passes only the rates from transition states to bound states and
+     * from bound states to transition states. However, if all the rates between all the states is specified, it can
+     * further define a large list/dictionary of ctmsms, one for each discrete region in order to emulate the spatially
+     * dependent rates. However, this latter feature is optional for alternative formulations of the scheme. In general
+     * the rate dictionary of transitions between transition and bound states (and viceversa) will be enough.
      */
     class msmrdMarkovStateModel {
     protected:
         long seed;
         std::map<std::string, float> rateDictionary;
         randomgen randg;
+        unsigned int startIndexTransitionStates = 10;
     public:
         unsigned int numBoundStates;
         unsigned int numTransitionStates;
@@ -29,7 +30,10 @@ namespace msmrd {
         * @param rateDictionary dictionary relating transitions to its corresponding rates. The keys
         * are strings of the form "state1->state2". The bound states have "b" before the number, and the transition
         * states are denoted by integers.
-        * @param random number generator class based on mt19937
+        * @param randg number generator class based on mt19937
+        * @param startIndexTransitionStates index of first transition states, if 10, only 9 bound states are supported.
+        * If 100, then 99 bound states are suported and so on. This parameter has to be consistent with the one used to
+        * generate the state numbering in the discrete trajectory (see patchyDimer trajectory for example).
         * @param numBoundStates number of bound states in the msm
         * @param numTransitionStates number of transition states
         */
@@ -37,9 +41,16 @@ namespace msmrd {
         msmrdMarkovStateModel(unsigned int numBoundStates, unsigned int numTransitionStates,
                          long seed, std::map<std::string, float> &rateDictionary);
 
-        std::tuple<double, int> computeTransition(int transitionState);
+        std::tuple<double, int> computeTransition2BoundState(int transitionState);
+
+        std::tuple<double, int> computeTransition2UnboundState(int boundState);
+
 
         float getRate(std::string key);
+
+        void setStartIndexTransitionStates(unsigned int newIndex) {
+            startIndexTransitionStates = newIndex;
+        }
 
     };
 

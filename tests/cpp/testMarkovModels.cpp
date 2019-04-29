@@ -59,7 +59,7 @@ TEST_CASE("Initialization of ctmsm dictionary in msmrdMarkovModel class", "[msmr
     REQUIRE(rate2b1 == 4.0);
     REQUIRE(rate1b2 == 3.0);
     REQUIRE(rate2b2 == 12.0);
-    auto transition = myMSM.computeTransition(1);
+    auto transition = myMSM.computeTransition2BoundState(1);
     auto time = std::get<0>(transition);
     auto endState = std::get<1>(transition);
     REQUIRE(time > 0);

@@ -139,7 +139,7 @@ namespace msmrd {
         double tcount = 0;
         bool propagateTMSM = true;
         bool activeMSM = true;
-        std::array<int, 2> indexesBoundParts{{-1, -1}};
+        int boundTo = -1;
         /**
          * @param state particle current state
          * @param nextState particle next state given and changed by the msm/ctmsm
@@ -149,9 +149,9 @@ namespace msmrd {
          * tcount and propagateTMSM are used to synchronize TMSM with diffusion/rotation timestepping
          * @param activeMSM determines if MSM behavior is active or dormant. Under certain conditions (bound state),
          * maybe it is convenient to turn off the MSM behavior.
-         * @param indexesBoundParts if particle is being used to model a bound state between two other particles,
-         * this variable indicate the indexes of the two bound particles in the particleList being intergrated. If
-         * not used, they take the default value -1.
+         * @param boundTo determines if particle is bound and to which particle in the particle list. If -1 the
+         * particle is not bound, otherwise the value of boundTo is the index of the other particle in the particle
+         * list.
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)

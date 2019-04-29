@@ -12,19 +12,70 @@ namespace msmrd {
      */
     template<>
     msmrdIntegrator<ctmsm>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
-                                                  std::vector<ctmsm> MSMlist, msmrdMSM markovModel,
-                                                  fullPartition positionOrientationPart) :
+                                            double relativeDistanceCutOff, std::vector<ctmsm> MSMlist,
+                                            msmrdMSM markovModel, fullPartition positionOrientationPart) :
             overdampedLangevinMarkovSwitch(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
-            positionOrientationPart(positionOrientationPart) {};
+            relativeDistanceCutOff(relativeDistanceCutOff), positionOrientationPart(positionOrientationPart) {};
 
     template<>
     msmrdIntegrator<msm>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
-                                            std::vector<msm> MSMlist, msmrdMSM markovModel,
-                                            fullPartition positionOrientationPart) :
+                                          double relativeDistanceCutOff, std::vector<msm> MSMlist,
+                                          msmrdMSM markovModel, fullPartition positionOrientationPart) :
             overdampedLangevinMarkovSwitch(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
-            positionOrientationPart(positionOrientationPart) { };
+            relativeDistanceCutOff(relativeDistanceCutOff), positionOrientationPart(positionOrientationPart) { };
 
-    // Main integrate function
+
+
+    // Computes possible transitions to bound state and saves them in the event manager. Used by integrate function.
+    template<>
+    void msmrdIntegrator<ctmsm>::computeTransitions2BoundStates(std::vector<particleMS> &parts) {
+        vec3<double> relativePosition;
+        quaternion<double> relativeOrientation;
+        quaternion<double> refQuaternion;
+        int currentTransitionState;
+        double transitionTime;
+        int nextState;
+        for (int i = 0; i < parts.size(); i++) {
+            for (int j = i + 1; j < parts.size(); j++) {
+                relativePosition = msmrdtools::calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition,
+                                                                         boundaryActive, domainBoundary->getBoundaryType(),
+                                                                         domainBoundary->boxsize);
+
+                if (relativePosition.norm() <= relativeDistanceCutOff) {
+                    relativeOrientation = parts[j].nextOrientation * parts[i].nextOrientation.conj();
+                    refQuaternion = parts[i].nextOrientation.conj();
+                    currentTransitionState = positionOrientationPart.getSectionNumber(relativePosition,
+                                                                                      relativeOrientation,
+                                                                                      refQuaternion);
+                    auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
+                    transitionTime = std::get<0>(transition);
+                    nextState = std::get<1>(transition);
+                    eventMgr.addEvent(transitionTime, nextState, i, j, "in");
+                }
+            }
+        }
+    }
+
+    /* Computes possible transitions from bound states to to transition states and saves them in the event manager.
+     * Used by integrate function. */
+    template<>
+    void msmrdIntegrator<ctmsm>::computeTransitions2UnboundStates(std::vector<particleMS> &parts) {
+        double transitionTime;
+        int nextState;
+        for (int i = 0; i < parts.size(); i++) {
+            // Check if particle[i] is bound (boundTo >= 0) and if bound pairs are only counted once (boundTo > i)
+            if (parts[i].boundTo > i) {
+                auto transition = markovModel.computeTransition2UnboundState(parts[i].state);
+                transitionTime = std::get<0>(transition);
+                nextState = std::get<1>(transition);
+                eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, "in");
+            }
+        }
+    }
+
+
+
+    /* Main integrate function */
     template<>
     void msmrdIntegrator<ctmsm>::integrate(std::vector<particleMS> &parts) {
 
@@ -50,37 +101,18 @@ namespace msmrd {
             }
         }
 
-        // Apply MSM/RD coupling for particles sufficiently close to each other.
-        vec3<double> relativePosition;
-        quaternion<double> relativeOrientation;
-        quaternion<double> refQuaternion;
-        int currentTransitionState;
-        double transitionTime;
-        int nextState;
-        for (int i = 0; i < parts.size(); i++) {
-            for (int j = i + 1; j < parts.size(); j++) {
-                relativePosition = msmrdtools::calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition,
-                                                                         boundaryActive, domainBoundary->getBoundaryType(),
-                                                                         domainBoundary->boxsize);
+        // Check for transitions to bound states from particles sufficiently close to each other.
+        computeTransitions2BoundStates(parts);
 
-                if (relativePosition.norm() <= 2.2) {
-                    relativeOrientation = parts[j].nextOrientation * parts[i].nextOrientation.conj();
-                    refQuaternion = parts[i].nextOrientation.conj();
-                    currentTransitionState = positionOrientationPart.getSectionNumber(relativePosition,
-                                                                                      relativeOrientation,
-                                                                                      refQuaternion);
-                    auto transition = markovModel.computeTransition(currentTransitionState);
-                    transitionTime = std::get<0>(transition);
-                    nextState = std::get<1>(transition);
-                    // STILL MISSING A BUNCH OF THINGS
+        // Check for transitions to unbound states from particles bound to each other.
+        computeTransitions2UnboundStates(parts);
+
+        // STILL MISSING A BUNCH OF THINGS
 
 //                    parts[i].deactivate();
 //                    parts[j].deactivate();
 //                    particleMS boundParticle = particleMS();
 //                    boundParticles.push_back();
-                }
-            }
-        }
 
         /* Update positions and orientations (sets calculated next position/orientation
          * calculated by integrator and boundary as current position/orientation). */
@@ -92,6 +124,9 @@ namespace msmrd {
         }
         clock += dt;
     }
+
+
+
 
 
 }
