@@ -33,6 +33,10 @@ namespace msmrd {
 
         void removeEvents(std::vector<std::tuple<double, int, std::array<int,2>, std::string>> events);
 
+        std::tuple<double, int, std::array<int,2>, std::string> getEvent(int index);
+
+        double getEventTime(int index);
+
         void sort();
     };
 }

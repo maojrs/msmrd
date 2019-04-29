@@ -25,11 +25,25 @@ namespace msmrd {
     }
 
     void eventManager::removeEvent(std::tuple<double, int, std::array<int,2>, std::string> event){
+        auto currentSize = eventList.size();
         std::remove(eventList.begin(), eventList.end(), event);
+        eventList.resize(currentSize - 1);
     }
 
     void eventManager::removeEvents(std::vector<std::tuple<double, int, std::array<int,2>, std::string>> events) {
         // Not clear yet hot to do this, perhaps: std::remove(eventList.begin(), eventList.end(), events);
+    }
+
+
+    // Returns event in eventList corresponding to the index provided
+    std::tuple<double, int, std::array<int,2>, std::string> eventManager::getEvent(int index) {
+        return eventList[index];
+    }
+
+    // Returns time of event in eventList corresponding to the index provided
+    double eventManager::getEventTime(int index) {
+        auto event = getEvent(index);
+        return std::get<0>(event);
     }
 
 

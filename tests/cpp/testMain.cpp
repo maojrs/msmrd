@@ -3,6 +3,7 @@
 //
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include <catch2/catch.hpp>
+#include "eventManager.hpp"
 #include "particle.hpp"
 #include "quaternion.hpp"
 #include "randomgen.hpp"
@@ -152,4 +153,34 @@ TEST_CASE("ParticleMS class basic functionality", "[particleMS]") {
     REQUIRE(partMS.getState() == newstate);
     REQUIRE(partMS.position == newposition);
     REQUIRE(partMS.orientation == neworientation);
+}
+
+TEST_CASE("Event manager functionality", "[eventManager]") {
+    eventManager eventMgr = eventManager();
+    double waitTime = 5.5;
+    int endState = 2;
+    std::string inORout = "in";
+    // Test adding events
+    eventMgr.addEvent(waitTime, endState, 1, 2, inORout);
+    eventMgr.addEvent(0.5*waitTime, 2*endState, 3, 5, inORout);
+    eventMgr.addEvent(2*waitTime, endState/2, 7, 6, inORout);
+    eventMgr.addEvent(3*waitTime, 3*endState, 3, 1, inORout);
+    REQUIRE(eventMgr.eventList.size() == 4);
+    // Test sorting of events by waiting time
+    eventMgr.sort();
+    REQUIRE(eventMgr.getEventTime(0) == 0.5*waitTime);
+    REQUIRE(eventMgr.getEventTime(1) == waitTime);
+    REQUIRE(eventMgr.getEventTime(2) == 2*waitTime);
+    REQUIRE(eventMgr.getEventTime(3) == 3*waitTime);
+    // Test getting and removing events
+    auto someEvent = eventMgr.getEvent(2);
+    eventMgr.removeEvent(someEvent);
+    REQUIRE(eventMgr.eventList.size() == 3);
+    REQUIRE(eventMgr.getEventTime(0) == 0.5*waitTime);
+    REQUIRE(eventMgr.getEventTime(1) == waitTime);
+    REQUIRE(eventMgr.getEventTime(2) == 3*waitTime);
+    eventMgr.removeEvent(1);
+    REQUIRE(eventMgr.eventList.size() == 2);
+    REQUIRE(eventMgr.getEventTime(0) == 0.5*waitTime);
+    REQUIRE(eventMgr.getEventTime(1) == 3*waitTime);
 }
