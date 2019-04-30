@@ -106,7 +106,7 @@ namespace msmrd {
         // Check for transitions to unbound states from particles bound to each other.
         computeTransitions2UnboundStates(parts);
 
-        // Sort list and check for events that will happen
+        // Sort list, check for events that should happen and make them happen.
         eventMgr.sort();
         int numEvents = eventMgr.getNumEvents();
         for (int i = 0; i < numEvents; i++) {
@@ -126,9 +126,15 @@ namespace msmrd {
                     parts[jIndex].boundTo = iIndex;
                     parts[iIndex].state = endState;
                     parts[jIndex].state = endState;
+                    /* Average bound particle position and orientation (save on particle with smaller index) and
+                     * deactivate particle with larger index. */
                     parts[iIndex].position = 0.5*(parts[iIndex].position + parts[jIndex].position);
-                    //parts[iIndex].orientation =
+                    parts[iIndex].orientation = msmrdtools::quaternionSlerp(parts[iIndex].orientation,
+                            parts[jIndex].orientation, 0.5);
                     parts[jIndex].deactivate();
+                    parts[iIndex].setD(markovModel.Dbound[endState]);
+                    parts[iIndex].setDrot(markovModel.DboundRot[endState]);
+
                 }
                 else if (inORout == "out") {
                     //Make transition to unbound state happen

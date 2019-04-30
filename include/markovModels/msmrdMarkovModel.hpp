@@ -4,14 +4,14 @@
 
 #pragma once
 #include <map>
-#include "markovModels/continuousTimeMarkovModel.hpp"
+#include "randomgen.hpp"
+
 
 namespace msmrd {
-    using ctmsm = msmrd::continuousTimeMarkovStateModel;
     /*
      * Base Markov state model class used for MSM/RD algorithm. This Markov model is completely constructed from the
      * rate dictionary. By default the rate dictionary passes only the rates from transition states to bound states and
-     * from bound states to transition states. However, if all the rates between all the states is specified, it can
+     * from bound states to transition states. However, if all the rates between all the states is specified, it could
      * further define a large list/dictionary of ctmsms, one for each discrete region in order to emulate the spatially
      * dependent rates. However, this latter feature is optional for alternative formulations of the scheme. In general
      * the rate dictionary of transitions between transition and bound states (and viceversa) will be enough.
@@ -25,6 +25,14 @@ namespace msmrd {
     public:
         unsigned int numBoundStates;
         unsigned int numTransitionStates;
+        unsigned int numAstates;
+        unsigned int numBstates;
+        std::vector<double> Dbound;
+        std::vector<double> DboundRot;
+        std::vector<double> DunboundA = {};
+        std::vector<double> DunboundRotA = {};
+        std::vector<double> DunboundB = {};
+        std::vector<double> DunboundRotB = {};
         /**
         * @param seed variable for random number generation (Note values of seed <= -1 correspond to random device)
         * @param rateDictionary dictionary relating transitions to its corresponding rates. The keys
@@ -36,9 +44,15 @@ namespace msmrd {
         * generate the state numbering in the discrete trajectory (see patchyDimer trajectory for example).
         * @param numBoundStates number of bound states in the msm
         * @param numTransitionStates number of transition states
+        * @param Dbound list of diffusion coefficients for each bound state
+        * @param DboundRot list of rotational diffusion coefficients for each bound state (particle type C)
+        * @param DunboundX list of diffusion coefficients for each unbound state of particle type X  (A or B)
+        * @param DunboundRotX list of rotational diffusion coefficients for each unbound state of particle
+        * type X  (A or B)
         */
 
         msmrdMarkovStateModel(unsigned int numBoundStates, unsigned int numTransitionStates,
+                              unsigned int numAstates, unsigned int numBstates,
                          long seed, std::map<std::string, float> &rateDictionary);
 
         std::tuple<double, int> computeTransition2BoundState(int transitionState);
@@ -51,6 +65,12 @@ namespace msmrd {
         void setStartIndexTransitionStates(unsigned int newIndex) {
             startIndexTransitionStates = newIndex;
         }
+
+        void setDbound(std::vector<double> &D, std::vector<double> &Drot);
+
+        void setDunboundA(std::vector<double> &D, std::vector<double> &Drot);
+
+        void setDunboundB(std::vector<double> &D, std::vector<double> &Drot);
 
     };
 

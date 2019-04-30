@@ -5,15 +5,21 @@
 #include "markovModels/msmrdMarkovModel.hpp"
 
 namespace msmrd{
-    using ctmsm = msmrd::continuousTimeMarkovStateModel;
     /**
-    * Implementation of Markov model class specializes for MSM/RD.
-    */
+     * Implementation of Markov model class specializes for MSM/RD.
+     */
     msmrdMarkovStateModel::msmrdMarkovStateModel(unsigned int numBoundStates, unsigned int numTransitionStates,
+                                                 unsigned int numAstates, unsigned int numBstates,
                                        long seed, std::map<std::string, float> &rateDictionary)
-            : numBoundStates(numBoundStates), numTransitionStates(numTransitionStates),
-              seed(seed), rateDictionary(rateDictionary) {
+            : numBoundStates(numBoundStates), numTransitionStates(numTransitionStates), numAstates(numAstates),
+              numBstates(numBstates), seed(seed), rateDictionary(rateDictionary) {
         randg.setSeed(seed);
+        Dbound.resize(numBoundStates);
+        DboundRot.resize(numBoundStates);
+        DunboundA.resize(numAstates);
+        DunboundRotA.resize(numAstates);
+        DunboundB.resize(numBstates);
+        DunboundRotB.resize(numBstates);
     };
 
     /* Computes transition time and end state starting from a given transition step. The end states correspond
@@ -109,6 +115,34 @@ namespace msmrd{
             return 0;
             //throw std::range_error("Key does not exist in dictionary");
         }
+    }
+
+    /* These functions set the diffusion coefficients for bound and unbound states (A and B).
+     * Note size of vectors must match numBoundStates or numAstates or numBstates. This functions NEEDS
+     * to be called to fill in diffusion coefficients. */
+
+    void msmrdMarkovStateModel::setDbound(std::vector<double> &D, std::vector<double> &Drot) {
+        if ( (D.size() != numBoundStates ) or (Drot.size() != numBoundStates) ) {
+            std::__throw_range_error("Vectors of diffusion coefficients must match number of bound states");
+        }
+        Dbound = D;
+        DboundRot = Drot;
+    }
+
+    void msmrdMarkovStateModel::setDunboundA(std::vector<double> &D, std::vector<double> &Drot) {
+        if ( (D.size() != numAstates ) or (Drot.size() != numAstates) ) {
+            std::__throw_range_error("Vectors of diffusion coefficients must match number of A states");
+        }
+        DunboundA = D;
+        DunboundRotA = Drot;
+    }
+
+    void msmrdMarkovStateModel::setDunboundB(std::vector<double> &D, std::vector<double> &Drot) {
+        if ( (D.size() != numBstates ) or (Drot.size() != numBstates) ) {
+            std::__throw_range_error("Vectors of diffusion coefficients must match number of B states");
+        }
+        DunboundB = D;
+        DunboundRotB = Drot;
     }
 
 }
