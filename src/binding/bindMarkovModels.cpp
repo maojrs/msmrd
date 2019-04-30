@@ -63,7 +63,6 @@ namespace msmrd {
                 .def("setDbound", &msmrdMSM::setDbound)
                 .def("setDunboundA", &msmrdMSM::setDunboundA)
                 .def("setDunboundB", &msmrdMSM::setDunboundB);
-
     }
 
 }

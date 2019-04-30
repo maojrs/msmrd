@@ -14,12 +14,8 @@ namespace msmrd{
             : numBoundStates(numBoundStates), numTransitionStates(numTransitionStates), numAstates(numAstates),
               numBstates(numBstates), seed(seed), rateDictionary(rateDictionary) {
         randg.setSeed(seed);
-        Dbound.resize(numBoundStates);
-        DboundRot.resize(numBoundStates);
-        DunboundA.resize(numAstates);
-        DunboundRotA.resize(numAstates);
-        DunboundB.resize(numBstates);
-        DunboundRotB.resize(numBstates);
+        Dboundlist.resize(numBoundStates);
+        DboundRotlist.resize(numBoundStates);
     };
 
     /* Computes transition time and end state starting from a given transition step. The end states correspond
@@ -125,24 +121,8 @@ namespace msmrd{
         if ( (D.size() != numBoundStates ) or (Drot.size() != numBoundStates) ) {
             std::__throw_range_error("Vectors of diffusion coefficients must match number of bound states");
         }
-        Dbound = D;
-        DboundRot = Drot;
-    }
-
-    void msmrdMarkovStateModel::setDunboundA(std::vector<double> &D, std::vector<double> &Drot) {
-        if ( (D.size() != numAstates ) or (Drot.size() != numAstates) ) {
-            std::__throw_range_error("Vectors of diffusion coefficients must match number of A states");
-        }
-        DunboundA = D;
-        DunboundRotA = Drot;
-    }
-
-    void msmrdMarkovStateModel::setDunboundB(std::vector<double> &D, std::vector<double> &Drot) {
-        if ( (D.size() != numBstates ) or (Drot.size() != numBstates) ) {
-            std::__throw_range_error("Vectors of diffusion coefficients must match number of B states");
-        }
-        DunboundB = D;
-        DunboundRotB = Drot;
+        Dboundlist = D;
+        DboundRotlist = Drot;
     }
 
 }

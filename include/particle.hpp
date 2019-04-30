@@ -20,7 +20,7 @@ namespace msmrd {
          * @param active determines if particle currently active
          */
     public:
-        int type;
+        int type = 0;
         double D;
         double Drot;
         vec3<double> position;
@@ -31,13 +31,13 @@ namespace msmrd {
         quaternion<double> nextOrientation;
         std::vector<quaternion<double>> symmetryQuaternions;
         /**
+         * @param type particle type (defaults to zero), for Markovian switching should be
+         * considered the same as the msmid.
          * @param D diffusion constant
          * @param Drot rotational diffusion constant
          * @param position position vector of the particle
          * @param orientvector orientation vector (only to be used by for rod-like particles)
          * @param orientation normalized quaternion representing the initial orientation of the particle
-         * @param type particle type (defaults to zero), for Markovian swithching should be
-         * considered the same as the msmid.
          * @param nextPosition saves next position for integrator to update
          * @param nextOrientvector saves next orientation vector for integrator to update
          * @param nextOrientation saves next orientation quaternions for integrator to update
@@ -94,6 +94,8 @@ namespace msmrd {
         void setD(double Dnew) { D = Dnew; }
 
         void setDrot(double Drotnew) { Drot = Drotnew; }
+
+        void setDs(double Dnew, double Drotnew) { D = Dnew, Drot = Drotnew; }
 
         void setType(int newtype) { type = newtype; }
 

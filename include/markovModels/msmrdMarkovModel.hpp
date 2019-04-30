@@ -15,6 +15,10 @@ namespace msmrd {
      * further define a large list/dictionary of ctmsms, one for each discrete region in order to emulate the spatially
      * dependent rates. However, this latter feature is optional for alternative formulations of the scheme. In general
      * the rate dictionary of transitions between transition and bound states (and viceversa) will be enough.
+     *
+     * It is used to establish the coupling between unbound states and bound states and to model the transition
+     * between bound states. It does NOT manage the Markov dynamics in the unbound states. That is done by the MSMs
+     * in MSMlist in the msmrdIntegrator.
      */
     class msmrdMarkovStateModel {
     protected:
@@ -27,12 +31,8 @@ namespace msmrd {
         unsigned int numTransitionStates;
         unsigned int numAstates;
         unsigned int numBstates;
-        std::vector<double> Dbound;
-        std::vector<double> DboundRot;
-        std::vector<double> DunboundA = {};
-        std::vector<double> DunboundRotA = {};
-        std::vector<double> DunboundB = {};
-        std::vector<double> DunboundRotB = {};
+        std::vector<double> Dboundlist;
+        std::vector<double> DboundRotlist;
         /**
         * @param seed variable for random number generation (Note values of seed <= -1 correspond to random device)
         * @param rateDictionary dictionary relating transitions to its corresponding rates. The keys
@@ -44,11 +44,9 @@ namespace msmrd {
         * generate the state numbering in the discrete trajectory (see patchyDimer trajectory for example).
         * @param numBoundStates number of bound states in the msm
         * @param numTransitionStates number of transition states
-        * @param Dbound list of diffusion coefficients for each bound state
-        * @param DboundRot list of rotational diffusion coefficients for each bound state (particle type C)
-        * @param DunboundX list of diffusion coefficients for each unbound state of particle type X  (A or B)
-        * @param DunboundRotX list of rotational diffusion coefficients for each unbound state of particle
-        * type X  (A or B)
+        * @param Dboundlist list of diffusion coefficients for each bound state.
+        * @param DboundRotlist list of rotational diffusion coefficients for each bound state (particle type C)
+
         */
 
         msmrdMarkovStateModel(unsigned int numBoundStates, unsigned int numTransitionStates,
@@ -67,10 +65,6 @@ namespace msmrd {
         }
 
         void setDbound(std::vector<double> &D, std::vector<double> &Drot);
-
-        void setDunboundA(std::vector<double> &D, std::vector<double> &Drot);
-
-        void setDunboundB(std::vector<double> &D, std::vector<double> &Drot);
 
     };
 

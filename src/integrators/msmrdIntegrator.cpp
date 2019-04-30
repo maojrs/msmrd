@@ -12,17 +12,31 @@ namespace msmrd {
      */
     template<>
     msmrdIntegrator<ctmsm>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
-                                            double relativeDistanceCutOff, std::vector<ctmsm> MSMlist,
-                                            msmrdMSM markovModel, fullPartition positionOrientationPart) :
+                                            int numParticleTypes, double relativeDistanceCutOff,
+                                            std::vector<ctmsm> MSMlist, msmrdMSM markovModel,
+                                            fullPartition positionOrientationPart) :
             overdampedLangevinMarkovSwitch(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
-            relativeDistanceCutOff(relativeDistanceCutOff), positionOrientationPart(positionOrientationPart) {};
+            numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff),
+            positionOrientationPart(positionOrientationPart) {
+        if (MSMlist.size() != numParticleTypes) {
+            std::__throw_range_error("Number of MSMs provided in MSMlist should match number of unbound particle"
+                                     "types in the simulation");
+        }
+    };
 
     template<>
     msmrdIntegrator<msm>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
-                                          double relativeDistanceCutOff, std::vector<msm> MSMlist,
-                                          msmrdMSM markovModel, fullPartition positionOrientationPart) :
+                                          int numParticleTypes,  double relativeDistanceCutOff,
+                                          std::vector<msm> MSMlist, msmrdMSM markovModel,
+                                          fullPartition positionOrientationPart) :
             overdampedLangevinMarkovSwitch(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
-            relativeDistanceCutOff(relativeDistanceCutOff), positionOrientationPart(positionOrientationPart) { };
+            numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff),
+            positionOrientationPart(positionOrientationPart) {
+        if (MSMlist.size() != numParticleTypes) {
+            std::__throw_range_error("Number of MSMs provided in MSMlist should match number of unbound particle"
+                                     "types in the simulation");
+        }
+    };
 
 
 
@@ -109,35 +123,74 @@ namespace msmrd {
         // Sort list, check for events that should happen and make them happen.
         eventMgr.sort();
         int numEvents = eventMgr.getNumEvents();
+        int eventCounter = 0;
+        int iNewState;
+        int jNewState;
         for (int i = 0; i < numEvents; i++) {
             if (eventMgr.getEventTime(i) > 0) {
                 break;
             }
             else {
+                eventCounter += 1;
                 auto event = eventMgr.getEvent(i);
                 auto residualTime = std::get<0>(event);
                 auto endState = std::get<1>(event);
                 auto iIndex = std::get<2>(event)[0];
                 auto jIndex = std::get<2>(event)[1];
                 auto inORout = std::get<3>(event);
+                // Make transition to bound state happen (smaller index remains the active particle)
                 if (inORout == "in") {
-                    //Make transition to bound state happen (smaller index remains the active particle)
+                    /* Establish pair connection in particle class and deactivate particle with larger index ( only
+                     * particle with smaller index remains active to represent the movement of the bound particle) */
                     parts[iIndex].boundTo = jIndex;
                     parts[jIndex].boundTo = iIndex;
-                    parts[iIndex].state = endState;
-                    parts[jIndex].state = endState;
-                    /* Average bound particle position and orientation (save on particle with smaller index) and
-                     * deactivate particle with larger index. */
+                    parts[jIndex].deactivate();
+                    // Set state for particle
+                    parts[iIndex].setState(endState);
+                    parts[jIndex].setState(endState);
+                    // Deactivate unbound MSM behavior if applicable
+                    parts[iIndex].activeMSM = false;
+                    parts[jIndex].activeMSM = false;
+                    // Set diffusion coefficients in bound state
+                    parts[iIndex].setDs(markovModel.Dboundlist[endState], markovModel.DboundRotlist[endState]);
+                    /* Average bound particle position and orientation (save on particle with smaller index),
+                     * send deactivated particle far away ( could be useful for visualization)*/
                     parts[iIndex].position = 0.5*(parts[iIndex].position + parts[jIndex].position);
                     parts[iIndex].orientation = msmrdtools::quaternionSlerp(parts[iIndex].orientation,
-                            parts[jIndex].orientation, 0.5);
-                    parts[jIndex].deactivate();
-                    parts[iIndex].setD(markovModel.Dbound[endState]);
-                    parts[iIndex].setDrot(markovModel.DboundRot[endState]);
+                                                                            parts[jIndex].orientation, 0.5);
+                    parts[jIndex].position = {10000000.0, 10000000.0, 10000000.0};
 
                 }
+                //Make transition to unbound state happen
                 else if (inORout == "out") {
-                    //Make transition to unbound state happen
+                    // Eliminate pair connection by resetting to default value -1 and activate particles.
+                    parts[iIndex].boundTo = -1;
+                    parts[jIndex].boundTo = -1;
+                    parts[iIndex].activate();
+                    parts[jIndex].activate();
+                    /* Calculates next states and activates MSM if there is a transition matrix (size larger than one).
+                     * More complex behavior to calculate new states possible */
+                    iNewState = 0;
+                    jNewState = 0;
+                    auto iPartType = parts[iIndex].type;
+                    auto jPartType = parts[jIndex].type;
+                    if (MSMlist[iPartType].tmatrix.size() > 1) {
+                        parts[iIndex].activeMSM = true;
+                        iNewState = randg.uniformInteger(0, MSMlist[iPartType].tmatrix.size());
+                    }
+                    if (MSMlist[jPartType].tmatrix.size() > 1) {
+                        parts[jIndex].activeMSM = true;
+                        jNewState = randg.uniformInteger(0, MSMlist[jPartType].tmatrix.size());
+                    }
+                    // Set new states
+                    parts[iIndex].setState(iNewState);
+                    parts[jIndex].setState(jNewState);
+                    // Set diffusion coefficients
+                    parts[iIndex].setDs(MSMlist[iPartType].Dlist[iNewState],
+                                        MSMlist[iPartType].Drotlist[iNewState]);
+                    parts[jIndex].setDs(MSMlist[jPartType].Dlist[jNewState],
+                                        MSMlist[jPartType].Drotlist[jNewState]);
+                    // Sets new positions and orientations I AM HERE NOW, STILL NEED TO IMPLEMENT THIS
                 }
             }
         }
