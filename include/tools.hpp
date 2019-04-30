@@ -65,5 +65,11 @@ namespace msmrdtools {
     vec3<double> calculateRelativePosition(vec3<double> pos1, vec3<double> pos2, bool boundaryActive,
                                            std::string boundaryType, vec3<double> boxsize);
 
+    // Calculates dot product between quaternions
+    double dotQuaternion(quaternion<double> q0, quaternion<double> q1);
+
+    // Calculates slerp (spherical linear interpolation) between quaternions, t between (0,1).
+    quaternion<double> quaternionSlerp(quaternion<double> q0, quaternion<double> q1, double t);
+
 }
 

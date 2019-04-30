@@ -121,4 +121,47 @@ namespace msmrdtools {
         }
         return relPosition;
     }
+
+    double dotQuaternion(quaternion<double> q0, quaternion<double> q1) {
+        return q0[0]*q1[0] + q0[1]*q1[1] + q0[2]*q1[2]+ q0[3]*q1[3];
+    }
+
+    // Calculates slerp (spherical linear interpolation between two quaternions).
+    quaternion<double> quaternionSlerp(quaternion<double> q0, quaternion<double> q1, double t) {
+        const double dotThreshold = 0.9995;
+
+        // Normalize since only unit quaternions are valid rotations.
+        q0 = q0/q0.norm();
+        q1 = q1/q1.norm();
+
+        // Compute the cosine of the angle between the two vectors.
+        double dot = dotQuaternion(q0, q1);
+
+        /* If the dot product is negative, slerp won't take the shorter path. As v1 and -v1 are equivalent when
+         * equivalent rotations, we only need reversing one quaternion. */
+        if (dot < 0) {
+            q1 = -1*q1;
+            dot = -dot;
+        }
+
+        if (dot > dotThreshold) {
+            // If the inputs are too close for comfort, linearly interpolate
+            // and normalize the result.
+
+            quaternion<double> result = q0 + t*(q1 - q0);
+            result = result/result.norm();
+            return result;
+        }
+
+        // Since dot is in range [0, dotThreshold], acos is safe
+        double theta_0 = acos(dot);        // theta_0 = angle between input vectors
+        double theta = theta_0*t;          // theta = angle between v0 and result
+        double sin_theta = sin(theta);     // compute this value only once
+        double sin_theta_0 = sin(theta_0); // compute this value only once
+
+        double s0 = cos(theta) - dot * sin_theta / sin_theta_0;  // == sin(theta_0 - theta) / sin(theta_0)
+        double s1 = sin_theta / sin_theta_0;
+
+        return (s0 * q0) + (s1 * q1);
+    }
 }

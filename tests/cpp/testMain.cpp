@@ -8,6 +8,7 @@
 #include "quaternion.hpp"
 #include "randomgen.hpp"
 #include "simulation.hpp"
+#include "tools.hpp"
 #include "vec3.hpp"
 
 using namespace msmrd;
@@ -36,6 +37,24 @@ TEST_CASE("Basic quaternion arithmetic", "[quaternions]") {
     REQUIRE( q1+v1 == q3 );
     REQUIRE( q1p+v1 == v3 );
     REQUIRE( q1*q2 == v4 );
+}
+
+TEST_CASE("Quaternion Slerp", "[quaternions]") {
+    double t = 0.7; //between 0 and 1
+    double tolerance = 0.00001;
+    quaternion<double> q1({1.,2.,3.,4.});
+    quaternion<double> q2({5.,1.,7.,5.});
+    q1 = q1/q1.norm();
+    q2 = q2/q2.norm();
+    quaternion<double> qslerp1 = msmrdtools::quaternionSlerp(q1, q2, t);
+    quaternion<double> qslerp2 = msmrdtools::quaternionSlerp(q2, q1, 1 - t);
+    auto qerror = qslerp1 - qslerp2;
+    REQUIRE( qerror.norm() < tolerance );
+    auto qrel1 = qslerp1*q1.conj();
+    auto qrel2 = qslerp2*q2.conj();
+    auto qerror2 = qrel1*q1 - qrel2*q2;
+    REQUIRE( qerror2.norm() < tolerance  );
+//  REQUIRE( q1*q2 == v4 );
 }
 
 TEST_CASE("Sampling from randomgen", "[randomgen]") {
