@@ -27,6 +27,12 @@ namespace msmrd {
         return uniform(mt_rand);
     };
 
+    double randomgen::uniformInteger(int imin, int imax) {
+        auto value = uniformRange(1.0*imin, 1.0*imax + 1);
+        return (int) std::floor(value);
+    };
+
+
     // Returns random number sampled from normal distribution with given mean and standard deviation
     double randomgen::normal(double mean, double stddev) {
         std::normal_distribution<double> normaldist(mean, stddev);

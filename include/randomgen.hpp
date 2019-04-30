@@ -25,6 +25,8 @@ namespace msmrd {
 
         double uniformRange(double rmin, double rmax);
 
+        double uniformInteger(int imin, int imax);
+
         double normal(double mean, double stddev);
 
         vec3<double> normal3D(double mean, double stddev);
