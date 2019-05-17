@@ -15,7 +15,7 @@ namespace msmrd {
     class eventManager {
     public:
         /*
-         * @param eventList, list of events/reaction/transisition. Each entry of the list has 4 components, time until
+         * @param eventList, list of events/reaction/transition. Each entry of the list has 4 components, time until
          * event happens, the state to which it will transision (endstate), an array containing the two indexes (in the
          * particleList) of the particles involved in the event and a string, "in" or "out" to show it is transitioning
          * to into a bound state or out of it. The list should be always sorted after being updated by ascending time
@@ -41,6 +41,9 @@ namespace msmrd {
 
         int getNumEvents() { return eventList.size(); }
 
-        void sort();
+        void sortAscending();
+
+        void sortDescending();
+
     };
 }

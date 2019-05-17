@@ -20,7 +20,7 @@ namespace msmrd {
 
     /*
      * Routines to remove events, note the different possibilities: one using index in the event list, the second one
-     * using the event itself and the third one using a list of events to be erase at once.
+     * using the event itself and the third one using a list of events to be erased at once.
      */
     void eventManager::removeEvent(int index){
         eventList.erase(eventList.begin() + index);
@@ -60,7 +60,17 @@ namespace msmrd {
 
 
     // Sorts event list in ascending order using the value of the first entry in the tuple (time).
-    void eventManager::sort() {
+    void eventManager::sortAscending() {
         std::sort(eventList.begin(), eventList.end());
+    }
+
+    // Sorts event list in descending order using the value of the first entry in the tuple (time).
+    void eventManager::sortDescending() {
+        // Lambda function to define sorting
+        auto sortdesc = [](const std::tuple<double, int, std::array<int,2>, std::string>& a,
+                           const std::tuple<double, int, std::array<int,2>, std::string>& b) {
+            return (std::get<0>(a) > std::get<0>(b));
+        };
+        std::sort(eventList.begin(), eventList.end(), sortdesc);
     }
 }

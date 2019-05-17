@@ -186,7 +186,7 @@ TEST_CASE("Event manager functionality", "[eventManager]") {
     eventMgr.addEvent(3*waitTime, 3*endState, 3, 1, inORout);
     REQUIRE(eventMgr.eventList.size() == 4);
     // Test sorting of events by waiting time
-    eventMgr.sort();
+    eventMgr.sortAscending();
     REQUIRE(eventMgr.getEventTime(0) == 0.5*waitTime);
     REQUIRE(eventMgr.getEventTime(1) == waitTime);
     REQUIRE(eventMgr.getEventTime(2) == 2*waitTime);
@@ -205,11 +205,11 @@ TEST_CASE("Event manager functionality", "[eventManager]") {
     // Test advance time
     eventMgr.addEvent(waitTime, endState, 1, 2, inORout);
     eventMgr.addEvent(2*waitTime, endState/2, 7, 6, inORout);
-    eventMgr.sort();
+    eventMgr.sortDescending();
     eventMgr.advanceTime(1.5);
-    REQUIRE(eventMgr.getEventTime(0) == 0.5*waitTime - 1.5);
-    REQUIRE(eventMgr.getEventTime(1) == waitTime - 1.5);
-    REQUIRE(eventMgr.getEventTime(2) == 2*waitTime - 1.5);
-    REQUIRE(eventMgr.getEventTime(3) == 3*waitTime - 1.5);
+    REQUIRE(eventMgr.getEventTime(0) == 3*waitTime - 1.5);
+    REQUIRE(eventMgr.getEventTime(1) == 2*waitTime - 1.5);
+    REQUIRE(eventMgr.getEventTime(2) == waitTime - 1.5);
+    REQUIRE(eventMgr.getEventTime(3) == 0.5*waitTime - 1.5);
 
 }
