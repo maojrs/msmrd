@@ -12,6 +12,9 @@ namespace msmrd {
      * for the event/transition, the indexes (in partList) of the particles involved (part1Index < part2Index) and
      * a string: "in" or "out" to show it is transitioning into a bound state or out of it. */
     void eventManager::addEvent(double waitTime, int endState, int part1Index, int part2Index, std::string inORout) {
+        if ((inORout != "in") and (inORout != "out")) {
+            std::range_error("Events can only take 'in' or 'out' strings as last argument");
+        }
         std::array<int, 2> partIndexes = {part1Index, part2Index};
         auto event = std::make_tuple(waitTime, endState, partIndexes, inORout);
         eventList.push_back(event);

@@ -60,9 +60,7 @@ namespace msmrd {
                 .def("getRate", &msmrdMarkovStateModel::getRate)
                 .def("computeTransition", &msmrdMSM::computeTransition2BoundState)
                 .def("computeTransition", &msmrdMSM::computeTransition2UnboundState)
-                .def("setDbound", &msmrdMSM::setDbound)
-                .def("setDunboundA", &msmrdMSM::setDunboundA)
-                .def("setDunboundB", &msmrdMSM::setDunboundB);
+                .def("setDbound", &msmrdMSM::setDbound);
     }
 
 }

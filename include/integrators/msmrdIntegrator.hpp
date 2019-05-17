@@ -41,8 +41,9 @@ namespace msmrd {
         * a.k.a positionOrientationPartition.
         * @param eventManager class to manage order of events (reactions/transitions).
         * @param MSMlist (see overdampedLanegvinMarkovSwitch parent class) can be either a vector of msms
-        * (not yet implemented) or of ctmsms. It corresponds to the different MSMs of the unbound particles. Its
-        * size should match the number of unbound particle types in the simulation.
+        * (not yet implemented) or of ctmsms. It corresponds to the MSMs of the unbound particles (conformation
+        * switching). Its size should match the number of unbound particle types in the simulation, one MSM
+        * per particle type.
         */
         msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
                         double relativeDistanceCutOff, std::vector<templateMSM> MSMlist, msmrdMSM markovModel,
@@ -54,6 +55,13 @@ namespace msmrd {
         void computeTransitions2BoundStates(std::vector<particleMS> &parts);
 
         void computeTransitions2UnboundStates(std::vector<particleMS> &parts);
+
+        void removeUnrealizedEvents(std::vector<particleMS> &parts);
+
+        void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+
+        void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+
 
     };
 
