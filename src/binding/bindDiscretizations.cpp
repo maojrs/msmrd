@@ -41,7 +41,7 @@ namespace msmrd {
                 .def(py::init<double &, int &, int &, int &>())
                 .def_property_readonly("numSections", &positionOrientationPartition::getNumSections)
                 .def("getSectionNumber", &positionOrientationPartition::getSectionNumberPyBind)
-                .def("getSection", &positionOrientationPartition::getSection);
+                .def("getSectionNumbers", &positionOrientationPartition::getSectionNumbers);
 
     };
 }

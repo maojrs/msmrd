@@ -60,11 +60,11 @@ namespace msmrd {
 
     /* Gets volumetric interval delimiter of the section corresponding to secNumber. The function return three
      * intervals, one in the r direction, one in the phi angle (polar) and one in the theta angle (azimuthal). */
-    std::tuple<std::vector<double>, std::vector<double>,
-            std::vector<double>> quaternionPartition::getSectionIntervals(int secNumber) {
-        std::vector<double> rInterval(2, 0);
-        std::vector<double> phiInterval(2,0);
-        std::vector<double> thetaInterval(2,0);
+    std::tuple<std::array<double, 2>, std::array<double, 2>,
+            std::array<double, 2>> quaternionPartition::getSectionIntervals(int secNumber) {
+        std::array<double, 2> rInterval;
+        std::array<double, 2> phiInterval;
+        std::array<double, 2> thetaInterval;
         // If on first section, return the full inner sphere interval limits.
         if (secNumber == 1) {
             rInterval = {0.0, radialSections[1]};
@@ -74,7 +74,7 @@ namespace msmrd {
         } else {
             /* Otherwise, find on which shell is the particle and use the sphericalPartition to obtain
              * the correct angular intervals */
-            std::tuple<std::vector<double>, std::vector<double>> angles;
+            std::tuple<std::array<double, 2>, std::array<double, 2>> angles;
             double rindex = -1;
             int sectionNumModule = (secNumber - 1) % numSphericalSections;
             if (sectionNumModule == 0) {

@@ -53,7 +53,8 @@ namespace msmrd {
 
         /* Gets volumetric interval delimiter of the section corresponding to secNumber. The function return three
         * intervals, one in the r direction, one in the phi angle (polar) and one in the theta angle (azimuthal). */
-        std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> getSectionIntervals(int secNumber);
+        std::tuple<std::array<double, 2>, std::array<double, 2>,
+                std::array<double, 2>> getSectionIntervals(int secNumber);
 
 
 

@@ -144,7 +144,7 @@ namespace msmrd{
 
     /* Returns phi-angles (polar) and theta-angles (azimuthal) that correspond to the sectionnumber
      * in the sphere partition */
-    std::tuple<std::vector<double>, std::vector<double>> spherePartition::getAngles(int secNumber) {
+    std::tuple<std::array<double, 2>, std::array<double, 2>> spherePartition::getAngles(int secNumber) {
         if (secNumber > numSections) {
             std::range_error("Error: section number is larger than number of partitions");
         }
@@ -184,8 +184,8 @@ namespace msmrd{
                 theta2 = thetasCollar[statesInCollar];
             }
         }
-        std::vector<double> phiInterval{phi1, phi2};
-        std::vector<double> thetaInterval{theta1, theta2};
+        std::array<double, 2> phiInterval = {phi1, phi2};
+        std::array<double, 2> thetaInterval = {theta1, theta2};
         return std::make_tuple(phiInterval, thetaInterval);
     }
 

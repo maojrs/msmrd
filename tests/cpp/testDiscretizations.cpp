@@ -60,16 +60,16 @@ TEST_CASE("Spherical partition", "[spherePartition]") {
     auto thetaInterval2 = std::get<1>(angles2);
     auto phiInterval3 = std::get<0>(angles3);
     auto thetaInterval3 = std::get<1>(angles3);
-    REQUIRE(phiIntervalUp == std::vector<double>{0.0, 0.5223148218060486} );
-    REQUIRE(thetaIntervalUp == std::vector<double>{0, 6.283185307179586} );
-    REQUIRE(phiIntervalDown == std::vector<double>{2.6192778317837444, 3.141592653589793} );
-    REQUIRE(thetaIntervalDown == std::vector<double>{0, 6.283185307179586} );
-    REQUIRE(phiInterval1 == std::vector<double>{1.5040801783846711, 2.6192778317837444} );
-    REQUIRE(thetaInterval1 == std::vector<double>{0.8975979010256552, 1.7951958020513104} );
-    REQUIRE(phiInterval2 == std::vector<double>{0.5223148218060486, 1.5040801783846711} );
-    REQUIRE(thetaInterval2 == std::vector<double>{1.0471975511965976, 2.0943951023931953} );
-    REQUIRE(phiInterval3 == std::vector<double>{1.5040801783846711, 2.6192778317837444} );
-    REQUIRE(thetaInterval3 == std::vector<double>{2.6927937030769655, 3.5903916041026207} );
+    REQUIRE(phiIntervalUp == std::array<double,2>{0.0, 0.5223148218060486} );
+    REQUIRE(thetaIntervalUp == std::array<double,2>{0, 6.283185307179586} );
+    REQUIRE(phiIntervalDown == std::array<double,2>{2.6192778317837444, 3.141592653589793} );
+    REQUIRE(thetaIntervalDown == std::array<double,2>{0, 6.283185307179586} );
+    REQUIRE(phiInterval1 == std::array<double,2>{1.5040801783846711, 2.6192778317837444} );
+    REQUIRE(thetaInterval1 == std::array<double,2>{0.8975979010256552, 1.7951958020513104} );
+    REQUIRE(phiInterval2 == std::array<double,2>{0.5223148218060486, 1.5040801783846711} );
+    REQUIRE(thetaInterval2 == std::array<double,2>{1.0471975511965976, 2.0943951023931953} );
+    REQUIRE(phiInterval3 == std::array<double,2>{1.5040801783846711, 2.6192778317837444} );
+    REQUIRE(thetaInterval3 == std::array<double,2>{2.6927937030769655, 3.5903916041026207} );
 }
 
 
@@ -126,16 +126,16 @@ TEST_CASE("Half spherical partition", "[halfSpherePartition]") {
     auto thetaInterval2 = std::get<1>(angles2);
     auto phiInterval3 = std::get<0>(angles3);
     auto thetaInterval3 = std::get<1>(angles3);
-    REQUIRE(phiIntervalUp == std::vector<double>{0.0, 0.5223148218060486} );
-    REQUIRE(thetaIntervalUp == std::vector<double>{0, 3.141592653589793} );
-    REQUIRE(phiIntervalDown == std::vector<double>{2.6192778317837444, 3.141592653589793} );
-    REQUIRE(thetaIntervalDown == std::vector<double>{0, 3.141592653589793} );
-    REQUIRE(phiInterval1 == std::vector<double>{0.5223148218060486, 1.2309594173407745} );
-    REQUIRE(thetaInterval1 == std::vector<double>{1.5707963267948966, 2.356194490192345} );
-    REQUIRE(phiInterval2 == std::vector<double>{1.2309594173407745, 1.9106332362490186} );
-    REQUIRE(thetaInterval2 == std::vector<double>{0.6283185307179586, 1.2566370614359172} );
-    REQUIRE(phiInterval3 == std::vector<double>{1.9106332362490186, 2.6192778317837444} );
-    REQUIRE(thetaInterval3 == std::vector<double>{0.0, 0.7853981633974483} );
+    REQUIRE(phiIntervalUp == std::array<double,2>{0.0, 0.5223148218060486} );
+    REQUIRE(thetaIntervalUp == std::array<double,2>{0, 3.141592653589793} );
+    REQUIRE(phiIntervalDown == std::array<double,2>{2.6192778317837444, 3.141592653589793} );
+    REQUIRE(thetaIntervalDown == std::array<double,2>{0, 3.141592653589793} );
+    REQUIRE(phiInterval1 == std::array<double,2>{0.5223148218060486, 1.2309594173407745} );
+    REQUIRE(thetaInterval1 == std::array<double,2>{1.5707963267948966, 2.356194490192345} );
+    REQUIRE(phiInterval2 == std::array<double,2>{1.2309594173407745, 1.9106332362490186} );
+    REQUIRE(thetaInterval2 == std::array<double,2>{0.6283185307179586, 1.2566370614359172} );
+    REQUIRE(phiInterval3 == std::array<double,2>{1.9106332362490186, 2.6192778317837444} );
+    REQUIRE(thetaInterval3 == std::array<double,2>{0.0, 0.7853981633974483} );
 }
 
 
@@ -197,11 +197,11 @@ TEST_CASE("Quaternion partition", "[quaternionPartition]") {
     auto intervals3 = quatPartition.getSectionIntervals(19);
     auto intervals4 = quatPartition.getSectionIntervals(57);
     // r intervals
-    std::vector<double> rIntervalRef0{0.0, 0.2};
-    std::vector<double> rIntervalRef1{0.8, 1.0};
-    std::vector<double> rIntervalRef2{0.6, 0.8};
-    std::vector<double> rIntervalRef3{0.4, 0.6};
-    std::vector<double> rIntervalRef4{0.8, 1.0};
+    std::array<double, 2> rIntervalRef0 = {0.0, 0.2};
+    std::array<double, 2> rIntervalRef1 = {0.8, 1.0};
+    std::array<double, 2> rIntervalRef2 = {0.6, 0.8};
+    std::array<double, 2> rIntervalRef3 = {0.4, 0.6};
+    std::array<double, 2> rIntervalRef4 = {0.8, 1.0};
     REQUIRE(msmrdtools::stdvecNorm(std::get<0>(intervals0), rIntervalRef0) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(std::get<0>(intervals1), rIntervalRef1) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(std::get<0>(intervals2), rIntervalRef2) <= 0.000001);
@@ -213,14 +213,14 @@ TEST_CASE("Quaternion partition", "[quaternionPartition]") {
     auto anglesRef3 = quatPartition.sphericalPartition->getAngles((19-1)%15);
     auto anglesRef4 = quatPartition.sphericalPartition->getAngles((57-1)%15);
     // phiIntervals
-    std::vector<double> phiRef0{0, M_PI};
+    std::array<double, 2> phiRef0 = {0, M_PI};
     REQUIRE(msmrdtools::stdvecNorm(std::get<1>(intervals0), phiRef0) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(std::get<1>(intervals1), std::get<0>(anglesRef1)) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(std::get<1>(intervals2), std::get<0>(anglesRef2)) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(std::get<1>(intervals3), std::get<0>(anglesRef3)) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(std::get<1>(intervals4), std::get<0>(anglesRef4)) <= 0.000001);
     // theta intervals
-    std::vector<double> thetaRef0{0, 2*M_PI};
+    std::array<double, 2> thetaRef0 = {0, 2*M_PI};
     REQUIRE(msmrdtools::stdvecNorm(std::get<2>(intervals0), thetaRef0) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(std::get<2>(intervals1), std::get<1>(anglesRef1)) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(std::get<2>(intervals2), std::get<1>(anglesRef2)) <= 0.000001);

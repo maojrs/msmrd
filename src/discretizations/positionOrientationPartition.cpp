@@ -57,8 +57,8 @@ namespace msmrd {
         return std::make_tuple(secNumRelativePos, secNumRelativeQuat);
     };
 
-    std::tuple<std::vector<double>, std::vector<double>,
-            std::vector<double>, std::vector<double>, std::vector<double>>
+    std::tuple<std::array<double, 2>, std::array<double, 2>,
+            std::array<double, 2>, std::array<double, 2>, std::array<double, 2>>
     positionOrientationPartition::getSectionIntervals(int secNumber){
         auto sectionNumbers = getSectionNumbers(secNumber);
         int secNumRelativePos = std::get<0>(sectionNumbers);

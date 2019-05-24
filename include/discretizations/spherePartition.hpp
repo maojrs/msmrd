@@ -61,7 +61,7 @@ namespace msmrd {
         int getSectionNumber(vec3<double> coordinate);
 
         // Given a section number give, phi and theta angles that define the section.
-        std::tuple<std::vector<double>, std::vector<double>> getAngles(int secNumber);
+        std::tuple<std::array<double, 2>, std::array<double, 2>> getAngles(int secNumber);
 
 
         /* Other not so important functions (mostly for PyBindings)*/

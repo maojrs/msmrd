@@ -74,8 +74,9 @@ namespace msmrd {
          * quatPartition->getSectionIntervals(secNumRelativeQuat). The first two returned values in the tuple
          * correspond to the angles intervals in the spherePartition and the next three correspond to the section
          * intervals of the quaternion partition. */
-        std::tuple<std::vector<double>, std::vector<double>,
-                std::vector<double>, std::vector<double>, std::vector<double>> getSectionIntervals(int secNumber);
+        std::tuple<std::array<double, 2>, std::array<double, 2>,
+                std::array<double, 2>, std::array<double, 2>, std::array<double, 2>>
+        getSectionIntervals(int secNumber);
 
 
         /* Other not so important functions (mostly for PyBindings)*/
