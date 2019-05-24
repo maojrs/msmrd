@@ -34,6 +34,14 @@ namespace msmrd {
         vec3<double> uniformSphere(double maxrad);
 
         vec3<double> uniformShell(double minrad, double maxrad);
+
+        vec3<double> uniformSphereSection (std::array<double,2> polarInterval, std::array<double,2> azimuthInterval);
+
+        vec3<double> uniformShellSection (std::array<double,2> rInterval, std::array<double,2> polarInterval,
+                                          std::array<double,2> azimuthInterval);
+
+
+
     };
 
 }

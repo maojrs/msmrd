@@ -106,6 +106,84 @@ TEST_CASE("Sampling from randomgen", "[randomgen]") {
     }
 }
 
+TEST_CASE("Sampling from randomgen, part2", "[randomgen]") {
+    randomgen randg;
+    // Uniform sphere section
+    std::array<double,2> polarInterval1 = {0.7, 1.2};
+    std::array<double,2> polarInterval2 = {0.2, 0.3};
+    std::array<double,2> polarInterval3 = {0.1, 1.4};
+    std::array<double,2> azimInterval1 = {0.1, 0.7};
+    std::array<double,2> azimInterval2 = {1.2, 3.3};
+    std::array<double,2> azimInterval3 = {4.4, 6.2};
+    for (int i=0; i<50; i++) {
+        auto trial1 = randg.uniformSphereSection(polarInterval1, azimInterval1);
+        auto trial2 = randg.uniformSphereSection(polarInterval2, azimInterval2);
+        auto trial3 = randg.uniformSphereSection(polarInterval3, azimInterval3);
+        auto polarAngle1 = std::acos(trial1[2]);
+        auto azimAngle1 = std::atan2(trial1[1], trial1[0]);
+        if (azimAngle1 < 0) { azimAngle1 += 2*M_PI; }
+        REQUIRE(polarAngle1 >= polarInterval1[0]);
+        REQUIRE(polarAngle1 <= polarInterval1[1]);
+        REQUIRE(azimAngle1 >= azimInterval1[0]);
+        REQUIRE(azimAngle1 <= azimInterval1[1]);
+        auto polarAngle2 = std::acos(trial2[2]);
+        auto azimAngle2 = std::atan2(trial2[1], trial2[0]);
+        if (azimAngle2 < 0) { azimAngle2 += 2*M_PI; }
+        REQUIRE(polarAngle2 >= polarInterval2[0]);
+        REQUIRE(polarAngle2 <= polarInterval2[1]);
+        REQUIRE(azimAngle2 >= azimInterval2[0]);
+        REQUIRE(azimAngle2 <= azimInterval2[1]);
+        auto polarAngle3 = std::acos(trial3[2]);
+        auto azimAngle3 = std::atan2(trial3[1], trial3[0]);
+        if (azimAngle3 < 0) { azimAngle3 += 2*M_PI; }
+        REQUIRE(polarAngle3 >= polarInterval3[0]);
+        REQUIRE(polarAngle3 <= polarInterval3[1]);
+        REQUIRE(azimAngle3 >= azimInterval3[0]);
+        REQUIRE(azimAngle3 <= azimInterval3[1]);
+    }
+    // Uniform sphere shell section
+    std::array<double,2> rInterval1 = {0.2, 5.2};
+    std::array<double,2> rInterval2 = {2.3, 4.1};
+    std::array<double,2> rInterval3 = {0.7, 1.9};
+    polarInterval1 = {0.0, 0.5};
+    polarInterval2 = {2.5, M_PI};
+    polarInterval3 = {1.2, 3.1};
+    for (int i=0; i<50; i++) {
+        auto trial1 = randg.uniformShellSection(rInterval1, polarInterval1, azimInterval1);
+        auto trial2 = randg.uniformShellSection(rInterval2, polarInterval2, azimInterval2);
+        auto trial3 = randg.uniformShellSection(rInterval3, polarInterval3, azimInterval3);
+        auto polarAngle1 = std::acos(trial1[2]/trial1.norm());
+        auto azimAngle1 = std::atan2(trial1[1], trial1[0]);
+        if (azimAngle1 < 0) { azimAngle1 += 2*M_PI; }
+        REQUIRE(trial1.norm() >= rInterval1[0]);
+        REQUIRE(trial1.norm() <= rInterval1[1]);
+        REQUIRE(polarAngle1 >= polarInterval1[0]);
+        REQUIRE(polarAngle1 <= polarInterval1[1]);
+        REQUIRE(azimAngle1 >= azimInterval1[0]);
+        REQUIRE(azimAngle1 <= azimInterval1[1]);
+        auto polarAngle2 = std::acos(trial2[2]/trial2.norm());
+        auto azimAngle2 = std::atan2(trial2[1], trial2[0]);
+        if (azimAngle2 < 0) { azimAngle2 += 2*M_PI; }
+        REQUIRE(trial2.norm() >= rInterval2[0]);
+        REQUIRE(trial2.norm() <= rInterval2[1]);
+        REQUIRE(polarAngle2 >= polarInterval2[0]);
+        REQUIRE(polarAngle2 <= polarInterval2[1]);
+        REQUIRE(azimAngle2 >= azimInterval2[0]);
+        REQUIRE(azimAngle2 <= azimInterval2[1]);
+        auto polarAngle3 = std::acos(trial3[2]/trial3.norm());
+        auto azimAngle3 = std::atan2(trial3[1], trial3[0]);
+        if (azimAngle3 < 0) { azimAngle3 += 2*M_PI; }
+        REQUIRE(trial3.norm() >= rInterval3[0]);
+        REQUIRE(trial3.norm() <= rInterval3[1]);
+        REQUIRE(polarAngle3 >= polarInterval3[0]);
+        REQUIRE(polarAngle3 <= polarInterval3[1]);
+        REQUIRE(azimAngle3 >= azimInterval3[0]);
+        REQUIRE(azimAngle3 <= azimInterval3[1]);
+    }
+}
+
+
+
 TEST_CASE("Particle class basic functionality", "[particle]") {
     double D = 1.0;
     double Drot = 0.5;

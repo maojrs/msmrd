@@ -57,9 +57,9 @@ namespace msmrd {
         rr = maxrad * std::pow(rr, 1. / 3.);
         th = std::acos(th);
         vec3<double> result;
-        result[0] = rr * std::cos(th);
-        result[1] = rr * std::sin(th) * std::cos(randph);
-        result[2] = rr * std::sin(th) * std::sin(randph);
+        result[0] = rr * std::sin(th) * std::cos(randph);
+        result[1] = rr * std::sin(th) * std::sin(randph);
+        result[2] = rr * std::cos(th);
         return result;
     };
 
@@ -76,10 +76,49 @@ namespace msmrd {
         th = std::acos(th);
         randph = 2 * M_PI * uniformRange(0, 1);
         vec3<double> result;
-        result[0] = rr * std::cos(th);
-        result[1] = rr * std::sin(th) * std::cos(randph);
-        result[2] = rr * std::sin(th) * std::sin(randph);
+        result[0] = rr * std::sin(th) * std::cos(randph);
+        result[1] = rr * std::sin(th) * std::sin(randph);
+        result[2] = rr * std::cos(th);
         return result;
+    }
+
+    /* Samples 3D unit vector in sphere surface delimited by an interval in the polar angle (phiInterval)
+     * and an interval in the azimuthal angle (thetaInterval) */
+    vec3<double> randomgen::uniformSphereSection (std::array<double,2> polarInterval,
+                                                  std::array<double,2> azimuthInterval) {
+        double limTheta1 = (std::cos(polarInterval[0]) + 1.0)/2.0;
+        double limTheta2 = (std::cos(polarInterval[1]) + 1.0)/2.0;
+        double randomTheta = uniformRange(limTheta1, limTheta2);
+        double th = std::acos(2.0 * randomTheta - 1.0);
+        double randph = uniformRange(azimuthInterval[0], azimuthInterval[1]);
+        vec3<double> result;
+        result[0] = std::sin(th) * std::cos(randph);
+        result[1] = std::sin(th) * std::sin(randph);
+        result[2] = std::cos(th);
+        return result;
+    }
+
+    // Samples 3D vector in a spherical shell delimited by rInterval, phiInterval and thetaInterval.
+    vec3<double> randomgen::uniformShellSection (std::array<double,2> rInterval, std::array<double,2> polarInterval,
+                                                 std::array<double,2> azimuthInterval) {
+        // Calculate radial value (alternative to the rejection sampling used in uniformShell)
+        double limR1 = std::pow(rInterval[0]/rInterval[1], 3);
+        double limR2 = 1.0;
+        double randomR = uniformRange(limR1, limR2);
+        double rr = rInterval[1] * std::pow(randomR, 1. / 3.);
+        // Calculate polar value
+        double limTheta1 = (std::cos(polarInterval[0]) + 1.0)/2.0;
+        double limTheta2 = (std::cos(polarInterval[1]) + 1.0)/2.0;
+        double randomTheta = uniformRange(limTheta1, limTheta2);
+        double th = std::acos(2.0 * randomTheta - 1.0);
+        // Calculate azimuthal value
+        double randph = uniformRange(azimuthInterval[0], azimuthInterval[1]);
+        vec3<double> result;
+        result[0] = rr * std::sin(th) * std::cos(randph);
+        result[1] = rr * std::sin(th) * std::sin(randph);
+        result[2] = rr * std::cos(th);
+        return result;
+
     }
 
 }

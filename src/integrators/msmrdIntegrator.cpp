@@ -153,13 +153,16 @@ namespace msmrd {
         auto jDiffRot = MSMlist[jPartType].Drotlist[jNewState];
         parts[iIndex].setDs(iDiff, iDiffRot);
         parts[jIndex].setDs(jDiff, jDiffRot);
-        // Sets next positions and orientations I AM HERE NOW, STILL NEED TO IMPLEMENT THIS
+        // Extract section intervals in partition corresponding to the endState.
         auto sections = positionOrientationPart.getSectionIntervals(endState);
         auto phiInterval = std::get<0>(sections); //polar
         auto thetaInterval = std::get<1>(sections); //azimuthal
         auto quatRadInterval = std::get<2>(sections);
         auto quatPhiInterval = std::get<3>(sections);
         auto quatThetaInterval = std::get<4>(sections);
+        // Sets next positions and orientations I AM HERE NOW, STILL NEED TO IMPLEMENT THIS
+
+        //auto position = randg.
     }
 
     /* Removes unrealized events where the particles drifted a distance apart beyond the relativeDistanceCutOff.
