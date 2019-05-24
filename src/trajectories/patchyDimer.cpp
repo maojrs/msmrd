@@ -46,13 +46,9 @@ namespace msmrd {
         auto orientation2 = particleList[j].orientation;
         relativeOrientation = orientation2*orientation1.conj();
 
-        // Calculate relative distance. If particle within periodic boundary, take that into account.
-        if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {
-            auto boxsize = domainBoundary->boxsize;
-            relativePosition = msmrdtools::distancePeriodicBox(particleList[j].position, particleList[i].position, boxsize);
-        } else {
-            relativePosition = particleList[j].position - particleList[i].position;
-        }
+        // Calculate relative distance taking into account periodic boundary.
+        relativePosition = msmrdtools::calculateRelativePosition(particleList[i].position, particleList[j].position,
+                boundaryActive, domainBoundary->getBoundaryType(), domainBoundary->boxsize);
 
         // Extract current state, save into sample and push sample to discreteTrajectoryData.
         if (relativePosition.norm() < 1.25) {

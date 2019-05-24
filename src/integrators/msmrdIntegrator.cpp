@@ -108,12 +108,11 @@ namespace msmrd {
         parts[jIndex].activeMSM = false;
         // Set diffusion coefficients in bound state
         parts[iIndex].setDs(markovModel.Dboundlist[endState], markovModel.DboundRotlist[endState]);
-        /* Average bound particle position and orientation (save on particle with smaller index),
-         * send deactivated particle far away ( could be useful for visualization)*/
+        // Average bound particle position and orientation (save on particle with smaller index).
         parts[iIndex].nextPosition = 0.5*(parts[iIndex].position + parts[jIndex].position);
         parts[iIndex].nextOrientation = msmrdtools::quaternionSlerp(parts[iIndex].orientation,
                                                                 parts[jIndex].orientation, 0.5);
-        // Assign constant distant position to inactive particle.
+        // Assign constant distant position to inactive particle ( could be useful for visualization).
         parts[jIndex].nextPosition = {10000000.0, 10000000.0, 10000000.0};
     }
 
@@ -155,6 +154,12 @@ namespace msmrd {
         parts[iIndex].setDs(iDiff, iDiffRot);
         parts[jIndex].setDs(jDiff, jDiffRot);
         // Sets next positions and orientations I AM HERE NOW, STILL NEED TO IMPLEMENT THIS
+        auto sections = positionOrientationPart.getSectionIntervals(endState);
+        auto phiInterval = std::get<0>(sections); //polar
+        auto thetaInterval = std::get<1>(sections); //azimuthal
+        auto quatRadInterval = std::get<2>(sections);
+        auto quatPhiInterval = std::get<3>(sections);
+        auto quatThetaInterval = std::get<4>(sections);
     }
 
     /* Removes unrealized events where the particles drifted a distance apart beyond the relativeDistanceCutOff.

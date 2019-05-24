@@ -60,12 +60,22 @@ namespace msmrd {
         int getSectionNumber(vec3<double> relativePosition, quaternion<double> relativeQuaternion,
                              quaternion<double> quaternionReference = {1,0,0,0});
 
-        /* Gets interval delimiters of the phase space section corresponding to a given section number.
+        /* Gets other two section numbers corresponding to the positionOrientationPartition section number.
          * The function returns a tuple (secNumRelativePos, secNumRelativeQuat): the section number corresponding
          * to the surface spherical partition, and the section number corresponding to the quaternion partition,
          * respectively. The exact intervals can then be extracted by calling
-         * spherePartition->getAngles(secNumRelativePos) and quaternion->getSectionintervals(secNumRelativeQuat)*/
-        std::tuple<int, int> getSection(int secNumber);
+         * spherePartition->getAngles(secNumRelativePos) and quatPartition->getSectionIntervals(secNumRelativeQuat),
+         * as done in getSectionIntervals. */
+        std::tuple<int, int> getSectionNumbers(int secNumber);
+
+        /* Gets the exact intervals for all the involved partitions corresponding to a given section number. It uses
+         * the function getSectionNumbers to obtain the correspinding section numbers in the spherePartition and in
+         * the quaternionPartition and calls spherePartition->getAngles(secNumRelativePos) and
+         * quatPartition->getSectionIntervals(secNumRelativeQuat). The first two returned values in the tuple
+         * correspond to the angles intervals in the spherePartition and the next three correspond to the section
+         * intervals of the quaternion partition. */
+        std::tuple<std::vector<double>, std::vector<double>,
+                std::vector<double>, std::vector<double>, std::vector<double>> getSectionIntervals(int secNumber);
 
 
         /* Other not so important functions (mostly for PyBindings)*/
