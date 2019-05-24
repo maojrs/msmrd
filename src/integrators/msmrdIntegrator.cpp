@@ -57,7 +57,7 @@ namespace msmrd {
                                                                          boundaryActive, domainBoundary->getBoundaryType(),
                                                                          domainBoundary->boxsize);
 
-                if (relativePosition.norm() <= relativeDistanceCutOff) {
+                if (relativePosition.norm() < relativeDistanceCutOff) {
                     relativeOrientation = parts[j].nextOrientation * parts[i].nextOrientation.conj();
                     refQuaternion = parts[i].nextOrientation.conj();
                     currentTransitionState = positionOrientationPart.getSectionNumber(relativePosition,
@@ -160,9 +160,19 @@ namespace msmrd {
         auto quatRadInterval = std::get<2>(sections);
         auto quatPhiInterval = std::get<3>(sections);
         auto quatThetaInterval = std::get<4>(sections);
-        // Sets next positions and orientations I AM HERE NOW, STILL NEED TO IMPLEMENT THIS
-
-        //auto position = randg.
+        // Calculate new relative positions and orientations I AM HERE NOW, STILL NEED TO IMPLEMENT THIS
+        auto relPosition = relativeDistanceCutOff * randg.uniformSphereSection(phiInterval, thetaInterval);
+        // Calculate realtive orientation from discretization (partition)
+        auto randomQuat = randg.uniformShellSection(quatRadInterval, quatPhiInterval, quatThetaInterval);
+        double sQuat = std::sqrt(1 - randomQuat.norm());
+        // Recover quaternion from its representation as a vector inside the unit 3D sphere
+        quaternion<double> relOrientation = {sQuat, randomQuat};
+        // Set next positions and orientations based on the relative ones (parts[iIndex] keeps track of position)
+        parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
+        parts[jIndex].nextPosition = parts[iIndex].nextPosition + relPosition;
+        // More complicate approach for orientation is possible but likely uneccesary.
+        parts[iIndex].nextOrientation = 1.0*parts[iIndex].orientation;
+        parts[jIndex].nextOrientation = relOrientation*parts[iIndex].nextOrientation;
     }
 
     /* Removes unrealized events where the particles drifted a distance apart beyond the relativeDistanceCutOff.
