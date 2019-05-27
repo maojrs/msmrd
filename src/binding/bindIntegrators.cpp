@@ -39,8 +39,8 @@ namespace msmrd {
                                                                               "numParticleTypes, relativeDistanceCutOff,"
                                                                               "MSMlist, mainMarkovModel, "
                                                                               "positionOrientationPartition)")
-                .def(py::init<double &, long &, std::string &, int &, double &, ctmsm &, msmrdMSM &>());
-                //.def("integrate", &msmrdIntegrator<ctmsm>::integrate);
+                .def(py::init<double &, long &, std::string &, int &, double &, ctmsm &, msmrdMSM &>())
+                .def("integrate", &msmrdIntegrator<ctmsm>::integrate);
 
         // Created c++ compatible particle list/vector/array of particles in python
         py::bind_vector<std::vector<particle>>(m, "particleList", py::module_local());

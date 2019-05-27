@@ -16,17 +16,22 @@ PYBIND11_MODULE(msmrd2binding, module) {
 
     // Load classes in main module
     msmrd::bindBoundaries(module);
-    msmrd::bindMarkovModels(module);
     msmrd::bindParticles(module);
     msmrd::bindSimulation(module);
 
     // Load main submodules
     auto discretizationsSubmodule = module.def_submodule("discretizations", "msmrd discretizations submodule");
     msmrd::bindDiscretizations(discretizationsSubmodule);
+
     auto integratorsSubmodule = module.def_submodule("integrators", "msmrd integrators submodule");
     msmrd::bindIntegrators(integratorsSubmodule);
+
+    auto markovModelsSubmodule = module.def_submodule("markovModels", "Markov models submodule");
+    msmrd::bindMarkovModels(markovModelsSubmodule);
+
     auto potentialsSubmodule = module.def_submodule("potentials", "msmrd potentials submodule");
     msmrd::bindPotentials(potentialsSubmodule);
+
     auto trajectoriesSubmodule = module.def_submodule("trajectories", "msmrd trajectories submodule");
     msmrd::bindTrajectories(trajectoriesSubmodule);
 
