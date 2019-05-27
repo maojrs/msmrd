@@ -26,7 +26,7 @@ namespace msmrd {
         double relativeDistanceCutOff = 2.2;
         int numParticleTypes;
         msmrdMSM &markovModel;
-        fullPartition &positionOrientationPart;
+        fullPartition *positionOrientationPart;
         eventManager eventMgr = eventManager();
     public:
         /**
@@ -43,14 +43,19 @@ namespace msmrd {
         * @param MSMlist (see overdampedLanegvinMarkovSwitch parent class) can be either a vector of msms
         * (not yet implemented) or of ctmsms. It corresponds to the MSMs of the unbound particles (conformation
         * switching). Its size should match the number of unbound particle types in the simulation, one MSM
-        * per particle type.
+        * per particle type. Size 1 is also acceptable, which assumes all aprticles share the same MSM.
         */
         msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                        double relativeDistanceCutOff, std::vector<templateMSM> MSMlist, msmrdMSM markovModel,
-                        fullPartition positionOrientationPart);
+                        double relativeDistanceCutOff, std::vector<templateMSM> MSMlist, msmrdMSM markovModel);
+
+        msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
+                        double relativeDistanceCutOff, templateMSM MSMlist, msmrdMSM markovModel);
 
         // Redefine integrate function
         void integrate(std::vector<particleMS> &parts);
+
+        void setDiscretization();
+        void setDiscretization(fullPartition positionOrientationPartition);
 
         void computeTransitions2BoundStates(std::vector<particleMS> &parts);
 
@@ -64,6 +69,51 @@ namespace msmrd {
 
 
     };
+
+    /* Templated declarations (need to be in header). */
+
+    /**
+     * Constructors for MSM/RD integration class, can take discrete time MSM (msm) or a continous-time MSM.
+     */
+    template <typename templateMSM>
+    msmrdIntegrator<templateMSM>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
+                                            int numParticleTypes, double relativeDistanceCutOff,
+                                            std::vector<templateMSM> MSMlist, msmrdMSM markovModel) :
+            overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
+            numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff) {
+        setDiscretization();
+        if (MSMlist.size() != numParticleTypes and MSMlist.size() != 1) {
+            std::__throw_range_error("Number of MSMs provided in MSMlist should match number of unbound particle"
+                                     "types in the simulation. If same all particles share same MSM, is enough to "
+                                     "provide one).");
+        }
+    };
+
+    template <typename templateMSM>
+    msmrdIntegrator<templateMSM>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
+                                            int numParticleTypes, double relativeDistanceCutOff,
+                                                  templateMSM MSMlist, msmrdMSM markovModel) :
+            overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
+            numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff) {
+        setDiscretization();
+    };
+
+
+    // Sets default discretization (partition).
+    template <typename templateMSM>
+    void msmrdIntegrator<templateMSM>::setDiscretization() {
+        int numSphericalSectionsPos = 7;
+        int numRadialSectionsQuat = 5;
+        int numSphericalSectionsQuat = numSphericalSectionsPos;
+        *positionOrientationPart = fullPartition(relativeDistanceCutOff, numSphericalSectionsPos,
+                                                 numRadialSectionsQuat, numSphericalSectionsQuat);
+    }
+
+    // Sets pointer to discretization chosen.
+    template <typename templateMSM>
+    void msmrdIntegrator<templateMSM>::setDiscretization(fullPartition thisFullPartition) {
+        positionOrientationPart = &thisFullPartition;
+    }
 
 
 

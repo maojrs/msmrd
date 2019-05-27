@@ -7,38 +7,6 @@
 
 namespace msmrd {
 
-    /**
-     * Constructor for MSM/RD integration class, can take discrete time MSM (msm) or a continous-time MSM.
-     */
-    template<>
-    msmrdIntegrator<ctmsm>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
-                                            int numParticleTypes, double relativeDistanceCutOff,
-                                            std::vector<ctmsm> MSMlist, msmrdMSM markovModel,
-                                            fullPartition positionOrientationPart) :
-            overdampedLangevinMarkovSwitch(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
-            numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff),
-            positionOrientationPart(positionOrientationPart) {
-        if (MSMlist.size() != numParticleTypes) {
-            std::__throw_range_error("Number of MSMs provided in MSMlist should match number of unbound particle"
-                                     "types in the simulation");
-        }
-    };
-
-    template<>
-    msmrdIntegrator<msm>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
-                                          int numParticleTypes,  double relativeDistanceCutOff,
-                                          std::vector<msm> MSMlist, msmrdMSM markovModel,
-                                          fullPartition positionOrientationPart) :
-            overdampedLangevinMarkovSwitch(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
-            numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff),
-            positionOrientationPart(positionOrientationPart) {
-        if (MSMlist.size() != numParticleTypes) {
-            std::__throw_range_error("Number of MSMs provided in MSMlist should match number of unbound particle"
-                                     "types in the simulation");
-        }
-    };
-
-
 
     /* Computes possible transitions to bound states from particles sufficiently close to each other (in transition
      * states) and saves them in the event manager. Used by integrate function. */
@@ -60,7 +28,7 @@ namespace msmrd {
                 if (relativePosition.norm() < relativeDistanceCutOff) {
                     relativeOrientation = parts[j].nextOrientation * parts[i].nextOrientation.conj();
                     refQuaternion = parts[i].nextOrientation.conj();
-                    currentTransitionState = positionOrientationPart.getSectionNumber(relativePosition,
+                    currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
                                                                                       relativeOrientation,
                                                                                       refQuaternion);
                     auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
@@ -154,12 +122,12 @@ namespace msmrd {
         parts[iIndex].setDs(iDiff, iDiffRot);
         parts[jIndex].setDs(jDiff, jDiffRot);
         // Extract section intervals in partition corresponding to the endState.
-        auto sections = positionOrientationPart.getSectionIntervals(endState);
+        auto sections = positionOrientationPart->getSectionIntervals(endState);
         auto phiInterval = std::get<0>(sections); //polar
         auto thetaInterval = std::get<1>(sections); //azimuthal
         auto quatRadInterval = std::get<2>(sections);
-        auto quatPhiInterval = std::get<3>(sections);
-        auto quatThetaInterval = std::get<4>(sections);
+        auto quatPhiInterval = std::get<3>(sections); //polar
+        auto quatThetaInterval = std::get<4>(sections); //azimuthal
         // Calculate new relative positions and orientations I AM HERE NOW, STILL NEED TO IMPLEMENT THIS
         auto relPosition = relativeDistanceCutOff * randg.uniformSphereSection(phiInterval, thetaInterval);
         // Calculate realtive orientation from discretization (partition)
@@ -171,8 +139,8 @@ namespace msmrd {
         parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
         parts[jIndex].nextPosition = parts[iIndex].nextPosition + relPosition;
         // More complicate approach for orientation is possible but likely uneccesary.
-        parts[iIndex].nextOrientation = 1.0*parts[iIndex].orientation;
-        parts[jIndex].nextOrientation = relOrientation*parts[iIndex].nextOrientation;
+        parts[iIndex].nextOrientation = 1.0 * parts[iIndex].orientation;
+        parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
     }
 
     /* Removes unrealized events where the particles drifted a distance apart beyond the relativeDistanceCutOff.
@@ -215,15 +183,6 @@ namespace msmrd {
             }
         }
 
-        // Enforce boundary and set new positions into parts[i].nextPosition, only if particle is active.
-        for (auto &part : parts) {
-            if (part.isActive()) {
-                if (boundaryActive) {
-                    domainBoundary->enforceBoundary(part);
-                }
-            }
-        }
-
         /* Remove unrealized previous events. Also compute transitions to bound states and to unbound states and add
          * them as new events in the event manager. Finally resort event list by descending waiting time (last in
          * list happen first) */
@@ -258,23 +217,29 @@ namespace msmrd {
             }
         }
 
+        // Enforce boundary and set new positions into parts[i].nextPosition (only if particle is active).
+        for (auto &part : parts) {
+            if (part.isActive() and boundaryActive) {
+                domainBoundary->enforceBoundary(part);
+            }
+        }
+
         /* Update positions and orientations (sets calculated next position/orientation
-         * calculated by integrator and boundary as current position/orientation). */
+         * calculated by integrator and boundary as current position/orientation). Note states
+         * are modified directly and don't need to be updated. */
         for (int i = 0; i < parts.size(); i++) {
-            //if (parts[i].isActive()) {
-                auto boundIndex = parts[i].boundTo;
+            if (parts[i].isActive()) {
                 parts[i].updatePosition();
                 if (rotation) {
                     parts[i].updateOrientation();
                 }
-            //}
+            }
         }
 
         // Advance global time and time in event manager
         clock += dt;
         eventMgr.advanceTime(dt);
     }
-
 
 
 }

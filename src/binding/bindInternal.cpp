@@ -29,10 +29,10 @@ namespace msmrd {
         pybind11::class_<trajectory>(m, "trajectory");
 
         /* Bind external potential parent class  */
-        pybind11::class_<externalPotential >(m, "externalPotential");
+        pybind11::class_<externalPotential>(m, "externalPotential");
 
         /* Bind pair potential parent class */
-        pybind11::class_<pairPotential >(m, "pairPotential");
+        pybind11::class_<pairPotential>(m, "pairPotential");
     }
 
 }
