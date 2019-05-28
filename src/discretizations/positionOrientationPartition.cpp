@@ -24,7 +24,7 @@ namespace msmrd {
 
         sphericalPartition = std::make_unique<spherePartition>(numSphericalSectionsPos);
         quatPartition = std::make_unique<quaternionPartition>(numRadialSectionsQuat, numSphericalSectionsQuat);
-        numTotalSections = numSphericalSectionsPos*quatPartition->numTotalSections;
+        numTotalSections = numSphericalSectionsPos * quatPartition->numTotalSections;
 
 //        /* Obtains a good naming scheme for the states, while keeping it an integer (convenient for pyemma)
 //         * numDigits is the number of digits used by numTotalSections in quaternion partition.

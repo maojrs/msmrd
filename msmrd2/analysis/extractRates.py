@@ -149,7 +149,7 @@ def extractRates(discreteTrajectories, boundstates, orientations):
     return rateDict, timecountDict, eventcountDict
 
 
-def extractRatesMSM(discreteTrajectories, lagtime, boundstates):
+def extractRatesMSM(discreteTrajectories, lagtime, boundstates, stitching = False, fullDictionary = False):
     '''
     Construct an MSM and extract rates from it using pyemma and msmtools. These rates differ from the rates in a
     rate transition matrix due to the fact that this takes all possible transmission pathways within a discrete
@@ -166,8 +166,12 @@ def extractRatesMSM(discreteTrajectories, lagtime, boundstates):
     unboundStateIndex = 0
     # Slice trajectories getting rid of the unbound state 0
     slicedDtrajs = splitDiscreteTrajs(discreteTrajectories, unboundStateIndex)
-    # Create MSM between transision states and bound states
-    mainmsm = pyemma.msm.estimate_markov_model(slicedDtrajs, lagtime, reversible=False)
+    if stitching:
+        finalTrajs = stitchTrajs(slicedDtrajs, 500)
+    else:
+        finalTrajs = slicedDtrajs
+    # Create MSM between transision states and bound states without stitching
+    mainmsm = pyemma.msm.estimate_markov_model(finalTrajs, lagtime, reversible=False)
     # The active set keep track of the indexes used by pyemma and the ones used to describe the state in our model.
     activeSet = mainmsm.active_set
     rateDict = {}
@@ -186,7 +190,12 @@ def extractRatesMSM(discreteTrajectories, lagtime, boundstates):
                 #mfpt = msmtools.analysis.mfpt(mainmsm.transition_matrix, i, j, tau = lagtime)
                 mfpt = mainmsm.mfpt(i, j) # already takes lagtime into consideration
                 rateDict[key] = 1.0/mfpt # Scaling by dt*stride not taken into account.
-    return rateDict
+    outputDict = dict(rateDict) #shallow copy
+    if not fullDictionary:
+        for key in rateDict:
+            if 'b' not in key:
+                outputDict.pop(key)
+    return outputDict
 
 
 

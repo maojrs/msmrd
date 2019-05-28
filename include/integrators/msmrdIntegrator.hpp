@@ -105,8 +105,9 @@ namespace msmrd {
         int numSphericalSectionsPos = 7;
         int numRadialSectionsQuat = 5;
         int numSphericalSectionsQuat = numSphericalSectionsPos;
-        *positionOrientationPart = fullPartition(relativeDistanceCutOff, numSphericalSectionsPos,
+        auto mainPartition = fullPartition(relativeDistanceCutOff, numSphericalSectionsPos,
                                                  numRadialSectionsQuat, numSphericalSectionsQuat);
+        positionOrientationPart = &mainPartition;
     }
 
     // Sets pointer to discretization chosen.

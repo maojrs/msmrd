@@ -174,6 +174,12 @@ namespace msmrd {
 
         void updateType() { type = 1 * nextType; };
 
+        bool isMSMactive() {return activeMSM; }
+
+        void activateMSM() {activeMSM = true; }
+
+        void deactivateMSM() {activeMSM = false; }
+
         int getState() const { return state; }
 
         double getLagtime() const { return lagtime; }

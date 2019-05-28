@@ -9,10 +9,9 @@ namespace msmrd{
      * Implementation of Markov model class specializes for MSM/RD.
      */
     msmrdMarkovStateModel::msmrdMarkovStateModel(unsigned int numBoundStates, unsigned int numTransitionStates,
-                                                 unsigned int numAstates, unsigned int numBstates,
                                        long seed, std::map<std::string, float> &rateDictionary)
-            : numBoundStates(numBoundStates), numTransitionStates(numTransitionStates), numAstates(numAstates),
-              numBstates(numBstates), seed(seed), rateDictionary(rateDictionary) {
+            : numBoundStates(numBoundStates), numTransitionStates(numTransitionStates),
+              seed(seed), rateDictionary(rateDictionary) {
         randg.setSeed(seed);
         Dboundlist.resize(numBoundStates);
         DboundRotlist.resize(numBoundStates);
@@ -62,12 +61,12 @@ namespace msmrd{
     std::tuple<double, int> msmrdMarkovStateModel::computeTransition2UnboundState(int boundState) {
         std::vector<float> rates(numTransitionStates);
         double transitionTime;
-        int index0 = startIndexTransitionStates;
+        int index0 = maxNumberBoundStates;
         int endState = 0;
 
         // Get rates to all transition states from dictionary
         std::string key;
-        for (int i = index0; i < index0 + numTransitionStates; i++) {
+        for (int i = index0 + 1; i < index0 + numTransitionStates; i++) {
             key = "b" + std::to_string(boundState) + "->" + std::to_string(i);
             rates[i] = getRate(key);
         }
@@ -114,7 +113,7 @@ namespace msmrd{
     }
 
     /* These functions set the diffusion coefficients for bound and unbound states (A and B).
-     * Note size of vectors must match numBoundStates or numAstates or numBstates. This functions NEEDS
+     * Note size of vectors must match numBoundStates. This functions NEEDS
      * to be called to fill in diffusion coefficients. */
 
     void msmrdMarkovStateModel::setDbound(std::vector<double> &D, std::vector<double> &Drot) {

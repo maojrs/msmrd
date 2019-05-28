@@ -7,6 +7,8 @@
 
 namespace msmrd {
 
+    // Template constructors in header
+
 
     /* Computes possible transitions to bound states from particles sufficiently close to each other (in transition
      * states) and saves them in the event manager. Used by integrate function. */
@@ -171,6 +173,9 @@ namespace msmrd {
     template<>
     void msmrdIntegrator<ctmsm>::integrate(std::vector<particleMS> &parts) {
 
+        // Calculate forces and torques and save them into forceField and torqueField (needed even if there are zero)
+        calculateForceTorqueFields<particleMS>(parts); // Should only run once if forces are zero.
+
         /* Integrate only active particles and save next positions/orientations in parts[i].next***.
          * Non-active particles will usually correspond to bound particles */
         for (int i = 0; i < parts.size(); i++) {
@@ -187,7 +192,7 @@ namespace msmrd {
          * them as new events in the event manager. Finally resort event list by descending waiting time (last in
          * list happen first) */
         removeUnrealizedEvents(parts);
-        computeTransitions2BoundStates(parts);
+        computeTransitions2BoundStates(parts); // PROBLEM WITH THIS FUNCTION!!! CHECK
         computeTransitions2UnboundStates(parts);
         eventMgr.sortDescending();
 

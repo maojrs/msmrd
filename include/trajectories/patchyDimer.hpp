@@ -28,7 +28,7 @@ namespace msmrd {
         std::unique_ptr<spherePartition> spherePart;
         std::unique_ptr<quaternionPartition> quaternionPart;
         std::unique_ptr<positionOrientationPartition> positionOrientationPart;
-        int startIndexTransitionStates = 10;
+        int maxNumberBoundStates = 10;
         int angularStates;
         double tolerance = 0.1;
         int prevsample = 0;
@@ -40,9 +40,10 @@ namespace msmrd {
          * needed to define the states.
          * @param spherePart pointer to equal area spherical partition class with relevant functions
          * @param quaternionPart pointer to volumetric spherical partition class to discretize quaternion space.
-         * @param startIndexTransitionStates index of first transition states, if 10, only 9 bound states are supported.
-         * If 100, then 99 bound states are suported and so on. This parameter has to be consistent with the one used
-         * by the msmrd integrator (see msmrdintegrator for example).
+         * @param maxNumberBoundStates maximum number of bound states supported. It is used to determine how to
+         * count (index) the transition states. The state maxNumberBoundStates + 1 will correspond not to a bound state
+         * but to the first transition state. This parameter has to be consistent with the one used
+         * by the msmrd integrator and the msmrdMarkovModel.
          * @param angularStates number of angular states for discretization
          * @ param tolerance is the maximum distance away from metastable state to still be considered metastable.
          * @param prevsample keeps calue of previous sample when sampling discrete trajectory, useful for

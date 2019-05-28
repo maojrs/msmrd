@@ -25,12 +25,10 @@ namespace msmrd {
         long seed;
         std::map<std::string, float> rateDictionary;
         randomgen randg;
-        unsigned int startIndexTransitionStates = 10;
+        unsigned int maxNumberBoundStates = 10;
     public:
         unsigned int numBoundStates;
         unsigned int numTransitionStates;
-        unsigned int numAstates;
-        unsigned int numBstates;
         std::vector<double> Dboundlist;
         std::vector<double> DboundRotlist;
         /**
@@ -39,9 +37,11 @@ namespace msmrd {
         * are strings of the form "state1->state2". The bound states have "b" before the number, and the transition
         * states are denoted by integers.
         * @param randg number generator class based on mt19937
-        * @param startIndexTransitionStates index of first transition states, if 10, only 9 bound states are supported.
-        * If 100, then 99 bound states are suported and so on. This parameter has to be consistent with the one used to
-        * generate the state numbering in the discrete trajectory (see patchyDimer trajectory for example).
+        * @param maxNumberBoundStates maximum number of bound states supported. It is used to determine how to
+        * count (index) the transition states. The state maxNumberBoundStates + 1 will correspond not to a bound state
+        * but to the first transition state. This parameter has to be consistent with the one used
+        * by the msmrd integrator and the with the one used to generate the state numbering in the discrete
+        * trajectory (see patchyDimer trajectory for example).
         * @param numBoundStates number of bound states in the msm
         * @param numTransitionStates number of transition states
         * @param Dboundlist list of diffusion coefficients for each bound state.
@@ -50,7 +50,6 @@ namespace msmrd {
         */
 
         msmrdMarkovStateModel(unsigned int numBoundStates, unsigned int numTransitionStates,
-                              unsigned int numAstates, unsigned int numBstates,
                          long seed, std::map<std::string, float> &rateDictionary);
 
         std::tuple<double, int> computeTransition2BoundState(int transitionState);
@@ -60,11 +59,17 @@ namespace msmrd {
 
         float getRate(std::string key);
 
-        void setStartIndexTransitionStates(unsigned int newIndex) {
-            startIndexTransitionStates = newIndex;
+        void setmaxNumberBoundStates(unsigned int newIndex) {
+            maxNumberBoundStates = newIndex;
         }
 
+        unsigned int getStartIndexTransitionRates() {
+            return maxNumberBoundStates;
+        }
+
+
         void setDbound(std::vector<double> &D, std::vector<double> &Drot);
+
 
     };
 

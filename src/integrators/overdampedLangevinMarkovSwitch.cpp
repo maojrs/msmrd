@@ -23,7 +23,6 @@ namespace msmrd {
     void overdampedLangevinMarkovSwitch<ctmsm>::integrateOne(int partIndex, std::vector<particleMS> &parts, double timestep) {
         vec3<double> force;
         vec3<double> torque;
-        std::array<vec3<double>, 2> forctorq;
         force = forceField[partIndex];
         torque = torqueField[partIndex];
         translate(parts[partIndex], force, timestep);

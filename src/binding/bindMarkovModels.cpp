@@ -51,16 +51,16 @@ namespace msmrd {
                 .def("getTransitionMatrix", &ctmsm::getTmatrix)
                 .def("propagate", &ctmsm::propagate);
 
-        py::class_<msmrdMSM>(m, "msmrdMarkovModel", "continuous time Markov state model specialized to use with"
+        py::class_<msmrdMSM>(m, "msmrdMarkovStateModel", "continuous time Markov state model specialized to use with"
                                                             "MSM/RD integration (num. of bound states, num. transition"
                                                             "states, num. of A states, num. of B states, seed, "
                                                             "rate dictionary")
-                .def(py::init<unsigned int &, unsigned int &, unsigned int &, unsigned int &,
-                        long &, std::map<std::string, float> &>())
+                .def(py::init<unsigned int &, unsigned int &, long &, std::map<std::string, float> &>())
                 .def("getRate", &msmrdMarkovStateModel::getRate)
                 .def("computeTransition", &msmrdMSM::computeTransition2BoundState)
                 .def("computeTransition", &msmrdMSM::computeTransition2UnboundState)
-                .def("setDbound", &msmrdMSM::setDbound);
+                .def("setDbound", &msmrdMSM::setDbound)
+                .def("setmaxNumberBoundStates", &msmrdMSM::setmaxNumberBoundStates);
     }
 
 }

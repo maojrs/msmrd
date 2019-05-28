@@ -55,12 +55,12 @@ namespace msmrd {
             sample = std::vector<int>{ getBoundState(orientation1, orientation2) };
 //            if (sample[0] == -1) {
 //                secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, orientation1);
-//                sample  = std::vector<int>{ startIndexTransitionStates + secNum };
+//                sample  = std::vector<int>{ maxNumberBoundStates + secNum };
 //            }
         } else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
             // Get corresponding section numbers from spherical partition to classify its state
             secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, orientation1);
-            sample  = std::vector<int>{startIndexTransitionStates + secNum};
+            sample  = std::vector<int>{maxNumberBoundStates + secNum};
         }
         prevsample = sample[0];
         discreteTrajectoryData.push_back(sample);

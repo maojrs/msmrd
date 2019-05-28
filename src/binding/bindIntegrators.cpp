@@ -8,7 +8,6 @@ namespace msmrd {
     using msm = msmrd::discreteTimeMarkovStateModel;
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
     using msmrdMSM = msmrd::msmrdMarkovStateModel;
-    using posOrtPartition = msmrd::positionOrientationPartition;
     /*
      * pyBinders for the c++ integrators classes
      */
