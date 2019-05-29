@@ -13,7 +13,7 @@ namespace msmrd {
      */
     class boundary {
     protected:
-        std::string boundarytype;
+        std::string boundarytype = "None";
        /*
         * @param boundarytype can be periodic, reflective or open
         * @param radius size of boundary in case of spherical boundary (simplifies code to have it in parent class)

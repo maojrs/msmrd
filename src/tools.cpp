@@ -115,7 +115,7 @@ namespace msmrdtools {
                                            std::string boundaryType, vec3<double> boxsize){
         vec3<double> relPosition;
         if (boundaryActive and boundaryType == "periodic") {
-            relPosition = distancePeriodicBox(pos2, pos1, boxsize);
+            relPosition = distancePeriodicBox(pos1, pos2, boxsize);
         } else {
             relPosition = pos2 - pos1;
         }
