@@ -86,6 +86,7 @@ set(PY_SOURCES
         include/vec3.hpp
         include/boundaries/boundary.hpp
         include/boundaries/box.hpp
+        include/boundaries/noBoundary.hpp
         include/boundaries/sphere.hpp
         include/discretizations/halfSpherePartition.hpp
         include/discretizations/positionOrientationPartition.hpp

@@ -4,6 +4,7 @@
 #include "binding.hpp"
 #include "boundaries/boundary.hpp"
 #include "boundaries/box.hpp"
+#include "boundaries/noBoundary.hpp"
 #include "boundaries/sphere.hpp"
 
 
@@ -26,6 +27,10 @@ namespace msmrd {
                 .def(py::init<double &, std::string>())
                 .def_property_readonly("maxRadius", &sphere::getRadius)
                 .def_property_readonly("boundaryType", &sphere::getBoundaryType);
+
+        py::class_<noBoundary, boundary>(m, "noBoundary", "noBoundary ())")
+                .def(py::init<>())
+                .def_property_readonly("boundaryType", &noBoundary::getBoundaryType);
     }
 
 }

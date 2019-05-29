@@ -7,6 +7,7 @@
 #include <utility>
 #include <memory>
 #include "boundaries/boundary.hpp"
+#include "boundaries/noBoundary.hpp"
 #include "particle.hpp"
 #include "randomgen.hpp"
 #include "potentials/potentials.hpp"
@@ -33,8 +34,8 @@ namespace msmrd {
         bool externalPotentialActive = false;
         bool pairPotentialActive = false;
 
-        // Boundary pointer
-        boundary *domainBoundary;
+        // Boundary pointer (set default boundary (inactive), i.e. no boundary)
+        boundary *domainBoundary = new noBoundary();
 
         // External potentials pointers (externalPot)
         externalPotential *externalPot;
@@ -114,7 +115,6 @@ namespace msmrd {
         bool isBoundaryActive() { return boundaryActive; }
 
         boundary* getBoundary() { return domainBoundary; }
-
 
     };
 

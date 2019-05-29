@@ -24,7 +24,8 @@ namespace msmrd {
             for (int j = i + 1; j < parts.size(); j++) {
                 // Need special function to calculate relative position, in case we use a periodic boundary.
                 relativePosition = msmrdtools::calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition,
-                                                                         boundaryActive, domainBoundary->getBoundaryType(),
+                                                                         boundaryActive,
+                                                                         domainBoundary->getBoundaryType(),
                                                                          domainBoundary->boxsize);
 
                 if (relativePosition.norm() < relativeDistanceCutOff) {

@@ -1,5 +1,6 @@
 set(TEST_SOURCES
         testMain.cpp
+        testBoundaries.cpp
         testDiscretizations.cpp
         testMarkovModels.cpp
         testPotentials.cpp

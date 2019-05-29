@@ -13,9 +13,9 @@ namespace msmrd {
      */
     class boundary {
     protected:
-        std::string boundarytype = "None";
+        std::string boundarytype;
        /*
-        * @param boundarytype can be periodic, reflective or open
+        * @param boundarytype can be periodic, reflective, open or none
         * @param radius size of boundary in case of spherical boundary (simplifies code to have it in parent class)
         * @param boxsize boundary size in case of box boundary (simplifies code to have it in parent class)
         */
@@ -36,7 +36,7 @@ namespace msmrd {
 
         void enforceBoundary(particle &part);
 
-        std::string getBoundaryType() { return boundarytype; }
+        std::string getBoundaryType() { return boundarytype; };
 
         /** Function to reflect vector
          * @param dr vector pointing from previous position to current position

@@ -32,7 +32,7 @@ namespace msmrd {
         if (particlesbodytype != "point" && particlesbodytype != "rod" && particlesbodytype != "rigidbody") {
             throw std::runtime_error("Unknown particles bodytype; it should be either point, rod, rigidbody");
         }
-     };
+    };
 
     // Integrate list of particles (need to override in case of MS particles)
     void integrator::integrate(std::vector<particle> &parts) {

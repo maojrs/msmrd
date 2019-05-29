@@ -36,7 +36,6 @@ namespace msmrd {
 
         box(vec3<double> boxsize, std::string boundarytype);
 
-        std::string getBoundaryType() const { return boundarytype; }
     };
 
 }
