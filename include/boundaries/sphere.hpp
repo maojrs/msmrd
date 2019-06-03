@@ -24,7 +24,6 @@ namespace msmrd{
          */
         sphere(double radius, std::string boundarytype);
 
-        std::string getBoundaryType() const { return boundarytype; }
         double getRadius() const { return radius; }
 
     };

@@ -23,10 +23,12 @@ namespace msmrd {
         for (int i = 0; i < parts.size(); i++) {
             for (int j = i + 1; j < parts.size(); j++) {
                 // Need special function to calculate relative position, in case we use a periodic boundary.
-                relativePosition = msmrdtools::calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition,
-                                                                         boundaryActive,
-                                                                         domainBoundary->getBoundaryType(),
-                                                                         domainBoundary->boxsize);
+                if (boundaryActive) {
+                    relativePosition = msmrdtools::calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition,
+                            boundaryActive, domainBoundary->getBoundaryType(), domainBoundary->getBoxsize());
+                } else {
+                    relativePosition = parts[j].nextPosition - parts[i].nextPosition;
+                }
 
                 if (relativePosition.norm() < relativeDistanceCutOff) {
                     relativeOrientation = parts[j].nextOrientation * parts[i].nextOrientation.conj();
@@ -156,9 +158,14 @@ namespace msmrd {
             auto event = eventMgr.getEvent(i);
             auto iIndex = std::get<2>(event)[0];
             auto jIndex = std::get<2>(event)[1];
-            auto relativePosition = msmrdtools::calculateRelativePosition(parts[iIndex].nextPosition,
-                    parts[jIndex].nextPosition, boundaryActive, domainBoundary->getBoundaryType(),
-                                                                          domainBoundary->boxsize);
+            vec3<double> relativePosition;
+            if (boundaryActive) {
+                relativePosition = msmrdtools::calculateRelativePosition(parts[iIndex].nextPosition,
+                        parts[jIndex].nextPosition, boundaryActive, domainBoundary->getBoundaryType(),
+                                                                         domainBoundary->getBoxsize());
+            } else{
+                relativePosition = parts[jIndex].nextPosition - parts[iIndex].nextPosition;
+            }
             // Remove event if particles drifted apart
             if (relativePosition.norm() >= relativeDistanceCutOff) {
                 eventMgr.removeEvent(i);

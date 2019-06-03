@@ -12,10 +12,12 @@ namespace msmrd {
      */
     class box : public boundary {
     private:
-        double xx, yy, zz;
-        std::array<vec3<double>, 3> normals = {{vec3<double>{-1, 0, 0},
-                                                vec3<double>{0, -1, 0},
-                                                vec3<double>{0, 0, -1}}};
+        double xx = 0.0;
+        double yy = 0.0;
+        double zz = 0.0;
+        std::array<vec3<double>, 3> const normals = {{vec3<double>{-1, 0, 0},
+                                                      vec3<double>{0, -1, 0},
+                                                      vec3<double>{0, 0, -1}}};
 
         void enforcePeriodicBoundary(particle &part) override;
 
@@ -32,9 +34,9 @@ namespace msmrd {
          * @param normals array of the three normals of the planes that constitute the box
          * @param boxsize vector of (xx,yy,zz)
          */
-        box(double xx, double yy, double zz, std::string boundarytype);
+        box(double xxnew, double yynew, double zznew, std::string boundarytype);
 
-        box(vec3<double> boxsize, std::string boundarytype);
+        box(vec3<double> newboxsize, std::string boundarytype);
 
     };
 

@@ -35,7 +35,7 @@ namespace msmrd {
         bool pairPotentialActive = false;
 
         // Boundary pointer (set default boundary (inactive), i.e. no boundary)
-        boundary *domainBoundary = new noBoundary();
+        boundary *domainBoundary;
 
         // External potentials pointers (externalPot)
         externalPotential *externalPot;

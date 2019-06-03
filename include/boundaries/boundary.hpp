@@ -36,7 +36,10 @@ namespace msmrd {
 
         void enforceBoundary(particle &part);
 
-        std::string getBoundaryType() { return boundarytype; };
+        std::string getBoundaryType() const { return boundarytype; }
+
+        vec3<double> getBoxsize() const { return boxsize; }
+
 
         /** Function to reflect vector
          * @param dr vector pointing from previous position to current position

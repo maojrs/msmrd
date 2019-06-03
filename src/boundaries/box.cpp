@@ -12,13 +12,16 @@ namespace msmrd {
      * @param y box length in y-axis from -y/2 to y/2
      * @param z box length in z-axis from -z/2 to z/2
      */
-    box::box(double xx, double yy, double zz, std::string boundarytype)
-            : xx(xx), yy(yy), zz(zz), boundary(boundarytype) {
-        boxsize = vec3<double>{xx, yy, zz};
+    box::box(double xxnew, double yynew, double zznew, std::string boundarytype)
+            : boundary(boundarytype) {
+        xx = xxnew;
+        yy = yynew;
+        zz = zznew;
+        boxsize = vec3<double> (xxnew, yynew, zznew);
     };
 
     box::box(vec3<double> newboxsize, std::string boundarytype) : boundary(boundarytype) {
-        boxsize = newboxsize;
+        boxsize = 1.0*newboxsize;
         xx = boxsize[0];
         yy = boxsize[1];
         zz = boxsize[2];
