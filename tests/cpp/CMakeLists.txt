@@ -2,11 +2,11 @@ set(TEST_SOURCES
         testMain.cpp
         testBoundaries.cpp
         testDiscretizations.cpp
+        testIntegrators.cpp
         testMarkovModels.cpp
         testPotentials.cpp
         testTools.cpp
-        testTrajectories.cpp
-        )
+        testTrajectories.cpp)
 
 add_executable(test_executable ${TEST_SOURCES})
 

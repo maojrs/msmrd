@@ -25,21 +25,22 @@ namespace msmrd {
     private:
         double relativeDistanceCutOff = 2.2;
         int numParticleTypes;
-        msmrdMSM &markovModel;
-        fullPartition *positionOrientationPart;
         eventManager eventMgr = eventManager();
     public:
+        msmrdMSM &markovModel;
+        fullPartition *positionOrientationPart;
+
         /**
         * @param relativeDistanceCutOff radial cut off that define distance at which MSM/RD coupling is activated. This
         * parameter has to be consistent with the relative distance cut off used to obtain the discrete trajectories
         * (see patchyDimer trajectory for example).
         * @param numParticleTypes define the number of particle types in the unbound states in the
         * simulation (usually 1 or 2).
+        * @param eventManager class to manage order of events (reactions/transitions).
         * @param markovModel pointer to class msmrdMarkovModel, which is the markovModel class specialized for
         * the MSM/RD scheme. It controls the markov Model in the bound state and the msmrd coupling.
         * @param positionOrientationPart pointer to full partition of relative distance and relative orientation,
         * a.k.a positionOrientationPartition.
-        * @param eventManager class to manage order of events (reactions/transitions).
         * @param MSMlist (see overdampedLanegvinMarkovSwitch parent class) can be either a vector of msms
         * (not yet implemented) or of ctmsms. It corresponds to the MSMs of the unbound particles (conformation
         * switching). Its size should match the number of unbound particle types in the simulation, one MSM
@@ -67,6 +68,8 @@ namespace msmrd {
 
         void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
+        float getRateFromKey(std::string);
+
 
     };
 
@@ -81,7 +84,9 @@ namespace msmrd {
                                             std::vector<templateMSM> MSMlist, msmrdMSM markovModel) :
             overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
             numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff) {
+
         setDiscretization();
+
         if (MSMlist.size() != numParticleTypes and MSMlist.size() != 1) {
             std::__throw_range_error("Number of MSMs provided in MSMlist should match number of unbound particle"
                                      "types in the simulation. If same all particles share same MSM, is enough to "
@@ -95,7 +100,9 @@ namespace msmrd {
                                                   templateMSM MSMlist, msmrdMSM markovModel) :
             overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
             numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff) {
+
         setDiscretization();
+
     };
 
 
@@ -105,17 +112,21 @@ namespace msmrd {
         int numSphericalSectionsPos = 7;
         int numRadialSectionsQuat = 5;
         int numSphericalSectionsQuat = numSphericalSectionsPos;
-        auto mainPartition = fullPartition(relativeDistanceCutOff, numSphericalSectionsPos,
+        positionOrientationPart = new fullPartition(relativeDistanceCutOff, numSphericalSectionsPos,
                                                  numRadialSectionsQuat, numSphericalSectionsQuat);
-        positionOrientationPart = &mainPartition;
     }
 
     // Sets pointer to discretization chosen.
     template <typename templateMSM>
     void msmrdIntegrator<templateMSM>::setDiscretization(fullPartition thisFullPartition) {
+        delete positionOrientationPart;
         positionOrientationPart = &thisFullPartition;
     }
 
+    template <typename templateMSM>
+    float msmrdIntegrator<templateMSM>::getRateFromKey(std::string key) {
+        return markovModel.getRate(key);
+    };
 
 
 

@@ -36,6 +36,7 @@ namespace msmrd {
                     currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
                                                                                       relativeOrientation,
                                                                                       refQuaternion);
+                    // PROBLEM ON LINE ABOVE OR BELOW ...
                     auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
                     transitionTime = std::get<0>(transition);
                     nextState = std::get<1>(transition);

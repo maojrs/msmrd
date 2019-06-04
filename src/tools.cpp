@@ -78,13 +78,13 @@ namespace msmrdtools {
 
     // Calculates relative distance (p2-p1) of two vectors (p1, p2) in a periodic box, returns realtive distance.
     vec3<double> distancePeriodicBox(vec3<double> p1, vec3<double> p2, vec3<double> edgeslength) {
-        vec3<double> p1Periodic = 1*p1;
+        vec3<double> p1Periodic = 1.0*p1;
         // Loop over three coordinates (x,y,z)
         for (int i = 0; i < 3; i++){
-            if (p2[i] - p1[i] > 0.5*edgeslength[i]) {
+            if ( (p2[i] - p1[i]) > 0.5*edgeslength[i]) {
                 p1Periodic[i] += edgeslength[i];
             }
-            if (p2[i] - p1[i] < -0.5*edgeslength[i]) {
+            if ( (p2[i] - p1[i]) < -0.5*edgeslength[i]) {
                 p1Periodic[i] -= edgeslength[i];
             }
         }
@@ -96,13 +96,12 @@ namespace msmrdtools {
     std::array<vec3<double>, 2> distancePeriodicBoxComplete(vec3<double> p1, vec3<double> p2,
                                                                        vec3<double> edgeslength) {
         vec3<double> p1Periodic = 1.0*p1;
-        vec3<double> halfedgelength = 0.5*edgeslength;
         // Loop over three coordinates (x,y,z)
         for (int i = 0; i < 3; i++){
-            if (p2[i] - p1[i] > halfedgelength[i]) {
+            if (p2[i] - p1[i] > 0.5*edgeslength[i]) {
                 p1Periodic[i] += edgeslength[i];
             }
-            if (p2[i] - p1[i] < -halfedgelength[i]) {
+            if (p2[i] - p1[i] < -0.5*edgeslength[i]) {
                 p1Periodic[i] -= edgeslength[i];
             }
         }

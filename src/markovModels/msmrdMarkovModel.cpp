@@ -21,6 +21,7 @@ namespace msmrd{
      * to one of the bound states (indexing of bound states begins in 1)*/
     std::tuple<double, int> msmrdMarkovStateModel::computeTransition2BoundState(int transitionState) {
         std::vector<float> rates(numBoundStates);
+
         double transitionTime;
         int endState = 0;
 
@@ -33,7 +34,7 @@ namespace msmrd{
 
         // Calculate lambda0  and ratescumsum for SSA/Gillespie algorithm
         double lambda0 = 0;
-        for(const auto& rate: rates) {
+        for(const auto &rate: rates) {
             lambda0 += rate;
         }
 
