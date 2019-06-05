@@ -68,13 +68,40 @@ TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
     REQUIRE(totalSections == 96); // total sections =  numSphSecsPos*(numSphSecsQuat*(numRadSecsQuat -1) + 1)
 
 
-    // Tests transition to bound state is correctly computed
+    // Tests transition to bound state is correctly computed by markovModel
     auto transition = testIntegrator.markovModel.computeTransition2BoundState(2);
     auto time = std::get<0>(transition);
     auto endState = std::get<1>(transition);
     REQUIRE(time > 0);
-    bool correctEndState = endState == 1 || endState == 2;
+    bool correctEndState = (endState == 1 || endState == 2);
     REQUIRE(correctEndState);
 
+    // Tests transitions to bound states are correctly computed by Integrator
+    int type = 0;
+    int state = 1;
+    double D = 1.0;
+    double Drot = 1.0;
+    auto position1 = vec3<double> {0.1, 0.1, 0.1};
+    auto position2 = vec3<double> {-0.1, -0.1, -0.1};
+    auto orientation = quaternion<double> {1.0, 0.0, 0.0, 0.0};
+    particleMS partMS1 = particleMS(type, state, D, Drot, position1, orientation);
+    particleMS partMS2 = particleMS(type, state, D, Drot, position2, orientation);
+    auto plist = std::vector<particleMS>{partMS1,partMS2};
+    auto numEvents = testIntegrator.eventMgr.getNumEvents();
+    REQUIRE(numEvents == 0);
+    testIntegrator.computeTransitions2BoundStates(plist);
+    numEvents = testIntegrator.eventMgr.getNumEvents();
+    auto event = testIntegrator.eventMgr.getEvent(0);
+    auto transitionTime = std::get<0>(event);
+    auto nextState = std::get<1>(event);
+    auto iIndex = std::get<2>(event)[0];
+    auto jIndex = std::get<2>(event)[1];
+    auto inORout = std::get<3>(event);
+    REQUIRE(numEvents == 1);
+    REQUIRE(transitionTime > 0);
+    REQUIRE( (nextState == 1 || nextState == 2) );
+    REQUIRE(iIndex == 0);
+    REQUIRE(jIndex == 1);
+    REQUIRE( (inORout == "in" || inORout == "out") );
 
 }

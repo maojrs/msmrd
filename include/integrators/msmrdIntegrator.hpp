@@ -25,9 +25,9 @@ namespace msmrd {
     private:
         double relativeDistanceCutOff = 2.2;
         int numParticleTypes;
-        eventManager eventMgr = eventManager();
     public:
-        msmrdMSM &markovModel;
+        eventManager eventMgr = eventManager();
+        msmrdMSM markovModel;
         fullPartition *positionOrientationPart;
 
         /**

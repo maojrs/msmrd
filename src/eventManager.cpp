@@ -42,7 +42,11 @@ namespace msmrd {
 
     // Returns event in eventList corresponding to the index provided
     std::tuple<double, int, std::array<int,2>, std::string> eventManager::getEvent(int index) {
-        return eventList[index];
+        if (index < eventList.size()) {
+            return eventList[index];
+        } else {
+            return {};
+        }
     }
 
 
