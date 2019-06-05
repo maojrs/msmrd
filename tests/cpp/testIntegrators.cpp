@@ -48,7 +48,25 @@ TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
     auto numSections = testIntegrator.positionOrientationPart->getNumSections();
     auto totalSections = numSections[0];
     REQUIRE(totalSections == 203);
-    // TEST MORE FUNCTIONS FROM PARTITION AND ALSO IF THE PARTITON IS SET TO A NEW VALUE
+    auto relPosition = vec3<double> {0.3, 0.5, 0.7};
+    auto relOrientation = quaternion<double> {0.2, 0.4, 0.3, 0.7};
+    relOrientation = relOrientation/relOrientation.norm();
+    auto refOrientation = quaternion<double> {1.0, 0.0 ,0.0, 0.0};
+    auto transitionState = testIntegrator.positionOrientationPart->getSectionNumber(relPosition,
+            relOrientation, refOrientation);
+    REQUIRE(transitionState == 23);
+
+    // Test if partition works when a new partition value is set
+    int numSphericalSectionsPos = 6;
+    int numRadialSectionsQuat = 4;
+    int numSphericalSectionsQuat = 5;
+    positionOrientationPartition newPartition = positionOrientationPartition(relativeDistanceCutOff, numSphericalSectionsPos,
+                                                     numRadialSectionsQuat, numSphericalSectionsQuat);
+    testIntegrator.setDiscretization(&newPartition);
+    numSections = testIntegrator.positionOrientationPart->getNumSections();
+    totalSections = numSections[0];
+    REQUIRE(totalSections == 96); // total sections =  numSphSecsPos*(numSphSecsQuat*(numRadSecsQuat -1) + 1)
+
 
     // Tests transition to bound state is correctly computed
     auto transition = testIntegrator.markovModel.computeTransition2BoundState(2);

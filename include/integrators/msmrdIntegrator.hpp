@@ -56,7 +56,7 @@ namespace msmrd {
         void integrate(std::vector<particleMS> &parts);
 
         void setDiscretization();
-        void setDiscretization(fullPartition positionOrientationPartition);
+        void setDiscretization(fullPartition *thisFullPartition);
 
         void computeTransitions2BoundStates(std::vector<particleMS> &parts);
 
@@ -111,16 +111,16 @@ namespace msmrd {
     void msmrdIntegrator<templateMSM>::setDiscretization() {
         int numSphericalSectionsPos = 7;
         int numRadialSectionsQuat = 5;
-        int numSphericalSectionsQuat = numSphericalSectionsPos;
+        int numSphericalSectionsQuat = 7;
         positionOrientationPart = new fullPartition(relativeDistanceCutOff, numSphericalSectionsPos,
                                                  numRadialSectionsQuat, numSphericalSectionsQuat);
     }
 
     // Sets pointer to discretization chosen.
     template <typename templateMSM>
-    void msmrdIntegrator<templateMSM>::setDiscretization(fullPartition thisFullPartition) {
+    void msmrdIntegrator<templateMSM>::setDiscretization(fullPartition *thisFullPartition) {
         delete positionOrientationPart;
-        positionOrientationPart = &thisFullPartition;
+        positionOrientationPart = thisFullPartition;
     }
 
     template <typename templateMSM>
