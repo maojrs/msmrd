@@ -55,10 +55,11 @@ namespace msmrd {
     void msmrdIntegrator<ctmsm>::computeTransitions2UnboundStates(std::vector<particleMS> &parts) {
         double transitionTime;
         int nextState;
+        std::tuple<double, int> transition;
         for (int i = 0; i < parts.size(); i++) {
-            // Check if particle[i] is bound (boundTo >= 0) and if bound pairs are only counted once (boundTo > i)
+            // Check if particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
             if (parts[i].boundTo > i) {
-                auto transition = markovModel.computeTransition2UnboundState(parts[i].state);
+                transition = markovModel.computeTransition2UnboundState(parts[i].state);
                 transitionTime = std::get<0>(transition);
                 nextState = std::get<1>(transition);
                 eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, "out");
@@ -67,30 +68,33 @@ namespace msmrd {
     }
 
     /* Makes particles with indexes iIndex and jIndex in the particle list transition to a bound state. Note
-     * always iIndex < jIndex should hold. Also particle with smaller index is the ones that remains active
+     * always iIndex < jIndex should hold. Also particle with smaller index is the one that remains active
      * to model position/orientation of bound complex. */
     template<>
     void msmrdIntegrator<ctmsm>::transition2BoundState(std::vector<particleMS> &parts, int iIndex,
                                                        int jIndex, int endState) {
         /* Establish pair connection in particle class and deactivate particle with larger index ( only
          * particle with smaller index remains active to represent the movement of the bound particle) */
-        parts[iIndex].boundTo = jIndex;
-        parts[jIndex].boundTo = iIndex;
+        parts[iIndex].setBoundTo(jIndex);
+        parts[jIndex].setBoundTo(iIndex);
         parts[jIndex].deactivate();
-        // Set state for particle
+//        // Set state for particle
         parts[iIndex].setState(endState);
         parts[jIndex].setState(endState);
-        // Deactivate unbound MSM behavior if applicable
+//        // Deactivate unbound MSM behavior if applicable
         parts[iIndex].activeMSM = false;
         parts[jIndex].activeMSM = false;
-        // Set diffusion coefficients in bound state
-        parts[iIndex].setDs(markovModel.Dboundlist[endState], markovModel.DboundRotlist[endState]);
+        // Set diffusion coefficients in bound state (note states start counting from 1, not zero)
+        parts[iIndex].setDs(markovModel.Dboundlist[endState-1], markovModel.DboundRotlist[endState-1]);
         // Average bound particle position and orientation (save on particle with smaller index).
+        if (rotation) {
+            parts[iIndex].nextOrientation = msmrdtools::quaternionSlerp(parts[iIndex].orientation,
+                                                                        parts[jIndex].orientation, 0.5);
+        }
         parts[iIndex].nextPosition = 0.5*(parts[iIndex].position + parts[jIndex].position);
-        parts[iIndex].nextOrientation = msmrdtools::quaternionSlerp(parts[iIndex].orientation,
-                                                                parts[jIndex].orientation, 0.5);
         // Assign constant distant position to inactive particle ( could be useful for visualization).
         parts[jIndex].nextPosition = {10000000.0, 10000000.0, 10000000.0};
+        parts[jIndex].updatePosition();
     }
 
 
@@ -218,7 +222,7 @@ namespace msmrd {
          * them as new events in the event manager. Finally resort event list by descending waiting time (last in
          * list happen first) */
         removeUnrealizedEvents(parts);
-        computeTransitions2BoundStates(parts); // PROBLEM WITH THIS FUNCTION!!! CHECK
+        computeTransitions2BoundStates(parts);
         computeTransitions2UnboundStates(parts);
         eventMgr.sortDescending();
 
@@ -232,10 +236,10 @@ namespace msmrd {
             } else {
                 // Load event data
                 auto event = eventMgr.getEvent(i);
-                auto residualTime = std::get<0>(event);
-                auto endState = std::get<1>(event);
-                auto iIndex = std::get<2>(event)[0];
-                auto jIndex = std::get<2>(event)[1];
+                double residualTime = std::get<0>(event);
+                int endState = std::get<1>(event);
+                int iIndex = std::get<2>(event)[0];
+                int jIndex = std::get<2>(event)[1];
                 auto inORout = std::get<3>(event);
                 // Make event happen
                 if (inORout == "in") {

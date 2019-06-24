@@ -67,8 +67,8 @@ namespace msmrd{
 
         // Get rates to all transition states from dictionary
         std::string key;
-        for (int i = index0 + 1; i < index0 + numTransitionStates; i++) {
-            key = "b" + std::to_string(boundState) + "->" + std::to_string(i);
+        for (int i = 0; i < numTransitionStates; i++) {
+            key = "b" + std::to_string(boundState) + "->" + std::to_string(index0 + i + 1);
             rates[i] = getRate(key);
         }
 
@@ -108,7 +108,7 @@ namespace msmrd{
         if (search != rateDictionary.end()) {
             return search->second;
         } else {
-            return 0;
+            return 0.0;
             //throw std::range_error("Key does not exist in dictionary");
         }
     }

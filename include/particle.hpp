@@ -190,9 +190,11 @@ namespace msmrd {
 
         void setNextState(int nextstate) { nextState = nextstate; }
 
-        void setNextType(int nexttype) { nextType = nexttype; }
-
         void setLagtime(double newlagtime) { lagtime = newlagtime; }
+
+        void setBoundTo(int particleIndex) { boundTo = particleIndex; }
+
+        void setNextType(int nexttype) { nextType = nexttype; }
 
         void setMSMoff() {activeMSM = false; }
 

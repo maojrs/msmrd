@@ -47,7 +47,9 @@ TEST_CASE("Initialization of dictionary in msmrdMarkovModel class", "[msmrdMarko
     int nBoundStates = 2;
     int nTransitionStates = 2;
     std::map<std::string, float> rateDictionary = { {"1->b1", 5.0}, {"1->b2", 3.0},
-                                                    {"2->b1", 4.0}, {"2->b2", 12.0} };
+                                                    {"2->b1", 4.0}, {"2->b2", 12.0},
+                                                    {"b1->1", 1.0}, {"b1->2", 0.5},
+                                                    {"b2->1", 2.0}, {"b2->2", 1.5}};
     // Create an msmMarkovModel
     auto myMSM = msmrdMarkovStateModel(nBoundStates, nTransitionStates, -1, rateDictionary);
     // Check if the initialization of ctmsms in msmrdMarkovmodel is done correctly.
@@ -59,10 +61,19 @@ TEST_CASE("Initialization of dictionary in msmrdMarkovModel class", "[msmrdMarko
     REQUIRE(rate2b1 == 4.0);
     REQUIRE(rate1b2 == 3.0);
     REQUIRE(rate2b2 == 12.0);
+    // Check transitions to bound state
     auto transition = myMSM.computeTransition2BoundState(1);
     auto time = std::get<0>(transition);
     auto endState = std::get<1>(transition);
     REQUIRE(time > 0);
     bool correctEndState = endState == 1 || endState == 2;
     REQUIRE(correctEndState);
+    // Check transitions to unbound states
+    auto transition2 = myMSM.computeTransition2UnboundState(1);
+    auto time2 = std::get<0>(transition);
+    auto endState2 = std::get<1>(transition);
+    REQUIRE(time2 > 0);
+    bool correctEndState2 = endState2 == 1 || endState2 == 2;
+    REQUIRE(correctEndState2);
+
 }

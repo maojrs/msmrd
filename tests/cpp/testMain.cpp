@@ -289,5 +289,16 @@ TEST_CASE("Event manager functionality", "[eventManager]") {
     REQUIRE(eventMgr.getEventTime(1) == 2*waitTime - 1.5);
     REQUIRE(eventMgr.getEventTime(2) == waitTime - 1.5);
     REQUIRE(eventMgr.getEventTime(3) == 0.5*waitTime - 1.5);
-
+    // Test getting and extracting info from event
+    auto anotherEvent = eventMgr.getEvent(3);
+    double residualTime = std::get<0>(anotherEvent);
+    int endState2 = std::get<1>(anotherEvent);
+    int iIndex = std::get<2>(anotherEvent)[0];
+    int jIndex = std::get<2>(anotherEvent)[1];
+    auto inORout2 = std::get<3>(anotherEvent);
+    REQUIRE(residualTime == 0.5*waitTime - 1.5);
+    REQUIRE(endState2 == 2*endState);
+    REQUIRE(iIndex == 3);
+    REQUIRE(jIndex == 5);
+    REQUIRE(inORout2 == inORout);
 }
