@@ -31,11 +31,15 @@ namespace msmrd {
                 }
 
                 if (relativePosition.norm() < relativeDistanceCutOff) {
-                    relativeOrientation = parts[j].nextOrientation * parts[i].nextOrientation.conj();
-                    refQuaternion = parts[i].nextOrientation.conj();
-                    currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
-                                                                                      relativeOrientation,
-                                                                                      refQuaternion);
+                    if (rotation) {
+                        relativeOrientation = parts[j].nextOrientation * parts[i].nextOrientation.conj();
+                        refQuaternion = parts[i].nextOrientation.conj();
+                        currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
+                                                                                           relativeOrientation,
+                                                                                           refQuaternion);
+                    } else {
+                        currentTransitionState = positionPart->getSectionNumber(relativePosition);
+                    }
                     // PROBLEM ON LINE ABOVE OR BELOW ...
                     auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
                     transitionTime = std::get<0>(transition);
@@ -128,25 +132,39 @@ namespace msmrd {
         parts[iIndex].setDs(iDiff, iDiffRot);
         parts[jIndex].setDs(jDiff, jDiffRot);
         // Extract section intervals in partition corresponding to the endState.
-        auto sections = positionOrientationPart->getSectionIntervals(endState);
-        auto phiInterval = std::get<0>(sections); //polar
-        auto thetaInterval = std::get<1>(sections); //azimuthal
-        auto quatRadInterval = std::get<2>(sections);
-        auto quatPhiInterval = std::get<3>(sections); //polar
-        auto quatThetaInterval = std::get<4>(sections); //azimuthal
-        // Calculate new relative positions and orientations I AM HERE NOW, STILL NEED TO IMPLEMENT THIS
+        std::array<double, 2> phiInterval;
+        std::array<double, 2> thetaInterval;
+        if (not rotation) {
+            auto sections = positionPart->getAngles(endState);
+            phiInterval = std::get<0>(sections); //polar
+            thetaInterval = std::get<1>(sections); //azimuthal
+        } else {
+            std::array<double, 2> quatRadInterval;
+            std::array<double, 2> quatPhiInterval;
+            std::array<double, 2> quatThetaInterval;
+            auto sections = positionOrientationPart->getSectionIntervals(endState);
+            phiInterval = std::get<0>(sections); //polar
+            thetaInterval = std::get<1>(sections); //azimuthal
+            quatRadInterval = std::get<2>(sections);
+            quatPhiInterval = std::get<3>(sections); //polar
+            quatThetaInterval = std::get<4>(sections); //azimuthal
+            // Calculate relative orientation from discretization (partition)
+            auto randomQuat = randg.uniformShellSection(quatRadInterval, quatPhiInterval, quatThetaInterval);
+            double sQuat = std::sqrt(1 - randomQuat.norm());
+            // Recover quaternion from its representation as a vector inside the unit 3D sphere
+            quaternion<double> relOrientation = {sQuat, randomQuat};
+            // More complicate approach for orientation is possible but likely uneccesary.
+            parts[iIndex].nextOrientation = 1.0 * parts[iIndex].orientation;
+            parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
+        }
+
+        // Calculate new relative positions and orientations
         auto relPosition = relativeDistanceCutOff * randg.uniformSphereSection(phiInterval, thetaInterval);
-        // Calculate realtive orientation from discretization (partition)
-        auto randomQuat = randg.uniformShellSection(quatRadInterval, quatPhiInterval, quatThetaInterval);
-        double sQuat = std::sqrt(1 - randomQuat.norm());
-        // Recover quaternion from its representation as a vector inside the unit 3D sphere
-        quaternion<double> relOrientation = {sQuat, randomQuat};
+
         // Set next positions and orientations based on the relative ones (parts[iIndex] keeps track of position)
         parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
         parts[jIndex].nextPosition = parts[iIndex].nextPosition + relPosition;
-        // More complicate approach for orientation is possible but likely uneccesary.
-        parts[iIndex].nextOrientation = 1.0 * parts[iIndex].orientation;
-        parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
+
     }
 
     /* Removes unrealized events where the particles drifted a distance apart beyond the relativeDistanceCutOff.

@@ -28,6 +28,7 @@ namespace msmrd {
     public:
         eventManager eventMgr = eventManager();
         msmrdMSM markovModel;
+        spherePartition *positionPart;
         fullPartition *positionOrientationPart;
 
         /**
@@ -39,8 +40,10 @@ namespace msmrd {
         * @param eventManager class to manage order of events (reactions/transitions).
         * @param markovModel pointer to class msmrdMarkovModel, which is the markovModel class specialized for
         * the MSM/RD scheme. It controls the markov Model in the bound state and the msmrd coupling.
+        * @param positionPart pointer to spherical partition of relative distance, only used when rotation
+        * is disabled in the integrator
         * @param positionOrientationPart pointer to full partition of relative distance and relative orientation,
-        * a.k.a positionOrientationPartition.
+        * a.k.a positionOrientationPartition, used when rotation is enabled.
         * @param MSMlist (see overdampedLanegvinMarkovSwitch parent class) can be either a vector of msms
         * (not yet implemented) or of ctmsms. It corresponds to the MSMs of the unbound particles (conformation
         * switching). Its size should match the number of unbound particle types in the simulation, one MSM
@@ -56,6 +59,7 @@ namespace msmrd {
         void integrate(std::vector<particleMS> &parts);
 
         void setDiscretization();
+        void setDiscretization(spherePartition *thisPositionPartition);
         void setDiscretization(fullPartition *thisFullPartition);
 
         void computeTransitions2BoundStates(std::vector<particleMS> &parts);
@@ -106,17 +110,26 @@ namespace msmrd {
     };
 
 
-    // Sets default discretization (partition).
+    /* Sets default discretization (partition). Sets both positionPart and positionOrientationPart in case either of
+     * the two is required. Note only one will actually be used by code. */
     template <typename templateMSM>
     void msmrdIntegrator<templateMSM>::setDiscretization() {
         int numSphericalSectionsPos = 7;
         int numRadialSectionsQuat = 5;
         int numSphericalSectionsQuat = 7;
+        positionPart = new spherePartition(numSphericalSectionsPos);
         positionOrientationPart = new fullPartition(relativeDistanceCutOff, numSphericalSectionsPos,
-                                                 numRadialSectionsQuat, numSphericalSectionsQuat);
+                                                    numRadialSectionsQuat, numSphericalSectionsQuat);
     }
 
-    // Sets pointer to discretization chosen.
+    // Sets pointer to discretization chosen (no rotation discretization).
+    template <typename templateMSM>
+    void msmrdIntegrator<templateMSM>::setDiscretization(spherePartition *thisPositionPartition) {
+        delete positionPart;
+        positionPart = thisPositionPartition;
+    }
+
+    // Sets pointer to discretization chosen (discretization taking into account rotation).
     template <typename templateMSM>
     void msmrdIntegrator<templateMSM>::setDiscretization(fullPartition *thisFullPartition) {
         delete positionOrientationPart;
