@@ -42,6 +42,7 @@ namespace msmrd {
                 .def_property_readonly("state", &particleMS::getState)
                 .def_property_readonly("lagtime", &particleMS::getLagtime)
                 .def_property_readonly("isMSMactive", &particleMS::isMSMactive)
+                .def_property_readonly("boundTo", &particleMS::getBoundTo)
                 .def("activateMSM", &particleMS::activateMSM)
                 .def("deactivateMSM", &particleMS::deactivateMSM)
                 .def("setState", &particleMS::setState)

@@ -184,6 +184,8 @@ namespace msmrd {
 
         double getLagtime() const { return lagtime; }
 
+        int getBoundTo() const { return boundTo; }
+
         void setState(int newstate) { state = newstate; }
 
         void setNextState(int nextstate) { nextState = nextstate; }

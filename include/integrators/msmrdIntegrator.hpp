@@ -23,7 +23,7 @@ namespace msmrd {
     template <typename templateMSM>
     class msmrdIntegrator : public overdampedLangevinMarkovSwitch<templateMSM> {
     private:
-        double relativeDistanceCutOff = 2.2;
+        double relativeDistanceCutOff;
         int numParticleTypes;
     public:
         eventManager eventMgr = eventManager();
