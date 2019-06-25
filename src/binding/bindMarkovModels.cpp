@@ -55,7 +55,7 @@ namespace msmrd {
                                                             "MSM/RD integration (num. of bound states, num. transition"
                                                             "states, num. of A states, num. of B states, seed, "
                                                             "rate dictionary")
-                .def(py::init<unsigned int &, unsigned int &, long &, std::map<std::string, float> &>())
+                .def(py::init<double &, unsigned int &, unsigned int &, long &, std::map<std::string, float> &>())
                 .def("getRate", &msmrdMarkovStateModel::getRate)
                 .def("computeTransition2BoundState", &msmrdMSM::computeTransition2BoundState)
                 .def("computeTransition2UnboundState", &msmrdMSM::computeTransition2UnboundState)
