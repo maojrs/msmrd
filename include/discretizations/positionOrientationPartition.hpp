@@ -31,6 +31,7 @@ namespace msmrd {
         int numSphericalSectionsPos;
         int numRadialSectionsQuat;
         int numSphericalSectionsQuat;
+        int numTotalQuatSections;
         int numTotalSections = 0;
         std::unique_ptr<spherePartition> sphericalPartition;
         std::unique_ptr<quaternionPartition> quatPartition;

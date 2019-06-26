@@ -24,6 +24,7 @@ namespace msmrd {
 
         sphericalPartition = std::make_unique<spherePartition>(numSphericalSectionsPos);
         quatPartition = std::make_unique<quaternionPartition>(numRadialSectionsQuat, numSphericalSectionsQuat);
+        numTotalQuatSections = quatPartition->numTotalSections;
         numTotalSections = numSphericalSectionsPos * quatPartition->numTotalSections;
 
 //        /* Obtains a good naming scheme for the states, while keeping it an integer (convenient for pyemma)
@@ -52,8 +53,8 @@ namespace msmrd {
 
 
     std::tuple<int, int> positionOrientationPartition::getSectionNumbers(int secNumber){
-        int secNumRelativePos = static_cast<int>(std::ceil(1.0*secNumber/numSphericalSectionsQuat));
-        int secNumRelativeQuat = secNumber % numSphericalSectionsQuat + 1;
+        int secNumRelativePos = static_cast<int>(std::ceil(1.0*secNumber/numTotalQuatSections));
+        int secNumRelativeQuat = secNumber % numTotalQuatSections + 1;
         return std::make_tuple(secNumRelativePos, secNumRelativeQuat);
     };
 

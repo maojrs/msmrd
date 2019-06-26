@@ -5,9 +5,11 @@
 #include "discretizations/spherePartition.hpp"
 #include "discretizations/halfSpherePartition.hpp"
 #include "discretizations/quaternionPartition.hpp"
+#include "discretizations/positionOrientationPartition.hpp"
 #include "tools.hpp"
 
 using namespace msmrd;
+
 
 TEST_CASE("Spherical partition", "[spherePartition]") {
     // Test main partition function
@@ -226,4 +228,36 @@ TEST_CASE("Quaternion partition", "[quaternionPartition]") {
     REQUIRE(msmrdtools::stdvecNorm(std::get<2>(intervals2), std::get<1>(anglesRef2)) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(std::get<2>(intervals3), std::get<1>(anglesRef3)) <= 0.000001);
     REQUIRE(msmrdtools::stdvecNorm(std::get<2>(intervals4), std::get<1>(anglesRef4)) <= 0.000001);
+}
+
+TEST_CASE("position orientation partition", "[positionOrientationPartition]") {
+    // Create position orientation partition (six dimensional)
+    int numSphericalSectionsPos = 7;
+    int numRadialSectionsQuat = 5;
+    int numSphericalSectionsQuat = 7;
+    positionOrientationPartition* positionOrientationPart = new positionOrientationPartition(2.2,
+            numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat);
+
+    int totalnumSecsQuat = numSphericalSectionsQuat*(numRadialSectionsQuat -1) + 1;
+    int numTransitionsStates = numSphericalSectionsPos * totalnumSecsQuat; //203
+
+    std::vector<int> endStates = {0, 50, 100, 150, numTransitionsStates};
+    for (auto const &endState : endStates) {
+        auto intervals = positionOrientationPart->getSectionIntervals(endState);
+        auto interval = std::get<0>(intervals);
+        REQUIRE(0 <= interval[0]);
+        REQUIRE(interval[0] < interval[1]);
+        interval = std::get<1>(intervals);
+        REQUIRE(0 <= interval[0]);
+        REQUIRE(interval[0] <= interval[1]);
+        interval = std::get<2>(intervals);
+        REQUIRE(0 <= interval[0]);
+        REQUIRE(interval[0] <= interval[1]);
+        interval = std::get<3>(intervals);
+        REQUIRE(0 <= interval[0]);
+        REQUIRE(interval[0] <= interval[1]);
+        interval = std::get<4>(intervals);
+        REQUIRE(0 <= interval[0]);
+        REQUIRE(interval[0] <= interval[1]);
+    }
 }
