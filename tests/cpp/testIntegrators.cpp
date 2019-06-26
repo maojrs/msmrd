@@ -92,12 +92,12 @@ TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
     REQUIRE(numEvents == 0);
     testIntegrator.computeTransitions2BoundStates(plist);
     numEvents = testIntegrator.eventMgr.getNumEvents();
-    auto event = testIntegrator.eventMgr.getEvent(0);
-    auto transitionTime = std::get<0>(event);
-    auto nextState = std::get<1>(event);
-    auto iIndex = std::get<2>(event)[0];
-    auto jIndex = std::get<2>(event)[1];
-    auto inORout = std::get<3>(event);
+    auto event = testIntegrator.eventMgr.getEvent(0,1);
+    auto transitionTime = event.waitTime;
+    auto nextState = event.endState;
+    auto iIndex = event.part1Index;
+    auto jIndex = event.part2Index;
+    auto inORout = event.inORout;
     REQUIRE(numEvents == 1);
     REQUIRE(transitionTime > 0);
     REQUIRE( (nextState == 1 || nextState == 2) );

@@ -25,6 +25,7 @@ namespace msmrd {
     private:
         double relativeDistanceCutOff;
         int numParticleTypes;
+        bool firstrun = true;
     public:
         eventManager eventMgr = eventManager();
         msmrdMSM markovModel;

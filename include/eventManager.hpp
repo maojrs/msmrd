@@ -13,37 +13,56 @@ namespace msmrd {
      * Class to manage events (mainly transitions and/or reactions) in MSM/RD algorithm.
      */
     class eventManager {
+    private:
+        struct event {
+            double waitTime;
+            int endState;
+            int part1Index;
+            int part2Index;
+            std::string inORout;
+        };
+        struct event emptyEvent = {.waitTime = std::numeric_limits<double>::infinity(),
+                .endState = -1, .part1Index = -1, .part2Index = -1, .inORout = ""};
     public:
-        /*
-         * @param eventList, list of events/reaction/transition. Each entry of the list has 4 components, time until
-         * event happens, the state to which it will transision (endstate), an array containing the two indexes (in the
-         * particleList) of the particles involved in the event and a string, "in" or "out" to show it is transitioning
-         * to into a bound state or out of it. The list should be always sorted after being updated by ascending time
-         * (first entry).
-         */
         std::vector<std::tuple<double, int, std::array<int,2>, std::string>> eventList  = {};
+
+        std::map<std::string, event> eventDictionary;
+
+        /*
+         * @struct event, each event consists of 5 variables, time until event happens, the state to which it will
+         * transision (endstate), indexes (in the particleList) of the particles involved in the event
+         * (part1Index < part2Index always) and a string, "in" or "out" to show it is transitioning into a bound state
+         * or out of it.
+         * @param emptyEvent defines default emptyEvent, returns event with waitTime = infinity.
+         * @param eventDictionary, list of events/reaction/transitions, associated with a key corresponding to the
+         * two indexes of the particles involved, e.g. "part1Index--part2Index", or more specifically "12--2".
+         */
 
         eventManager() {};
 
         void addEvent(double waitTime, int endState, int part1Index, int part2Index, std::string inORout);
 
-        void removeEvent(int index);
+        void removeEvent(int part1Index, int part2Index);
 
-        void removeEvent(std::tuple<double, int, std::array<int,2>, std::string> event);
+//        void removeEvent(int index);
+//
+//        void removeEvent(std::tuple<double, int, std::array<int,2>, std::string> event);
 
-        void removeEvents(std::vector<std::tuple<double, int, std::array<int,2>, std::string>> events);
+//        std::tuple<double, int, std::array<int,2>, std::string> getEvent(int index);
 
-        std::tuple<double, int, std::array<int,2>, std::string> getEvent(int index);
+        double getEventTime(int part1Index, int part2Index);
 
-        double getEventTime(int index);
+        struct event getEvent(int part1Index, int part2Index);
+
+        //double getEventTime(int index);
 
         void advanceTime(double timeStep);
 
-        int getNumEvents() { return eventList.size(); }
+        int getNumEvents() { return eventDictionary.size(); }
 
-        void sortAscending();
-
-        void sortDescending();
+//        void sortAscending();
+//
+//        void sortDescending();
 
     };
 }

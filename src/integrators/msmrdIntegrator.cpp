@@ -58,7 +58,7 @@ namespace msmrd {
         std::tuple<double, int> transition;
         for (int i = 0; i < parts.size(); i++) {
             // Check if particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
-            if (parts[i].boundTo > -1) {
+            if (parts[i].boundTo > i) {
                 transition = markovModel.computeTransition2UnboundState(parts[i].state);
                 transitionTime = std::get<0>(transition);
                 nextState = std::get<1>(transition);
@@ -176,17 +176,14 @@ namespace msmrd {
      * future code optimization. */
     template<>
     void msmrdIntegrator<ctmsm>::removeUnrealizedEvents(std::vector<particleMS> &parts) {
-        int numEvents = eventMgr.getNumEvents();
-        for (int i = numEvents - 1; i>=0; --i) {
-            auto event = eventMgr.getEvent(i);
-            auto transitionTime = std::get<0>(event);
-            auto iIndex = std::get<2>(event)[0];
-            auto jIndex = std::get<2>(event)[1];
+        for (auto &thisEvent : eventMgr.eventDictionary) {
+            auto transitionTime = thisEvent.second.waitTime;
+            auto iIndex = thisEvent.second.part1Index;
+            auto jIndex = thisEvent.second.part2Index;
             vec3<double> relativePosition;
             // Remove event if transition time is infinity
             if (isinf(transitionTime)) {
-                eventMgr.removeEvent(i);
-
+                eventMgr.removeEvent(iIndex, jIndex);
             }
             // If particles in unbound state and relative position is larger than cutOff, remove event.
             else if (parts[iIndex].boundTo == -1 and parts[jIndex].boundTo == -1) {
@@ -200,7 +197,7 @@ namespace msmrd {
                 }
                 // Remove event if particles drifted apart
                 if (relativePosition.norm() >= relativeDistanceCutOff) {
-                    eventMgr.removeEvent(i);
+                    eventMgr.removeEvent(iIndex, jIndex);
                 }
             }
         }
@@ -214,8 +211,12 @@ namespace msmrd {
     template<>
     void msmrdIntegrator<ctmsm>::integrate(std::vector<particleMS> &parts) {
 
-        // Calculate forces and torques and save them into forceField and torqueField (needed even if there are zero)
-        calculateForceTorqueFields<particleMS>(parts); // Should only run once if forces are zero.
+        /* Calculate forces and torques and save them into forceField and torqueField. For the MSM/RD this will
+         * in general zero, so only needs to be run once. */
+        if (firstrun) {
+            calculateForceTorqueFields<particleMS>(parts);
+            firstrun = false;
+        }
 
         /* Integrate only active particles and save next positions/orientations in parts[i].next***.
          * Non-active particles will usually correspond to bound particles */
@@ -232,34 +233,30 @@ namespace msmrd {
         /* Remove unrealized previous events. Also compute transitions to bound states and to unbound states and add
          * them as new events in the event manager. Finally resort event list by descending waiting time (last in
          * list happen first) */
-        //removeUnrealizedEvents(parts);
+        removeUnrealizedEvents(parts);
         computeTransitions2BoundStates(parts);
         computeTransitions2UnboundStates(parts);
-        eventMgr.sortDescending();
 
 
         // Check for events that should happen in this time step and make them happen.
-        int numEvents = eventMgr.getNumEvents();
-        for (int i = numEvents - 1; i>=0; --i) {
+        for (auto &thisEvent : eventMgr.eventDictionary) {
+            auto transitionTime = thisEvent.second.waitTime;
+
             // Break loop if only future events are left (eventTime>0)
-            if (eventMgr.getEventTime(i) > 0) {
-                break;
-            } else {
+            if (transitionTime < 0) {
                 // Load event data
-                auto event = eventMgr.getEvent(i);
-                double residualTime = std::get<0>(event);
-                int endState = std::get<1>(event);
-                int iIndex = std::get<2>(event)[0];
-                int jIndex = std::get<2>(event)[1];
-                auto inORout = std::get<3>(event);
+                auto endState = thisEvent.second.endState;
+                auto iIndex = thisEvent.second.part1Index;
+                auto jIndex = thisEvent.second.part2Index;
+                auto inORout = thisEvent.second.inORout;
                 // Make event happen
-                if (inORout == "in") {
+                if (thisEvent.second.inORout == "in") {
                     transition2BoundState(parts, iIndex, jIndex, endState);
                 } else if (inORout == "out") {
                     transition2UnboundState(parts, iIndex, jIndex, endState);
                 }
                 // Remove event from event list
-                eventMgr.removeEvent(i);
+                eventMgr.removeEvent(iIndex, jIndex);
             }
         }
 

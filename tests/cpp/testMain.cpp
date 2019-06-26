@@ -260,45 +260,53 @@ TEST_CASE("Event manager functionality", "[eventManager]") {
     // Test adding events
     eventMgr.addEvent(waitTime, endState, 1, 2, inORout);
     eventMgr.addEvent(0.5*waitTime, 2*endState, 3, 5, inORout);
-    eventMgr.addEvent(2*waitTime, endState/2, 7, 6, inORout);
-    eventMgr.addEvent(3*waitTime, 3*endState, 3, 1, inORout);
-    REQUIRE(eventMgr.eventList.size() == 4);
-    // Test sorting of events by waiting time
-    eventMgr.sortAscending();
-    REQUIRE(eventMgr.getEventTime(0) == 0.5*waitTime);
-    REQUIRE(eventMgr.getEventTime(1) == waitTime);
-    REQUIRE(eventMgr.getEventTime(2) == 2*waitTime);
-    REQUIRE(eventMgr.getEventTime(3) == 3*waitTime);
+    eventMgr.addEvent(2*waitTime, endState/2, 6, 7, inORout);
+    eventMgr.addEvent(3*waitTime, 3*endState, 1, 3, inORout);
+    REQUIRE(eventMgr.getNumEvents() == 4);
     // Test getting and removing events
-    auto someEvent = eventMgr.getEvent(2);
-    eventMgr.removeEvent(someEvent);
-    REQUIRE(eventMgr.eventList.size() == 3);
-    REQUIRE(eventMgr.getEventTime(0) == 0.5*waitTime);
-    REQUIRE(eventMgr.getEventTime(1) == waitTime);
-    REQUIRE(eventMgr.getEventTime(2) == 3*waitTime);
-    eventMgr.removeEvent(1);
-    REQUIRE(eventMgr.eventList.size() == 2);
-    REQUIRE(eventMgr.getEventTime(0) == 0.5*waitTime);
-    REQUIRE(eventMgr.getEventTime(1) == 3*waitTime);
+    eventMgr.removeEvent(6,7);
+    REQUIRE(eventMgr.getNumEvents() == 3);
+    REQUIRE(eventMgr.getEventTime(1,2) == waitTime);
+    REQUIRE(eventMgr.getEventTime(3,5) == 0.5*waitTime);
+    REQUIRE(eventMgr.getEventTime(1,3) == 3*waitTime);
+    eventMgr.removeEvent(1,2);
+    REQUIRE(eventMgr.getNumEvents() == 2);
+    REQUIRE(eventMgr.getEventTime(3,5) == 0.5*waitTime);
+    REQUIRE(eventMgr.getEventTime(1,3) == 3*waitTime);
     // Test advance time
     eventMgr.addEvent(waitTime, endState, 1, 2, inORout);
-    eventMgr.addEvent(2*waitTime, endState/2, 7, 6, inORout);
-    eventMgr.sortDescending();
+    eventMgr.addEvent(2*waitTime, endState/2, 6, 7, inORout);
     eventMgr.advanceTime(1.5);
-    REQUIRE(eventMgr.getEventTime(0) == 3*waitTime - 1.5);
-    REQUIRE(eventMgr.getEventTime(1) == 2*waitTime - 1.5);
-    REQUIRE(eventMgr.getEventTime(2) == waitTime - 1.5);
-    REQUIRE(eventMgr.getEventTime(3) == 0.5*waitTime - 1.5);
+    REQUIRE(eventMgr.getEventTime(1,2) == waitTime - 1.5);
+    REQUIRE(eventMgr.getEventTime(3,5) == 0.5*waitTime - 1.5);
+    REQUIRE(eventMgr.getEventTime(6,7) == 2*waitTime - 1.5);
+    REQUIRE(eventMgr.getEventTime(1,3) == 3*waitTime - 1.5);
     // Test getting and extracting info from event
-    auto anotherEvent = eventMgr.getEvent(3);
-    double residualTime = std::get<0>(anotherEvent);
-    int endState2 = std::get<1>(anotherEvent);
-    int iIndex = std::get<2>(anotherEvent)[0];
-    int jIndex = std::get<2>(anotherEvent)[1];
-    auto inORout2 = std::get<3>(anotherEvent);
+    auto anotherEvent = eventMgr.getEvent(3,5);
+    double residualTime = anotherEvent.waitTime;
+    int endState2 = anotherEvent.endState;
+    int iIndex = anotherEvent.part1Index;
+    int jIndex = anotherEvent.part2Index;
+    auto inORout2 = anotherEvent.inORout;
     REQUIRE(residualTime == 0.5*waitTime - 1.5);
     REQUIRE(endState2 == 2*endState);
     REQUIRE(iIndex == 3);
     REQUIRE(jIndex == 5);
     REQUIRE(inORout2 == inORout);
+    /* Test adding an event with same key (same pair of particles).
+     * If duplicated, it should only keep the one with smaller waitTime. */
+    eventMgr.addEvent(5.0*waitTime, endState, 1, 2, inORout);
+    auto oneMoreEvent = eventMgr.getEvent(1,2);
+    residualTime = oneMoreEvent.waitTime;
+    REQUIRE(eventMgr.getNumEvents() == 4);
+    REQUIRE(residualTime == waitTime - 1.5);
+    eventMgr.addEvent(0.5*waitTime, endState, 1, 2, inORout);
+    oneMoreEvent = eventMgr.getEvent(1,2);
+    residualTime = oneMoreEvent.waitTime;
+    REQUIRE(eventMgr.getNumEvents() == 4);
+    REQUIRE(residualTime == 0.5*waitTime);
+    // Test getting event with key not currently in dictionary
+    auto oneLastEvent = eventMgr.getEvent(45,43);
+    residualTime = oneLastEvent.waitTime;
+    REQUIRE(residualTime == std::numeric_limits<double>::infinity());
 }
