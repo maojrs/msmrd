@@ -12,8 +12,8 @@ namespace msmrd {
      * for the event/transition, the indexes (in partList) of the particles involved (part1Index < part2Index) and
      * a string: "in" or "out". */
     void eventManager::addEvent(double waitTime, int endState, int part1Index, int part2Index, std::string inORout) {
-        if ((inORout != "in") and (inORout != "out")) {
-            std::range_error("Events can only take 'in' or 'out' strings as last argument");
+        if ((inORout != "in") and (inORout != "out") and (inORout != "inside")) {
+            std::range_error("Events can only take 'in', 'out' or 'inside' strings as last argument");
         }
         // Create key and new event
         std::string eventKey = std::to_string(part1Index) + "--" + std::to_string(part2Index);

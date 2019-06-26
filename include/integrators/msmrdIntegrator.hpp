@@ -60,18 +60,24 @@ namespace msmrd {
         void integrate(std::vector<particleMS> &parts);
 
         void setDiscretization();
+
         void setDiscretization(spherePartition *thisPositionPartition);
+
         void setDiscretization(fullPartition *thisFullPartition);
 
         void computeTransitions2BoundStates(std::vector<particleMS> &parts);
 
         void computeTransitions2UnboundStates(std::vector<particleMS> &parts);
 
+        void computeTransitionsBetweenBoundStates(std::vector<particleMS> &parts);
+
         void removeUnrealizedEvents(std::vector<particleMS> &parts);
 
         void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
         void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+
+        void transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
         float getRateFromKey(std::string);
 

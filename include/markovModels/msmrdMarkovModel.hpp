@@ -59,6 +59,8 @@ namespace msmrd {
 
         std::tuple<double, int> computeTransition2UnboundState(int boundState);
 
+        std::tuple<double, int> computeTransitionBetweenBoundStates(int boundState);
+
 
         float getRate(std::string key);
 

@@ -49,7 +49,7 @@ namespace msmrd {
         }
     }
 
-    /* Computes possible transitions from unbound states to transition states and saves them in the event manager.
+    /* Computes possible transitions from bound states to transition states and saves them in the event manager.
      * Used by integrate function. */
     template<>
     void msmrdIntegrator<ctmsm>::computeTransitions2UnboundStates(std::vector<particleMS> &parts) {
@@ -67,6 +67,24 @@ namespace msmrd {
         }
     }
 
+    /* Computes possible transitions from bound states to other bound states and saves them in the event manager.
+     * Used by integrate function. */
+    template<>
+    void msmrdIntegrator<ctmsm>::computeTransitionsBetweenBoundStates(std::vector<particleMS> &parts) {
+        double transitionTime;
+        int nextState;
+        std::tuple<double, int> transition;
+        for (int i = 0; i < parts.size(); i++) {
+            // Check if particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
+            if (parts[i].boundTo > i) {
+                transition = markovModel.computeTransitionBetweenBoundStates(parts[i].state);
+                transitionTime = std::get<0>(transition);
+                nextState = std::get<1>(transition);
+                eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, "inside");
+            }
+        }
+    }
+
     /* Makes particles with indexes iIndex and jIndex in the particle list transition to a bound state. Note
      * always iIndex < jIndex should hold. Also particle with smaller index is the one that remains active
      * to model position/orientation of bound complex. */
@@ -78,10 +96,10 @@ namespace msmrd {
         parts[iIndex].boundTo = jIndex;
         parts[jIndex].boundTo = iIndex;
         parts[jIndex].deactivate();
-//        // Set state for particle
+        // Set state for particle
         parts[iIndex].setState(endState);
         parts[jIndex].setState(endState);
-//        // Deactivate unbound MSM behavior if applicable
+        // Deactivate unbound MSM behavior if applicable
         parts[iIndex].activeMSM = false;
         parts[jIndex].activeMSM = false;
         // Set diffusion coefficients in bound state (note states start counting from 1, not zero)
@@ -167,8 +185,21 @@ namespace msmrd {
         // Set next positions and orientations based on the relative ones (parts[iIndex] keeps track of position)
         parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
         parts[jIndex].nextPosition = parts[iIndex].nextPosition + relPosition;
-
     }
+
+
+    /* Transitions already bound particles with indexes iIndex and jIndex in the particle list
+     * to another bound state. */
+    template<>
+    void msmrdIntegrator<ctmsm>::transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex,
+                                                       int jIndex, int endState) {
+        // Set state for particle
+        parts[iIndex].setState(endState);
+        parts[jIndex].setState(endState);
+        // Set diffusion coefficients in bound state (note states start counting from 1, not zero)
+        parts[iIndex].setDs(markovModel.Dboundlist[endState-1], markovModel.DboundRotlist[endState-1]);
+    }
+
 
     /* Removes unrealized events where unbound particles drifted a distance apart beyond the relativeDistanceCutOff,
      * or when zero rates yielded infinite values. This can be more optimally included inside the
@@ -236,6 +267,8 @@ namespace msmrd {
         removeUnrealizedEvents(parts);
         computeTransitions2BoundStates(parts);
         computeTransitions2UnboundStates(parts);
+        computeTransitionsBetweenBoundStates(parts);
+
 
 
         // Check for events that should happen in this time step and make them happen.
@@ -254,6 +287,8 @@ namespace msmrd {
                     transition2BoundState(parts, iIndex, jIndex, endState);
                 } else if (inORout == "out") {
                     transition2UnboundState(parts, iIndex, jIndex, endState);
+                } else if (inORout == "inside") {
+                    transitionBetweenBoundStates(parts, iIndex, jIndex, endState);
                 }
                 // Remove event from event list
                 eventMgr.removeEvent(iIndex, jIndex);
