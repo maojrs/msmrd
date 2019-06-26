@@ -24,8 +24,6 @@ namespace msmrd {
         struct event emptyEvent = {.waitTime = std::numeric_limits<double>::infinity(),
                 .endState = -1, .part1Index = -1, .part2Index = -1, .inORout = ""};
     public:
-        std::vector<std::tuple<double, int, std::array<int,2>, std::string>> eventList  = {};
-
         std::map<std::string, event> eventDictionary;
 
         /*
@@ -44,25 +42,13 @@ namespace msmrd {
 
         void removeEvent(int part1Index, int part2Index);
 
-//        void removeEvent(int index);
-//
-//        void removeEvent(std::tuple<double, int, std::array<int,2>, std::string> event);
-
-//        std::tuple<double, int, std::array<int,2>, std::string> getEvent(int index);
-
         double getEventTime(int part1Index, int part2Index);
 
         struct event getEvent(int part1Index, int part2Index);
 
-        //double getEventTime(int index);
-
         void advanceTime(double timeStep);
 
         int getNumEvents() { return eventDictionary.size(); }
-
-//        void sortAscending();
-//
-//        void sortDescending();
 
     };
 }
