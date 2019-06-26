@@ -58,7 +58,7 @@ namespace msmrd {
         std::tuple<double, int> transition;
         for (int i = 0; i < parts.size(); i++) {
             // Check if particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
-            if (parts[i].boundTo > i) {
+            if (parts[i].boundTo > -1) {
                 transition = markovModel.computeTransition2UnboundState(parts[i].state);
                 transitionTime = std::get<0>(transition);
                 nextState = std::get<1>(transition);
@@ -75,8 +75,8 @@ namespace msmrd {
                                                        int jIndex, int endState) {
         /* Establish pair connection in particle class and deactivate particle with larger index ( only
          * particle with smaller index remains active to represent the movement of the bound particle) */
-        parts[iIndex].setBoundTo(jIndex);
-        parts[jIndex].setBoundTo(iIndex);
+        parts[iIndex].boundTo = jIndex;
+        parts[jIndex].boundTo = iIndex;
         parts[jIndex].deactivate();
 //        // Set state for particle
         parts[iIndex].setState(endState);
@@ -170,27 +170,38 @@ namespace msmrd {
 
     }
 
-    /* Removes unrealized events where the particles drifted a distance apart beyond the relativeDistanceCutOff.
-     * This can be more optimally included inside the computeTransitions2BoundStates function. However, the
-     * code is more clear if left separate. Better left for future code optimization. */
+    /* Removes unrealized events where unbound particles drifted a distance apart beyond the relativeDistanceCutOff,
+     * or when zero rates yielded infinite values. This can be more optimally included inside the
+     * computeTransitions2BoundStates function. However, the code is more clear if left separate. Better left for
+     * future code optimization. */
     template<>
     void msmrdIntegrator<ctmsm>::removeUnrealizedEvents(std::vector<particleMS> &parts) {
         int numEvents = eventMgr.getNumEvents();
         for (int i = numEvents - 1; i>=0; --i) {
             auto event = eventMgr.getEvent(i);
+            auto transitionTime = std::get<0>(event);
             auto iIndex = std::get<2>(event)[0];
             auto jIndex = std::get<2>(event)[1];
             vec3<double> relativePosition;
-            if (boundaryActive) {
-                relativePosition = msmrdtools::calculateRelativePosition(parts[iIndex].nextPosition,
-                        parts[jIndex].nextPosition, boundaryActive, domainBoundary->getBoundaryType(),
-                                                                         domainBoundary->getBoxsize());
-            } else{
-                relativePosition = parts[jIndex].nextPosition - parts[iIndex].nextPosition;
-            }
-            // Remove event if particles drifted apart
-            if (relativePosition.norm() >= relativeDistanceCutOff) {
+            // Remove event if transition time is infinity
+            if (isinf(transitionTime)) {
                 eventMgr.removeEvent(i);
+
+            }
+            // If particles in unbound state and relative position is larger than cutOff, remove event.
+            else if (parts[iIndex].boundTo == -1 and parts[jIndex].boundTo == -1) {
+                if (boundaryActive) {
+                    relativePosition = msmrdtools::calculateRelativePosition(parts[iIndex].nextPosition,
+                                                                             parts[jIndex].nextPosition, boundaryActive,
+                                                                             domainBoundary->getBoundaryType(),
+                                                                             domainBoundary->getBoxsize());
+                } else {
+                    relativePosition = parts[jIndex].nextPosition - parts[iIndex].nextPosition;
+                }
+                // Remove event if particles drifted apart
+                if (relativePosition.norm() >= relativeDistanceCutOff) {
+                    eventMgr.removeEvent(i);
+                }
             }
         }
     }
@@ -221,7 +232,7 @@ namespace msmrd {
         /* Remove unrealized previous events. Also compute transitions to bound states and to unbound states and add
          * them as new events in the event manager. Finally resort event list by descending waiting time (last in
          * list happen first) */
-        removeUnrealizedEvents(parts);
+        //removeUnrealizedEvents(parts);
         computeTransitions2BoundStates(parts);
         computeTransitions2UnboundStates(parts);
         eventMgr.sortDescending();
