@@ -40,6 +40,7 @@ namespace msmrd {
                                                                               "positionOrientationPartition)")
                 .def(py::init<double &, long &, std::string &, int &, double &, ctmsm &, msmrdMSM &>())
                 .def("getRateFromKey", &msmrdIntegrator<ctmsm>::getRateFromKey)
+                .def("setDiscretization", &msmrdIntegrator<ctmsm>::setDiscretization)
                 .def("integrate", &msmrdIntegrator<ctmsm>::integrate);
 
         // Created c++ compatible particle list/vector/array of particles in python

@@ -59,9 +59,9 @@ namespace msmrd {
         // Redefine integrate function
         void integrate(std::vector<particleMS> &parts);
 
-        void setDiscretization();
+        void setDefaultDiscretization();
 
-        void setDiscretization(spherePartition *thisPositionPartition);
+        //void setDiscretization(spherePartition *thisPositionPartition);
 
         void setDiscretization(fullPartition *thisFullPartition);
 
@@ -96,7 +96,7 @@ namespace msmrd {
             overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
             numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff) {
 
-        setDiscretization();
+        setDefaultDiscretization();
 
         if (MSMlist.size() != numParticleTypes and MSMlist.size() != 1) {
             std::__throw_range_error("Number of MSMs provided in MSMlist should match number of unbound particle"
@@ -112,7 +112,7 @@ namespace msmrd {
             overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
             numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff) {
 
-        setDiscretization();
+        setDefaultDiscretization();
 
     };
 
@@ -120,7 +120,7 @@ namespace msmrd {
     /* Sets default discretization (partition). Sets both positionPart and positionOrientationPart in case either of
      * the two is required. Note only one will actually be used by code. */
     template <typename templateMSM>
-    void msmrdIntegrator<templateMSM>::setDiscretization() {
+    void msmrdIntegrator<templateMSM>::setDefaultDiscretization() {
         int numSphericalSectionsPos = 7;
         int numRadialSectionsQuat = 5;
         int numSphericalSectionsQuat = 7;
@@ -129,12 +129,12 @@ namespace msmrd {
                                                     numRadialSectionsQuat, numSphericalSectionsQuat);
     }
 
-    // Sets pointer to discretization chosen (no rotation discretization).
-    template <typename templateMSM>
-    void msmrdIntegrator<templateMSM>::setDiscretization(spherePartition *thisPositionPartition) {
-        delete positionPart;
-        positionPart = thisPositionPartition;
-    }
+//    // Sets pointer to discretization chosen (no rotation discretization).
+//    template <typename templateMSM>
+//    void msmrdIntegrator<templateMSM>::setDiscretization(spherePartition *thisPositionPartition) {
+//        delete positionPart;
+//        positionPart = thisPositionPartition;
+//    }
 
     // Sets pointer to discretization chosen (discretization taking into account rotation).
     template <typename templateMSM>
