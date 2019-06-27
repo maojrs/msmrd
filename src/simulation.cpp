@@ -8,7 +8,7 @@
 #include "trajectories/trajectory.hpp"
 #include "trajectories/trajectoryPosition.hpp"
 #include "trajectories/trajectoryPositionOrientation.hpp"
-#include "trajectories/patchyDimer.hpp"
+#include "trajectories/discrete/patchyDimer.hpp"
 
 
 

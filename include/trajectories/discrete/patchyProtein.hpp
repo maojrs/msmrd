@@ -4,7 +4,7 @@
 
 #pragma once
 #include <memory>
-#include "trajectoryPositionOrientation.hpp"
+#include "trajectories/trajectoryPositionOrientation.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
 #include "tools.hpp"
 

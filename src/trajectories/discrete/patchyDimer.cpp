@@ -1,7 +1,7 @@
 //
 // Created by maojrs on 1/22/19.
 //
-#include "trajectories/patchyDimer.hpp"
+#include "trajectories/discrete/patchyDimer.hpp"
 
 namespace msmrd {
 

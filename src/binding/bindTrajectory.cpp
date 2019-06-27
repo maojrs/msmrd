@@ -9,8 +9,8 @@ namespace msmrd {
      */
     void bindTrajectories(py::module &m) {
 
-        py::class_<trajectoryPosition, trajectory>(m, "trajectoryPosition", "position trajectory (#particles or #pairs of particles, "
-                                                                "approx size)")
+        py::class_<trajectoryPosition, trajectory>(m, "trajectoryPosition", "position trajectory (#particles or "
+                                                                            "#pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
                 .def("sample", &trajectoryPosition::sample)
                 .def("sampleRelative", &trajectoryPosition::sampleRelative)
@@ -21,8 +21,9 @@ namespace msmrd {
                 .def_property_readonly("data", &trajectoryPosition::getTrajectoryData);
 
 
-        py::class_<trajectoryPositionOrientation, trajectory>(m, "trajectoryPositionOrientation", "position and orientation "
-                                                                                      "trajectory (#particles or #pairs "
+        py::class_<trajectoryPositionOrientation, trajectory>(m, "trajectoryPositionOrientation", "position and "
+                                                                                      "orientation trajectory "
+                                                                                      "(#particles or #pairs "
                                                                                       "of particles, approx size)")
                 .def(py::init<int &, int &>())
                 .def("sample", &trajectoryPositionOrientation::sample)

@@ -2,7 +2,7 @@
 // Created by maojrs on 4/8/19.
 //
 
-#include "trajectories/patchyProtein.hpp"
+#include "trajectories/discrete/patchyProtein.hpp"
 
 namespace msmrd {
     /*

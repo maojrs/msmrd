@@ -58,11 +58,11 @@ set(SOURCES
         src/potentials/patchyProtein.cpp
         src/potentials/patchyProteinMarkovSwitch.cpp
         src/potentials/potentials.cpp
-        src/trajectories/patchyDimer.cpp
-        src/trajectories/patchyProtein.cpp
         src/trajectories/trajectory.cpp
         src/trajectories/trajectoryPosition.cpp
         src/trajectories/trajectoryPositionOrientation.cpp
+        src/trajectories/discrete/patchyDimer.cpp
+        src/trajectories/discrete/patchyProtein.cpp
         )
 
 set(PY_SOURCES
@@ -109,11 +109,11 @@ set(PY_SOURCES
         include/potentials/patchyParticleAngular.hpp
         include/potentials/patchyProtein.hpp
         include/potentials/patchyProteinMarkovSwitch.hpp
-        include/trajectories/patchyDimer.hpp
-        include/trajectories/patchyProtein.hpp
         include/trajectories/trajectory.hpp
         include/trajectories/trajectoryPosition.hpp
         include/trajectories/trajectoryPositionOrientation.hpp
+        include/trajectories/discrete/patchyDimer.hpp
+        include/trajectories/discrete/patchyProtein.hpp
         )
 
 add_library(msmrd2core SHARED ${SOURCES})
