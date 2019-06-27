@@ -58,6 +58,9 @@ namespace msmrd {
 
         int getBoundState(quaternion<double> q1, quaternion<double> q2);
 
+        int getBoundStatePyBind(particle part1, particle part2);
+
+
     };
 
 }

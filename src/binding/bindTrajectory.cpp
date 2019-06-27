@@ -1,6 +1,8 @@
 #include "binding.hpp"
 #include "trajectories/trajectoryPosition.hpp"
 #include "trajectories/trajectoryPositionOrientation.hpp"
+#include "trajectories/discrete/patchyDimer.hpp"
+
 
 
 namespace msmrd {
@@ -33,6 +35,16 @@ namespace msmrd {
                 .def("writeChunk2H5file", &trajectoryPositionOrientation::writeChunk2H5file<double,8>)
                 .def("emptyBuffer", &trajectoryPositionOrientation::emptyBuffer)
                 .def_property_readonly("data", &trajectoryPositionOrientation::getTrajectoryData);
+
+
+        py::class_<patchyDimer, trajectoryPositionOrientation>(m, "patchyDimer", "discrete trajectory of patchy dimer"
+                                                                                 "exampole(#particles or #pairs "
+                                                                                 "of particles, approx size)")
+                .def(py::init<int &, int &>())
+                .def("sampleDiscreteTrajectory", &patchyDimer::sampleDiscreteTrajectory)
+                .def("getBoundState", &patchyDimer::getBoundStatePyBind);
+
+
     }
 
 }

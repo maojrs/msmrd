@@ -94,6 +94,39 @@ namespace msmrd {
         return prevsample; //-1;
     };
 
+
+    /* Given two position and orientations, return either bound state A (1), bound state B (2) or unbound (-1).
+     * This is a special version for PyBind, useful when calculating benchmarks in python interface. */
+    int patchyDimer::getBoundStatePyBind(particle part1, particle part2) {
+
+        // Calculate relative orientation
+        vec3<double> relativePosition;
+        auto position1 = part1.position;
+        auto position2 = part2.position;
+        auto orientation1quat = part1.orientation;
+        auto orientation2quat = part2.orientation;
+
+        // Calculate relative distance taking into account periodic boundary.
+        if (boundaryActive) {
+            relativePosition = msmrdtools::calculateRelativePosition(position1, position2,
+                                                                                  boundaryActive,
+                                                                                  domainBoundary->getBoundaryType(),
+                                                                                  domainBoundary->boxsize);
+        } else {
+            relativePosition = position2 - position1;
+        }
+
+        // Extract current state, save into sample and push sample to discreteTrajectoryData.
+        int boundState = -1;
+        if (relativePosition.norm() < 1.25) {
+            boundState = getBoundState(orientation1quat, orientation2quat);
+        }
+        if (boundState != 1 and boundState != 2) {
+            boundState = -1;
+        }
+        return boundState;
+    };
+
     /*
      * Define metastable relative orientations (including symmetric quaternion)
      */
