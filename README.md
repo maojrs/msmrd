@@ -11,14 +11,14 @@ python setup.py install
 
 ## To do:
 
-- [x] Test sample overdamped Lanegvin integrator with pybindings.
+- [x] Finish working version of generalized MSM/RD integrator with arbitrary relative position/orientation.
 
-- [x] Write header and source file for potentials.
+- [ ] Implement first test case for simplest two dimer/two bound states model.
 
-- [x] Rewrite module for MSM and CTMSM in c++.
+- [ ] Implement test case for 'patchy proteins'.
 
-- [x] Rewrite previous code for diffusion with rotation and Markovian switch. 
+- [ ] Implement case for trimer and pentamer (requires additional modification of msmrdIntegrator, perhaps make a child class). 
 
-- [ ] Write tests for randgen, msm, ctmsm, odLangevin and odLangevinMarkovSwitch classes
+- [ ] Review untested parts of code and write tests (not urgent since most complex and relevant parts already have extensive tests).
 
-- [x] Choose toy system with orientation dependent potential
+- [ ] Extend overdampedLangevinMS and msmrdIntegrator to handle discrete MSMs (not required but could be a nice addition).
