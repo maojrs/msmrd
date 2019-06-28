@@ -23,29 +23,31 @@ namespace msmrd {
      */
     class patchyDimer : public trajectoryPositionOrientation {
     private:
-        std::vector<quaternion<double>> rotMetastableStates;
-        std::vector<quaternion<double>> symmetryQuaternions{{1,0,0,0}};
-        std::unique_ptr<spherePartition> spherePart;
-        std::unique_ptr<quaternionPartition> quaternionPart;
         std::unique_ptr<positionOrientationPartition> positionOrientationPart;
+        std::array< std::tuple<vec3<double>, quaternion<double>>, 8> boundStates{};
         int maxNumberBoundStates = 10;
-        int angularStates;
-        double tolerance = 0.1;
+        double tolerancePosition = 0.1;
+        double toleranceOrientation = 2*M_PI*0.1;
         int prevsample = 0;
     public:
         /*
-         * @param rotMetastableStates[X] correspond to the list of relative rotations that correspond to a
-         * metastable state/region X. Each rotation is represented by a quaternion.
-         * @symmetryQuaternions list of rotation that represents the structural symmetries of the patchy particle if
-         * needed to define the states.
-         * @param spherePart pointer to equal area spherical partition class with relevant functions
-         * @param quaternionPart pointer to volumetric spherical partition class to discretize quaternion space.
+         * @positionOrientationPart full six dimensional partition of phase space of relative position and orientation.
+         * This is required to sample the discrete trajectory in the transition regions given by this discretization.
+         * @boundStates vector of tuples. Each tuple contains a vector and a quaternion indicating one of the 8 bound
+         * states. The vector corresponds to the relative position (pos2-pos1) in the frame of reference of particle 1
+         * (smaller index) between particle 1 and 2. The fixed frame of reference also assumes particle 1 is in its
+         * default initial orientation. The quaternion corresponds to the relative orientation between the two
+         * particles, also measuerd from the fixed frame of reference of particle 1. This variable is calculated by
+         * the setMetastableRegions function.
          * @param maxNumberBoundStates maximum number of bound states supported. It is used to determine how to
          * count (index) the transition states. The state maxNumberBoundStates + 1 will correspond not to a bound state
          * but to the first transition state. This parameter has to be consistent with the one used
          * by the msmrd integrator and the msmrdMarkovModel.
-         * @param angularStates number of angular states for discretization
-         * @ param tolerance is the maximum distance away from metastable state to still be considered metastable.
+         * @param tolerancePosition is the maximum acceptable difference between the relative position and the
+         * calculated relative position of a metstable region to still be considered part of a bound state.
+         * @param toleranceOrientation is the maximum acceptable angle-distance difference between the relative
+         * orientation and the relative orientation calculated of a given metastable region to still be considerer
+         * part of a bound state.
          * @param prevsample keeps calue of previous sample when sampling discrete trajectory, useful for
          * coreMSM approach
          */
@@ -56,7 +58,7 @@ namespace msmrd {
 
         void setMetastableRegions();
 
-        int getBoundState(quaternion<double> q1, quaternion<double> q2);
+        int getBoundState(vec3<double> relativePosition, quaternion<double> relativeOrientation);
 
         int getBoundStatePyBind(particle part1, particle part2);
 
