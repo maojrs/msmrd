@@ -78,6 +78,13 @@ def renormalize(q):
     return newq
 
 def quaternionDistance(q1, q2):
+    ''' Calculate quaternion distance between two quaternions'''
     innerProduct = q1[0]*q2[0] + q1[1]*q2[1] + q1[2]*q2[2] + q1[3]*q2[3]
     return 1.0 - innerProduct*innerProduct;
 
+
+def quaternionAngleDistance(q1, q2):
+    ''' Calculate quaternion angle distance between two quaternions '''
+    relquat = multiply(q2, conjugate(q1))
+    relangle = quat2angle(relquat)
+    return np.linalg.norm(relangle)

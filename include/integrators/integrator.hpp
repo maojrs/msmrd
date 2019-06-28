@@ -110,6 +110,10 @@ namespace msmrd {
 
         double getClock() const { return clock; }
 
+        void setClock(double newTime) { clock = newTime; }
+
+        void resetClock() {clock = 0.0;}
+
         std::string getParticlesBodyType() const { return particlesbodytype; }
 
         bool isBoundaryActive() { return boundaryActive; }
