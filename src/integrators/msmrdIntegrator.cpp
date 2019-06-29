@@ -213,7 +213,7 @@ namespace msmrd {
             auto jIndex = thisEvent.second.part2Index;
             vec3<double> relativePosition;
             // Remove event if transition time is infinity
-            if (isinf(transitionTime)) {
+            if (std::isinf(transitionTime)) {
                 eventMgr.removeEvent(iIndex, jIndex);
             }
             // If particles in unbound state and relative position is larger than cutOff, remove event.

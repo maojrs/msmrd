@@ -47,7 +47,7 @@ def runParallelSims(simnumber):
     # Creates simulation
     sim = msmrd2.simulation(integrator)
     # Simulation parameters
-    timesteps = 400000 #20000000 # 200000000 #5000
+    timesteps = 20000000 #5000000 #400000 #20000000 # 200000000 #5000
     bufferSize = 1024
     stride = 25 #1
     outTxt = False
@@ -58,7 +58,8 @@ def runParallelSims(simnumber):
     # fails (might fail with parallel python) to write the data.
     filename = "../data/dimer/simDimer_t" + "{:.2E}".format(timesteps)  \
                + "_s{:d}".format(stride) + "_{:04d}".format(simnumber)
-    #filename = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer_discrete/simDimer" + "{:04d}".format(simnumber)
+    #filename = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer_discrete/simDimert" + \ 
+    # "{:.2E}".format(timesteps)  + "_s{:d}".format(stride) + "_{:04d}".format(simnumber)
     trajtype = "patchyDimer"
 
     # Runs simulation
