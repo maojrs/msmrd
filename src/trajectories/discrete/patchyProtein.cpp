@@ -22,6 +22,7 @@ namespace msmrd {
     patchyProtein::patchyProtein(unsigned long Nparticles, int bufferSize, double relativeDistanceCutOff,
                                  int numSphericalSectionsPos, int numRadialSectionsQuat,
                                  int numSphericalSectionsQuat) : trajectoryPositionOrientation(Nparticles, bufferSize) {
+        discreteTrajectoryData.reserve(bufferSize);
         positionOrientationPart = std::make_unique<positionOrientationPartition>(relativeDistanceCutOff,
                 numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat);
         setMetastableRegions();

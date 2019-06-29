@@ -10,10 +10,7 @@ namespace msmrd {
      * Implementation of trajectory class to store full position only trajectories
      */
     trajectoryPosition::trajectoryPosition(unsigned long Nparticles, int bufferSize) : trajectory(Nparticles, bufferSize){
-        trajectoryData.resize(0);
         trajectoryData.reserve(Nparticles*bufferSize);
-        discreteTrajectoryData.resize(0);
-        discreteTrajectoryData.reserve(bufferSize);
     };
 
     // Sample from list of particles and store in trajectoryData

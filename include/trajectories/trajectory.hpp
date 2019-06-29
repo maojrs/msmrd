@@ -30,8 +30,8 @@ namespace msmrd {
         const std::size_t kB = 1024;
         const std::size_t MB = 1024 * kB;
         bool firstrun = true;
-        std::vector<std::vector<double>> trajectoryData;
-        std::vector<std::vector<int>> discreteTrajectoryData;
+        std::vector<std::vector<double>> trajectoryData = {};
+        std::vector<std::vector<int>> discreteTrajectoryData = {};
         boundary *domainBoundary;
         bool boundaryActive = false;
     public:
@@ -62,6 +62,7 @@ namespace msmrd {
         void setBoundary(boundary *bndry);
 
         // Virtual functions to sample from list of particles, store in trajectoryData, and empty data buffer
+
         virtual void sample(double time, std::vector<particle> &particleList) = 0;
 
         virtual void sampleRelative(double time, std::vector<particle> &particleList) = 0;
@@ -70,12 +71,14 @@ namespace msmrd {
 
 
         // Functions used by child classes
+
         std::vector<std::vector<double>> getTrajectoryData() { return trajectoryData; }
 
         std::vector<std::vector<int>> getDiscreteTrajectoryData() { return discreteTrajectoryData; }
 
         /* Templated functions for writing to text and H5 file (template for H5 useful since datasize
          * needs to be known at runtime) */
+
         template< typename scalar>
         void write2file(std::string filename, std::vector<std::vector<scalar>> localdata);
 
