@@ -26,8 +26,8 @@ namespace msmrd {
         std::unique_ptr<positionOrientationPartition> positionOrientationPart;
         std::array< std::tuple<vec3<double>, quaternion<double>>, 8> boundStates{};
         int maxNumberBoundStates = 10;
-        double tolerancePosition = 0.1;
-        double toleranceOrientation = 2*M_PI*0.1;
+        double tolerancePosition = 0.15;
+        double toleranceOrientation = 0.15*2*M_PI;
         int prevsample = 0;
     public:
         /*
@@ -37,8 +37,8 @@ namespace msmrd {
          * states. The vector corresponds to the relative position (pos2-pos1) in the frame of reference of particle 1
          * (smaller index) between particle 1 and 2. The fixed frame of reference also assumes particle 1 is in its
          * default initial orientation. The quaternion corresponds to the relative orientation between the two
-         * particles, also measuerd from the fixed frame of reference of particle 1. This variable is calculated by
-         * the setMetastableRegions function.
+         * particles, also measured from the fixed frame of reference of particle 1. Thesw bound states are
+         * calculated by the setMetastableRegions function.
          * @param maxNumberBoundStates maximum number of bound states supported. It is used to determine how to
          * count (index) the transition states. The state maxNumberBoundStates + 1 will correspond not to a bound state
          * but to the first transition state. This parameter has to be consistent with the one used

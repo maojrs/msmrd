@@ -50,7 +50,7 @@ def conjugate(q):
 def relativeOrientation(q1,q2):
     '''Return relative quaternion between q1 and q2, measured from q1'''
     q1conj = conjugate(q1)
-    qout = multiply(q2,q1conj)
+    qout = multiply(q1conj, q2) # Order very important qrel = q_1^c * q2
     return qout
 
 def angle2quat(phi):

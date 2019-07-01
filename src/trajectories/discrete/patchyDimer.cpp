@@ -44,12 +44,9 @@ namespace msmrd {
         relativePosition = msmrdtools::rotateVec(relativePosition, part1.orientation.conj());
         quaternion<double> quatReference = {1,0,0,0}; // we can then define reference quaternion as identity.
 
-        // Calculate relative orientation (make sure defined only on top half of unit sphere in 4D space (s>0))
+        // Calculate relative orientation
         quaternion<double> relativeOrientation;
-        relativeOrientation = part2.orientation * part1.orientation.conj();
-        if (relativeOrientation[0] < 0) {
-            relativeOrientation = -1.0 * relativeOrientation;
-        }
+        relativeOrientation = part1.orientation.conj() * part2.orientation;
 
         // Extract current state, save into sample and push sample to discreteTrajectoryData.
         int secNum;
@@ -105,14 +102,10 @@ namespace msmrd {
         // Rotate relative position to match the reference orientation of particle 1.
         relativePosition = msmrdtools::rotateVec(relativePosition, part1.orientation.conj());
 
-        // Calculate relative orientation (make sure defined only on top half of unit sphere in 4D space (s>0))
-        quaternion<double> relativeOrientation = part2.orientation * part1.orientation.conj();
-        if (relativeOrientation[0] < 0) {
-            relativeOrientation = -1.0 * relativeOrientation;
-        }
+        // Calculate relative orientation
+        quaternion<double> relativeOrientation = part1.orientation.conj() * part2.orientation;
 
-        /* Check if it matches a bound states, if so return the corresponding state. Otherwise
-         * return -1. */
+        // Check if it matches a bound state, if so return the corresponding state. Otherwise return -1.
         vec3<double> relPosCenter;
         quaternion<double> relQuatCenter;
         double angleDistance;
@@ -147,18 +140,15 @@ namespace msmrd {
         rotations[1] = {0.0, 0.0, -2 * M_PI / 5.0}; //ok
         rotations[2] = {0.0, 0.0, M_PI}; //ok
         rotations[3] = {0.0, M_PI, 0.0}; //ok
-        rotations[4] = {0.0, 0.0, 2 * M_PI / 5.0}; //ok
-        rotations[5] = M_PI * relPos2orthogonal; //ok
-        rotations[6] = {0.0, M_PI, 0.0}; //ok
-        rotations[7] = {0.0, 0.0, M_PI}; //ok
-        /*Convert rotations in the axis angle representation to quaternions (with first entry s positive to
-         * perserve one to one relation to rotations) */
+        // --first 4 rotations correspond to binding on top patch of particle 1, next 4 rotations to bottom patch
+        rotations[4] = M_PI * relPos2orthogonal; //ok
+        rotations[5] = {0.0, 0.0, 2 * M_PI / 5.0}; //ok
+        rotations[6] = {0.0, 0.0, M_PI}; //ok
+        rotations[7] = {0.0, M_PI, 0.0}; //ok
+        /*Convert rotations in the axis angle representation to quaternions */
         std::array<quaternion<double>, 8> quatRotations;
         for (int i = 0; i < 8; i++) {
             quatRotations[i] = msmrdtools::axisangle2quaternion(rotations[i]);
-            if (quatRotations[i][0] < 0) {
-                quatRotations[i] = -1.0 * quatRotations[i];
-            }
         }
         // Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
         boundStates[0] = std::make_tuple(relPos1, quatRotations[0]);
