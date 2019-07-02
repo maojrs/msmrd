@@ -44,7 +44,7 @@ namespace msmrd {
         relativePosition = msmrdtools::rotateVec(relativePosition, part1.orientation.conj());
         quaternion<double> quatReference = {1,0,0,0}; // we can then define reference quaternion as identity.
 
-        // Calculate relative orientation
+        // Calculate relative orientation (w/respect to particle 1)
         quaternion<double> relativeOrientation;
         relativeOrientation = part1.orientation.conj() * part2.orientation;
 
@@ -102,7 +102,7 @@ namespace msmrd {
         // Rotate relative position to match the reference orientation of particle 1.
         relativePosition = msmrdtools::rotateVec(relativePosition, part1.orientation.conj());
 
-        // Calculate relative orientation
+        // Calculate relative orientation (w/respect to particle 1)
         quaternion<double> relativeOrientation = part1.orientation.conj() * part2.orientation;
 
         // Check if it matches a bound state, if so return the corresponding state. Otherwise return -1.
