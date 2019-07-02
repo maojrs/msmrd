@@ -7,17 +7,35 @@ import multiprocessing
 from multiprocessing import Pool
 
 
-# Main parameters
+# Main parameters for particle and integrator
 numparticles = 2
-boxsize = 6
+dt = 0.0001 #0.00001 #0.000005
+bodytype = 'rigidbody'
 D = 1.0
 Drot = 1.0
 relativeDistanceCutOff = 2.2
 numTrajectories = 100
 
+# Define patchy Particle potential with angular dependence (make sure it is consistent with msmrd data)
+sigma = 1.0
+strength = 50.0
+angularStrength = 10.0
+angleDiff = 3*np.pi/5.0
+patch1 = np.array([np.cos(angleDiff/2),np.sin(angleDiff/2),0.])
+patch2 = np.array([np.cos(-angleDiff/2),np.sin(-angleDiff/2),0.])
+patchesCoordinates = [patch1, patch2]
+potentialPatchyParticleAngular = patchyParticleAngular(sigma, strength, angularStrength, patchesCoordinates)
+
+# Define simulaion boundaries (choose either spherical or box)
+boxsize = 6
+boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
+
+# Bound states and dummy trajectory definition, needed to calculate boundstate of patchydimer
+boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
+boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
+dummyTraj = msmrd2.trajectories.patchyDimer(2,1)
+
 # Create empty files to save the data in parallel algorithm
-fptsA = np.zeros([numTrajectories])
-fptsB = np.zeros([numTrajectories])
 filename = '../data/dimer/first_passage_times/patchyDimerFPTs_boxsize' + str(boxsize) + '.xyz'
 
 def simulationFPT(trajectorynum):
@@ -28,28 +46,10 @@ def simulationFPT(trajectorynum):
     :return: state, first passage time
     '''
     # Define integrator and boundary (over-damped Langevin)
-    dt = 0.0001 #0.00001 #0.000005
     seed = -trajectorynum # Negative seed, uses random device as seed
-    bodytype = 'rigidbody'
     integrator = odLangevin(dt, seed, bodytype)
-    boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
     integrator.setBoundary(boxBoundary)
-
-    # Define Patchy Particle potential
-    sigma = 1.0
-    strength = 160 #200.0
-    angularStrength = 20 #200.0
-    angleDiff = 3*np.pi/5.0
-    patch1 = np.array([np.cos(angleDiff/2),np.sin(angleDiff/2),0.])
-    patch2 = np.array([np.cos(-angleDiff/2),np.sin(-angleDiff/2),0.])
-    patchesCoordinates = [patch1, patch2]
-    potentialPatchyParticleAngular = patchyParticleAngular(sigma, strength, angularStrength, patchesCoordinates)
     integrator.setPairPotential(potentialPatchyParticleAngular)
-
-    # Dummy trajectory definition, needed to calculate boundstate of patchydimer
-    traj = msmrd2.trajectories.patchyDimer(2,1)
-    boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer
-    boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer
 
     # Generate random position and orientation particle list with two particles
     partlist = particleTools.randomPartList(numparticles, boxsize, relativeDistanceCutOff, D, Drot)
@@ -59,7 +59,7 @@ def simulationFPT(trajectorynum):
     unbound = True
     while(unbound):
         integrator.integrate(partlist)
-        boundState = traj.getBoundState(partlist[0], partlist[1])
+        boundState = dummyTraj.getBoundState(partlist[0], partlist[1])
         if boundState in boundStatesA:
             unbound = False
             return 'A', integrator.clock

@@ -86,68 +86,6 @@ def createStatesDictionaries(boundstates, orientations):
             eventcountDict[stateStr] = 0
     return timecountDict, eventcountDict
 
-# THIS FUNCTION IS NOT QUITE CORRECT, DO CORRECT IMPLEMENTATION OR DELETE. KEPT FOR NOW AS REFERENCE
-def extractRates(discreteTrajectories, boundstates, orientations):
-    '''
-    Calculates rates from discrete trajectories. Verify convention used with corresponding trajectory class,
-    in this case: 0-unbound, 1-first bound state, 2-second bound state, 3 is a transition state, not relevant for
-    this calculation, ij orientation transition state (patchyDimer)
-    :param discreteTrajectories: list of discrete trajectories, i.e. each element is one discrete trajectory
-    :param boundstates: number of bound states. They will be labelled as b0, b1, .... (up to 9 supported
-    with current indexing implementation. Simple modification can support more).
-    :param orientations: number of discrete orientations (e.g. 3), which determine the number of possible
-    transition states between relative orientations (e.g. 11, 12, 13, 22, 23, 33).
-    :return: {rateDict, timecountDict, eventcountDict} the second two dictionaries map state label to accumulated time
-    to transition and to number of events found for that particular transition. The first dictionary returns the
-    rates corresponding to each transition. The dictionary keys have the form stateA->stateB; if the state is a bound
-    state, the key is a "b" followed by the state number. For the transition states composed by two integers,
-    correspond to the two closest orientational discrete states of each of the two particles (touched by a line
-    between the two centers of mass).
-    '''
-    # Create dictionaries to count events and times, and list with bound states.
-    timecountDict, eventcountDict = createStatesDictionaries(boundstates, orientations)
-    boundstatesList = np.arange(0, boundstates, 1) + 1
-
-    # Extract rates counting transitions and the times each transition takes
-    for dtraj in discreteTrajectories:
-        # Counter for number of steps before transition
-        tstep = 1
-        # Loop over one trajectory values
-        for i in range(len(dtraj)-1):
-            # Make sure there is a transition and that neither the current state nor the endstate are zero
-            state = dtraj[i]
-            endstate = dtraj[i+1]
-            if (state != endstate) and (state != 0) and (endstate != 0):
-                # If neither the current state nor the end state is a boundstate, don't store transition (skip one cycle in loop).
-                if ((state not in boundstatesList) and (endstate not in boundstatesList)):
-                    continue
-                # Count how many timesteps the trajectory remained in current state before transitioning to endstate
-                prevstate = state
-                while (prevstate == state):
-                    prevstate = dtraj[i-tstep]
-                    if (prevstate == state):
-                        tstep += 1
-                # Update number of events and accumulated time (timesteps) in dictionaries
-                if (state in boundstatesList) :
-                    dictkey1 = 'b' + str(state)
-                else:
-                    dictkey1 = str(state)
-                if (endstate in boundstatesList):
-                    dictkey2 = 'b' + str(endstate)
-                else:
-                    dictkey2 = str(endstate)
-                dictkey = dictkey1 + '->' + dictkey2
-                timecountDict[dictkey] += tstep
-                eventcountDict[dictkey] += 1
-                tstep = 1
-    # Scale by the number of events and save in rate Dictionary (note rates need to be scaled by dt)
-    rateDict = {}
-    for key in timecountDict:
-        if eventcountDict[key] != 0:
-            rateDict[key] = 1.0/(timecountDict[key]/eventcountDict[key])
-
-    return rateDict, timecountDict, eventcountDict
-
 
 def extractRatesMSM(discreteTrajectories, lagtime, boundstates, stitching = False, fullDictionary = False):
     '''
@@ -181,9 +119,9 @@ def extractRatesMSM(discreteTrajectories, lagtime, boundstates, stitching = Fals
             if i != j:
                 originKey = str(originState)
                 transitionKey = str(transitionState)
-                if (i < boundstates):
+                if (originState in list(range(1,boundstates + 1))):
                     originKey = 'b' + originKey
-                if (j < boundstates):
+                if (transitionState in list(range(1,boundstates + 1))):
                     transitionKey = 'b' + transitionKey
                 key = originKey + '->' + transitionKey
                 # These two are equivalent statements
