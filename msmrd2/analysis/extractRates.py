@@ -6,6 +6,8 @@ import pyemma
 import msmtools.analysis
 
 
+# Functions to help extract rates from data and/or MSMs
+
 
 def loadTrajectory(fnamebase, fnumber):
     '''
@@ -127,6 +129,46 @@ def extractRatesMSM(discreteTrajectories, lagtime, boundstates, stitching = Fals
                 # These two are equivalent statements
                 #mfpt = msmtools.analysis.mfpt(mainmsm.transition_matrix, i, j, tau = lagtime)
                 mfpt = mainmsm.mfpt(i, j) # already takes lagtime into consideration
+                rateDict[key] = 1.0/mfpt # Scaling by dt*stride not taken into account.
+    outputDict = dict(rateDict) #shallow copy
+    if not fullDictionary:
+        for key in rateDict:
+            if 'b' not in key:
+                outputDict.pop(key)
+    return outputDict
+
+
+
+def MSMtoRateDictionary(MarkovStateModel, numBoundStates, fullDictionary = False):
+    '''
+    Given an MSM calculated by PyEMMA, calculates the rate dictionary
+    :param MarkovStateModel: MSM obtained by PyEMMA from the MD trajectories.
+    :param numBoundStatesL number of bound states in the model.
+    :param fullDictionary: if true outputs rates for all possible transitions. Otherwise
+    only the ones that include a bound state.
+    :return: :return rateDict: dictionary that maps transition with rates. The dictionary keys have the form
+    "stateA->stateB"; if the state is a bound state, the key is a "b" followed by the state number.
+    For the transition states composed by two integers, they correspond to the two closest orientational
+    discrete states of each of the two particles (touched by a line between the two centers of mass). Also
+    note rates need to be scale by dt.
+    '''
+    # The active set keep track of the indexes used by pyemma and the ones used to describe the state in our model.
+    activeSet = MarkovStateModel.active_set
+    rateDict = {}
+    # Loop over active set, where "i" is the index in pyemma for state "state".
+    for i, originState in enumerate(activeSet):
+        for j, transitionState in enumerate(activeSet):
+            if i != j:
+                originKey = str(originState)
+                transitionKey = str(transitionState)
+                if (originState in list(range(1,numBoundStates + 1))):
+                    originKey = 'b' + originKey
+                if (transitionState in list(range(1,numBoundStates + 1))):
+                    transitionKey = 'b' + transitionKey
+                key = originKey + '->' + transitionKey
+                # The next two are equivalent statements
+                #mfpt = msmtools.analysis.mfpt(mainmsm.transition_matrix, i, j, tau = lagtime)
+                mfpt = MarkovStateModel.mfpt(i, j) # already takes lagtime into consideration
                 rateDict[key] = 1.0/mfpt # Scaling by dt*stride not taken into account.
     outputDict = dict(rateDict) #shallow copy
     if not fullDictionary:
