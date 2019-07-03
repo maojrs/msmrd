@@ -43,7 +43,7 @@ namespace msmrd {
                 .def_property_readonly("D", [](const ctmsm &currentmsm) {
                     return vec2numpy(currentmsm.nstates, currentmsm.Dlist);
                 })
-                .def_property_readonly("Drot", [](const msm &currentmsm) {
+                .def_property_readonly("Drot", [](const ctmsm &currentmsm) {
                     return vec2numpy(currentmsm.nstates, currentmsm.Drotlist);
                 })
                 .def("setD", &ctmsm::setD)

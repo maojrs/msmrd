@@ -1,0 +1,131 @@
+from typing import List, Any
+
+import numpy as np
+import pickle
+import multiprocessing
+from multiprocessing import Pool
+import msmrd2
+from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
+from msmrd2.markovModels import msmrdMarkovStateModel as msmrdMSM
+from msmrd2.integrators import msmrdIntegrator
+import msmrd2.tools.particleTools as particleTools
+
+# Main parameters for particle and integrator
+numParticles = 2
+partTypes = 0
+dt = 0.0001 #0.002 # should be smaller than Gillespie inverse transition rates
+bodytype = 'rigidbody'
+numBoundStates = 8
+maxNumBoundStates = 10
+relativeDistanceCutOff = 2.2
+numParticleTypes = 1 # num. of particle types (not states) in unbound state
+numTrajectories = 1000
+
+# Define discretization (need to be consistent with the on used to generate the rate dictionary
+numSphericalSectionsPos = 7
+numRadialSectionsQuat = 5
+numSphericalSectionsQuat = 7
+totalnumSecsQuat = numSphericalSectionsQuat*(numRadialSectionsQuat -1) + 1
+numTransitionsStates = numSphericalSectionsPos * totalnumSecsQuat #203
+discretization = msmrd2.discretizations.positionOrientationPartition(relativeDistanceCutOff, numSphericalSectionsPos,
+                                                                     numRadialSectionsQuat, numSphericalSectionsQuat)
+
+# Load pickled rateDicitionary generated in generateRateDictionary
+pickle_in = open("../examples/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt200.pickle","rb")
+rateDictionary = pickle.load(pickle_in)
+
+# Parameters to define continuous-time MSM for unbound dynamics: unboundMSM (assumed same for all particles)
+MSMtype = 0
+ratematrix = np.array([[0]]) # no unbound dynamics
+Dlist = np.array([1.0])
+Drotlist = np.array([1.0])
+
+# Parameters to define coupling Markov model for bound dynamics: couplingMSM
+seed = 0
+Dbound = 0.5*np.ones(numBoundStates)
+DboundRot = np.ones(numBoundStates)
+# trajectory relevant parameters (Need to be equal to the one used to generate the rateDictionary)
+dt_traj = 0.00001
+lagtime = 200
+effectiveLagtime = dt_traj*lagtime # very important to provide this value
+
+
+# Define simulation boundaries (choose either spherical or box)
+boxsize = 6
+boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
+
+
+# Bound states definition, needed to calculate boundstate
+boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
+boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
+
+# Create empty files to save the data in parallel algorithm
+filename = '../data/dimer/first_passage_times/MSMRDpatchyDimerFPTs_boxsize' + str(boxsize) + '.xyz'
+
+def MSMRDsimulationFPT(trajectorynum):
+    '''
+    Calculates first passage time of a trajectory with random initial
+    conditions and final state a bound state
+    :param trajectorynum: number of trajectories on which to calculate the FPT
+    :return: state, first passage time
+    '''
+
+    # Set unbound MSM
+    seed = -int(2*trajectorynum) # Negative seed, uses random device as seed
+    unboundMSM = ctmsm(MSMtype, ratematrix, seed)
+    unboundMSM.setD(Dlist)
+    unboundMSM.setDrot(Drotlist)
+
+    # Set coupling MSM
+    seed = -int(3*trajectorynum) # Negative seed, uses random device as seed
+    couplingMSM = msmrdMSM(effectiveLagtime, numBoundStates, numTransitionsStates, seed, rateDictionary)
+    couplingMSM.setDbound(Dbound, DboundRot)
+    couplingMSM.setmaxNumberBoundStates(maxNumBoundStates)
+
+    # Define integrator, boundary and discretization
+    seed = -trajectorynum # Negative seed, uses random device as seed
+    integrator = msmrdIntegrator(dt, seed, bodytype, numParticleTypes, relativeDistanceCutOff, unboundMSM, couplingMSM)
+    integrator.setBoundary(boxBoundary)
+    integrator.setDiscretization(discretization)
+
+    # Generate random position and orientation particle list with two particles
+    partlist = particleTools.randomParticleMSList(numParticles, boxsize,
+                                                  relativeDistanceCutOff, partTypes, [unboundMSM])
+
+    # Calculates the first passage times for a given bound state. Each trajectory is integrated until
+    # a bound state is reached. The output in the files is the elapsed time.
+    unbound = True
+    while(unbound):
+        integrator.integrate(partlist)
+        currentState = partlist[0].state
+        if currentState in boundStatesA:
+            unbound = False
+            return 'A', integrator.clock
+        elif currentState in boundStatesB:
+            unbound = False
+            return 'B', integrator.clock
+        elif integrator.clock >= 2000.0:
+            unbound = False
+            return 'Failed at:', integrator.clock
+
+
+
+def multiprocessingHandler():
+    '''
+    Handles parallel processing of simulationFPT and writes to same file in parallel
+    '''
+    num_cores = multiprocessing.cpu_count()
+    pool = Pool(processes=num_cores)
+    trajNumList = list(range(numTrajectories))
+    with open(filename, 'w') as file:
+        for index, result in enumerate(pool.imap(MSMRDsimulationFPT, trajNumList)):
+            state, time = result
+            if state == 'A' or state == 'B':
+                file.write(state + ' ' + str(time) + '\n')
+                print("Simulation " + str(index) + ", done. Success!")
+            else:
+                print("Simulation " + str(index) + ", done. Failed :(")
+
+
+# Run parallel code
+multiprocessingHandler()

@@ -26,7 +26,7 @@ patch2 = np.array([np.cos(-angleDiff/2),np.sin(-angleDiff/2),0.])
 patchesCoordinates = [patch1, patch2]
 potentialPatchyParticleAngular = patchyParticleAngular(sigma, strength, angularStrength, patchesCoordinates)
 
-# Define simulaion boundaries (choose either spherical or box)
+# Define simulation boundaries (choose either spherical or box)
 boxsize = 6
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
 
@@ -52,7 +52,7 @@ def simulationFPT(trajectorynum):
     integrator.setPairPotential(potentialPatchyParticleAngular)
 
     # Generate random position and orientation particle list with two particles
-    partlist = particleTools.randomPartList(numparticles, boxsize, relativeDistanceCutOff, D, Drot)
+    partlist = particleTools.randomParticleList(numparticles, boxsize, relativeDistanceCutOff, D, Drot)
 
     # Calculates the first passage times for a given bound state. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.

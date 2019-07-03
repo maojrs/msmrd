@@ -45,14 +45,14 @@ boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
 # Provides base filename (folder must exist (and preferably empty), otherwise H5 might fail)
 basefilename = "../data/dimer/simDimer_t" + "{:.2E}".format(timesteps) + \
            "_s{:d}".format(stride)
-#basefilename = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer_discrete/simDimert" + \
+#basefilename = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer_discrete/simDimer_t" + \
 #           "{:.2E}".format(timesteps)  + "_s{:d}".format(stride)
 
 # Simulation wrapper for parallel runs
 def runParallelSims(simnumber):
 
     # Define particle list
-    partlist = particleTools.randomPartList(Nparticles, boxsize, separationDistance, D, Drot)
+    partlist = particleTools.randomParticleList(Nparticles, boxsize, separationDistance, D, Drot)
 
     # Integrator definition
     seed = -simnumber # random seed (negative), it is also different for every simulation, good for parallel simulation
