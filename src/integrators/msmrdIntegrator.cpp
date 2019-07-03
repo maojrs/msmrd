@@ -32,7 +32,7 @@ namespace msmrd {
 
                 if (relativePosition.norm() < relativeDistanceCutOff) {
                     if (rotation) {
-                        relativeOrientation = parts[j].nextOrientation * parts[i].nextOrientation.conj();
+                        relativeOrientation = parts[i].nextOrientation.conj() * parts[j].nextOrientation;
                         refQuaternion = parts[i].nextOrientation.conj();
                         currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
                                                                                            relativeOrientation,
@@ -40,10 +40,15 @@ namespace msmrd {
                     } else {
                         currentTransitionState = positionPart->getSectionNumber(relativePosition);
                     }
-                    auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
-                    transitionTime = std::get<0>(transition);
-                    nextState = std::get<1>(transition);
-                    eventMgr.addEvent(transitionTime, nextState, i, j, "in");
+                    /* Only add new event if particle drifted into another origin state (currentTransitionState),
+                     * or if the previous events is empty (currentTransitionState == -1). */
+                    auto previousEvent = eventMgr.getEvent(i, j);
+                    if (previousEvent.originState != currentTransitionState) {
+                        auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
+                        transitionTime = std::get<0>(transition);
+                        nextState = std::get<1>(transition);
+                        eventMgr.addEvent(transitionTime, nextState, i, j, currentTransitionState, "in");
+                    }
                 }
             }
         }
@@ -62,7 +67,7 @@ namespace msmrd {
                 transition = markovModel.computeTransition2UnboundState(parts[i].state);
                 transitionTime = std::get<0>(transition);
                 nextState = std::get<1>(transition);
-                eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, "out");
+                eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, parts[i].state, "out");
             }
         }
     }
@@ -80,7 +85,7 @@ namespace msmrd {
                 transition = markovModel.computeTransitionBetweenBoundStates(parts[i].state);
                 transitionTime = std::get<0>(transition);
                 nextState = std::get<1>(transition);
-                eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, "inside");
+                eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, parts[i].state, "inside");
             }
         }
     }
