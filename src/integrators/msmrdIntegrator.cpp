@@ -22,32 +22,36 @@ namespace msmrd {
         int nextState;
         for (int i = 0; i < parts.size(); i++) {
             for (int j = i + 1; j < parts.size(); j++) {
-                // Need special function to calculate relative position, in case we use a periodic boundary.
-                if (boundaryActive) {
-                    relativePosition = msmrdtools::calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition,
-                            boundaryActive, domainBoundary->getBoundaryType(), domainBoundary->getBoxsize());
-                } else {
-                    relativePosition = parts[j].nextPosition - parts[i].nextPosition;
-                }
-
-                if (relativePosition.norm() < relativeDistanceCutOff) {
-                    if (rotation) {
-                        relativeOrientation = parts[i].nextOrientation.conj() * parts[j].nextOrientation;
-                        refQuaternion = parts[i].nextOrientation.conj();
-                        currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
-                                                                                           relativeOrientation,
-                                                                                           refQuaternion);
+                /* Only compute new transition if particles drifted into transition region for
+                 * the first time, i.e. empty event */
+                auto previousEvent = eventMgr.getEvent(i, j);
+                if (previousEvent.inORout == "empty") {
+                    // Need special function to calculate relative position, in case we use a periodic boundary.
+                    if (boundaryActive) {
+                        relativePosition = msmrdtools::calculateRelativePosition(parts[i].nextPosition,
+                                                                                 parts[j].nextPosition,
+                                                                                 boundaryActive,
+                                                                                 domainBoundary->getBoundaryType(),
+                                                                                 domainBoundary->getBoxsize());
                     } else {
-                        currentTransitionState = positionPart->getSectionNumber(relativePosition);
+                        relativePosition = parts[j].nextPosition - parts[i].nextPosition;
                     }
-                    /* Only add new event if particle drifted into another origin state (currentTransitionState),
-                     * or if the previous events is empty (currentTransitionState == -1). */
-                    auto previousEvent = eventMgr.getEvent(i, j);
-                    if (previousEvent.originState != currentTransitionState) {
+
+                    if (relativePosition.norm() < relativeDistanceCutOff) {
+                        if (rotation) {
+                            relativeOrientation = parts[i].nextOrientation.conj() * parts[j].nextOrientation;
+                            refQuaternion = parts[i].nextOrientation.conj();
+                            currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
+                                                                                               relativeOrientation,
+                                                                                               refQuaternion);
+                        } else {
+                            currentTransitionState = positionPart->getSectionNumber(relativePosition);
+                        }
                         auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
                         transitionTime = std::get<0>(transition);
                         nextState = std::get<1>(transition);
                         eventMgr.addEvent(transitionTime, nextState, i, j, currentTransitionState, "in");
+
                     }
                 }
             }
@@ -62,12 +66,18 @@ namespace msmrd {
         int nextState;
         std::tuple<double, int> transition;
         for (int i = 0; i < parts.size(); i++) {
-            // Check if particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
+            // Only compute transition if particle is bound to another particle.
             if (parts[i].boundTo > i) {
-                transition = markovModel.computeTransition2UnboundState(parts[i].state);
-                transitionTime = std::get<0>(transition);
-                nextState = std::get<1>(transition);
-                eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, parts[i].state, "out");
+                /* Only compute transition if particles drifted into bound state for
+                 * the first time, i.e. empty event */
+                auto previousEvent = eventMgr.getEvent(i, parts[i].boundTo);
+                if (previousEvent.inORout == "empty") {
+                    // Check if particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
+                        transition = markovModel.computeTransition2UnboundState(parts[i].state);
+                        transitionTime = std::get<0>(transition);
+                        nextState = std::get<1>(transition);
+                        eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, parts[i].state, "out");
+                }
             }
         }
     }
@@ -82,10 +92,15 @@ namespace msmrd {
         for (int i = 0; i < parts.size(); i++) {
             // Check if particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
             if (parts[i].boundTo > i) {
-                transition = markovModel.computeTransitionBetweenBoundStates(parts[i].state);
-                transitionTime = std::get<0>(transition);
-                nextState = std::get<1>(transition);
-                eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, parts[i].state, "inside");
+                auto previousEvent = eventMgr.getEvent(i, parts[i].boundTo);
+                /* Only compute transition if particles drifted into new bound state for
+                 * the first time, i.e. empty event */
+                if (previousEvent.inORout == "empty") {
+                    transition = markovModel.computeTransitionBetweenBoundStates(parts[i].state);
+                    transitionTime = std::get<0>(transition);
+                    nextState = std::get<1>(transition);
+                    eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, parts[i].state, "inside");
+                }
             }
         }
     }

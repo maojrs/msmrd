@@ -23,7 +23,7 @@ namespace msmrd {
             std::string inORout;
         };
         struct event emptyEvent = {.waitTime = std::numeric_limits<double>::infinity(),
-                .endState = -1, .part1Index = -1, .part2Index = -1, .originState = -1, .inORout = ""};
+                .endState = -1, .part1Index = -1, .part2Index = -1, .originState = -1, .inORout = "empty"};
     public:
         std::map<std::string, event> eventDictionary;
 
