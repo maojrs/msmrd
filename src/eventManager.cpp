@@ -61,12 +61,24 @@ namespace msmrd {
         }
     }
 
-
+    // Advances time of all events
     void eventManager::advanceTime(double timeStep) {
         double newTime;
         for (auto &thisEvent : eventDictionary) {
             thisEvent.second.waitTime = thisEvent.second.waitTime - timeStep;
         }
+    }
+
+    // Outputs event log into file
+    void eventManager::outputEventLog(int timeIteration, std::string baseFilename) {
+        std::ofstream outputfile;
+        outputfile.open (baseFilename + "_t" + std::to_string(timeIteration)+ ".txt");
+        for (auto &thisEvent : eventDictionary) {
+            auto value = thisEvent.second;
+            outputfile << value.waitTime << " " << value.endState << " " << value.part1Index <<
+                       " " << value.part2Index << " " << value.originState << " " << value.inORout << " \n";
+        }
+        outputfile.close();
     }
 
 }

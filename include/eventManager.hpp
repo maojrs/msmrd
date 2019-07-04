@@ -52,5 +52,7 @@ namespace msmrd {
 
         int getNumEvents() { return eventDictionary.size(); }
 
+        void outputEventLog(int timeIteration, std::string baseFilename);
+
     };
 }
