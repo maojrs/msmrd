@@ -13,13 +13,13 @@ import msmrd2.tools.particleTools as particleTools
 # Main parameters for particle and integrator
 numParticles = 2
 partTypes = 0
-dt = 0.0001 #0.002 # should be smaller than Gillespie inverse transition rates
+dt = 0.00001 #0.002 # should be smaller than Gillespie inverse transition rates
 bodytype = 'rigidbody'
 numBoundStates = 8
 maxNumBoundStates = 10
 relativeDistanceCutOff = 2.2
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
-numTrajectories = 1000
+numTrajectories = 200
 
 # Define discretization (need to be consistent with the on used to generate the rate dictionary
 numSphericalSectionsPos = 7
@@ -31,7 +31,8 @@ discretization = msmrd2.discretizations.positionOrientationPartition(relativeDis
                                                                      numRadialSectionsQuat, numSphericalSectionsQuat)
 
 # Load pickled rateDicitionary generated in generateRateDictionary
-pickle_in = open("../examples/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt200.pickle","rb")
+lagtime = 200
+pickle_in = open("../examples/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime) +  ".pickle","rb")
 rateDictionary = pickle.load(pickle_in)
 
 # Parameters to define continuous-time MSM for unbound dynamics: unboundMSM (assumed same for all particles)
@@ -49,7 +50,6 @@ DboundRot = np.ones(numBoundStates)
 # Define simulation boundaries (choose either spherical or box)
 boxsize = 6
 boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
-boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
 
 # Bound states definition, needed to calculate boundstate
@@ -57,13 +57,14 @@ boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
 boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
 
 # Create empty files to save the data in parallel algorithm
-filename = '../data/dimer/first_passage_times/MSMRDpatchyDimerFPTs_boxsize' + str(boxsize) + '.xyz'
+filename = '../data/dimer/first_passage_times/MSMRDpatchyDimerFPTs_lagt' + str(lagtime) \
+           + '_boxsize' + str(boxsize) + '.xyz'
 
 def MSMRDsimulationFPT(trajectorynum):
     '''
     Calculates first passage time of a trajectory with random initial
     conditions and final state a bound state
-    :param trajectorynum: number of trajectories on which to calculate the FPT
+    :param trajectorynum: trajectory number (index on parallel computation) on which to calculate the FPT
     :return: state, first passage time
     '''
 

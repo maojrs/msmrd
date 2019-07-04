@@ -290,6 +290,9 @@ namespace msmrd {
         computeTransitionsBetweenBoundStates(parts);
 
 
+        // Advance global time and in event manager (make events in [t,t+dt) happen)
+        clock += dt;
+        eventMgr.advanceTime(dt);
 
         // Check for events that should happen in this time step and make them happen.
         for (auto &thisEvent : eventMgr.eventDictionary) {
@@ -334,9 +337,6 @@ namespace msmrd {
             }
         }
 
-        // Advance global time and time in event manager
-        clock += dt;
-        eventMgr.advanceTime(dt);
     }
 
 
