@@ -89,7 +89,7 @@ def createStatesDictionaries(boundstates, orientations):
     return timecountDict, eventcountDict
 
 
-def extractRatesMSM(discreteTrajectories, lagtime, boundstates, stitching = False, fullDictionary = False):
+def extractRatesMSM(discreteTrajectories, lagtime, boundstates, dtEffective, stitching = False, fullDictionary = False):
     '''
     Construct an MSM and extract rates from it using pyemma and msmtools. These rates differ from the rates in a
     rate transition matrix due to the fact that this takes all possible transmission pathways within a discrete
@@ -97,6 +97,8 @@ def extractRatesMSM(discreteTrajectories, lagtime, boundstates, stitching = Fals
     :param discreteTrajectories: raw discrete trajectories including the unbound state.
     :param lagtime: preferred lagtime chose for MSM (might need tweaking for each case)
     :param boundstates: numbe of boundstates
+    :param dtEffective takes into account the effective time step from the data, usually equalt to dt*stride of
+    the simulation.
     :return rateDict: dictionary that maps transition with rates. The dictionary keys have the form
     "stateA->stateB"; if the state is a bound state, the key is a "b" followed by the state number.
     For the transition states composed by two integers, they correspond to the two closest orientational
@@ -129,7 +131,7 @@ def extractRatesMSM(discreteTrajectories, lagtime, boundstates, stitching = Fals
                 # These two are equivalent statements
                 #mfpt = msmtools.analysis.mfpt(mainmsm.transition_matrix, i, j, tau = lagtime)
                 mfpt = mainmsm.mfpt(i, j) # already takes lagtime into consideration
-                rateDict[key] = 1.0/mfpt # Scaling by dt*stride not taken into account.
+                rateDict[key] = 1.0/(dtEffective*mfpt) # Scaling by dt*stride included here.
     outputDict = dict(rateDict) #shallow copy
     if not fullDictionary:
         for key in rateDict:
@@ -139,11 +141,13 @@ def extractRatesMSM(discreteTrajectories, lagtime, boundstates, stitching = Fals
 
 
 
-def MSMtoRateDictionary(MarkovStateModel, numBoundStates, fullDictionary = False):
+def MSMtoRateDictionary(MarkovStateModel, numBoundStates, dtEffective, fullDictionary = False):
     '''
     Given an MSM calculated by PyEMMA, calculates the rate dictionary
     :param MarkovStateModel: MSM obtained by PyEMMA from the MD trajectories.
-    :param numBoundStatesL number of bound states in the model.
+    :param numBoundStates number of bound states in the model.
+    :param dtEffective takes into account the effective time step from the data, usually equalt to dt*stride of
+    the simulation.
     :param fullDictionary: if true outputs rates for all possible transitions. Otherwise
     only the ones that include a bound state.
     :return: :return rateDict: dictionary that maps transition with rates. The dictionary keys have the form
@@ -169,7 +173,7 @@ def MSMtoRateDictionary(MarkovStateModel, numBoundStates, fullDictionary = False
                 # The next two are equivalent statements
                 #mfpt = msmtools.analysis.mfpt(mainmsm.transition_matrix, i, j, tau = lagtime)
                 mfpt = MarkovStateModel.mfpt(i, j) # already takes lagtime into consideration
-                rateDict[key] = 1.0/mfpt # Scaling by dt*stride not taken into account.
+                rateDict[key] = 1.0/(dtEffective*mfpt) # Scaling by dt*stride included here.
     outputDict = dict(rateDict) #shallow copy
     if not fullDictionary:
         for key in rateDict:

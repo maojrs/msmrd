@@ -44,14 +44,11 @@ Drotlist = np.array([1.0])
 seed = 0
 Dbound = 0.5*np.ones(numBoundStates)
 DboundRot = np.ones(numBoundStates)
-# trajectory relevant parameters (Need to be equal to the one used to generate the rateDictionary)
-dt_traj = 0.00001
-lagtime = 200
-effectiveLagtime = dt_traj*lagtime # very important to provide this value
 
 
 # Define simulation boundaries (choose either spherical or box)
 boxsize = 6
+boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
 
@@ -78,7 +75,7 @@ def MSMRDsimulationFPT(trajectorynum):
 
     # Set coupling MSM
     seed = -int(3*trajectorynum) # Negative seed, uses random device as seed
-    couplingMSM = msmrdMSM(effectiveLagtime, numBoundStates, numTransitionsStates, seed, rateDictionary)
+    couplingMSM = msmrdMSM(numBoundStates, numTransitionsStates, seed, rateDictionary)
     couplingMSM.setDbound(Dbound, DboundRot)
     couplingMSM.setmaxNumberBoundStates(maxNumBoundStates)
 

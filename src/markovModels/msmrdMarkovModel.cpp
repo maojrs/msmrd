@@ -8,11 +8,11 @@ namespace msmrd{
     /**
      * Implementation of Markov model class specializes for MSM/RD.
      */
-    msmrdMarkovStateModel::msmrdMarkovStateModel(double effectiveLagtime, unsigned int numBoundStates,
+    msmrdMarkovStateModel::msmrdMarkovStateModel(unsigned int numBoundStates,
                                                  unsigned int numTransitionStates, long seed,
                                                  std::map<std::string, float> &rateDictionary)
-            : effectiveLagtime(effectiveLagtime), numBoundStates(numBoundStates),
-              numTransitionStates(numTransitionStates), seed(seed), rateDictionary(rateDictionary) {
+            : numBoundStates(numBoundStates), numTransitionStates(numTransitionStates), seed(seed),
+              rateDictionary(rateDictionary) {
         randg.setSeed(seed);
         Dboundlist.resize(numBoundStates);
         DboundRotlist.resize(numBoundStates);
@@ -41,7 +41,7 @@ namespace msmrd{
 
         // Calculate time for transition
         double r1 = randg.uniformRange(0, 1);
-        transitionTime = effectiveLagtime*std::log(1.0/r1)/lambda0;
+        transitionTime = std::log(1.0/r1)/lambda0;
 
         // Calculate end state
         double r2lam0 = randg.uniformRange(0, 1)*lambda0;
@@ -81,7 +81,7 @@ namespace msmrd{
 
         // Calculate time for transition
         double r1 = randg.uniformRange(0, 1);
-        transitionTime = effectiveLagtime*std::log(1.0/r1)/lambda0;
+        transitionTime = std::log(1.0/r1)/lambda0;
 
         // Calculate end state
         double r2lam0 = randg.uniformRange(0, 1)*lambda0;
@@ -125,7 +125,7 @@ namespace msmrd{
 
         // Calculate time for transition
         double r1 = randg.uniformRange(0, 1);
-        transitionTime = effectiveLagtime*std::log(1.0/r1)/lambda0;
+        transitionTime = std::log(1.0/r1)/lambda0;
 
         // Calculate end state
         double r2lam0 = randg.uniformRange(0, 1)*lambda0;

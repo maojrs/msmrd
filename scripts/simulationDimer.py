@@ -13,7 +13,7 @@ dt = 0.00001
 bodytype = "rigidbody"
 D = 1
 Drot = 1
-separationDistance = 1.5 # for initial condition
+separationDistance = 1.5 # minimum separation distance for initial condition
 numSimulations = 10 #500 #1000 #20 #200
 
 

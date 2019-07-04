@@ -27,7 +27,6 @@ namespace msmrd {
         randomgen randg;
         unsigned int maxNumberBoundStates = 10;
     public:
-        double effectiveLagtime;
         unsigned int numBoundStates;
         unsigned int numTransitionStates;
         std::vector<double> Dboundlist;
@@ -36,15 +35,14 @@ namespace msmrd {
         * @param seed variable for random number generation (Note values of seed <= -1 correspond to random device)
         * @param rateDictionary dictionary relating transitions to its corresponding rates. The keys
         * are strings of the form "state1->state2". The bound states have "b" before the number, and the transition
-        * states are denoted by integers.
+        * states are denoted by integers. Note the time units of the rates should be consistent with the time units
+         * used in the simulaton (already scaled by dt*stride from the original trajectories).
         * @param randg number generator class based on mt19937
         * @param maxNumberBoundStates maximum number of bound states supported. It is used to determine how to
         * count (index) the transition states. The state maxNumberBoundStates + 1 will correspond not to a bound state
         * but to the first transition state. This parameter has to be consistent with the one used
         * by the msmrd integrator and the with the one used to generate the state numbering in the discrete
         * trajectory (see patchyDimer trajectory for example).
-        * @param effectiveLagtime corresponds to the effective lagtime (lagtime*dt) of the Markov model of the trajectories
-        * used to estimate the rate dictionary. It is required to scale the transition times.
         * @param numBoundStates number of bound states in the msm
         * @param numTransitionStates number of transition states
         * @param Dboundlist list of diffusion coefficients for each bound state.
@@ -52,7 +50,7 @@ namespace msmrd {
 
         */
 
-        msmrdMarkovStateModel(double effectiveLagtime, unsigned int numBoundStates, unsigned int numTransitionStates,
+        msmrdMarkovStateModel(unsigned int numBoundStates, unsigned int numTransitionStates,
                          long seed, std::map<std::string, float> &rateDictionary);
 
         std::tuple<double, int> computeTransition2BoundState(int transitionState);

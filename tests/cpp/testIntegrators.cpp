@@ -21,10 +21,9 @@ TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
     // Create an msmrdMarkovModel for coupling (tested on testMarkovModels)
     int nBoundStates = 2;
     int nTransitionStates = 2;
-    double effectiveLagtime = 1.0;
     std::map<std::string, float> rateDictionary = { {"1->b1", 5.0}, {"1->b2", 3.0},
                                                     {"2->b1", 4.0}, {"2->b2", 12.0} };
-    auto couplingMSM = msmrdMSM(effectiveLagtime, nBoundStates, nTransitionStates, -1, rateDictionary);
+    auto couplingMSM = msmrdMSM(nBoundStates, nTransitionStates, -1, rateDictionary);
 
     // Create another MSM to model the unbound state dynamics (none in this case)
     int msmid = 0;

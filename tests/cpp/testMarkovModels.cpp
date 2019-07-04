@@ -46,13 +46,12 @@ TEST_CASE("Fundamental CTMSM parameters and propagation test", "[ctmsm]") {
 TEST_CASE("Initialization of dictionary in msmrdMarkovModel class", "[msmrdMarkovModel]") {
     int nBoundStates = 2;
     int nTransitionStates = 2;
-    double effectiveLagtime = 1.0;
     std::map<std::string, float> rateDictionary = { {"1->b1", 5.0}, {"1->b2", 3.0},
                                                     {"2->b1", 4.0}, {"2->b2", 12.0},
                                                     {"b1->1", 1.0}, {"b1->2", 0.5},
                                                     {"b2->1", 2.0}, {"b2->2", 1.5}};
     // Create an msmMarkovModel
-    auto myMSM = msmrdMarkovStateModel(effectiveLagtime, nBoundStates, nTransitionStates, -1, rateDictionary);
+    auto myMSM = msmrdMarkovStateModel(nBoundStates, nTransitionStates, -1, rateDictionary);
     // Check if the initialization of ctmsms in msmrdMarkovmodel is done correctly.
     auto rate1b1 = myMSM.getRate("1->b1");
     auto rate2b1 = myMSM.getRate("2->b1");
