@@ -1,5 +1,3 @@
-from typing import List, Any
-
 import numpy as np
 import pickle
 import multiprocessing
@@ -19,7 +17,7 @@ numBoundStates = 8
 maxNumBoundStates = 10
 relativeDistanceCutOff = 2.2
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
-numTrajectories = 200
+numTrajectories = 2000
 
 # Define discretization (need to be consistent with the on used to generate the rate dictionary
 numSphericalSectionsPos = 7

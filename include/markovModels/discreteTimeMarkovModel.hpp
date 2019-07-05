@@ -11,7 +11,7 @@ namespace msmrd {
      */
     class discreteTimeMarkovStateModel : public markovModel {
     public:
-        discreteTimeMarkovStateModel(int msmid, std::vector <std::vector<double>> &tempmatrix, double lagtime,
+        discreteTimeMarkovStateModel(int msmid, std::vector <std::vector<double>> tempmatrix, double lagtime,
                                      long seed);
 
         void propagate(particleMS &part, int ksteps) override;

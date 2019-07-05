@@ -10,7 +10,7 @@ namespace msmrd {
      * Implementation of continuous-time msm (ctmsm) class, see msmbase parent class for parameter description.
      */
     continuousTimeMarkovStateModel::continuousTimeMarkovStateModel(int msmid,
-                                                                   std::vector<std::vector<double>> &tempmatrix,
+                                                                   std::vector<std::vector<double>> tempmatrix,
                                                                    long seed)
             : markovModel(msmid, tempmatrix, 0.0, seed) {
         // Verify CTMSM transition rate matrix rows sum to 0
@@ -18,9 +18,9 @@ namespace msmrd {
         for (const auto &row : tempmatrix) {
             rowsum = 0;
             for (auto &n : row) { rowsum += n; }
-            if (std::abs(rowsum) > tolerance) {
-                throw std::range_error("Continuous-time MSM transition rate matrix rows should sum to 0");
-            }
+                if (std::abs(rowsum) > tolerance) {
+                    throw std::range_error("Continuous-time MSM transition rate matrix rows should sum to 0");
+                }
         }
         calculateParameters();
         lagtime = 0;

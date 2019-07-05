@@ -17,7 +17,7 @@ namespace msmrd {
         void calculateParameters();
 
     public:
-        continuousTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> &tempmatrix, long seed);
+        continuousTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> tempmatrix, long seed);
 
         void propagate(particleMS &part, int ksteps) override;
 

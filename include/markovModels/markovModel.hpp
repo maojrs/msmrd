@@ -38,7 +38,7 @@ namespace msmrd {
          */
 
         // Base constructor, can receive std::vectior matrix or numpy array matrix (through pybind)
-        markovModel(int msmid, std::vector<std::vector<double>> &tempmatrix, double lagtime, long seed);
+        markovModel(int msmid, std::vector<std::vector<double>> tempmatrix, double lagtime, long seed);
 
         // Main functions definitions (=0 for abstract class)
         virtual void propagate(particleMS &part, int ksteps) = 0;
