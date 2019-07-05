@@ -17,26 +17,23 @@ namespace msmrd {
      *  value, for CTMSM it will change in each iteration.
      *  @param seed variable for random number generation (Note values of seed <= -1 correspond to random device)
      */
-    markovModel::markovModel(int msmid, std::vector<std::vector<double>> tempmatrix, double lagtime, long seed)
-            : msmid(msmid), lagtime(lagtime), seed(seed) {
+    markovModel::markovModel(int msmid, std::vector<std::vector<double>> tmatrix, double lagtime, long seed)
+            : msmid(msmid), tmatrix(tmatrix), lagtime(lagtime), seed(seed) {
 
         // Resize vectors by input matrix size and set seed of random number generator
-        nstates = static_cast<int>(tempmatrix.size());
+        nstates = static_cast<int>(tmatrix.size());
         Dlist.resize(nstates);
         Drotlist.resize(nstates);
         tmatrix.resize(nstates);
         randg.setSeed(seed);
 
         // Verify input 2D vector is a square matrix and fill tmatrix
-        for (const auto &row : tempmatrix) {
-            if (tempmatrix.size() != row.size()) {
+        for (const auto &row : tmatrix) {
+            if (tmatrix.size() != row.size()) {
                 throw std::range_error("MSM matrix must be a square matrix");
             }
         }
-        for (int i = 0; i < nstates; i++) {
-            tmatrix[i].resize(nstates);
-            std::copy_n(tempmatrix[i].begin(), nstates, tmatrix[i].begin());
-        }
+
     };
 
 }

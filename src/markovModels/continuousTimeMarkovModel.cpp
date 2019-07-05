@@ -10,12 +10,12 @@ namespace msmrd {
      * Implementation of continuous-time msm (ctmsm) class, see msmbase parent class for parameter description.
      */
     continuousTimeMarkovStateModel::continuousTimeMarkovStateModel(int msmid,
-                                                                   std::vector<std::vector<double>> tempmatrix,
+                                                                   std::vector<std::vector<double>> tmatrix,
                                                                    long seed)
-            : markovModel(msmid, tempmatrix, 0.0, seed) {
+            : markovModel(msmid, tmatrix, 0.0, seed) {
         // Verify CTMSM transition rate matrix rows sum to 0
         double long rowsum;
-        for (const auto &row : tempmatrix) {
+        for (const auto &row : tmatrix) {
             rowsum = 0;
             for (auto &n : row) { rowsum += n; }
                 if (std::abs(rowsum) > tolerance) {
@@ -28,26 +28,32 @@ namespace msmrd {
 
     // Calculates parameters often used by ctmsm::propagate from transition matrix
     void continuousTimeMarkovStateModel::calculateParameters() {
-        std::vector<double> ratevector(nstates - 1);
-        int index;
         lambda0.resize(nstates);
         ratescumsum.resize(nstates);
-        // Calculates lambda0 (sum of outgoing rates), for each state (sum of row excluding diagonal negative value)
-        for (int row = 0; row < nstates; row++) {
-            index = 0;
-            for (int col = 0; col < nstates; col++) {
-                if (col != row) {
-                    ratevector[index] = tmatrix[row][col];
-                    index++;
+        if (nstates == 1) {
+            lambda0[0] = 0;
+            ratescumsum[0] = {0.0};
+        }
+        else { //nstates > 1
+            std::vector<double> ratevector(nstates - 1);
+            int index;
+            // Calculates lambda0 (sum of outgoing rates), for each state (sum of row excluding diagonal negative value)
+            for (int row = 0; row < nstates; row++) {
+                index = 0;
+                for (int col = 0; col < nstates; col++) {
+                    if (col != row) {
+                        ratevector[index] = tmatrix[row][col];
+                        index++;
+                    }
                 }
-            }
-            lambda0[row] = 0;
-            for (auto &n : ratevector) { lambda0[row] += n; }
-            // Calculates ratescumsum (rate cumulative sum for current row)
-            ratescumsum[row].resize(nstates - 1);
-            std::copy_n(ratevector.begin(), nstates, ratescumsum[row].begin());
-            for (int col = 1; col < nstates - 1; col++) {
-                ratescumsum[row][col] += ratescumsum[row][col - 1];
+                lambda0[row] = 0;
+                for (auto &n : ratevector) { lambda0[row] += n; }
+                // Calculates ratescumsum (rate cumulative sum for current row)
+                ratescumsum[row].resize(nstates - 1);
+                std::copy_n(ratevector.begin(), nstates, ratescumsum[row].begin());
+                for (int col = 1; col < nstates - 1; col++) {
+                    ratescumsum[row][col] += ratescumsum[row][col - 1];
+                }
             }
         }
     };

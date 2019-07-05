@@ -22,7 +22,7 @@ namespace msmrd {
     public:
         double lagtime;
         std::vector<std::vector<double>> tmatrix;
-        unsigned int nstates;
+        unsigned int nstates = 1;
         std::vector<double> Dlist;
         std::vector<double> Drotlist;
         /**
@@ -38,7 +38,7 @@ namespace msmrd {
          */
 
         // Base constructor, can receive std::vectior matrix or numpy array matrix (through pybind)
-        markovModel(int msmid, std::vector<std::vector<double>> tempmatrix, double lagtime, long seed);
+        markovModel(int msmid, std::vector<std::vector<double>> tmatrix, double lagtime, long seed);
 
         // Main functions definitions (=0 for abstract class)
         virtual void propagate(particleMS &part, int ksteps) = 0;
