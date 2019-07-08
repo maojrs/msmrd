@@ -52,7 +52,8 @@ basefilename = "../data/dimer/simDimer_t" + "{:.2E}".format(timesteps) + \
 def runParallelSims(simnumber):
 
     # Define particle list
-    partlist = particleTools.randomParticleList(Nparticles, boxsize, separationDistance, D, Drot)
+    seed = int(simnumber)
+    partlist = particleTools.randomParticleList(Nparticles, boxsize, separationDistance, D, Drot, seed)
 
     # Integrator definition
     seed = -simnumber # random seed (negative), it is also different for every simulation, good for parallel simulation

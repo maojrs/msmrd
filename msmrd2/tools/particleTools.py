@@ -6,16 +6,22 @@ import warnings
 
 
 
-def randomParticleList(numparticles, boxsize, separationDistance, D, Drot):
+def randomParticleList(numparticles, boxsize, separationDistance, D, Drot, numpySeed = -1):
     '''
     :param numparticles: number of particles in list
     :param boxsize: size of simulation box, if scalar it assumes the three box edges are the same in all dimensions
     :param separationDistance: separation distance between particle to avoid overlapping
     :param D and Drot: diffusion coefficients of particles.
+    :param numpySeed seed for numpy random generator. Important to specify in parallel runs. Default value of -1
+    will use the default seed provided by numpy.
     :return:
     Generates particle list with uniformly random position and orientation. It also enforces the particles don't
     overlap over a distance given by the relative distance cut off.
     '''
+
+    # Set numpy seed if provided (important when running parallel processes, otherwise not required)
+    if numpySeed != -1:
+        np.random.seed(numpySeed)
 
     # Warning in case of not ideal parameters.
     if separationDistance > boxsize:
@@ -49,18 +55,23 @@ def randomParticleList(numparticles, boxsize, separationDistance, D, Drot):
     return partlist
 
 
-def randomParticleMSList(numparticles, boxsize, separationDistance, types, unboundMSMs):
+def randomParticleMSList(numparticles, boxsize, separationDistance, types, unboundMSMs, numpySeed = -1):
     '''
     :param numparticles: number of particles in list
     :param boxsize: size of simulation box, if scalar it assumes the three box edges are the same in all dimensions
     :param separationDistance: separation distance between particle to avoid overlapping
     :param types types of particles (can be array of integers or integer if all particles are the same)
     :param unboundMSMs: list of unboundMSM, needed to extract diffusion coefficients of particles.
-    :param state initial state of particles (can be array of integers or integer if all particles are the same)
+    :param numpySeed seed for numpy random generator. Important to specify in parallel runs. Default value of -1
+    will use the default seed provided by numpy.
     :return:
     Generates list of particleMS with uniformly random position and orientation. It also enforces the particles don't
     overlap over a distance given by the relative distance cut off.
     '''
+
+    # Set numpy seed if provided (important when running parallel processes, otherwise not required)
+    if numpySeed != -1:
+        np.random.seed(numpySeed)
 
     # Warning in case of not ideal parameters.
     if separationDistance > boxsize:

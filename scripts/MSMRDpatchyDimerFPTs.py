@@ -11,7 +11,7 @@ import msmrd2.tools.particleTools as particleTools
 # Main parameters for particle and integrator
 numParticles = 2
 partTypes = 0
-dt = 0.00001 #0.002 # should be smaller than Gillespie inverse transition rates
+dt = 0.0001 #0.002 # should be smaller than Gillespie inverse transition rates
 bodytype = 'rigidbody'
 numBoundStates = 8
 maxNumBoundStates = 10
@@ -85,8 +85,9 @@ def MSMRDsimulationFPT(trajectorynum):
     integrator.setDiscretization(discretization)
 
     # Generate random position and orientation particle list with two particles
+    seed = int(trajectorynum)
     partlist = particleTools.randomParticleMSList(numParticles, boxsize,
-                                                  relativeDistanceCutOff, partTypes, [unboundMSM])
+                                                  relativeDistanceCutOff, partTypes, [unboundMSM], seed)
 
     # Calculates the first passage times for a given bound state. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.

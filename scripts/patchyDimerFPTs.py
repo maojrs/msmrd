@@ -36,7 +36,8 @@ boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
 dummyTraj = msmrd2.trajectories.patchyDimer(2,1)
 
 # Create empty files to save the data in parallel algorithm
-filename = '../data/dimer/first_passage_times/patchyDimerFPTs_boxsize' + str(boxsize) + '.xyz'
+filename = '../data/dimer/first_passage_times/patchyDimerFPTs_trajs' + str(numTrajectories) \
+           +'_boxsize' + str(boxsize) + '.xyz'
 
 def simulationFPT(trajectorynum):
     '''
@@ -52,7 +53,8 @@ def simulationFPT(trajectorynum):
     integrator.setPairPotential(potentialPatchyParticleAngular)
 
     # Generate random position and orientation particle list with two particles
-    partlist = particleTools.randomParticleList(numparticles, boxsize, relativeDistanceCutOff, D, Drot)
+    seed = int(trajectorynum)
+    partlist = particleTools.randomParticleList(numparticles, boxsize, relativeDistanceCutOff, D, Drot, seed)
 
     # Calculates the first passage times for a given bound state. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.
