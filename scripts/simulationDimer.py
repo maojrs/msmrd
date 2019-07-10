@@ -45,7 +45,7 @@ boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
 # Provides base filename (folder must exist (and preferably empty), otherwise H5 might fail)
 basefilename = "../data/dimer/simDimer_t" + "{:.2E}".format(timesteps) + \
            "_s{:d}".format(stride)
-#basefilename = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer_discrete/simDimer_t" + \
+#basefilename = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/simDimer_t" + \
 #           "{:.2E}".format(timesteps)  + "_s{:d}".format(stride)
 
 # Simulation wrapper for parallel runs

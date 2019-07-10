@@ -76,10 +76,9 @@ namespace msmrd {
 
         std::vector<std::vector<int>> getDiscreteTrajectoryData() { return discreteTrajectoryData; }
 
-        // Utility functions
-
         vec3<double> calculateRelativePosition(vec3<double> position1, vec3<double> position2);
 
+        
         /* Templated functions for writing to text and H5 file (template for H5 useful since datasize
          * needs to be known at runtime) */
 
