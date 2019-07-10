@@ -23,23 +23,31 @@ namespace msmrd {
         setMetastableRegions();
     };
 
-
+    /* Samples discrete trajectory directly from the particle list. This is done for every timestep and saved into
+     * the class data directly, so this function is better suited to obtain the discrete trajectory at the same
+     * time as it is being computed. It is assumed only the first two particles are relevant. */
     void patchyDimer::sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) {
         // Initialize sample with value zero
-        std::vector<int> sample{0};
+        int sample = sampleDiscreteState(particleList[0], particleList[1]);
 
-        auto part1 = particleList[0];
-        auto part2 = particleList[1];
+        // Save previous value and push into trajectory
+        prevsample = sample;
+        discreteTrajectoryData.push_back(std::vector<int>{sample});
+    };
+
+
+    /* Main function to sample the discrete state of two particles. It returns the corresponding
+     * bound state, transition state or unbound state (0). In the bound region (r< boundStatesCutOff), it uses
+     * the core MSM approach to assign a value (previous state if current state is not a bound or
+     * transition state). */
+    int patchyDimer::sampleDiscreteState(particle part1, particle part2) {
+        // Initialize sample with value zero
+        int discreteState = 0;
 
         /* Calculate relative position taking into account periodic boundary measured
          * from i to j (gets you from i to j). */
-        vec3<double> relativePosition;
-        if (boundaryActive) {
-            relativePosition = msmrdtools::calculateRelativePosition(part1.position, part2.position,
-                    boundaryActive, domainBoundary->getBoundaryType(), domainBoundary->boxsize);
-        } else {
-            relativePosition = part2.position - part1.position;
-        }
+        vec3<double> relativePosition = calculateRelativePosition(part1.position, part2.position);
+
         // Rotate relative position to match the reference orientation of particle 1. (VERY IMPORTANT)
         relativePosition = msmrdtools::rotateVec(relativePosition, part1.orientation.conj());
         quaternion<double> quatReference = {1,0,0,0}; // we can then define reference quaternion as identity.
@@ -48,26 +56,30 @@ namespace msmrd {
         quaternion<double> relativeOrientation;
         relativeOrientation = part1.orientation.conj() * part2.orientation;
 
-        // Extract current state, save into sample and push sample to discreteTrajectoryData.
+        // Extract current state, save into sample and return sample
         int secNum;
-        if (relativePosition.norm() < 1.25) {
-            sample = std::vector<int>{ getBoundState(relativePosition, relativeOrientation) };
+        if (relativePosition.norm() < boundStatesCutOff) {
+            discreteState = getBoundState(relativePosition, relativeOrientation);
+            // If sample doesn't correspond to any bound state, assign previous state
+            if (discreteState == -1) {
+                discreteState = prevsample;
+            }
         } else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
             // Get corresponding section numbers from spherical partition to classify its state
             secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, quatReference);
-            sample  = std::vector<int>{maxNumberBoundStates + secNum};
+            discreteState  = maxNumberBoundStates + secNum;
         }
-        prevsample = sample[0];
-        discreteTrajectoryData.push_back(sample);
+        return discreteState;
+        //discreteTrajectoryData.push_back(sample);
     };
 
 
     /* Given two particles, use their positions and orientations to determine if they are in one of
-     * the 8 bound states (1 to 8). If not, return the value of the previous state */
+     * the 8 bound states (1 to 8). If not, return -1 (to later assign the value of the previous state) */
     int patchyDimer::getBoundState(vec3<double> relativePosition, quaternion<double> relativeOrientation) {
 
         /* Check if it matches a bound states, if so return the corresponding state. Otherwise
-         * return the previous state. */
+         * return -1. */
         vec3<double> relPosCenter;
         quaternion<double> relQuatCenter;
         double angleDistance;
@@ -82,49 +94,15 @@ namespace msmrd {
                 }
             }
         }
-
-        return prevsample;
-    };
-
-
-    /* Similar to getBoundState, but return -1 when they don't correspond to any bound state. This is
-     * a special version for PyBind, useful when calculating benchmarks in python interface. Note it is a mixture
-     * between sampleDiscreteTrjacteory and getBoundState. */
-    int patchyDimer::getBoundStatePyBind(particle part1, particle part2) {
-        // Calculate relative distance taking into account periodic boundary.
-        vec3<double> relativePosition;
-        if (boundaryActive) {
-            relativePosition = msmrdtools::calculateRelativePosition(part1.position, part2.position,
-                    boundaryActive, domainBoundary->getBoundaryType(), domainBoundary->boxsize);
-        } else {
-            relativePosition = part2.position - part1.position;
-        }
-        // Rotate relative position to match the reference orientation of particle 1.
-        relativePosition = msmrdtools::rotateVec(relativePosition, part1.orientation.conj());
-
-        // Calculate relative orientation (w/respect to particle 1)
-        quaternion<double> relativeOrientation = part1.orientation.conj() * part2.orientation;
-
-        // Check if it matches a bound state, if so return the corresponding state. Otherwise return -1.
-        vec3<double> relPosCenter;
-        quaternion<double> relQuatCenter;
-        double angleDistance;
-        for (int i = 0; i < 8; i++) {
-            relPosCenter = std::get<0>(boundStates[i]);
-            relQuatCenter = std::get<1>(boundStates[i]);
-
-            if ( (relPosCenter - relativePosition).norm() <= tolerancePosition) {
-                angleDistance = msmrdtools::quaternionAngleDistance(relQuatCenter, relativeOrientation);
-                if  ( angleDistance < toleranceOrientation) {
-                    return i + 1;
-                }
-            }
-        }
-
         return -1;
+        //return prevsample;
     };
 
 
+    /* Sets metastable regions (bound states) of patchy dimer (two equal patcy particles, each with two patches
+     * an ang angleDiff away). The centers of the metastable regions are given by a tuple of relative position
+     * and relative orientation. The size of the regions are determined by tolerancePosition and
+     * toleranceOrientation*/
     void patchyDimer::setMetastableRegions() {
         double angleDiff = 3 * M_PI / 5; // angle difference to form a pentamer
         /* Define relative position vectors from particle 1 at the origin. These two patches
@@ -160,5 +138,102 @@ namespace msmrd {
         boundStates[6] = std::make_tuple(relPos2, quatRotations[6]);
         boundStates[7] = std::make_tuple(relPos2, quatRotations[7]);
     }
+
+
+    /*
+     * Mostly only used when interacting using python and/or interacting with pybind.
+     */
+
+    /* From a given trajectory of the from (timestep, position, orientation), where repeated timesteps mean
+     * differente particles at same tieme step, obtain a discrete trajectory using the patchyDimer discretization.
+     * This is useful to load trajectories directly from python and discretize them.*/
+    std::vector<double> patchyDimer::discretizeTrajectory(std::vector<std::vector<double>> trajectory) {
+        int numParticles = 2; // Must be two to discretize trajectory (also it is a dimer)
+        int timesteps = static_cast<int>(trajectory.size() / numParticles);
+
+        // Set output trajectory
+        std::vector<double> discreteTrajectory(timesteps);
+
+        vec3<double> position1;
+        vec3<double> position2;
+        quaternion<double> orientation1;
+        quaternion<double> orientation2;
+
+        int prevDiscreteState = 0;
+        int discreteState = 0;
+
+        for (int i = 0; i < timesteps; i++) {
+            auto part1Data = trajectory[numParticles*i];
+            auto part2Data = trajectory[numParticles*i + 1];
+            position1 = {part1Data[1], part1Data[2], part1Data[3]};
+            position2 = {part2Data[1], part2Data[2], part2Data[3]};
+            orientation1 = {part1Data[4], part1Data[5], part1Data[6], part1Data[7]};
+            orientation2 = {part2Data[4], part2Data[5], part2Data[6], part2Data[7]};
+            auto dummyParticle1 = particle(0, 0, position1, orientation1);
+            auto dummyParticle2 = particle(0, 0, position2, orientation2);
+            discreteState = getState(dummyParticle1, dummyParticle2);
+            if (discreteState == -1) {
+                discreteState = 1*prevDiscreteState;
+            }
+            prevDiscreteState = 1*discreteState;
+
+            discreteTrajectory[i] = discreteState;
+        }
+        return discreteTrajectory;
+    }
+
+
+    /* Similar to getBoundState, but it returns the corresponding bound state, transition state or
+     * unbound state (0). If it returns -1, then the trajectory is below the boundStatesCutOff, but it
+     * does not belong to any bound state; therefore, the previous state sould be assigned if computing a
+     * discrete trajectory. It is a mixture between sampleDiscreteState and getBoundState. It will
+     * specially useful for PyBind when calculating benchmarks in python interface and when using
+     * discretizeTrajectory to obtain discrete trajectories directly from python arrays.  */
+    int patchyDimer::getState(particle part1, particle part2) {
+        // Calculate relative distance taking into account periodic boundary.
+        vec3<double> relativePosition = calculateRelativePosition(part1.position, part2.position);
+
+        // Rotate relative position to match the reference orientation of particle 1.
+        relativePosition = msmrdtools::rotateVec(relativePosition, part1.orientation.conj());
+        quaternion<double> quatReference = {1,0,0,0}; // we can then define reference quaternion as identity.
+
+        // Calculate relative orientation (w/respect to particle 1)
+        quaternion<double> relativeOrientation = part1.orientation.conj() * part2.orientation;
+
+        // Check if it matches a bound state, if so return the corresponding state. Otherwise return -1.
+        int secNum;
+        int state;
+        vec3<double> relPosCenter;
+        quaternion<double> relQuatCenter;
+        double angleDistance;
+        // Returns bound state or -1 if below boundStatesCutOff region but not belonging to any bound state
+        if (relativePosition.norm() < boundStatesCutOff) {
+            for (int i = 0; i < 8; i++) {
+                relPosCenter = std::get<0>(boundStates[i]);
+                relQuatCenter = std::get<1>(boundStates[i]);
+
+                if ((relPosCenter - relativePosition).norm() <= tolerancePosition) {
+                    angleDistance = msmrdtools::quaternionAngleDistance(relQuatCenter, relativeOrientation);
+                    if (angleDistance < toleranceOrientation) {
+                        return i + 1;
+                    }
+                }
+            }
+            return -1;
+        }
+        // Returns transition state
+        else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
+            // Get corresponding section numbers from spherical partition to classify its state
+            secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, quatReference);
+            return maxNumberBoundStates + secNum;
+        }
+        // Returns unbound state
+        else {
+            return 0;
+        }
+    };
+
+
+
 
 }

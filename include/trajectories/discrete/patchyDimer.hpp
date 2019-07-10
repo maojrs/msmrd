@@ -15,7 +15,8 @@ namespace msmrd {
      * trajectoryPositionOrientation is that this class can sample the discrete trajectory that is
      * specific for the patchy dimer application. In short words,  it chooses how to discretize the full
      * trajectory of two particle into a discretized trajectory to be analyzed and extracted into
-     * a Markov state model.
+     * a Markov state model. It also implements functionality to discretize trajectories directly loaded
+     * from a python array.
      *
      * Patchy dimer will have one unbound state (0), two (or more) bound states (1,2) and
      * angularStates = numSections(numSections+1)/2 angular discrete states (3-3+angularStates).
@@ -26,6 +27,7 @@ namespace msmrd {
         std::unique_ptr<positionOrientationPartition> positionOrientationPart;
         std::array< std::tuple<vec3<double>, quaternion<double>>, 8> boundStates{};
         int maxNumberBoundStates = 10;
+        double boundStatesCutOff = 1.25;
         double tolerancePosition = 0.15;
         double toleranceOrientation = 0.15*2*M_PI;
         int prevsample = 0;
@@ -43,6 +45,12 @@ namespace msmrd {
          * count (index) the transition states. The state maxNumberBoundStates + 1 will correspond not to a bound state
          * but to the first transition state. This parameter has to be consistent with the one used
          * by the msmrd integrator and the msmrdMarkovModel.
+         * @param boundStatesCutOff any relative distance smaller than this value will no longer assign states using
+         * the positionOrientationPartition. Instead in the region bounded by r<boundStatesCutOff, the Core MSM
+         * approach will determine the state opf the discrete trajectory, i.e. the same state will be sampled in the
+         * discrete trajectory until a new bound state is reached or r>=boundStatesCutOff. Note boundStatesCutOff
+         * should be smaller than positionOrientationPart->relativeDistanceCutOff.
+         * a new bound states is hittes
          * @param tolerancePosition is the maximum acceptable difference between the relative position and the
          * calculated relative position of a metstable region to still be considered part of a bound state.
          * @param toleranceOrientation is the maximum acceptable angle-distance difference between the relative
@@ -56,11 +64,19 @@ namespace msmrd {
 
         void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override;
 
-        void setMetastableRegions();
+        int sampleDiscreteState(particle part1, particle part2);
 
         int getBoundState(vec3<double> relativePosition, quaternion<double> relativeOrientation);
 
-        int getBoundStatePyBind(particle part1, particle part2);
+        void setMetastableRegions();
+
+
+
+        // Next fucntions are mostly only used when interacting with python or by pybind.
+
+        std::vector<double> discretizeTrajectory(std::vector<std::vector<double>> trajectory);
+
+        int getState(particle part1, particle part2);
 
 
     };

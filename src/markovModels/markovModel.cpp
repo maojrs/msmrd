@@ -24,7 +24,7 @@ namespace msmrd {
         nstates = static_cast<int>(tmatrix.size());
         Dlist.resize(nstates);
         Drotlist.resize(nstates);
-        tmatrix.resize(nstates);
+        //tmatrix.resize(nstates);
         randg.setSeed(seed);
 
         // Verify input 2D vector is a square matrix and fill tmatrix
