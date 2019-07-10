@@ -27,10 +27,9 @@ namespace msmrd {
 
         py::class_<msmrdMSM>(m, "msmrdMarkovStateModel", "continuous time Markov state model specialized to use with"
                                                             "MSM/RD integration (num. of bound states, num. transition"
-                                                            "states, num. of A states, num. of B states, seed, "
-                                                            "rate dictionary")
+                                                            "states, seed, rate dictionary")
                 .def(py::init<unsigned int &, unsigned int &, long &, std::map<std::string, float> &>())
-                .def("getRate", &msmrdMarkovStateModel::getRate)
+                .def("getRate", &msmrdMSM::getRate)
                 .def("computeTransition2BoundState", &msmrdMSM::computeTransition2BoundState)
                 .def("computeTransition2UnboundState", &msmrdMSM::computeTransition2UnboundState)
                 .def("setDbound", &msmrdMSM::setDbound)

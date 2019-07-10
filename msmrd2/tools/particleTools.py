@@ -2,6 +2,7 @@
 
 import numpy as np
 import msmrd2
+import random
 import warnings
 
 
@@ -21,7 +22,7 @@ def randomParticleList(numparticles, boxsize, separationDistance, D, Drot, numpy
 
     # Set numpy seed if provided (important when running parallel processes, otherwise not required)
     if numpySeed != -1:
-        np.random.seed(numpySeed)
+        random.seed(numpySeed) #better than np.random for parallel seeding
 
     # Warning in case of not ideal parameters.
     if separationDistance > boxsize:
@@ -36,17 +37,22 @@ def randomParticleList(numparticles, boxsize, separationDistance, D, Drot, numpy
     pyPartlist = []
     for i in range(numparticles):
         overlap = True
+        numTrials = 0
         while overlap:
-            position = np.array([boxsize[0]*np.random.rand()-0.5*boxsize[0],
-                                 boxsize[1]*np.random.rand()-0.5*boxsize[1],
-                                 boxsize[2]*np.random.rand()-0.5*boxsize[2]])
+            numTrials = numTrials + 1
+            position = np.array([boxsize[0]*random.random()-0.5*boxsize[0],
+                                 boxsize[1]*random.random()-0.5*boxsize[1],
+                                 boxsize[2]*random.random()-0.5*boxsize[2]])
             overlap = False
             for j in range(len(pyPartlist)):
                 if np.linalg.norm(position - pyPartlist[j].position) < separationDistance:
                     overlap = True
                     continue
+            if numTrials >= 100000:
+                warnings.warn("Cannot easily set nonoverlapping particles with current setup. Check boxsize, "
+                              "number of particles and separation distance.")
 
-        orientation = np.array([np.random.rand(),np.random.rand(),np.random.rand(),np.random.rand()])
+        orientation = np.array([random.random(), random.random(), random.random(), random.random()])
         orientation = orientation/np.linalg.norm(orientation)
         part = msmrd2.particle(D, Drot, position, orientation)
         pyPartlist.append(part)
@@ -71,7 +77,7 @@ def randomParticleMSList(numparticles, boxsize, separationDistance, types, unbou
 
     # Set numpy seed if provided (important when running parallel processes, otherwise not required)
     if numpySeed != -1:
-        np.random.seed(numpySeed)
+        random.seed(numpySeed)
 
     # Warning in case of not ideal parameters.
     if separationDistance > boxsize:
@@ -89,23 +95,28 @@ def randomParticleMSList(numparticles, boxsize, separationDistance, types, unbou
     states = np.zeros(numparticles, dtype = 'int')
     for i in range(numparticles):
         maxstates = len(unboundMSMs[types[i]].D)
-        states[i] = np.random.randint(maxstates)
+        states[i] = random.randint(maxstates - 1)
 
     # Create non-overlapping particle list
     pyPartlist = []
     for i in range(numparticles):
+        numTrials = 0
         overlap = True
         while overlap:
-            position = np.array([boxsize[0]*np.random.rand()-0.5*boxsize[0],
-                                 boxsize[1]*np.random.rand()-0.5*boxsize[1],
-                                 boxsize[2]*np.random.rand()-0.5*boxsize[2]])
+            numTrials = numTrials + 1
+            position = np.array([boxsize[0]*random.random()-0.5*boxsize[0],
+                                 boxsize[1]*random.random()-0.5*boxsize[1],
+                                 boxsize[2]*random.random()-0.5*boxsize[2]])
             overlap = False
             for j in range(len(pyPartlist)):
                 if np.linalg.norm(position - pyPartlist[j].position) < separationDistance:
                     overlap = True
                     continue
+            if numTrials >= 100000:
+                warnings.warn("Cannot easily set nonoverlapping particles with current setup. Check boxsize, "
+                          "number of particles and separation distance.")
 
-        orientation = np.array([np.random.rand(),np.random.rand(),np.random.rand(),np.random.rand()])
+        orientation = np.array([random.random(), random.random(), random.random(), random.random()])
         orientation = orientation/np.linalg.norm(orientation)
         D = unboundMSMs[types[i]].D[states[i]]
         Drot = unboundMSMs[types[i]].Drot[states[i]]

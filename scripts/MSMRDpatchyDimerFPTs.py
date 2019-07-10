@@ -17,7 +17,7 @@ numBoundStates = 8
 maxNumBoundStates = 10
 relativeDistanceCutOff = 2.2
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
-numTrajectories = 2000
+numTrajectories = 10000
 
 # Define discretization (need to be consistent with the on used to generate the rate dictionary
 numSphericalSectionsPos = 7
@@ -29,7 +29,7 @@ discretization = msmrd2.discretizations.positionOrientationPartition(relativeDis
                                                                      numRadialSectionsQuat, numSphericalSectionsQuat)
 
 # Load pickled rateDicitionary generated in generateRateDictionary
-lagtime = 200
+lagtime = 600
 pickle_in = open("../examples/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime) +  ".pickle","rb")
 rateDictionary = pickle.load(pickle_in)
 
@@ -55,8 +55,8 @@ boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
 boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
 
 # Create empty files to save the data in parallel algorithm
-filename = '../data/dimer/first_passage_times/MSMRDpatchyDimerFPTs_lagt' + str(lagtime) \
-           + '_boxsize' + str(boxsize) + '.xyz'
+filename = '../data/dimer/first_passage_times/MSMRDpatchyDimerFPTs_trajs' + str(numTrajectories) + \
+           '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
 def MSMRDsimulationFPT(trajectorynum):
     '''
