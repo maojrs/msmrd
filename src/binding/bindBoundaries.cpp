@@ -19,18 +19,15 @@ namespace msmrd {
                 .def(py::init<double &, double &, double &, std::string>())
                 .def_property_readonly("boxsize", [](const box &currentbox) {
                     return vec2numpy(3, currentbox.boxsize);
-                })
-                .def_property_readonly("boundaryType", &box::getBoundaryType);
+                });
 
         py::class_<sphere, boundary>(m, "sphere", "spherical boundary (radius, boundarytype (periodic, "
                                                   "reflective or open))")
                 .def(py::init<double &, std::string>())
-                .def_property_readonly("maxRadius", &sphere::getRadius)
-                .def_property_readonly("boundaryType", &sphere::getBoundaryType);
+                .def_property_readonly("maxRadius", &sphere::getRadius);
 
         py::class_<noBoundary, boundary>(m, "noBoundary", "noBoundary ())")
-                .def(py::init<>())
-                .def_property_readonly("boundaryType", &noBoundary::getBoundaryType);
+                .def(py::init<>());
     }
 
 }

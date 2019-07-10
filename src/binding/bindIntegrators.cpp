@@ -16,13 +16,6 @@ namespace msmrd {
                                                                 "particlesbodytype (point, rod, rigidbody, "
                                                                 "pointmix, rodmix or rigidbodymix) )")
                 .def(py::init<double &, long &, std::string &>())
-                .def_property_readonly("clock", &overdampedLangevin::getClock)
-                .def("setClock", &overdampedLangevin::setClock)
-                .def("resetClock", &overdampedLangevin::resetClock)
-                .def("setKbT", &overdampedLangevin::setKbT)
-                .def("setBoundary", &overdampedLangevin::setBoundary)
-                .def("setExternalPotential", &overdampedLangevin::setExternalPotential)
-                .def("setPairPotential", &overdampedLangevin::setPairPotential)
                 .def("integrate", &overdampedLangevin::integrate);
 
         py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch",
