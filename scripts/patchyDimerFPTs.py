@@ -15,8 +15,10 @@ D = 1.0
 Drot = 1.0
 relativeDistanceCutOff = 2.2
 numTrajectories = 100
+# Other important parameters
+boxsize = 6
 
-# Define patchy Particle potential with angular dependence (make sure it is consistent with msmrd data)
+# Parameters of patchy Particle potential with angular dependence (make sure it is consistent with msmrd data)
 sigma = 1.0
 strength = 50.0
 angularStrength = 10.0
@@ -24,16 +26,10 @@ angleDiff = 3*np.pi/5.0
 patch1 = np.array([np.cos(angleDiff/2),np.sin(angleDiff/2),0.])
 patch2 = np.array([np.cos(-angleDiff/2),np.sin(-angleDiff/2),0.])
 patchesCoordinates = [patch1, patch2]
-potentialPatchyParticleAngular = patchyParticleAngular(sigma, strength, angularStrength, patchesCoordinates)
 
-# Define simulation boundaries (choose either spherical or box)
-boxsize = 6
-boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
-
-# Bound states and dummy trajectory definition, needed to calculate boundstate of patchydimer
+# Bound states, needed to calculate boundstate of patchydimer
 boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
 boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
-dummyTraj = msmrd2.trajectories.patchyDimer(2,1)
 
 # Create empty files to save the data in parallel algorithm
 filename = '../data/dimer/first_passage_times/patchyDimerFPTs_trajs' + str(numTrajectories) \
@@ -46,8 +42,18 @@ def simulationFPT(trajectorynum):
     :param trajectorynum: number of trajectories on which to calculate the FPT
     :return: state, first passage time
     '''
+
+    # Define dummy trajectory to extract bound states from python (needed to use getState function)
+    dummyTraj = msmrd2.trajectories.patchyDimer(2,1)
+
+    # Define simulation boundaries (choose either spherical or box)
+    boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
+
+    # Define potential
+    potentialPatchyParticleAngular = patchyParticleAngular(sigma, strength, angularStrength, patchesCoordinates)
+
     # Define integrator and boundary (over-damped Langevin)
-    seed = -trajectorynum # Negative seed, uses random device as seed
+    seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
     integrator = odLangevin(dt, seed, bodytype)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPatchyParticleAngular)
@@ -61,7 +67,7 @@ def simulationFPT(trajectorynum):
     unbound = True
     while(unbound):
         integrator.integrate(partlist)
-        boundState = dummyTraj.getBoundState(partlist[0], partlist[1])
+        boundState = dummyTraj.getState(partlist[0], partlist[1])
         if boundState in boundStatesA:
             unbound = False
             return 'A', integrator.clock

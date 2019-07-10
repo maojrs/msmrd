@@ -56,7 +56,7 @@ def runParallelSims(simnumber):
     partlist = particleTools.randomParticleList(Nparticles, boxsize, separationDistance, D, Drot, seed)
 
     # Integrator definition
-    seed = -simnumber # random seed (negative), it is also different for every simulation, good for parallel simulation
+    seed = int(-1*simnumber) # random seed (negative), it is also different for every simulation, good for parallel simulation
     integrator = odLangevin(dt, seed, bodytype)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPatchyParticleAngular)

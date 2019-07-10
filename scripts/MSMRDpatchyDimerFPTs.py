@@ -18,20 +18,16 @@ maxNumBoundStates = 10
 relativeDistanceCutOff = 2.2
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
+# Other important parameters
+lagtime = 600
+boxsize = 6
 
-# Define discretization (need to be consistent with the on used to generate the rate dictionary
+# Discretization parameters (need to be consistent with the on used to generate the rate dictionary
 numSphericalSectionsPos = 7
 numRadialSectionsQuat = 5
 numSphericalSectionsQuat = 7
 totalnumSecsQuat = numSphericalSectionsQuat*(numRadialSectionsQuat -1) + 1
 numTransitionsStates = numSphericalSectionsPos * totalnumSecsQuat #203
-discretization = msmrd2.discretizations.positionOrientationPartition(relativeDistanceCutOff, numSphericalSectionsPos,
-                                                                     numRadialSectionsQuat, numSphericalSectionsQuat)
-
-# Load pickled rateDicitionary generated in generateRateDictionary
-lagtime = 600
-pickle_in = open("../examples/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime) +  ".pickle","rb")
-rateDictionary = pickle.load(pickle_in)
 
 # Parameters to define continuous-time MSM for unbound dynamics: unboundMSM (assumed same for all particles)
 MSMtype = 0
@@ -40,15 +36,8 @@ Dlist = np.array([1.0])
 Drotlist = np.array([1.0])
 
 # Parameters to define coupling Markov model for bound dynamics: couplingMSM
-seed = 0
 Dbound = 0.5*np.ones(numBoundStates)
 DboundRot = np.ones(numBoundStates)
-
-
-# Define simulation boundaries (choose either spherical or box)
-boxsize = 6
-boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
-
 
 # Bound states definition, needed to calculate boundstate
 boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
@@ -66,20 +55,32 @@ def MSMRDsimulationFPT(trajectorynum):
     :return: state, first passage time
     '''
 
+    # Define discretization
+    discretization = msmrd2.discretizations.positionOrientationPartition(relativeDistanceCutOff,
+                                            numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat)
+
+    # Define boundary
+    boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
+
+    # Load rate dicitionary
+    pickle_in = open("../examples/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime)
+                     +  ".pickle","rb")
+    rateDictionary = pickle.load(pickle_in)
+
     # Set unbound MSM
-    seed = -int(2*trajectorynum) # Negative seed, uses random device as seed
+    seed = int(-2*trajectorynum) # Negative seed, uses random device as seed
     unboundMSM = ctmsm(MSMtype, ratematrix, seed)
     unboundMSM.setD(Dlist)
     unboundMSM.setDrot(Drotlist)
 
     # Set coupling MSM
-    seed = -int(3*trajectorynum) # Negative seed, uses random device as seed
+    seed = int(-3*trajectorynum) # Negative seed, uses random device as seed
     couplingMSM = msmrdMSM(numBoundStates, numTransitionsStates, seed, rateDictionary)
     couplingMSM.setDbound(Dbound, DboundRot)
     couplingMSM.setmaxNumberBoundStates(maxNumBoundStates)
 
     # Define integrator, boundary and discretization
-    seed = -trajectorynum # Negative seed, uses random device as seed
+    seed = -int(1*trajectorynum) # Negative seed, uses random device as seed
     integrator = msmrdIntegrator(dt, seed, bodytype, numParticleTypes, relativeDistanceCutOff, unboundMSM, couplingMSM)
     integrator.setBoundary(boxBoundary)
     integrator.setDiscretization(discretization)
