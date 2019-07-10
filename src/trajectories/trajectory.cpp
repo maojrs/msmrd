@@ -32,4 +32,16 @@ namespace msmrd {
         boundaryActive = true;
         domainBoundary = bndry;
     }
+
+    // Calculates relative position using boundary information loaded into trajectory class (position2 - position1)
+    vec3<double> trajectory::calculateRelativePosition(vec3<double> position1, vec3<double> position2) {
+        vec3<double> relativePosition;
+        if (boundaryActive) {
+            relativePosition = msmrdtools::calculateRelativePosition(position1, position2,
+                    boundaryActive, domainBoundary->getBoundaryType(), domainBoundary->boxsize);
+        } else {
+            relativePosition = position2 - position1;
+        }
+        return relativePosition;
+    }
 }
