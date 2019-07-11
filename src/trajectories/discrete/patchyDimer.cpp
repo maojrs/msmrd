@@ -15,7 +15,7 @@ namespace msmrd {
         double radialCutOff = 2.2;
         int numSphericalSectionsPos = 7;
         int numRadialSectionsQuat = 5;
-        int numSphericalSectionsQuat = numSphericalSectionsPos;
+        int numSphericalSectionsQuat = 7;
         discreteTrajectoryData.reserve(bufferSize);
         positionOrientationPart = std::make_unique<positionOrientationPartition>(radialCutOff, numSphericalSectionsPos,
                                                                                  numRadialSectionsQuat,
