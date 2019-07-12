@@ -30,7 +30,6 @@ namespace msmrd {
         double boundStatesCutOff = 1.25;
         double tolerancePosition = 0.15;
         double toleranceOrientation = 0.15*2*M_PI;
-        std::string discretizationMode = "CoreMSM"; // "CoreMSM" or "fullDiscretization"
         int prevsample = 0;
     public:
         /*
@@ -57,13 +56,10 @@ namespace msmrd {
          * @param toleranceOrientation is the maximum acceptable angle-distance difference between the relative
          * orientation and the relative orientation calculated of a given metastable region to still be considerer
          * part of a bound state.
-         * @param discretizationMode can be either "CoreMSM" or "fullDiscretization". It chooses how to discretize
-         * the region r<boundStatesCutOff that is not a bound state. CoreMSM uses the value of the previous known
-         * bound or transition state, where else fullDiscretization uses the value corresponding to the
-         * positionOrientationPartition. Note other values, like "None" will simply yield -1 when neither in bound
-         * state, unbound state nor transition state.
          * @param prevsample keeps calue of previous sample when sampling discrete trajectory, useful for
-         * coreMSM approach
+         * CoreMSM approach. The CoreMSM approach chooses how to discretize the region r<boundStatesCutOff that
+         * is not a bound state. CoreMSM uses the value of the previous known bound or transition state until a new
+         * bound or transition state is reached.
          */
 
         patchyDimer(unsigned long Nparticles, int bufferSize);
@@ -80,10 +76,9 @@ namespace msmrd {
 
         // Next fucntions are mostly only used when interacting with python or by pybind.
 
-        std::vector<double> discretizeTrajectory(std::vector<std::vector<double>> trajectory,
-                                                 std::string discretizationType);
+        std::vector<double> discretizeTrajectory(std::vector<std::vector<double>> trajectory);
 
-        int getState(particle part1, particle part2, std::string discretizationType);
+        int getState(particle part1, particle part2);
 
 
     };

@@ -60,13 +60,9 @@ namespace msmrd {
         int secNum;
         if (relativePosition.norm() < boundStatesCutOff) {
             discreteState = getBoundState(relativePosition, relativeOrientation);
-            /* If sample doesn't correspond to any bound state in r<boundStatesCutOff, assign previous state (CoreMSM),
-             * transition state(fullDiscretization) or -1 ("None" or other), depending on discretizationMode */
-            if (discreteState == -1 and discretizationMode == "CoreMSM") {
+            // If sample doesn't correspond to any bound state in r<boundStatesCutOff, assign previous state (CoreMSM)
+            if (discreteState == -1) {
                     discreteState = prevsample;
-            } else if( discreteState == -1 and discretizationMode == "fullDiscretization") {
-                secNum = positionOrientationPart->getSectionNumber(relativePosition,relativeOrientation, quatReference);
-                discreteState = maxNumberBoundStates + secNum;
             }
         } else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
             // Get corresponding section numbers from spherical partition to classify its state
@@ -150,8 +146,7 @@ namespace msmrd {
     /* From a given trajectory of the from (timestep, position, orientation), where repeated timesteps mean
      * differente particles at same tieme step, obtain a discrete trajectory using the patchyDimer discretization.
      * This is useful to load trajectories directly from python and discretize them.*/
-    std::vector<double> patchyDimer::discretizeTrajectory(std::vector<std::vector<double>> trajectory,
-                                                          std::string discretizationType = "CoreMSM") {
+    std::vector<double> patchyDimer::discretizeTrajectory(std::vector<std::vector<double>> trajectory) {
         int numParticles = 2; // Must be two to discretize trajectory (also it is a dimer)
         int timesteps = static_cast<int>(trajectory.size() / numParticles);
 
@@ -175,9 +170,9 @@ namespace msmrd {
             orientation2 = {part2Data[4], part2Data[5], part2Data[6], part2Data[7]};
             auto dummyParticle1 = particle(0, 0, position1, orientation1);
             auto dummyParticle2 = particle(0, 0, position2, orientation2);
-            discreteState = getState(dummyParticle1, dummyParticle2, discretizationType);
-            // If getState returned -1, return previous state if in CoreMSM approach.
-            if (discreteState == -1 and discretizationType == "CoreMSM") {
+            discreteState = getState(dummyParticle1, dummyParticle2);
+            // If getState returned -1, return previous (CoreMSM approach).
+            if (discreteState == -1) {
                 discreteState = 1 * prevDiscreteState;
             }
             prevDiscreteState = 1*discreteState;
@@ -194,7 +189,7 @@ namespace msmrd {
      * discrete trajectory. It is a mixture between sampleDiscreteState and getBoundState. It will
      * specially useful for PyBind when calculating benchmarks in python interface and when using
      * discretizeTrajectory to obtain discrete trajectories directly from python arrays.  */
-    int patchyDimer::getState(particle part1, particle part2, std::string discretizationType = "CoreMSM") {
+    int patchyDimer::getState(particle part1, particle part2) {
         // Calculate relative distance taking into account periodic boundary.
         vec3<double> relativePosition = calculateRelativePosition(part1.position, part2.position);
 
@@ -216,7 +211,7 @@ namespace msmrd {
             for (int i = 0; i < 8; i++) {
                 relPosCenter = std::get<0>(boundStates[i]);
                 relQuatCenter = std::get<1>(boundStates[i]);
-
+                // If in bound state, returns bound state
                 if ((relPosCenter - relativePosition).norm() <= tolerancePosition) {
                     angleDistance = msmrdtools::quaternionAngleDistance(relQuatCenter, relativeOrientation);
                     if (angleDistance < toleranceOrientation) {
@@ -224,12 +219,7 @@ namespace msmrd {
                     }
                 }
             }
-            if (discretizationType == "fullDiscretization") {
-                secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, quatReference);
-                return maxNumberBoundStates + secNum; // returns transition state in r<boundStatesCutOff
-            } else {
-                return -1; // returns -1 when not bound and not in "fullDiscretization" mode.
-            }
+            return -1; // returns -1 when not in bound state but in r<boundStatesCutOff, so CoreMSM is later applied.
         }
         // Returns transition state
         else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
