@@ -27,7 +27,8 @@ namespace msmrd {
         std::unique_ptr<positionOrientationPartition> positionOrientationPart;
         std::array< std::tuple<vec3<double>, quaternion<double>>, 8> boundStates{};
         int maxNumberBoundStates = 10;
-        double boundStatesCutOff = 1.25;
+        double radialLowerBound = 1.25; //1.3; //1.4; //1.25; # 1.4 and 2.2 was a good combination;
+        double radialUpperBound = 2.2; //2.5; //2.2  //2.2;   # 1.25 and 2.2 the original configuration. 1.3 and 2.5 the latest
         double tolerancePosition = 0.15;
         double toleranceOrientation = 0.15*2*M_PI;
         int prevsample = 0;
@@ -35,6 +36,7 @@ namespace msmrd {
         /*
          * @positionOrientationPart full six dimensional partition of phase space of relative position and orientation.
          * This is required to sample the discrete trajectory in the transition regions given by this discretization.
+         * IMPORTANT: The MSMRD integrator must use the same partition.
          * @boundStates vector of tuples. Each tuple contains a vector and a quaternion indicating one of the 8 bound
          * states. The vector corresponds to the relative position (pos2-pos1) in the frame of reference of particle 1
          * (smaller index) between particle 1 and 2. The fixed frame of reference also assumes particle 1 is in its
@@ -45,19 +47,22 @@ namespace msmrd {
          * count (index) the transition states. The state maxNumberBoundStates + 1 will correspond not to a bound state
          * but to the first transition state. This parameter has to be consistent with the one used
          * by the msmrd integrator and the msmrdMarkovModel.
-         * @param boundStatesCutOff any relative distance smaller than this value will no longer assign states using
-         * the positionOrientationPartition. Instead in the region bounded by r<boundStatesCutOff, the Core MSM
-         * approach will determine the state opf the discrete trajectory, i.e. the same state will be sampled in the
-         * discrete trajectory until a new bound state is reached or r>=boundStatesCutOff. Note boundStatesCutOff
-         * should be smaller than positionOrientationPart->relativeDistanceCutOff.
-         * a new bound states is hittes
+         * @param radialLowerBound any relative distance smaller than this value will no longer assign states using
+         * the positionOrientationPartition. Instead in the region bounded by r<radialLowerBound, either a bound state
+         * is assigned or the Core MSM approach will determine the state opf the discrete trajectory, i.e. the previous
+         * state will be sampled in the discrete trajectory until a new bound state is reached or r>=radialLowerBound.
+         * Note radialLowerBound < radialUpperBound (positionOrientationPart->relativeDistanceCutOff).
+         * @param radialUpperBound is the upper relative distance limit for the positionOrientationPartition
+         * (positionOrientationPart->relativeDistanceCutOff). Any relative distance above will yield the unbound
+         * state 0, instead of a transition state in the region radialLowerBound <= r < radialUpperBound.
+         * IMPORTANT: The MSMRD integrator must have the this same value as the relativeDistanceCutOff.
          * @param tolerancePosition is the maximum acceptable difference between the relative position and the
          * calculated relative position of a metstable region to still be considered part of a bound state.
          * @param toleranceOrientation is the maximum acceptable angle-distance difference between the relative
          * orientation and the relative orientation calculated of a given metastable region to still be considerer
          * part of a bound state.
          * @param prevsample keeps calue of previous sample when sampling discrete trajectory, useful for
-         * CoreMSM approach. The CoreMSM approach chooses how to discretize the region r<boundStatesCutOff that
+         * CoreMSM approach. The CoreMSM approach chooses how to discretize the region r<radialLowerBound that
          * is not a bound state. CoreMSM uses the value of the previous known bound or transition state until a new
          * bound or transition state is reached.
          */
