@@ -98,6 +98,7 @@ namespace msmrd {
         // Main public functions definitions
         void integrate(std::vector<particle> &parts);
 
+        vec3<double> calculateRelativePosition(vec3<double> p1, vec3<double> p2);
 
         // Getters and setters
         void setBoundary(boundary *bndry);

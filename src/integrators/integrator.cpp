@@ -63,6 +63,17 @@ namespace msmrd {
         clock += dt;
     }
 
+    // Calculates relative distance (p2-p1) of two vectors, p1, p2, taking into account possible periodic boundary
+    vec3<double> integrator::calculateRelativePosition(vec3<double> p1, vec3<double> p2) {
+        // Calculate relative distance. If box periodic boundary, take that into account.
+        if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {
+            auto boxsize = domainBoundary->boxsize;
+            return msmrdtools::distancePeriodicBox(p1, p2, boxsize);
+        } else {
+            return p2 - p1;
+        }
+    };
+
     // Incorporates custom boundary into integrator
     void integrator::setBoundary(boundary *bndry) {
         boundaryActive = true;
