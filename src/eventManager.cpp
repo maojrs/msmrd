@@ -11,15 +11,15 @@ namespace msmrd {
     /* Adds an event to the event dictionary. This requires specifying the wait time until event happens, the end state
      * for the event/transition, the indexes (in partList) of the particles involved (part1Index < part2Index) and
      * a string: "in" or "out". */
-    void eventManager::addEvent(double waitTime, int endState, int part1Index, int part2Index,
-                                int originState, std::string inORout) {
+    void eventManager::addEvent(double waitTime, int part1Index, int part2Index,
+                                int originState, int endState, std::string inORout) {
         if ((inORout != "in") and (inORout != "out") and (inORout != "inside")) {
             std::range_error("Events can only take 'in', 'out' or 'inside' strings as last argument");
         }
         // Create key and new event
         std::string eventKey = std::to_string(part1Index) + "--" + std::to_string(part2Index);
-        event thisEvent = {.waitTime = waitTime, .endState = endState, .part1Index = part1Index,
-                           .part2Index = part2Index, originState = originState, .inORout = inORout};
+        event thisEvent = {.waitTime = waitTime, .part1Index = part1Index, .part2Index = part2Index,
+                           .originState = originState, .endState = endState, .inORout = inORout};
         // See if value already exists and if so keep the one with the smallest time. Otherwise insert new event.
         auto search = eventDictionary.find(eventKey);
         // If key and value already assigned in dictionary.

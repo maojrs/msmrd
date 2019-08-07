@@ -259,10 +259,10 @@ TEST_CASE("Event manager functionality", "[eventManager]") {
     int originState = 100;
     std::string inORout = "in";
     // Test adding events
-    eventMgr.addEvent(waitTime, endState, 1, 2, originState, inORout);
-    eventMgr.addEvent(0.5*waitTime, 2*endState, 3, 5, originState, inORout);
-    eventMgr.addEvent(2*waitTime, endState/2, 6, 7, originState, inORout);
-    eventMgr.addEvent(3*waitTime, 3*endState, 1, 3, originState, inORout);
+    eventMgr.addEvent(waitTime, 1, 2, originState, endState, inORout);
+    eventMgr.addEvent(0.5*waitTime, 3, 5, originState, 2*endState, inORout);
+    eventMgr.addEvent(2*waitTime, 6, 7, originState, endState/2, inORout);
+    eventMgr.addEvent(3*waitTime, 1, 3, originState, 3*endState, inORout);
     REQUIRE(eventMgr.getNumEvents() == 4);
     // Test getting and removing events
     eventMgr.removeEvent(6,7);
@@ -275,8 +275,8 @@ TEST_CASE("Event manager functionality", "[eventManager]") {
     REQUIRE(eventMgr.getEventTime(3,5) == 0.5*waitTime);
     REQUIRE(eventMgr.getEventTime(1,3) == 3*waitTime);
     // Test advance time
-    eventMgr.addEvent(waitTime, endState, 1, 2, originState, inORout);
-    eventMgr.addEvent(2*waitTime, endState/2, 6, 7, originState, inORout);
+    eventMgr.addEvent(waitTime, 1, 2, originState, endState, inORout);
+    eventMgr.addEvent(2*waitTime, 6, 7, originState, endState/2, inORout);
     eventMgr.advanceTime(1.5);
     REQUIRE(eventMgr.getEventTime(1,2) == waitTime - 1.5);
     REQUIRE(eventMgr.getEventTime(3,5) == 0.5*waitTime - 1.5);
@@ -296,12 +296,12 @@ TEST_CASE("Event manager functionality", "[eventManager]") {
     REQUIRE(inORout2 == inORout);
     /* Test adding an event with same key (same pair of particles).
      * If duplicated, it should only keep the one with smaller waitTime. */
-    eventMgr.addEvent(5.0*waitTime, endState, 1, 2, originState, inORout);
+    eventMgr.addEvent(5.0*waitTime, 1, 2, originState, endState, inORout);
     auto oneMoreEvent = eventMgr.getEvent(1,2);
     residualTime = oneMoreEvent.waitTime;
     REQUIRE(eventMgr.getNumEvents() == 4);
     REQUIRE(residualTime == waitTime - 1.5);
-    eventMgr.addEvent(0.5*waitTime, endState, 1, 2, originState, inORout);
+    eventMgr.addEvent(0.5*waitTime, 1, 2, originState, endState, inORout);
     oneMoreEvent = eventMgr.getEvent(1,2);
     residualTime = oneMoreEvent.waitTime;
     REQUIRE(eventMgr.getNumEvents() == 4);
