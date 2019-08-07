@@ -50,7 +50,7 @@ namespace msmrd {
                         auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
                         transitionTime = std::get<0>(transition);
                         nextState = std::get<1>(transition);
-                        eventMgr.addEvent(transitionTime, nextState, i, j, currentTransitionState, "in");
+                        eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState, "in");
 
                     }
                 }
@@ -76,7 +76,7 @@ namespace msmrd {
                         transition = markovModel.computeTransition2UnboundState(parts[i].state);
                         transitionTime = std::get<0>(transition);
                         nextState = std::get<1>(transition);
-                        eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, parts[i].state, "out");
+                        eventMgr.addEvent(transitionTime, i, parts[i].boundTo, parts[i].state, nextState, "out");
                 }
             }
         }
@@ -99,7 +99,7 @@ namespace msmrd {
                     transition = markovModel.computeTransitionBetweenBoundStates(parts[i].state);
                     transitionTime = std::get<0>(transition);
                     nextState = std::get<1>(transition);
-                    eventMgr.addEvent(transitionTime, nextState, i, parts[i].boundTo, parts[i].state, "inside");
+                    eventMgr.addEvent(transitionTime, i, parts[i].boundTo, parts[i].state, nextState, "inside");
                 }
             }
         }
@@ -227,20 +227,26 @@ namespace msmrd {
      * future code optimization. */
     template<>
     void msmrdIntegrator<ctmsm>::removeUnrealizedEvents(std::vector<particleMS> &parts) {
-        for (auto &thisEvent : eventMgr.eventDictionary) {
-            auto transitionTime = thisEvent.second.waitTime;
-            auto iIndex = thisEvent.second.part1Index;
-            auto jIndex = thisEvent.second.part2Index;
+        // Important not to use range loop, iterator loop better since events are being erased.
+        auto it = eventMgr.eventDictionary.begin();
+        while(it != eventMgr.eventDictionary.end()) {
+            auto transitionTime = it->second.waitTime;
+            auto iIndex = it->second.part1Index;
+            auto jIndex = it->second.part2Index;
             vec3<double> relativePosition;
             // Remove event if transition time is infinity
             if (std::isinf(transitionTime)) {
-                eventMgr.removeEvent(iIndex, jIndex);
+                //eventMgr.removeEvent(iIndex, jIndex);
+                //erase() will return the next iterator
+                it = eventMgr.eventDictionary.erase(it);
+                continue;
             }
             // If particles in unbound state and relative position is larger than cutOff, remove event.
-            else if (parts[iIndex].boundTo == -1 and parts[jIndex].boundTo == -1) {
+            if (parts[iIndex].boundTo == -1 and parts[jIndex].boundTo == -1) {
                 if (boundaryActive) {
                     relativePosition = msmrdtools::calculateRelativePosition(parts[iIndex].nextPosition,
-                                                                             parts[jIndex].nextPosition, boundaryActive,
+                                                                             parts[jIndex].nextPosition,
+                                                                             boundaryActive,
                                                                              domainBoundary->getBoundaryType(),
                                                                              domainBoundary->getBoxsize());
                 } else {
@@ -248,9 +254,12 @@ namespace msmrd {
                 }
                 // Remove event if particles drifted apart
                 if (relativePosition.norm() >= relativeDistanceCutOff) {
-                    eventMgr.removeEvent(iIndex, jIndex);
+                    //eventMgr.removeEvent(iIndex, jIndex);
+                    it = eventMgr.eventDictionary.erase(it);
+                    continue;
                 }
             }
+            it++;
         }
     }
 

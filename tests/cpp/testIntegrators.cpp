@@ -103,5 +103,64 @@ TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
     REQUIRE(iIndex == 0);
     REQUIRE(jIndex == 1);
     REQUIRE( (inORout == "in" || inORout == "out") );
+}
 
+TEST_CASE("Remove unrealized events function from msmrdIntegrator", "[msmrdIntegrator]") {
+    // Create an msmrdMarkovModel for coupling (tested on testMarkovModels)
+    int nBoundStates = 3;
+    int nTransitionStates = 2;
+    std::map<std::string, float> rateDictionary = {{"1->b1", 5.0},
+                                                   {"1->b2", 3.0},
+                                                   {"2->b1", 4.0},
+                                                   {"2->b2", 12.0}};
+    auto couplingMSM = msmrdMSM(nBoundStates, nTransitionStates, -1, rateDictionary);
+
+    // Create another MSM to model the unbound state dynamics (none in this case)
+    int msmid = 0;
+    std::vector<std::vector<double>> tmatrix = {{0}};
+    ctmsm unboundMSM = ctmsm(msmid, tmatrix, 0);
+
+    // Create an MSMRD integrator
+    double dt = 0.05;
+    std::string bodytype = "rigidbody";
+    int numParticleTypes = 1;
+    double relativeDistanceCutOff = 2.2;
+    msmrdIntegrator<ctmsm> testIntegrator = msmrdIntegrator<ctmsm>(dt, 0, bodytype, numParticleTypes,
+                                                                   relativeDistanceCutOff, unboundMSM, couplingMSM);
+    // Create a particleMS list
+    vec3<double> pos1 = vec3<double>(0,0,0);
+    vec3<double> pos2 = vec3<double>(1,0,0);
+    vec3<double> pos3 = vec3<double>(3,0,0);
+    vec3<double> pos4 = vec3<double>(7,0,0);
+    quaternion<double> orientation = quaternion<double>(1,0,0,0);
+    particleMS part0 = particleMS(0, 0, 1.0, 1.0, pos1, orientation);
+    particleMS part1 = particleMS(0, 0, 1.0, 1.0, pos2, orientation);
+    particleMS part2 = particleMS(0, 0, 1.0, 1.0, pos3, orientation);
+    particleMS part3 = particleMS(0, 0, 1.0, 1.0, pos4, orientation);
+    part0.boundTo = 1;
+    part1.boundTo = 0;
+    part2.boundTo = -1;
+    part3.boundTo = -1;
+    std::vector<particleMS> partMSList = {part0, part1, part2, part3};
+
+    // Add events to list
+    testIntegrator.eventMgr.addEvent(std::numeric_limits<double>::infinity(), -1, -1, -1, -1, "empty");
+    testIntegrator.eventMgr.addEvent(0.5, 0, 1, 0, 2, "in");
+    testIntegrator.eventMgr.addEvent(0.777, 0, 2, 0, 3, "in");
+    testIntegrator.eventMgr.addEvent(1.0, 2, 3, -1, 2, "in");
+    // Check integrity of list
+    REQUIRE(testIntegrator.eventMgr.eventDictionary.size() == 4);
+    // Cehck integrity of list after deleting unwanted events
+    testIntegrator.removeUnrealizedEvents(partMSList);
+    REQUIRE(testIntegrator.eventMgr.eventDictionary.size() == 2);
+    std::string event1Key = "0--1";
+    std::string event2Key = "0--2";
+    auto search1 = testIntegrator.eventMgr.eventDictionary.find(event1Key);
+    auto search2 = testIntegrator.eventMgr.eventDictionary.find(event2Key);
+    REQUIRE(search1 != testIntegrator.eventMgr.eventDictionary.end());
+    REQUIRE(search2 != testIntegrator.eventMgr.eventDictionary.end());
+    auto time1 = search1->second.waitTime;
+    auto time2 = search2->second.waitTime;
+    REQUIRE(time1 == 0.5);
+    REQUIRE(time2 == 0.777);
 }
