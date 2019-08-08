@@ -51,7 +51,7 @@ boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
 boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
 
 # Create empty files to save the data in parallel algorithm
-filename = '../data/dimer/first_passage_times/MSMRDpatchyDimerFPTs_test_trajs' + str(numTrajectories) + \
+filename = '../../data/dimer/first_passage_times/MSMRDpatchyDimerFPTs_2bound_trajs' + str(numTrajectories) + \
            '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
 def MSMRDsimulationFPT(trajectorynum):
@@ -70,7 +70,7 @@ def MSMRDsimulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../examples/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../examples/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     rateDictionary = pickle.load(pickle_in)
 

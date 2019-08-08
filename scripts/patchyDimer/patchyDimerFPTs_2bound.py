@@ -37,7 +37,7 @@ boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
 boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
 
 # Create empty files to save the data in parallel algorithm
-filename = '../data/dimer/first_passage_times/patchyDimerFPTs_trajs' + str(numTrajectories) \
+filename = '../../data/dimer/first_passage_times/patchyDimerFPTs_2bound_trajs' + str(numTrajectories) \
            +'_boxsize' + str(boxsize) + '.xyz'
 
 def simulationFPT(trajectorynum):
