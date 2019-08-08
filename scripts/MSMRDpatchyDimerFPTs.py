@@ -8,6 +8,13 @@ from msmrd2.markovModels import msmrdMarkovStateModel as msmrdMSM
 from msmrd2.integrators import msmrdIntegrator
 import msmrd2.tools.particleTools as particleTools
 
+'''
+Creates an MSM/RD simulation of two particle that calculates first passage times (FPTs) from a random 
+unbound configuration to either of the two bound states (A or B). This requires as input a rate dictionary 
+calculated from an MSM of an MD simulation (the rate dictionary is loaded using pickle). The data is 
+written to '../data/dimer/first_passage_times/MSMRDfilename_here.
+'''
+
 # Main parameters for particle and integrator
 numParticles = 2
 partTypes = 0
@@ -15,7 +22,7 @@ dt = 0.0001 #0.002 # should be smaller than Gillespie inverse transition rates
 bodytype = 'rigidbody'
 numBoundStates = 8
 maxNumBoundStates = 10
-relativeDistanceCutOff = 2.8 #2.2
+relativeDistanceCutOff = 2.2 #2.2
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
 # Other important parameters
@@ -44,7 +51,7 @@ boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
 boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
 
 # Create empty files to save the data in parallel algorithm
-filename = '../data/dimer/first_passage_times/MSMRDpatchyDimerFPTs_testRUPPER_trajs' + str(numTrajectories) + \
+filename = '../data/dimer/first_passage_times/MSMRDpatchyDimerFPTs_test_trajs' + str(numTrajectories) + \
            '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
 def MSMRDsimulationFPT(trajectorynum):
@@ -63,7 +70,7 @@ def MSMRDsimulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../examples/pickled_data/ratedictionary_testRUPPER_dimer_t2.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../examples/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     rateDictionary = pickle.load(pickle_in)
 

@@ -6,6 +6,11 @@ import msmrd2.tools.particleTools as particleTools
 import multiprocessing
 from multiprocessing import Pool
 
+'''
+Creates an MD simulation of two particle and calculates their first passage times (FPTs) from a random 
+unbound configuration to either of the two bound states (A or B). The data is written to 
+'../data/dimer/first_passage_times/filename_here.
+'''
 
 # Main parameters for particle and integrator
 numparticles = 2
