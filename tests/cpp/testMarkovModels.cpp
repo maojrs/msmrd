@@ -69,7 +69,7 @@ TEST_CASE("Initialization of dictionary in msmrdMarkovModel class", "[msmrdMarko
     bool correctEndState = endState == 1 || endState == 2;
     REQUIRE(correctEndState);
     // Check transitions to unbound states
-    auto transition2 = myMSM.computeTransition2UnboundState(1);
+    auto transition2 = myMSM.computeTransitionFromBoundState(1);
     auto time2 = std::get<0>(transition);
     auto endState2 = std::get<1>(transition);
     REQUIRE(time2 > 0);

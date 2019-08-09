@@ -31,9 +31,9 @@ namespace msmrd {
                 .def(py::init<unsigned int &, unsigned int &, long &, std::map<std::string, float> &>())
                 .def("getRate", &msmrdMSM::getRate)
                 .def("computeTransition2BoundState", &msmrdMSM::computeTransition2BoundState)
-                .def("computeTransition2UnboundState", &msmrdMSM::computeTransition2UnboundState)
+                .def("computeTransitionFromoundState", &msmrdMSM::computeTransitionFromBoundState)
                 .def("setDbound", &msmrdMSM::setDbound)
-                .def("setmaxNumberBoundStates", &msmrdMSM::setmaxNumberBoundStates);
+                .def("setMaxNumberBoundStates", &msmrdMSM::setMaxNumberBoundStates);
     }
 
 }

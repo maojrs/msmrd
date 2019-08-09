@@ -49,10 +49,10 @@ namespace msmrd {
         }
     }
 
-    /* Computes possible transitions from bound states to transition states and saves them in the event manager.
-     * Used by integrate function. */
+    /* Computes possible transitions from bound states to other bound states or transition states
+     * and saves them in the event manager. Used by integrate function. */
     template<>
-    void msmrdIntegrator<ctmsm>::computeTransitions2UnboundStates(std::vector<particleMS> &parts) {
+    void msmrdIntegrator<ctmsm>::computeTransitionsFromBoundStates(std::vector<particleMS> &parts) {
         double transitionTime;
         int nextState;
         std::tuple<double, int> transition;
@@ -60,41 +60,24 @@ namespace msmrd {
             // Only compute transition if particle is bound to another particle.
             // If particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
             if (parts[i].boundTo > i) {
-                /* Only compute transition if particles drifted into bound state for
+                /* Only compute transition if particles drifted into a given bound state for
                  * the first time, i.e. empty event */
                 auto previousEvent = eventMgr.getEvent(i, parts[i].boundTo);
                 if (previousEvent.inORout == "empty") {
-                    transition = markovModel.computeTransition2UnboundState(parts[i].state);
+                    transition = markovModel.computeTransitionFromBoundState(parts[i].state);
                     transitionTime = std::get<0>(transition);
                     nextState = std::get<1>(transition);
-                    eventMgr.addEvent(transitionTime, i, parts[i].boundTo, parts[i].state, nextState, "out");
+                    // Distinguish between events within bound states (inside) and unbinding events (out)
+                    if (nextState <= markovModel.getMaxNumberBoundStates()) {
+                        eventMgr.addEvent(transitionTime, i, parts[i].boundTo, parts[i].state, nextState, "inside");
+                    } else {
+                        eventMgr.addEvent(transitionTime, i, parts[i].boundTo, parts[i].state, nextState, "out");
+                    }
                 }
             }
         }
     }
-
-    /* Computes possible transitions from bound states to other bound states and saves them in the event manager.
-     * Used by integrate function. */
-    template<>
-    void msmrdIntegrator<ctmsm>::computeTransitionsBetweenBoundStates(std::vector<particleMS> &parts) {
-        double transitionTime;
-        int nextState;
-        std::tuple<double, int> transition;
-        for (int i = 0; i < parts.size(); i++) {
-            // Check if particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
-            if (parts[i].boundTo > i) {
-                auto previousEvent = eventMgr.getEvent(i, parts[i].boundTo);
-                /* Only compute transition if particles drifted into new bound state for
-                 * the first time, i.e. empty event */
-                if (previousEvent.inORout == "empty") {
-                    transition = markovModel.computeTransitionBetweenBoundStates(parts[i].state);
-                    transitionTime = std::get<0>(transition);
-                    nextState = std::get<1>(transition);
-                    eventMgr.addEvent(transitionTime, i, parts[i].boundTo, parts[i].state, nextState, "inside");
-                }
-            }
-        }
-    }
+    
 
     /* Makes particles with indexes iIndex and jIndex in the particle list transition to a bound state. Note
      * always iIndex < jIndex should hold. Also particle with smaller index is the one that remains active
@@ -132,8 +115,12 @@ namespace msmrd {
     template<>
     void msmrdIntegrator<ctmsm>::transition2UnboundState(std::vector<particleMS> &parts, int iIndex,
                                                        int jIndex, int endState) {
+
         int iNewState;
         int jNewState;
+        // Redefine endstate indexing, so it is understood by the partition/discretization.
+        int maxNumberBoundStates = markovModel.getMaxNumberBoundStates();
+        endState = endState - maxNumberBoundStates;
         // Eliminate pair connection by resetting to default value -1 and activate particles.
         parts[iIndex].boundTo = -1;
         parts[jIndex].boundTo = -1;
@@ -280,8 +267,7 @@ namespace msmrd {
          * list happen first) */
         removeUnrealizedEvents(parts);
         computeTransitions2BoundStates(parts);
-        computeTransitions2UnboundStates(parts);
-        computeTransitionsBetweenBoundStates(parts);
+        computeTransitionsFromBoundStates(parts);
 
 
         // Advance global time and in event manager (make events in [t,t+dt) happen)

@@ -168,7 +168,7 @@ def MSMRDsimulationFPT(trajectorynum):
     seed = int(-3*trajectorynum) # Negative seed, uses random device as seed
     couplingMSM = msmrdMSM(numBoundStates, numTransitionsStates, seed, rateDictionary)
     couplingMSM.setDbound(Dbound, DboundRot)
-    couplingMSM.setmaxNumberBoundStates(maxNumBoundStates)
+    couplingMSM.setMaxNumberBoundStates(maxNumBoundStates)
 
     # Define integrator, boundary and discretization
     seed = -int(1*trajectorynum) # Negative seed, uses random device as seed

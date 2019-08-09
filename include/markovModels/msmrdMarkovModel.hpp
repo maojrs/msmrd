@@ -55,15 +55,17 @@ namespace msmrd {
 
         std::tuple<double, int> computeTransition2BoundState(int transitionState);
 
-        std::tuple<double, int> computeTransition2UnboundState(int boundState);
-
-        std::tuple<double, int> computeTransitionBetweenBoundStates(int boundState);
+        std::tuple<double, int> computeTransitionFromBoundState(int boundState);
 
 
         float getRate(std::string key);
 
-        void setmaxNumberBoundStates(unsigned int newIndex) {
+        void setMaxNumberBoundStates(unsigned int newIndex) {
             maxNumberBoundStates = newIndex;
+        }
+
+        unsigned int getMaxNumberBoundStates() {
+            return maxNumberBoundStates;
         }
 
         unsigned int getStartIndexTransitionRates() {

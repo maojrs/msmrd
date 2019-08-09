@@ -67,9 +67,11 @@ namespace msmrd {
 
         void computeTransitions2BoundStates(std::vector<particleMS> &parts);
 
-        void computeTransitions2UnboundStates(std::vector<particleMS> &parts);
+        void computeTransitionsFromBoundStates(std::vector<particleMS> &parts);
 
-        void computeTransitionsBetweenBoundStates(std::vector<particleMS> &parts);
+//        void computeTransitions2UnboundStates(std::vector<particleMS> &parts);
+//
+//        void computeTransitionsBetweenBoundStates(std::vector<particleMS> &parts);
 
         void removeUnrealizedEvents(std::vector<particleMS> &parts);
 

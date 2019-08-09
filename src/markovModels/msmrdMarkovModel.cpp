@@ -59,19 +59,24 @@ namespace msmrd{
 
 
     /* Computes transition time and end state starting from a given bound state. The end states correspond
-     * to one of the transition states (indexing of bound states begins in 1)*/
-    std::tuple<double, int> msmrdMarkovStateModel::computeTransition2UnboundState(int boundState) {
-        std::vector<float> rates(numTransitionStates);
+     * to either another bound state or a transition state (indexing of bound states begins in 1)*/
+    std::tuple<double, int> msmrdMarkovStateModel::computeTransitionFromBoundState(int boundState) {
+        std::vector<float> rates(maxNumberBoundStates + numTransitionStates);
         double transitionTime;
         int index0 = maxNumberBoundStates;
         int endState = 0;
 
-        // Get rates to all transition states from dictionary
+        // Get rates to all bound states from dictionary
         std::string key;
-        for (int i = 0; i < numTransitionStates; i++) {
-            key = "b" + std::to_string(boundState) + "->" + std::to_string(index0 + i + 1);
+        for (int i = 0; i < maxNumberBoundStates; i++) {
+            key = "b" + std::to_string(boundState) + "->" + "b" + std::to_string(i + 1);
             rates[i] = getRate(key);
         }
+        // Get rates to all transition states from dictionary
+        for (int i = 0; i < numTransitionStates; i++) {
+            key = "b" + std::to_string(boundState) + "->" + std::to_string(index0 + i + 1);
+            rates[index0 + i] = getRate(key);
+        }
 
         // Calculate lambda0  and ratescumsum for SSA/Gillespie algorithm
         double lambda0 = 0;
@@ -86,59 +91,15 @@ namespace msmrd{
         // Calculate end state
         double r2lam0 = randg.uniformRange(0, 1)*lambda0;
         double cumsum = 0;
-        for (int i=0; i< numTransitionStates; i++){
+        for (int i=0; i < maxNumberBoundStates + numTransitionStates; i++){
             cumsum += rates[i];
             if (r2lam0 <= cumsum) {
-                endState = i + 1; // Index0 is not necessary, since endstate is assumed to be a transition state
+                endState = i + 1;
                 break;
             }
         }
-
         return std::make_tuple(transitionTime, endState);
     }
-
-    /* Computes transition time and end state starting from a given bound state. The end states correspond
-     * to one of the transition states (indexing of bound states begins in 1)*/
-    std::tuple<double, int> msmrdMarkovStateModel::computeTransitionBetweenBoundStates(int boundState) {
-        std::vector<float> rates(numBoundStates);
-        double transitionTime;
-        int endState = 0;
-
-        // Get rates to all transition states from dictionary
-        std::string key;
-        for (int i = 0; i < numBoundStates; i++) {
-            if (i != boundState -1) {
-                key = "b" + std::to_string(boundState) + "->b" + std::to_string(i + 1);
-                rates[i] = getRate(key);
-            }
-            else {
-                // Set self rate to zero
-                rates[i] = 0.0;
-            }
-        }
-
-        // Calculate lambda0  and ratescumsum for SSA/Gillespie algorithm
-        double lambda0 = 0;
-        for(const auto& rate: rates) {
-            lambda0 += rate;
-        }
-
-        // Calculate time for transition
-        double r1 = randg.uniformRange(0, 1);
-        transitionTime = std::log(1.0/r1)/lambda0;
-
-        // Calculate end state
-        double r2lam0 = randg.uniformRange(0, 1)*lambda0;
-        double cumsum = 0;
-        for (int i=0; i< numBoundStates; i++){
-            cumsum += rates[i];
-            if (r2lam0 <= cumsum) {
-                endState = i+1;
-                break;
-            }
-        }
-        return std::make_tuple(transitionTime, endState);
-    };
 
 
 
