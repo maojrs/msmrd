@@ -58,16 +58,16 @@ namespace msmrd {
         std::tuple<double, int> transition;
         for (int i = 0; i < parts.size(); i++) {
             // Only compute transition if particle is bound to another particle.
+            // If particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
             if (parts[i].boundTo > i) {
                 /* Only compute transition if particles drifted into bound state for
                  * the first time, i.e. empty event */
                 auto previousEvent = eventMgr.getEvent(i, parts[i].boundTo);
                 if (previousEvent.inORout == "empty") {
-                    // Check if particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
-                        transition = markovModel.computeTransition2UnboundState(parts[i].state);
-                        transitionTime = std::get<0>(transition);
-                        nextState = std::get<1>(transition);
-                        eventMgr.addEvent(transitionTime, i, parts[i].boundTo, parts[i].state, nextState, "out");
+                    transition = markovModel.computeTransition2UnboundState(parts[i].state);
+                    transitionTime = std::get<0>(transition);
+                    nextState = std::get<1>(transition);
+                    eventMgr.addEvent(transitionTime, i, parts[i].boundTo, parts[i].state, nextState, "out");
                 }
             }
         }

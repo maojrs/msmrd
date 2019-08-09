@@ -70,7 +70,8 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
     :return: random particle list corresponding to either state A or state B.
     '''
 
-    # Transform boxsize and type to vector if neccesarry.
+    # Transform boxsize and type to vector if neccesary.
+    boxsize = boxsize - 1 # to ensure the whole compund is initially inside box (1 is the norm of relpos below)
     if np.isscalar(boxsize):
         boxsize = np.array([boxsize, boxsize, boxsize])
 
@@ -84,10 +85,11 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
     D2 = unboundMSMs[types[1]].D[0]
     Drot2 = unboundMSMs[types[1]].Drot[0]
 
+
     position1 = np.array([0.0, 0.0, 0.0])
-    # position1 = np.array([boxsize[0]*random.random()-0.5*boxsize[0],
-    #                       boxsize[1]*random.random()-0.5*boxsize[1],
-    #                       boxsize[2]*random.random()-0.5*boxsize[2]])
+    #position1 = np.array([boxsize[0]*random.random()-0.5*boxsize[0],
+    #                    boxsize[1]*random.random()-0.5*boxsize[1],
+    #                     boxsize[2]*random.random()-0.5*boxsize[2]])
     orientation1 = np.array([1.0, 0.0, 0.0, 0.0])
     # Define relative position
     relpos1 = np.array([np.cos(angleDiff / 2.0),np.sin(angleDiff / 2.0), 0])

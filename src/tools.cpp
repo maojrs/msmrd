@@ -76,7 +76,7 @@ namespace msmrdtools {
         return relangle.norm();
     }
 
-    // Calculates relative distance (p2-p1) of two vectors (p1, p2) in a periodic box, returns realtive distance.
+    // Calculates relative distance (p2-p1) of two vectors (p1, p2) in a periodic box, returns relative distance.
     vec3<double> distancePeriodicBox(vec3<double> p1, vec3<double> p2, vec3<double> edgeslength) {
         vec3<double> p1Periodic = 1.0*p1;
         // Loop over three coordinates (x,y,z)

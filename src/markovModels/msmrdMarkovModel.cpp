@@ -89,7 +89,7 @@ namespace msmrd{
         for (int i=0; i< numTransitionStates; i++){
             cumsum += rates[i];
             if (r2lam0 <= cumsum) {
-                endState = i+1;
+                endState = i + 1; // Index0 is not necessary, since endstate is assumed to be a transition state
                 break;
             }
         }

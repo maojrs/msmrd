@@ -54,13 +54,14 @@ def generateParticleList(state, boxsize, D, Drot, randomSeed = -1):
     '''
 
     # Transform boxsize to vector if neccesarry.
+    boxsize = boxsize - 1 # to ensure the whole compund is initially inside box (1 is the norm of relpos below)
     if np.isscalar(boxsize):
         boxsize = np.array([boxsize, boxsize, boxsize])
 
     position1 = np.array([0.0, 0.0, 0.0])
-    # position1 = np.array([boxsize[0]*random.random()-0.5*boxsize[0],
-    #                       boxsize[1]*random.random()-0.5*boxsize[1],
-    #                       boxsize[2]*random.random()-0.5*boxsize[2]])
+    #position1 = np.array([boxsize[0]*random.random()-0.5*boxsize[0],
+    #                      boxsize[1]*random.random()-0.5*boxsize[1],
+    #                      boxsize[2]*random.random()-0.5*boxsize[2]])
     orientation1 = np.array([1.0, 0.0, 0.0, 0.0])
     # Define relative position
     relpos1 = np.array([np.cos(angleDiff / 2.0),np.sin(angleDiff / 2.0), 0])
