@@ -18,9 +18,9 @@ dt = 0.0001 #0.00001 #0.000005
 bodytype = 'rigidbody'
 D = 1.0
 Drot = 1.0
-initialState = 'A'
+initialState = 'B'
 relativeDistanceCutOff = 2.2
-numTrajectories = 1000
+numTrajectories = 10000
 # Other important parameters
 boxsize = 6
 

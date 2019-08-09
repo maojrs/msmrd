@@ -21,12 +21,12 @@ numParticles = 2
 partTypes = 0
 dt = 0.0001 #0.002 # should be smaller than Gillespie inverse transition rates
 bodytype = 'rigidbody'
-initialState = 'A'
+initialState = 'B'
 numBoundStates = 8
 maxNumBoundStates = 10
 relativeDistanceCutOff = 2.2 #2.2
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
-numTrajectories = 1000
+numTrajectories = 10000
 # Other important parameters
 lagtime = 600
 boxsize = 6
@@ -63,7 +63,8 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
     state has several different configurations, this functions picks one randomly. The definition of the
     states is taken form patchyDimer.cpp
     :param state: bound state in which the two particle list should be in, A or B
-    :param D and Drot: diffusion coefficients of particles.
+    :param boxsize: size of simulation box, if scalar it assumes the three box edges are the same in all dimensions
+    :param unboundMSMs: list of unboundMSM, needed to extract diffusion coefficients of particles.
     :param randomSeed: seed for python random generator. Important to specify in parallel runs. Default value of -1
     will use the default seed.
     :return: random particle list corresponding to either state A or state B.
@@ -72,6 +73,7 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
     # Transform boxsize and type to vector if neccesarry.
     if np.isscalar(boxsize):
         boxsize = np.array([boxsize, boxsize, boxsize])
+
     if np.isscalar(types):
         newtypes = np.ones(2, dtype = 'int')
         types = (types*newtypes).astype(int)
@@ -113,6 +115,7 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
     pos2[4:8] = [position1 + relpos2]*4
 
     # Assign position and orientation depending on initial state A or B
+    substate = 0
     if state == 'A':
         substate = random.choice([1,2,5,6])
         position2 = pos2[substate - 1]
@@ -121,8 +124,8 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
         substate = random.choice([3,4,7,8])
         position2 = pos2[substate - 1]
         orientation2 = quatRotations[substate - 1]
-    part1 = msmrd2.particleMS(types[0], 0, D1, Drot1, position1, orientation1)
-    part2 = msmrd2.particleMS(types[1], 0, D2, Drot2, position2, orientation2)
+    part1 = msmrd2.particleMS(types[0], substate, D1, Drot1, position1, orientation1)
+    part2 = msmrd2.particleMS(types[1], substate, D2, Drot2, position2, orientation2)
     part1.setBoundTo(1)
     part2.setBoundTo(0)
     part1.deactivateMSM()
@@ -180,7 +183,8 @@ def MSMRDsimulationFPT(trajectorynum):
     bound = True
     while(bound):
         integrator.integrate(partlist)
-        boundState = dummyTraj.getState(partlist[0], partlist[1])
+        #currentState = partlist[0].state
+        currentState = dummyTraj.getState(partlist[0], partlist[1])
         if currentState == 0:
             bound = False
             return initialState, integrator.clock
