@@ -179,7 +179,7 @@ namespace msmrd {
             parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
         }
 
-        // Calculate new relative positions and orientations
+        // Calculate new relative positions and orientations by sampling uniformly in shell section
         auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
 
         // Set next positions and orientations based on the relative ones (parts[iIndex] keeps track of position)
