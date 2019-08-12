@@ -67,11 +67,11 @@ def MSMRDsimulationFPT(trajectorynum):
     discretization = msmrd2.discretizations.positionOrientationPartition(relativeDistanceCutOff,
                                             numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat)
 
-    # Define boundary
+    # Define boundaryk
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../examples/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     rateDictionary = pickle.load(pickle_in)
 
