@@ -69,12 +69,12 @@ namespace msmrd{
         // Get rates to all bound states from dictionary
         std::string key;
         for (int i = 0; i < maxNumberBoundStates; i++) {
-            key = "b" + std::to_string(boundState) + "->" + "b" + std::to_string(i + 1);
-            rates[i] = getRate(key);
+            key = "b" + std::to_string(boundState) + "->b" + std::to_string(i + 1);
+            rates[i] = getRate(key); // non-existent keys yield rate zero
         }
         // Get rates to all transition states from dictionary
         for (int i = 0; i < numTransitionStates; i++) {
-            key = "b" + std::to_string(boundState) + "->" + std::to_string(index0 + i + 1);
+            key = "b" + std::to_string(boundState) + "->" + std::to_string(i + 1); //index0 not required here
             rates[index0 + i] = getRate(key);
         }
 

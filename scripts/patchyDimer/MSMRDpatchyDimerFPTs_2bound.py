@@ -22,7 +22,8 @@ dt = 0.0001 #0.002 # should be smaller than Gillespie inverse transition rates
 bodytype = 'rigidbody'
 numBoundStates = 8
 maxNumBoundStates = 10
-relativeDistanceCutOff = 2.2 #2.2
+radialBounds = [1.4, 2.2] #2.2
+relativeDistanceCutOff = radialBounds[1]
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
 # Other important parameters
@@ -88,7 +89,7 @@ def MSMRDsimulationFPT(trajectorynum):
 
     # Define integrator, boundary and discretization
     seed = -int(1*trajectorynum) # Negative seed, uses random device as seed
-    integrator = msmrdIntegrator(dt, seed, bodytype, numParticleTypes, relativeDistanceCutOff, unboundMSM, couplingMSM)
+    integrator = msmrdIntegrator(dt, seed, bodytype, numParticleTypes, radialBounds, unboundMSM, couplingMSM)
     integrator.setBoundary(boxBoundary)
     integrator.setDiscretization(discretization)
 

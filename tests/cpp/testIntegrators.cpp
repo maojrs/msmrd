@@ -34,9 +34,9 @@ TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
     double dt = 0.05;
     std::string bodytype = "rigidbody";
     int numParticleTypes = 1;
-    double relativeDistanceCutOff = 2.2;
+    std::array<double,2> radialBounds = {1.4, 2.2};
     msmrdIntegrator<ctmsm> testIntegrator = msmrdIntegrator<ctmsm>(dt, 0, bodytype, numParticleTypes,
-            relativeDistanceCutOff, unboundMSM, couplingMSM);
+                                                                   radialBounds, unboundMSM, couplingMSM);
 
     // Test rate dictionary is correctly loaded from couplingMSM into integrator
     REQUIRE(testIntegrator.getRateFromKey("1->b1") == 5.0);
@@ -60,7 +60,7 @@ TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
     int numSphericalSectionsPos = 6;
     int numRadialSectionsQuat = 4;
     int numSphericalSectionsQuat = 5;
-    positionOrientationPartition newPartition = positionOrientationPartition(relativeDistanceCutOff, numSphericalSectionsPos,
+    positionOrientationPartition newPartition = positionOrientationPartition(radialBounds[1], numSphericalSectionsPos,
                                                      numRadialSectionsQuat, numSphericalSectionsQuat);
     testIntegrator.setDiscretization(&newPartition);
     numSections = testIntegrator.positionOrientationPart->getNumSections();
@@ -124,9 +124,9 @@ TEST_CASE("Remove unrealized events function from msmrdIntegrator", "[msmrdInteg
     double dt = 0.05;
     std::string bodytype = "rigidbody";
     int numParticleTypes = 1;
-    double relativeDistanceCutOff = 2.2;
+    std::array<double,2> radialBounds = {1.4, 2.2};
     msmrdIntegrator<ctmsm> testIntegrator = msmrdIntegrator<ctmsm>(dt, 0, bodytype, numParticleTypes,
-                                                                   relativeDistanceCutOff, unboundMSM, couplingMSM);
+                                                                   radialBounds, unboundMSM, couplingMSM);
     // Create a particleMS list
     vec3<double> pos1 = vec3<double>(0,0,0);
     vec3<double> pos2 = vec3<double>(1,0,0);

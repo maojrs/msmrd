@@ -23,7 +23,7 @@ namespace msmrd {
     template <typename templateMSM>
     class msmrdIntegrator : public overdampedLangevinMarkovSwitch<templateMSM> {
     private:
-        double relativeDistanceCutOff;
+        std::array<double,2> radialBounds;
         int numParticleTypes;
         bool firstrun = true;
     public:
@@ -33,9 +33,14 @@ namespace msmrd {
         fullPartition *positionOrientationPart;
 
         /**
-        * @param relativeDistanceCutOff radial cut off that define distance at which MSM/RD coupling is activated. This
-        * parameter has to be consistent with the relative distance cut off used to obtain the discrete trajectories
-        * (see patchyDimer trajectory for example).
+        * @param radialBounds radial lower bound and upper bound of transition region in MSM/RD scheme. It MUST
+        * match the parameters used in discretization to obtain the MSM and the rateDictionary (see patchyDimer
+        * trajectory for example). If relative distance is smaller than lower radial bound (radialBound[0]), we
+        * are on the bound states region where. Between the bounds radialBound[0] and radialBound[1] the discretization
+        * defines the transition states region. If the relative distance is larger than the upper radial bound
+        * radialBound[1], then MSM/RD is completely desactivated and the dynamics are independent. The upper radial
+        * bound radialBound[1], corresponds to the relativeDistanceCutOff in other sections of the code.
+        * the discretization used coreMSM
         * @param numParticleTypes define the number of particle types in the unbound states in the
         * simulation (usually 1 or 2).
         * @param eventManager class to manage order of events (reactions/transitions).
@@ -51,10 +56,10 @@ namespace msmrd {
         * per particle type. Size 1 is also acceptable, which assumes all aprticles share the same MSM.
         */
         msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                        double relativeDistanceCutOff, std::vector<templateMSM> MSMlist, msmrdMSM markovModel);
+                        std::array<double,2> radialBound, std::vector<templateMSM> MSMlist, msmrdMSM markovModel);
 
         msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                        double relativeDistanceCutOff, templateMSM MSMlist, msmrdMSM markovModel);
+                        std::array<double,2> radialBound, templateMSM MSMlist, msmrdMSM markovModel);
 
         // Redefine integrate function
         void integrate(std::vector<particleMS> &parts);
@@ -93,10 +98,10 @@ namespace msmrd {
      */
     template <typename templateMSM>
     msmrdIntegrator<templateMSM>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
-                                            int numParticleTypes, double relativeDistanceCutOff,
+                                            int numParticleTypes, std::array<double,2> radialBounds,
                                             std::vector<templateMSM> MSMlist, msmrdMSM markovModel) :
             overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
-            numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff) {
+            numParticleTypes(numParticleTypes), radialBounds(radialBounds) {
 
         setDefaultDiscretization();
 
@@ -109,10 +114,10 @@ namespace msmrd {
 
     template <typename templateMSM>
     msmrdIntegrator<templateMSM>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
-                                            int numParticleTypes, double relativeDistanceCutOff,
+                                            int numParticleTypes, std::array<double,2> radialBounds,
                                                   templateMSM MSMlist, msmrdMSM markovModel) :
             overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
-            numParticleTypes(numParticleTypes), relativeDistanceCutOff(relativeDistanceCutOff) {
+            numParticleTypes(numParticleTypes), radialBounds(radialBounds) {
 
         setDefaultDiscretization();
 
@@ -126,6 +131,7 @@ namespace msmrd {
         int numSphericalSectionsPos = 7;
         int numRadialSectionsQuat = 5;
         int numSphericalSectionsQuat = 7;
+        double relativeDistanceCutOff = radialBounds[1];
         positionPart = new spherePartition(numSphericalSectionsPos);
         positionOrientationPart = new fullPartition(relativeDistanceCutOff, numSphericalSectionsPos,
                                                     numRadialSectionsQuat, numSphericalSectionsQuat);

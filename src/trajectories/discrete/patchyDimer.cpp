@@ -221,7 +221,7 @@ namespace msmrd {
             return -1; // returns -1 when not in bound state but in r<radialLowerBound, so CoreMSM is later applied.
         }
         // Returns transition state
-        else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
+        else if (relativePosition.norm() < radialUpperBound) {
             // Get corresponding section numbers from spherical partition to classify its state
             secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, quatReference);
             return maxNumberBoundStates + secNum;

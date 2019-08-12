@@ -33,7 +33,7 @@ namespace msmrd {
                                                                               "numParticleTypes, relativeDistanceCutOff,"
                                                                               "MSMlist, mainMarkovModel, "
                                                                               "positionOrientationPartition)")
-                .def(py::init<double &, long &, std::string &, int &, double &, ctmsm &, msmrdMSM &>())
+                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, ctmsm &, msmrdMSM &>())
                 .def("getRateFromKey", &msmrdIntegrator<ctmsm>::getRateFromKey)
                 .def("setDiscretization", &msmrdIntegrator<ctmsm>::setDiscretization)
                 .def("integrate", &msmrdIntegrator<ctmsm>::integrate);

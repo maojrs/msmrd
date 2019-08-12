@@ -22,27 +22,29 @@ namespace msmrd {
         int nextState;
         for (int i = 0; i < parts.size(); i++) {
             for (int j = i + 1; j < parts.size(); j++) {
-                /* Only compute new transition if particles drifted into transition region for
-                 * the first time, i.e. empty event */
-                auto previousEvent = eventMgr.getEvent(i, j);
-                if (previousEvent.inORout == "empty") {
-                    // Need special function to calculate relative position, in case we use a periodic boundary.
-                    relativePosition = calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition);
-                    if (relativePosition.norm() < relativeDistanceCutOff) {
-                        if (rotation) {
-                            relativeOrientation = parts[i].nextOrientation.conj() * parts[j].nextOrientation;
-                            refQuaternion = parts[i].nextOrientation.conj();
-                            currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
-                                                                                               relativeOrientation,
-                                                                                               refQuaternion);
-                        } else {
-                            currentTransitionState = positionPart->getSectionNumber(relativePosition);
+                // Only compute transitions if particles are in unbound state.
+                if (parts[i].boundTo == -1 and parts[j].boundTo == -1) {
+                    /* Only compute new transition if particles drifted into transition region for
+                     * the first time, i.e. empty event */
+                    auto previousEvent = eventMgr.getEvent(i, j);
+                    if (previousEvent.inORout == "empty") {
+                        // Need special function to calculate relative position, in case we use a periodic boundary.
+                        relativePosition = calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition);
+                        if (relativePosition.norm() < radialBounds[1]) {
+                            if (rotation) {
+                                relativeOrientation = parts[i].nextOrientation.conj() * parts[j].nextOrientation;
+                                refQuaternion = parts[i].nextOrientation.conj();
+                                currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
+                                                                                                   relativeOrientation,
+                                                                                                   refQuaternion);
+                            } else {
+                                currentTransitionState = positionPart->getSectionNumber(relativePosition);
+                            }
+                            auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
+                            transitionTime = std::get<0>(transition);
+                            nextState = std::get<1>(transition);
+                            eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState, "in");
                         }
-                        auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
-                        transitionTime = std::get<0>(transition);
-                        nextState = std::get<1>(transition);
-                        eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState, "in");
-
                     }
                 }
             }
@@ -58,9 +60,9 @@ namespace msmrd {
         std::tuple<double, int> transition;
         for (int i = 0; i < parts.size(); i++) {
             // Only compute transition if particle is bound to another particle.
-            // If particle[i] is bound (boundTo > 0); if bound pairs are only counted once (boundTo > i)
+            // If particle[i] is bound, boundTo > 0; if bound pairs are only to be counted once, then boundTo > i
             if (parts[i].boundTo > i) {
-                /* Only compute transition if particles drifted into a given bound state for
+                /* Only compute transition if particles swiched into a given bound state for
                  * the first time, i.e. empty event */
                 auto previousEvent = eventMgr.getEvent(i, parts[i].boundTo);
                 if (previousEvent.inORout == "empty") {
@@ -77,7 +79,7 @@ namespace msmrd {
             }
         }
     }
-    
+
 
     /* Makes particles with indexes iIndex and jIndex in the particle list transition to a bound state. Note
      * always iIndex < jIndex should hold. Also particle with smaller index is the one that remains active
@@ -178,7 +180,7 @@ namespace msmrd {
         }
 
         // Calculate new relative positions and orientations
-        auto relPosition = relativeDistanceCutOff * randg.uniformSphereSection(phiInterval, thetaInterval);
+        auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
 
         // Set next positions and orientations based on the relative ones (parts[iIndex] keeps track of position)
         parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
@@ -186,7 +188,7 @@ namespace msmrd {
     }
 
 
-    /* Transitions already bound particles with indexes iIndex and jIndex in the particle list
+    /* Transitions of already bound particles with indexes iIndex and jIndex in the particle list
      * to another bound state. */
     template<>
     void msmrdIntegrator<ctmsm>::transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex,
@@ -199,7 +201,7 @@ namespace msmrd {
     }
 
 
-    /* Removes unrealized events where unbound particles drifted a distance apart beyond the relativeDistanceCutOff,
+    /* Removes unrealized events where unbound particles drifted a distance apart beyond the upper radial bound,
      * or when zero rates yielded infinite values. This can be more optimally included inside the
      * computeTransitions2BoundStates function. However, the code is more clear if left separate. Better left for
      * future code optimization. */
@@ -225,7 +227,7 @@ namespace msmrd {
                 relativePosition = calculateRelativePosition(parts[iIndex].nextPosition, parts[jIndex].nextPosition);
 
                 // Remove event if particles drifted apart
-                if (relativePosition.norm() >= relativeDistanceCutOff) {
+                if (relativePosition.norm() >= radialBounds[1]) {
                     //eventMgr.removeEvent(iIndex, jIndex);
                     it = eventMgr.eventDictionary.erase(it);
                     continue;
@@ -234,8 +236,6 @@ namespace msmrd {
             it++;
         }
     }
-
-
 
 
 
@@ -251,7 +251,7 @@ namespace msmrd {
         }
 
         /* Integrate only active particles and save next positions/orientations in parts[i].next***.
-         * Non-active particles will usually correspond to bound particles */
+         * Non-active particles will usually correspond to one of the particles of a bound pair of particles */
         for (int i = 0; i < parts.size(); i++) {
             if (parts[i].isActive()) {
                 if (parts[i].activeMSM) {
@@ -262,9 +262,8 @@ namespace msmrd {
             }
         }
 
-        /* Remove unrealized previous events. Also compute transitions to bound states and to unbound states and add
-         * them as new events in the event manager. Finally resort event list by descending waiting time (last in
-         * list happen first) */
+        /* Remove unrealized previous events. Also compute transitions to and from bound states and add
+         * them as new events in the event manager. */
         removeUnrealizedEvents(parts);
         computeTransitions2BoundStates(parts);
         computeTransitionsFromBoundStates(parts);
@@ -286,14 +285,14 @@ namespace msmrd {
                 auto jIndex = thisEvent.second.part2Index;
                 auto inORout = thisEvent.second.inORout;
                 // Make event happen
-                if (thisEvent.second.inORout == "in") {
+                if (inORout == "in") {
                     transition2BoundState(parts, iIndex, jIndex, endState);
                 } else if (inORout == "out") {
                     transition2UnboundState(parts, iIndex, jIndex, endState);
                 } else if (inORout == "inside") {
                     transitionBetweenBoundStates(parts, iIndex, jIndex, endState);
                 }
-                // Remove event from event list
+                // Remove event from event list once it has happened
                 eventMgr.removeEvent(iIndex, jIndex);
             }
         }

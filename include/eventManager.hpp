@@ -34,7 +34,7 @@ namespace msmrd {
          * a bound state, out of it or within bound states, repsectively.
          * @param emptyEvent defines default emptyEvent, returns event with waitTime = infinity.
          * @param eventDictionary, list of events/reaction/transitions, associated with a key corresponding to the
-         * two indexes of the particles involved, e.g. "part1Index--part2Index", or more specifically "12--2".
+         * two indexes of the particles involved, e.g. "part1Index--part2Index", or more specifically "1--2".
          */
 
         eventManager() {};

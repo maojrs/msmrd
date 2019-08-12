@@ -24,7 +24,8 @@ bodytype = 'rigidbody'
 initialState = 'B'
 numBoundStates = 8
 maxNumBoundStates = 10
-relativeDistanceCutOff = 2.2 #2.2
+radialBounds = [1.4, 2.2] #2.2
+relativeDistanceCutOff = radialBounds[1]
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
 # Other important parameters
@@ -128,10 +129,13 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
         orientation2 = quatRotations[substate - 1]
     part1 = msmrd2.particleMS(types[0], substate, D1, Drot1, position1, orientation1)
     part2 = msmrd2.particleMS(types[1], substate, D2, Drot2, position2, orientation2)
+    # Set up bound particles as if done by the code (deactivate one of them)
     part1.setBoundTo(1)
     part2.setBoundTo(0)
     part1.deactivateMSM()
     part2.deactivateMSM()
+    part2.deactivate()
+    part2.setPosition([10000000.0, 10000000.0, 10000000.0])
     partlist = msmrd2.integrators.particleMSList([part1, part2])
     return partlist
 
@@ -172,7 +176,7 @@ def MSMRDsimulationFPT(trajectorynum):
 
     # Define integrator, boundary and discretization
     seed = -int(1*trajectorynum) # Negative seed, uses random device as seed
-    integrator = msmrdIntegrator(dt, seed, bodytype, numParticleTypes, relativeDistanceCutOff, unboundMSM, couplingMSM)
+    integrator = msmrdIntegrator(dt, seed, bodytype, numParticleTypes, radialBounds, unboundMSM, couplingMSM)
     integrator.setBoundary(boxBoundary)
     integrator.setDiscretization(discretization)
 
@@ -187,7 +191,7 @@ def MSMRDsimulationFPT(trajectorynum):
         integrator.integrate(partlist)
         #currentState = partlist[0].state
         currentState = dummyTraj.getState(partlist[0], partlist[1])
-        if currentState == 0:
+        if (partlist[0].boundTo == -1) and (currentState == 0):
             bound = False
             return initialState, integrator.clock
         elif integrator.clock >= 2000.0:
