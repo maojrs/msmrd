@@ -74,10 +74,6 @@ namespace msmrd {
 
         void computeTransitionsFromBoundStates(std::vector<particleMS> &parts);
 
-//        void computeTransitions2UnboundStates(std::vector<particleMS> &parts);
-//
-//        void computeTransitionsBetweenBoundStates(std::vector<particleMS> &parts);
-
         void removeUnrealizedEvents(std::vector<particleMS> &parts);
 
         void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
@@ -85,6 +81,8 @@ namespace msmrd {
         void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
         void transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+
+        void applyEvents(std::vector<particleMS> &parts);
 
         float getRateFromKey(std::string);
 

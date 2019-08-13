@@ -241,6 +241,33 @@ namespace msmrd {
     }
 
 
+    /* Apply events in event manager that should happen during the current time step. */
+    template<>
+    void msmrdIntegrator<ctmsm>::applyEvents(std::vector<particleMS> &parts) {
+        for (auto &thisEvent : eventMgr.eventDictionary) {
+            auto transitionTime = thisEvent.second.waitTime;
+            /* Only apply events that should happen in during this
+             * timestep (they correspond to transitionTime < 0) */
+            if (transitionTime < 0) {
+                // Load event data
+                auto iIndex = thisEvent.second.part1Index;
+                auto jIndex = thisEvent.second.part2Index;
+                auto endState = thisEvent.second.endState;
+                auto eventType = thisEvent.second.eventType;
+                // Make event happen (depending on event type)
+                if (eventType == "binding") {
+                    transition2BoundState(parts, iIndex, jIndex, endState);
+                } else if (eventType == "unbinding") {
+                    transition2UnboundState(parts, iIndex, jIndex, endState);
+                } else if (eventType == "bound2boundTransition") {
+                    transitionBetweenBoundStates(parts, iIndex, jIndex, endState);
+                }
+                // Remove event from event list once it has happened
+                eventMgr.removeEvent(iIndex, jIndex);
+            }
+        }
+    }
+
 
     /* Main integrate function */
     template<>
@@ -267,40 +294,21 @@ namespace msmrd {
             }
         }
 
-        /* Remove unrealized previous events. Also compute transitions to and from bound states and add
-         * them as new events in the event manager. */
+        // Remove unrealized previous events.
         removeUnrealizedEvents(parts);
+
+        // Compute transitions to bound states (from unbound states)
         computeTransitions2BoundStates(parts);
+
+        // Compute transitions from bound states (to unbound states (transition regions) or other bound states)
         computeTransitionsFromBoundStates(parts);
 
-
-        // Advance global time and in event manager (make events in [t,t+dt) happen)
+        // Advance global time and in event manager (to make events in [t,t+dt) happen)
         clock += dt;
         eventMgr.advanceTime(dt);
 
-        // Check for events that should happen in this time step and make them happen.
-        for (auto &thisEvent : eventMgr.eventDictionary) {
-            auto transitionTime = thisEvent.second.waitTime;
-
-            // Break loop if only future events are left (eventTime>0)
-            if (transitionTime < 0) {
-                // Load event data
-                auto endState = thisEvent.second.endState;
-                auto iIndex = thisEvent.second.part1Index;
-                auto jIndex = thisEvent.second.part2Index;
-                auto eventType = thisEvent.second.eventType;
-                // Make event happen
-                if (eventType == "binding") {
-                    transition2BoundState(parts, iIndex, jIndex, endState);
-                } else if (eventType == "unbinding") {
-                    transition2UnboundState(parts, iIndex, jIndex, endState);
-                } else if (eventType == "bound2boundTransition") {
-                    transitionBetweenBoundStates(parts, iIndex, jIndex, endState);
-                }
-                // Remove event from event list once it has happened
-                eventMgr.removeEvent(iIndex, jIndex);
-            }
-        }
+        // Check for events that should happen in [t,t+dt) and make them happen.
+        applyEvents(parts);
 
         // Enforce boundary and set new positions into parts[i].nextPosition (only if particle is active).
         enforceBoundary(parts);
