@@ -30,8 +30,8 @@ trajtype = "patchyDimer"
 
 # Define patchy Particle potential with angular dependence
 sigma = 1.0
-strength = 50.0
-angularStrength = 10.0
+strength = 160.0 #50.0
+angularStrength = 20.0 #10.0
 angleDiff = 3*np.pi/5.0
 patch1 = np.array([np.cos(angleDiff/2),np.sin(angleDiff/2),0.])
 patch2 = np.array([np.cos(-angleDiff/2),np.sin(-angleDiff/2),0.])

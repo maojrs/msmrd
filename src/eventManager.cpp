@@ -36,6 +36,8 @@ namespace msmrd {
         }
     }
 
+    /* Removes event associated with particles with indexes: part1Index and part2Index. It is assumed
+     * there is only one event associated to a pair of particles and that part1Index < part2Index */
     void eventManager::removeEvent(int part1Index, int part2Index) {
         std::string eventKey = std::to_string(part1Index) + "--" + std::to_string(part2Index);
         eventDictionary.erase(eventKey);

@@ -63,7 +63,7 @@ namespace msmrd {
             // Only compute transition if particle is bound to another particle.
             // If particle[i] is bound, boundTo > 0; if bound pairs are only to be counted once, then boundTo > i
             if (parts[i].boundTo > i) {
-                /* Only compute transition if particles swiched into a given bound state for
+                /* Only compute transition if particles switched into a given bound state for
                  * the first time, i.e. empty event */
                 auto previousEvent = eventMgr.getEvent(i, parts[i].boundTo);
                 if (previousEvent.eventType == "empty") {
@@ -247,8 +247,8 @@ namespace msmrd {
         for (auto &thisEvent : eventMgr.eventDictionary) {
             auto transitionTime = thisEvent.second.waitTime;
             /* Only apply events that should happen in during this
-             * timestep (they correspond to transitionTime < dt) */
-            if (transitionTime < dt) {
+             * timestep (they correspond to transitionTime < 0) */
+            if (transitionTime < 0) {
                 // Load event data
                 auto iIndex = thisEvent.second.part1Index;
                 auto jIndex = thisEvent.second.part2Index;
@@ -280,19 +280,7 @@ namespace msmrd {
             firstrun = false;
         }
 
-        // Remove unrealized previous events (see function for detailed description).
-        removeUnrealizedEvents(parts);
-
-        // Compute transitions to bound states (from unbound states) and add them to the event manager.
-        computeTransitions2BoundStates(parts);
-
-        // Compute transitions from bound states (to unbound or other bound states) and add them to event manager.
-        computeTransitionsFromBoundStates(parts);
-
-        // Check for events in event manager that should happen during this time step [t,t+dt) and make them happen.
-        applyEvents(parts);
-
-        /* Integrate only active particles and save next positions/orientations in parts[i].next***.
+        /* Integrate only active particles and save next positions/orientations in parts[i].next.
          * Non-active particles will usually correspond to one of the particles of a bound pair of particles */
         for (int i = 0; i < parts.size(); i++) {
             if (parts[i].isActive()) {
@@ -306,6 +294,23 @@ namespace msmrd {
             }
         }
 
+        /* Advance global time and in event manager (to make events happen). Useful to draw a timeline to
+         * understand order of events. */
+        clock += dt;
+        eventMgr.advanceTime(dt);
+
+        // Remove unrealized previous events (see function for detailed description).
+        removeUnrealizedEvents(parts);
+
+        // Compute transitions to bound states (from unbound states) and add them to the event manager.
+        computeTransitions2BoundStates(parts);
+
+        // Compute transitions from bound states (to unbound or other bound states) and add them to event manager.
+        computeTransitionsFromBoundStates(parts);
+
+        // Check for events in event manager that should happen during this time step [t,t+dt) and make them happen.
+        applyEvents(parts);
+
         // Enforce boundary and set new positions into parts[i].nextPosition (only if particle is active).
         enforceBoundary(parts);
 
@@ -313,10 +318,6 @@ namespace msmrd {
          * calculated by integrator and boundary as current position/orientation). Note states
          * are modified directly and don't need to be updated. */
         updatePositionOrientation(parts);
-
-        // Advance global time and in event manager (to make events happen)
-        clock += dt;
-        eventMgr.advanceTime(dt);
 
     }
 
