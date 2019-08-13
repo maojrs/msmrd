@@ -88,10 +88,17 @@ namespace msmrd {
         template< typename PARTICLE >
         void calculatePairsForceTorques(std::vector<PARTICLE> &parts, int numParticles);
 
+        // Other functions used by most integrators, so defined here as template functions
+
+        template< typename PARTICLE >
+        void updatePositionOrientation(std::vector<PARTICLE> &parts);
+
+        template< typename PARTICLE >
+        void enforceBoundary(std::vector<PARTICLE> &parts);
+
 
     public:
         double clock;
-
 
         integrator(double dt, long seed, std::string particlesbodytype);
 
@@ -99,6 +106,7 @@ namespace msmrd {
         void integrate(std::vector<particle> &parts);
 
         vec3<double> calculateRelativePosition(vec3<double> p1, vec3<double> p2);
+
 
         // Getters and setters
         void setBoundary(boundary *bndry);
@@ -192,6 +200,34 @@ namespace msmrd {
             }
         }
     }
+
+
+    /* Update positions and orientations (sets calculated next position/orientation
+     * calculated by integrator and boundary as current position/orientation). Only
+     * updated isparticle is active. Orientation only updated if rotation is active */
+    template <typename PARTICLE>
+    void integrator::updatePositionOrientation(std::vector<PARTICLE> &parts){
+        for (int i = 0; i < parts.size(); i++) {
+            if (parts[i].isActive()) {
+                parts[i].updatePosition();
+                if (rotation) {
+                    parts[i].updateOrientation();
+                }
+            }
+        }
+    }
+
+    /* Enforces boundary; sets new positions given by boundary conditions (e.g. periodic bounary)
+     * into parts[i].nextPosition. This is only done if particle is active (which is the default
+     * value for a newly created particle) */
+    template< typename PARTICLE >
+    void integrator::enforceBoundary(std::vector<PARTICLE> &parts) {
+        for (auto &part : parts) {
+            if (part.isActive() and boundaryActive) {
+                domainBoundary->enforceBoundary(part);
+            }
+        }
+    };
 
 }
 

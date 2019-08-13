@@ -46,20 +46,13 @@ namespace msmrd {
             integrateOne(i, parts, dt);
         }
 
-        // Enforce boundary and set new positions into parts[i].nextPosition
-        for (auto &part : parts) {
-            if (boundaryActive) {
-                domainBoundary->enforceBoundary(part);
-            }
-        }
-        /* Update positions and orientations (sets calculated next position/orientation
-         * calculated by integrator and boundary as current position/orientation). */
-        for (auto &part : parts) {
-            part.updatePosition();
-            if (rotation) {
-                part.updateOrientation();
-            }
-        }
+        // Enforce boundary; sets new positions into parts[i].nextPosition (only if particle is active)
+        enforceBoundary(parts);
+
+        // Update position/orientation based on parts[i].nextPosition, parts[i].nextOrientation
+        updatePositionOrientation(parts);
+
+        // Updates time
         clock += dt;
     }
 
@@ -73,6 +66,7 @@ namespace msmrd {
             return p2 - p1;
         }
     };
+
 
     // Incorporates custom boundary into integrator
     void integrator::setBoundary(boundary *bndry) {

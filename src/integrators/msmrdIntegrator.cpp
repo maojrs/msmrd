@@ -303,23 +303,12 @@ namespace msmrd {
         }
 
         // Enforce boundary and set new positions into parts[i].nextPosition (only if particle is active).
-        for (auto &part : parts) {
-            if (part.isActive() and boundaryActive) {
-                domainBoundary->enforceBoundary(part);
-            }
-        }
+        enforceBoundary(parts);
 
         /* Update positions and orientations (sets calculated next position/orientation
          * calculated by integrator and boundary as current position/orientation). Note states
          * are modified directly and don't need to be updated. */
-        for (int i = 0; i < parts.size(); i++) {
-            if (parts[i].isActive()) {
-                parts[i].updatePosition();
-                if (rotation) {
-                    parts[i].updateOrientation();
-                }
-            }
-        }
+        updatePositionOrientation(parts);
 
     }
 

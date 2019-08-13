@@ -117,19 +117,12 @@ namespace msmrd {
             }
         }
         // Enforce boundary and set new positions into parts[i].nextPosition
-        for (int i = 0; i < parts.size(); i++) {
-            if (boundaryActive) {
-                domainBoundary->enforceBoundary(parts[i]);
-            }
-        }
+        enforceBoundary(parts);
+
         /* Update positions and orientations (sets calculated next position/orientation
          * calculated by integrator and boundary as current position/orientation). */
-        for (int i = 0; i < parts.size(); i++) {
-            parts[i].updatePosition();
-            if (rotation) {
-                parts[i].updateOrientation();
-            }
-        }
+        updatePositionOrientation(parts);
+
         clock += dt;
     }
 
