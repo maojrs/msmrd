@@ -52,7 +52,7 @@ namespace msmrd {
         }
     }
 
-    /* Computes possible transitions from bound states to other bound states or transition states
+    /* Computes possible transitions from bound states to other bound states or unbound states (transition states)
      * and saves them in the event manager. Used by integrate function. */
     template<>
     void msmrdIntegrator<ctmsm>::computeTransitionsFromBoundStates(std::vector<particleMS> &parts) {
@@ -247,8 +247,8 @@ namespace msmrd {
         for (auto &thisEvent : eventMgr.eventDictionary) {
             auto transitionTime = thisEvent.second.waitTime;
             /* Only apply events that should happen in during this
-             * timestep (they correspond to transitionTime < 0) */
-            if (transitionTime < 0) {
+             * timestep (they correspond to transitionTime < dt) */
+            if (transitionTime < dt) {
                 // Load event data
                 auto iIndex = thisEvent.second.part1Index;
                 auto jIndex = thisEvent.second.part2Index;
@@ -280,6 +280,18 @@ namespace msmrd {
             firstrun = false;
         }
 
+        // Remove unrealized previous events (see function for detailed description).
+        removeUnrealizedEvents(parts);
+
+        // Compute transitions to bound states (from unbound states) and add them to the event manager.
+        computeTransitions2BoundStates(parts);
+
+        // Compute transitions from bound states (to unbound or other bound states) and add them to event manager.
+        computeTransitionsFromBoundStates(parts);
+
+        // Check for events in event manager that should happen during this time step [t,t+dt) and make them happen.
+        applyEvents(parts);
+
         /* Integrate only active particles and save next positions/orientations in parts[i].next***.
          * Non-active particles will usually correspond to one of the particles of a bound pair of particles */
         for (int i = 0; i < parts.size(); i++) {
@@ -294,22 +306,6 @@ namespace msmrd {
             }
         }
 
-        // Remove unrealized previous events.
-        removeUnrealizedEvents(parts);
-
-        // Compute transitions to bound states (from unbound states)
-        computeTransitions2BoundStates(parts);
-
-        // Compute transitions from bound states (to unbound states (transition regions) or other bound states)
-        computeTransitionsFromBoundStates(parts);
-
-        // Advance global time and in event manager (to make events in [t,t+dt) happen)
-        clock += dt;
-        eventMgr.advanceTime(dt);
-
-        // Check for events that should happen in [t,t+dt) and make them happen.
-        applyEvents(parts);
-
         // Enforce boundary and set new positions into parts[i].nextPosition (only if particle is active).
         enforceBoundary(parts);
 
@@ -317,6 +313,10 @@ namespace msmrd {
          * calculated by integrator and boundary as current position/orientation). Note states
          * are modified directly and don't need to be updated. */
         updatePositionOrientation(parts);
+
+        // Advance global time and in event manager (to make events happen)
+        clock += dt;
+        eventMgr.advanceTime(dt);
 
     }
 
