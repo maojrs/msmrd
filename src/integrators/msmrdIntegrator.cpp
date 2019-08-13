@@ -20,15 +20,16 @@ namespace msmrd {
         int currentTransitionState;
         double transitionTime;
         int nextState;
+        // Loop over all pairs of particles without repetition with i < j
         for (int i = 0; i < parts.size(); i++) {
             for (int j = i + 1; j < parts.size(); j++) {
                 // Only compute transitions if particles are in unbound state.
                 if (parts[i].boundTo == -1 and parts[j].boundTo == -1) {
                     /* Only compute new transition if particles drifted into transition region for
-                     * the first time, i.e. empty event */
+                     * the first time, i.e. empty event and relativeDistance < radialBounds[1] */
                     auto previousEvent = eventMgr.getEvent(i, j);
-                    if (previousEvent.inORout == "empty") {
-                        // Need special function to calculate relative position, in case we use a periodic boundary.
+                    if (previousEvent.eventType == "empty") {
+                        // Need special function to calculate relative position, in case we have a periodic boundary.
                         relativePosition = calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition);
                         if (relativePosition.norm() < radialBounds[1]) {
                             if (rotation) {
@@ -43,7 +44,7 @@ namespace msmrd {
                             auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
                             transitionTime = std::get<0>(transition);
                             nextState = std::get<1>(transition);
-                            eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState, "in");
+                            eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState, "binding");
                         }
                     }
                 }
@@ -65,15 +66,17 @@ namespace msmrd {
                 /* Only compute transition if particles swiched into a given bound state for
                  * the first time, i.e. empty event */
                 auto previousEvent = eventMgr.getEvent(i, parts[i].boundTo);
-                if (previousEvent.inORout == "empty") {
+                if (previousEvent.eventType == "empty") {
                     transition = markovModel.computeTransitionFromBoundState(parts[i].state);
                     transitionTime = std::get<0>(transition);
                     nextState = std::get<1>(transition);
-                    // Distinguish between events within bound states (inside) and unbinding events (out)
+                    // Distinguish between events bound to bound transition) and unbinding events
                     if (nextState <= markovModel.getMaxNumberBoundStates()) {
-                        eventMgr.addEvent(transitionTime, i, parts[i].boundTo, parts[i].state, nextState, "inside");
+                        eventMgr.addEvent(transitionTime, i, parts[i].boundTo,
+                                          parts[i].state, nextState, "bound2boundTransition");
                     } else {
-                        eventMgr.addEvent(transitionTime, i, parts[i].boundTo, parts[i].state, nextState, "out");
+                        eventMgr.addEvent(transitionTime, i, parts[i].boundTo,
+                                          parts[i].state, nextState, "unbinding");
                     }
                 }
             }
@@ -244,7 +247,7 @@ namespace msmrd {
     void msmrdIntegrator<ctmsm>::integrate(std::vector<particleMS> &parts) {
 
         /* Calculate forces and torques and save them into forceField and torqueField. For the MSM/RD this will
-         * in general zero, so only needs to be run once. */
+         * in general be zero, so only needs to be run once. */
         if (firstrun) {
             calculateForceTorqueFields<particleMS>(parts);
             firstrun = false;
@@ -254,6 +257,8 @@ namespace msmrd {
          * Non-active particles will usually correspond to one of the particles of a bound pair of particles */
         for (int i = 0; i < parts.size(); i++) {
             if (parts[i].isActive()) {
+                /* Choose basic integration depending if particle MSM is
+                 * active (this corresponds only to the MSM in the unbound state) */
                 if (parts[i].activeMSM) {
                     integrateOneMS(i, parts, dt);
                 } else {
@@ -283,13 +288,13 @@ namespace msmrd {
                 auto endState = thisEvent.second.endState;
                 auto iIndex = thisEvent.second.part1Index;
                 auto jIndex = thisEvent.second.part2Index;
-                auto inORout = thisEvent.second.inORout;
+                auto eventType = thisEvent.second.eventType;
                 // Make event happen
-                if (inORout == "in") {
+                if (eventType == "binding") {
                     transition2BoundState(parts, iIndex, jIndex, endState);
-                } else if (inORout == "out") {
+                } else if (eventType == "unbinding") {
                     transition2UnboundState(parts, iIndex, jIndex, endState);
-                } else if (inORout == "inside") {
+                } else if (eventType == "bound2boundTransition") {
                     transitionBetweenBoundStates(parts, iIndex, jIndex, endState);
                 }
                 // Remove event from event list once it has happened

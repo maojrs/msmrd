@@ -96,13 +96,13 @@ TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
     auto nextState = event.endState;
     auto iIndex = event.part1Index;
     auto jIndex = event.part2Index;
-    auto inORout = event.inORout;
+    auto eventType = event.eventType;
     REQUIRE(numEvents == 1);
     REQUIRE(transitionTime > 0);
     REQUIRE( (nextState == 1 || nextState == 2) );
     REQUIRE(iIndex == 0);
     REQUIRE(jIndex == 1);
-    REQUIRE( (inORout == "in" || inORout == "out") );
+    REQUIRE( (eventType == "binding" || eventType == "unbinding") );
 }
 
 TEST_CASE("Remove unrealized events function from msmrdIntegrator", "[msmrdIntegrator]") {
@@ -145,9 +145,9 @@ TEST_CASE("Remove unrealized events function from msmrdIntegrator", "[msmrdInteg
 
     // Add events to list
     testIntegrator.eventMgr.addEvent(std::numeric_limits<double>::infinity(), -1, -1, -1, -1, "empty");
-    testIntegrator.eventMgr.addEvent(0.5, 0, 1, 0, 2, "in");
-    testIntegrator.eventMgr.addEvent(0.777, 0, 2, 0, 3, "in");
-    testIntegrator.eventMgr.addEvent(1.0, 2, 3, -1, 2, "in");
+    testIntegrator.eventMgr.addEvent(0.5, 0, 1, 0, 2, "binding");
+    testIntegrator.eventMgr.addEvent(0.777, 0, 2, 0, 3, "binding");
+    testIntegrator.eventMgr.addEvent(1.0, 2, 3, -1, 2, "binding");
     // Check integrity of list
     REQUIRE(testIntegrator.eventMgr.eventDictionary.size() == 4);
     // Cehck integrity of list after deleting unwanted events

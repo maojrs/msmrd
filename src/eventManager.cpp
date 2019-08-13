@@ -10,16 +10,18 @@ namespace msmrd {
 
     /* Adds an event to the event dictionary. This requires specifying the wait time until event happens, the end state
      * for the event/transition, the indexes (in partList) of the particles involved (part1Index < part2Index) and
-     * a string: "in" or "out". */
+     * a string eventType: "binding", "unbinding", "bound2boundTransition" and "empty". */
     void eventManager::addEvent(double waitTime, int part1Index, int part2Index,
-                                int originState, int endState, std::string inORout) {
-        if ((inORout != "in") and (inORout != "out") and (inORout != "inside")) {
-            std::range_error("Events can only take 'in', 'out' or 'inside' strings as last argument");
+                                int originState, int endState, std::string eventType) {
+        if ((eventType != "binding") and (eventType != "unbinding") and
+            (eventType != "bound2boundTransition") and (eventType != "empty")) {
+            std::range_error("Events can only take 'binding', 'unbinding', 'bound2boundTransition' or 'empty' "
+                             "strings as last argument");
         }
         // Create key and new event
         std::string eventKey = std::to_string(part1Index) + "--" + std::to_string(part2Index);
         event thisEvent = {.waitTime = waitTime, .part1Index = part1Index, .part2Index = part2Index,
-                           .originState = originState, .endState = endState, .inORout = inORout};
+                           .originState = originState, .endState = endState, .eventType = eventType};
         // See if value already exists and if so keep the one with the smallest time. Otherwise insert new event.
         auto search = eventDictionary.find(eventKey);
         // If key and value already assigned in dictionary.
@@ -76,7 +78,7 @@ namespace msmrd {
         for (auto &thisEvent : eventDictionary) {
             auto value = thisEvent.second;
             outputfile << value.waitTime << " " << value.endState << " " << value.part1Index <<
-                       " " << value.part2Index << " " << value.originState << " " << value.inORout << " \n";
+                       " " << value.part2Index << " " << value.originState << " " << value.eventType << " \n";
         }
         outputfile.close();
     }

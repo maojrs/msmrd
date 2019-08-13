@@ -20,18 +20,19 @@ namespace msmrd {
             int part2Index;
             int originState;
             int endState;
-            std::string inORout;
+            std::string eventType;
         };
         struct event emptyEvent = {.waitTime = std::numeric_limits<double>::infinity(),
-               .part1Index = -1, .part2Index = -1, .originState = -1,  .endState = -1, .inORout = "empty"};
+               .part1Index = -1, .part2Index = -1, .originState = -1,  .endState = -1, .eventType = "empty"};
     public:
         std::map<std::string, event> eventDictionary;
 
         /*
          * @struct event, each event consists of 5 variables, time until event happens, the state to which it will
          * transision (endstate), indexes (in the particleList) of the particles involved in the event
-         * (part1Index < part2Index always) and a string, "in", "out" or "inside" to show it is transitioning into
-         * a bound state, out of it or within bound states, repsectively.
+         * (part1Index < part2Index always) and a string eventType: "binding", "unbinding", "bound2boundTransition"
+         * or "empty" to show it is transitioning into a bound state or out of it or within bound states or that
+         * it is an empty event respectively.
          * @param emptyEvent defines default emptyEvent, returns event with waitTime = infinity.
          * @param eventDictionary, list of events/reaction/transitions, associated with a key corresponding to the
          * two indexes of the particles involved, e.g. "part1Index--part2Index", or more specifically "1--2".
@@ -40,7 +41,7 @@ namespace msmrd {
         eventManager() {};
 
         void addEvent(double waitTime, int part1Index, int part2Index,
-                      int originState, int endState, std::string inORout);
+                      int originState, int endState, std::string eventType);
 
         void removeEvent(int part1Index, int part2Index);
 

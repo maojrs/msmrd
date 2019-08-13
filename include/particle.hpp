@@ -149,8 +149,8 @@ namespace msmrd {
          * @param tcount counts time in between MSM/CTMSM iterations
          * @param propagateTMSM determines if MSM/CTMSM should be propagated on a given timestep
          * tcount and propagateTMSM are used to synchronize TMSM with diffusion/rotation timestepping
-         * @param activeMSM determines if MSM behavior is active or dormant. Under certain conditions (bound state),
-         * maybe it is convenient to turn off the MSM behavior.
+         * @param activeMSM determines if MSM behavior is active or dormant. This applied only to the MSM for
+         * unbound particles. If in bound state, this activeMSM should be set to false.
          * @param boundTo determines if particle is bound and to which particle in the particle list. If -1 the
          * particle is not bound, otherwise the value of boundTo is the index of the other particle in the particle
          * list.
