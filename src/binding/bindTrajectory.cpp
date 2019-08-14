@@ -34,7 +34,8 @@ namespace msmrd {
                 .def(py::init<int &, int &>())
                 .def("sampleDiscreteTrajectory", &patchyDimer::sampleDiscreteTrajectory)
                 .def("getState", &patchyDimer::getState)
-                .def("discretizeTrajectory", &patchyDimer::discretizeTrajectory);
+                .def("discretizeTrajectory", &patchyDimer::discretizeTrajectory)
+                .def("discretizeTrajectoryH5", &patchyDimer::discretizeTrajectoryH5);
 
 
     }

@@ -3,12 +3,14 @@ import numpy as np
 
 # Functions to load trajectories and manipulate them
 
-def loadTrajectory(fnamebase, fnumber):
+def loadTrajectory(fnamebase, fnumber, fastload = False):
     '''
     Reads data from discrete trajectory and returns a simple np.array of
     integers representing the discrete trajectory. Assumes h5 file.
     :param fnamebase, base of the filename
     :param fnumber, filenumber
+    :param fastload if true loads the H5 data, if false it converts the data to numpy.
+    this however makes the loading very slow.
     :return: array of arrays representing the trajectory
     '''
     filename = fnamebase + str(fnumber).zfill(4) + '.h5'
@@ -16,7 +18,11 @@ def loadTrajectory(fnamebase, fnumber):
 
     # Get the data
     a_group_key = list(f.keys())[0]
-    data = np.array(f[a_group_key])
+    if fastload:
+        data = f[a_group_key]
+    else:
+        data = np.array(f[a_group_key])
+        #data = f[a_group_key][:] # equivalent
 
     return data
 

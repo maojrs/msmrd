@@ -7,6 +7,7 @@
 #include "trajectories/trajectoryPositionOrientation.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
 #include "tools.hpp"
+#include "H5Cpp.h"
 
 namespace msmrd {
     /**
@@ -82,6 +83,9 @@ namespace msmrd {
         // Next fucntions are mostly only used when interacting with python or by pybind.
 
         std::vector<double> discretizeTrajectory(std::vector<std::vector<double>> trajectory);
+
+        // Load H5 directly and discretizes it
+        std::vector<double> discretizeTrajectoryH5(std::string filename);
 
         int getState(particle part1, particle part2);
 

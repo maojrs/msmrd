@@ -182,6 +182,71 @@ namespace msmrd {
     }
 
 
+
+    /* From a given trajectory H5 file of the from (timestep, position, orientation), where repeated timesteps mean
+     * differente particles at same tieme step, obtain a discrete trajectory using the patchyDimer discretization.
+     * This is the same as discretizeTrajectory, but loads the H5 file directly in c++ and later discretizes them.*/
+    std::vector<double> patchyDimer::discretizeTrajectoryH5(std::string filename) {
+        int numParticles = 2; // Must be two to discretize trajectory (also it is a dimer)
+        vec3<double> position1;
+        vec3<double> position2;
+        quaternion<double> orientation1;
+        quaternion<double> orientation2;
+
+        int prevDiscreteState = 0;
+        int discreteState = 0;
+
+        // Read H5 file
+        const H5std_string  FILE_NAME(filename);
+        const H5std_string  DATASET_NAME("msmrd_data");
+        H5File file(FILE_NAME, H5F_ACC_RDONLY);
+        DataSet dataset = file.openDataSet(DATASET_NAME);
+
+        // Get dimensions of dataset
+        DataSpace dataspace = dataset.getSpace();
+        hsize_t dims[2];
+        int rank = dataspace.getSimpleExtentDims(dims);
+
+        // Define output of read data
+        //double trajectory[320000][8];
+        int NX = dims[0];
+        int NY = dims[1];
+        double *trajectory = new double[NX*NY];
+
+        // Set output trajectory
+        int timesteps = static_cast<int>(dims[0] / numParticles);
+        std::vector<double> discreteTrajectory(timesteps);
+
+        // Define the memory space to read dataset.
+        DataSpace mspace(rank, dims);
+
+        dataset.read(trajectory, PredType::NATIVE_DOUBLE, mspace, dataspace);
+
+        for (int i = 0; i < timesteps; i++) {
+            /* 2D array indexes (row, col), with row = numParticles*i and col the column between 0 and 7. Its
+             * 1D version index should be row*NY + col*/
+            int jj = (numParticles * i)*NY;
+            int kk = (numParticles*i + 1)*NY;
+            position1 = {trajectory[jj+1], trajectory[jj+2], trajectory[jj+3]};
+            position2 = {trajectory[kk+1], trajectory[kk+2], trajectory[kk+3]};
+            orientation1 = {trajectory[jj+4], trajectory[jj+5], trajectory[jj+6], trajectory[jj+7]};
+            orientation2 = {trajectory[kk+4], trajectory[kk+5], trajectory[kk+6], trajectory[kk+7]};
+            auto dummyParticle1 = particle(0, 0, position1, orientation1);
+            auto dummyParticle2 = particle(0, 0, position2, orientation2);
+            discreteState = getState(dummyParticle1, dummyParticle2);
+            // If getState returned -1, return previous (CoreMSM approach).
+            if (discreteState == -1) {
+                discreteState = 1 * prevDiscreteState;
+            }
+            prevDiscreteState = 1*discreteState;
+
+            discreteTrajectory[i] = discreteState;
+        }
+        delete [] trajectory;
+        return discreteTrajectory;
+    }
+
+
     /* Similar to getBoundState, but it returns the corresponding bound state, transition state or
      * unbound state (0). If it returns -1, then the trajectory is below the radialLowerBound, but it
      * does not belong to any bound state; therefore, the previous state sould be assigned if computing a
