@@ -18,11 +18,10 @@ numSimulations = 10 #500 #1000 #20 #200
 
 
 # Simulation parameters
-timesteps = 2000000 #5000000 #400000 #20000000
+timesteps = 4000000 #2000000 #5000000 #400000 #20000000
 bufferSize = 1024
 stride = 25
 outTxt = False
-outH5 = True
 outH5 = True
 outChunked = True
 trajtype = "patchyDimer"
@@ -30,8 +29,8 @@ trajtype = "patchyDimer"
 
 # Define patchy Particle potential with angular dependence
 sigma = 1.0
-strength = 160.0 #50.0
-angularStrength = 20.0 #10.0
+strength = 100.0 #50.0
+angularStrength = 10.0 #10.0
 angleDiff = 3*np.pi/5.0
 patch1 = np.array([np.cos(angleDiff/2),np.sin(angleDiff/2),0.])
 patch2 = np.array([np.cos(-angleDiff/2),np.sin(-angleDiff/2),0.])

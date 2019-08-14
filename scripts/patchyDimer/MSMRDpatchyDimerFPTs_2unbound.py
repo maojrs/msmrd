@@ -24,7 +24,7 @@ bodytype = 'rigidbody'
 initialState = 'B'
 numBoundStates = 8
 maxNumBoundStates = 10
-radialBounds = [1.4, 2.2] #2.2
+radialBounds = [1.3, 1.8] # must match patchyDimer discretization
 relativeDistanceCutOff = radialBounds[1]
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
@@ -158,7 +158,7 @@ def MSMRDsimulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/pickled_data/ratedictionary_dimer_t4.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     rateDictionary = pickle.load(pickle_in)
 

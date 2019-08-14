@@ -65,7 +65,7 @@ namespace msmrd {
         } else {
             return p2 - p1;
         }
-    };
+    }
 
 
     // Incorporates custom boundary into integrator

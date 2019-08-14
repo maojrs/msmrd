@@ -35,13 +35,11 @@ namespace msmrd {
 
     // Calculates relative position using boundary information loaded into trajectory class (position2 - position1)
     vec3<double> trajectory::calculateRelativePosition(vec3<double> position1, vec3<double> position2) {
-        vec3<double> relativePosition;
-        if (boundaryActive) {
-            relativePosition = msmrdtools::calculateRelativePosition(position1, position2,
-                    boundaryActive, domainBoundary->getBoundaryType(), domainBoundary->boxsize);
+        if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {
+            auto boxsize = domainBoundary->boxsize;
+            return msmrdtools::distancePeriodicBox(position1, position2, boxsize);
         } else {
-            relativePosition = position2 - position1;
+            return position2 - position1;
         }
-        return relativePosition;
     }
 }

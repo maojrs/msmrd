@@ -183,7 +183,8 @@ namespace msmrd {
         }
 
         // Calculate new relative positions and orientations by sampling uniformly in shell section
-        auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
+        //auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
+        auto relPosition = radialBounds[1] * randg.uniformSphereSection(phiInterval, thetaInterval);
 
         // Set next positions and orientations based on the relative ones (parts[iIndex] keeps track of position)
         parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;

@@ -92,7 +92,7 @@ namespace msmrdtools {
     }
 
     /* Calculates relative distance (p2-p1) of two vectors (p1, p2) in a periodic box, returns tuple with
-     * "virtual" position of p1 as first entry and relative distance as secon entry */
+     * "virtual" position of p1 as first entry and relative distance as second entry */
     std::array<vec3<double>, 2> distancePeriodicBoxComplete(vec3<double> p1, vec3<double> p2,
                                                                        vec3<double> edgeslength) {
         vec3<double> p1Periodic = 1.0*p1;
