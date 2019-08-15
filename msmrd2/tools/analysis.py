@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 
 # Functions to help analyze data
 
@@ -21,8 +22,10 @@ def bootstrappingMFPTs(fptList, numBootstrapSamples):
     fptStdDev = np.std(mfpts)
     return mfpt, fptStdDev
 
-def writeParameters(filename, parameterDictionary, pickleDictionary = False):
+def writeParameters(filename, parameterDictionary):
     '''
+    Writes parameters into .dat file for easy reading and into a .pickle file for
+    easy loading.
     :param filename: filename (and location) to write parameters
     :param parameterDictionary: dictionary of parameters to be written
     '''
@@ -30,8 +33,12 @@ def writeParameters(filename, parameterDictionary, pickleDictionary = False):
         for key, value in parameterDictionary.items():
             file.write(key + ' ' + str(value) + '\n')
 
-    if pickleDictionary:
-        import pickle
-        pickle_out = open(filename + ".pickle","wb")
-        pickle.dump(parameterDictionary, pickle_out)
-        pickle_out.close()
+    pickle_out = open(filename + ".pickle","wb")
+    pickle.dump(parameterDictionary, pickle_out)
+    pickle_out.close()
+
+
+def readParameters(filename):
+    pickle_in = open(filename + ".pickle","rb")
+    parameterDictionary = pickle.load(pickle_in)
+    return parameterDictionary

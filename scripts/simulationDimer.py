@@ -41,7 +41,8 @@ potentialPatchyParticleAngular = patchyParticleAngular(sigma, strength, angularS
 
 # Define simulaion boundaries (choose either spherical or box)
 boxsize = 5
-boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
+boundaryType = 'periodic'
+boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
 
 # Parent directory location
 parentDirectory = "../data/dimer/"
@@ -60,11 +61,11 @@ except OSError as error:
 
 # Create parameter dictionary to write to parameters reference file
 parameterfilename = os.path.join(filedirectory, "parameters")
-parameterDictionary = {'Nparticles' : Nparticles, 'dt' : dt, 'bodytype' : bodytype, 'D' : D, 'Drot' : Drot,
-                       'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype, 'boxsize' : boxsize,
-                       'potentialStrength' : strength, 'potentialAngularStrength' : angularStrength,
-                       'potentialPatchesAngleDiff' : angleDiff}
-analysisTools.writeParameters(parameterfilename, parameterDictionary, pickleDictionary = True)
+parameterDictionary = {'numFiles' : numSimulations, 'numParticles' : Nparticles, 'dt' : dt, 'bodytype' : bodytype,
+                       'D' : D, 'Drot' : Drot, 'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype,
+                       'boxsize' : boxsize, 'boundaryType' : boundaryType, 'potentialStrength' : strength,
+                       'potentialAngularStrength' : angularStrength, 'potentialPatchesAngleDiff' : angleDiff}
+analysisTools.writeParameters(parameterfilename, parameterDictionary)
 
 
 # Provides base filename (folder must exist (and preferably empty), otherwise H5 might fail)
@@ -78,7 +79,7 @@ def runParallelSims(simnumber):
     partlist = particleTools.randomParticleList(Nparticles, boxsize, separationDistance, D, Drot, seed)
 
     # Integrator definition
-    seed = int(-1*simnumber) # random seed (negative), it is also different for every simulation, good for parallel simulation
+    seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
     integrator = odLangevin(dt, seed, bodytype)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPatchyParticleAngular)
