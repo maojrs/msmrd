@@ -21,3 +21,17 @@ def bootstrappingMFPTs(fptList, numBootstrapSamples):
     fptStdDev = np.std(mfpts)
     return mfpt, fptStdDev
 
+def writeParameters(filename, parameterDictionary, pickleDictionary = False):
+    '''
+    :param filename: filename (and location) to write parameters
+    :param parameterDictionary: dictionary of parameters to be written
+    '''
+    with open(filename + ".dat", 'w') as file:
+        for key, value in parameterDictionary.items():
+            file.write(key + ' ' + str(value) + '\n')
+
+    if pickleDictionary:
+        import pickle
+        pickle_out = open(filename + ".pickle","wb")
+        pickle.dump(parameterDictionary, pickle_out)
+        pickle_out.close()
