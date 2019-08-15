@@ -8,7 +8,7 @@ from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
 from msmrd2.markovModels import msmrdMarkovStateModel as msmrdMSM
 from msmrd2.integrators import msmrdIntegrator
 import msmrd2.tools.quaternions as quaternions
-
+import os
 
 '''
 Creates an MSM/RD simulation of two particle that calculates first passage times (FPTs) from a random 
@@ -24,7 +24,7 @@ bodytype = 'rigidbody'
 initialState = 'B'
 numBoundStates = 8
 maxNumBoundStates = 10
-radialBounds = [1.3, 1.8] # must match patchyDimer discretization
+radialBounds = [1.25, 2.25] # must match patchyDimer discretization
 relativeDistanceCutOff = radialBounds[1]
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
@@ -54,8 +54,18 @@ DboundRot = np.ones(numBoundStates)
 boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
 boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
 
-# Create empty files to save the data in parallel algorithm
-filename = '../../data/dimer/first_passage_times/MSMRDpatchyDimerFPTs_' + initialState + '2unbound_trajs' \
+# Chooses parent directory
+parentDirectory = "../../data/dimer/first_passage_times/"
+# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/first_passage_times/"
+
+# Creates parent directory if it doesn't exist already
+try:
+    os.mkdir(parentDirectory)
+except OSError as error:
+    print("First passage times directory already exists. Simulation continues.")
+
+# Chooses filename for output file with the results of the parallel simulation
+filename = parentDirectory + 'MSMRDpatchyDimerFPTs_' + initialState + '2unbound_trajs' \
            + str(numTrajectories) + '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
 def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
@@ -158,7 +168,7 @@ def MSMRDsimulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/ratedictionary_dimer_t4.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     rateDictionary = pickle.load(pickle_in)
 

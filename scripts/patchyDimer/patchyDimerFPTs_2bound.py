@@ -5,6 +5,7 @@ from msmrd2.integrators import overdampedLangevin as odLangevin
 import msmrd2.tools.particleTools as particleTools
 import multiprocessing
 from multiprocessing import Pool
+import os
 
 '''
 Creates an MD simulation of two particle and calculates their first passage times (FPTs) from a random 
@@ -18,14 +19,14 @@ dt = 0.0001 #0.00001 #0.000005
 bodytype = 'rigidbody'
 D = 1.0
 Drot = 1.0
-relativeDistanceCutOff = 2.2
+relativeDistanceCutOff = 2.25
 numTrajectories = 10000
 # Other important parameters
 boxsize = 6
 
 # Parameters of patchy Particle potential with angular dependence (make sure it is consistent with msmrd data)
 sigma = 1.0
-strength = 100.0
+strength = 75.0
 angularStrength = 10.0
 angleDiff = 3*np.pi/5.0
 patch1 = np.array([np.cos(angleDiff/2),np.sin(angleDiff/2),0.])
@@ -36,8 +37,18 @@ patchesCoordinates = [patch1, patch2]
 boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
 boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
 
+# Chooses parent directory
+parentDirectory = "../../data/dimer/first_passage_times/"
+# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/first_passage_times/"
+
+# Creates parent directory if it doesn't exist already
+try:
+    os.mkdir(parentDirectory)
+except OSError as error:
+    print("First passage times directory already exists. Simulation continues.")
+
 # Create empty files to save the data in parallel algorithm
-filename = '../../data/dimer/first_passage_times/patchyDimerFPTs_2bound_trajs' + str(numTrajectories) \
+filename = parentDirectory  + 'patchyDimerFPTs_2bound_trajs' + str(numTrajectories) \
            +'_boxsize' + str(boxsize) + '.xyz'
 
 def simulationFPT(trajectorynum):

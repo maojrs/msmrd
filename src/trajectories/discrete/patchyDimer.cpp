@@ -222,6 +222,8 @@ namespace msmrd {
 
         dataset.read(trajectory, PredType::NATIVE_DOUBLE, mspace, dataspace);
 
+        file.close();
+
         for (int i = 0; i < timesteps; i++) {
             /* 2D array indexes (row, col), with row = numParticles*i and col the column between 0 and 7. Its
              * 1D version index should be row*NY + col*/

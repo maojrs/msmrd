@@ -17,7 +17,7 @@ bodytype = "rigidbody"
 D = 1
 Drot = 1
 separationDistance = 1.25 # minimum separation distance for initial condition
-numSimulations = 10 #500 #1000 #20 #200
+numSimulations = 500 #500 #1000 #20 #200
 
 
 # Simulation parameters
@@ -28,7 +28,6 @@ outTxt = False
 outH5 = True
 outChunked = True
 trajtype = "patchyDimer"
-
 
 # Define patchy Particle potential with angular dependence
 sigma = 1.0
@@ -44,12 +43,12 @@ potentialPatchyParticleAngular = patchyParticleAngular(sigma, strength, angularS
 boxsize = 5
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
 
-# File directory location
+# Parent directory location
 parentDirectory = "../data/dimer/"
 # parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/"
 
 # Create folder for data
-foldername = "simulation3"
+foldername = "75strength"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
@@ -63,7 +62,8 @@ except OSError as error:
 parameterfilename = os.path.join(filedirectory, "parameters")
 parameterDictionary = {'Nparticles' : Nparticles, 'dt' : dt, 'bodytype' : bodytype, 'D' : D, 'Drot' : Drot,
                        'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype, 'boxsize' : boxsize,
-                       'potentialStrength' : strength, 'potentialAngularStrength' : angularStrength}
+                       'potentialStrength' : strength, 'potentialAngularStrength' : angularStrength,
+                       'potentialPatchesAngleDiff' : angleDiff}
 analysisTools.writeParameters(parameterfilename, parameterDictionary, pickleDictionary = True)
 
 
