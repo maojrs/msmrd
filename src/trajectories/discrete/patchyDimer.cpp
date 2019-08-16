@@ -16,7 +16,19 @@ namespace msmrd {
         int numRadialSectionsQuat = 5;
         int numSphericalSectionsQuat = 7;
         discreteTrajectoryData.reserve(bufferSize);
-        positionOrientationPart = std::make_unique<positionOrientationPartition>(radialUpperBound, numSphericalSectionsPos,
+        positionOrientationPart = std::make_unique<positionOrientationPartition>(rUpperBound, numSphericalSectionsPos,
+                                                                                 numRadialSectionsQuat,
+                                                                                 numSphericalSectionsQuat);
+        setMetastableRegions();
+    };
+
+    patchyDimer::patchyDimer(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound) :
+        trajectoryPositionOrientation(Nparticles, bufferSize), rLowerBound(rLowerBound), rUpperBound(rUpperBound) {
+        int numSphericalSectionsPos = 7;
+        int numRadialSectionsQuat = 5;
+        int numSphericalSectionsQuat = 7;
+        discreteTrajectoryData.reserve(bufferSize);
+        positionOrientationPart = std::make_unique<positionOrientationPartition>(rUpperBound, numSphericalSectionsPos,
                                                                                  numRadialSectionsQuat,
                                                                                  numSphericalSectionsQuat);
         setMetastableRegions();
@@ -36,7 +48,7 @@ namespace msmrd {
 
 
     /* Main function to sample the discrete state of two particles. It returns the corresponding
-     * bound state, transition state or unbound state (0). In the bound region (r< radialLowerBound), it uses
+     * bound state, transition state or unbound state (0). In the bound region (r< rLowerBound), it uses
      * the core MSM approach to assign a value (previous state if current state is not a bound or
      * transition state). */
     int patchyDimer::sampleDiscreteState(particle part1, particle part2) {
@@ -57,9 +69,9 @@ namespace msmrd {
 
         // Extract current state, save into sample and return sample
         int secNum;
-        if (relativePosition.norm() < radialLowerBound) {
+        if (relativePosition.norm() < rLowerBound) {
             discreteState = getBoundState(relativePosition, relativeOrientation);
-            // If sample doesn't correspond to any bound state in r<radialLowerBound, assign previous state (CoreMSM)
+            // If sample doesn't correspond to any bound state in r<rLowerBound, assign previous state (CoreMSM)
             if (discreteState == -1) {
                     discreteState = prevsample;
             }
@@ -250,7 +262,7 @@ namespace msmrd {
 
 
     /* Similar to getBoundState, but it returns the corresponding bound state, transition state or
-     * unbound state (0). If it returns -1, then the trajectory is below the radialLowerBound, but it
+     * unbound state (0). If it returns -1, then the trajectory is below the rLowerBound, but it
      * does not belong to any bound state; therefore, the previous state sould be assigned if computing a
      * discrete trajectory. It is a mixture between sampleDiscreteState and getBoundState. It will
      * specially useful for PyBind when calculating benchmarks in python interface and when using
@@ -272,8 +284,8 @@ namespace msmrd {
         vec3<double> relPosCenter;
         quaternion<double> relQuatCenter;
         double angleDistance;
-        // Returns bound state, -1 or transitionState if below radialLowerBound region but not in any bound state
-        if (relativePosition.norm() < radialLowerBound) {
+        // Returns bound state, -1 or transitionState if below rLowerBound region but not in any bound state
+        if (relativePosition.norm() < rLowerBound) {
             for (int i = 0; i < 8; i++) {
                 relPosCenter = std::get<0>(boundStates[i]);
                 relQuatCenter = std::get<1>(boundStates[i]);
@@ -285,10 +297,10 @@ namespace msmrd {
                     }
                 }
             }
-            return -1; // returns -1 when not in bound state but in r<radialLowerBound, so CoreMSM is later applied.
+            return -1; // returns -1 when not in bound state but in r<rLowerBound, so CoreMSM is later applied.
         }
         // Returns transition state
-        else if (relativePosition.norm() < radialUpperBound) {
+        else if (relativePosition.norm() < rUpperBound) {
             // Get corresponding section numbers from spherical partition to classify its state
             secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, quatReference);
             return maxNumberBoundStates + secNum;

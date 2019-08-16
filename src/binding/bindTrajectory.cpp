@@ -14,30 +14,30 @@ namespace msmrd {
         py::class_<trajectoryPosition, trajectory>(m, "trajectoryPosition", "position trajectory (#particles or "
                                                                             "#pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
-                .def("write2H5file", &trajectoryPosition::write2H5file<double,4>)
-                .def("writeChunk2H5file", &trajectoryPosition::writeChunk2H5file<double,4>);
-
+                .def("write2H5file", &trajectoryPosition::write2H5file<double, 4>)
+                .def("writeChunk2H5file", &trajectoryPosition::writeChunk2H5file<double, 4>);
 
 
         py::class_<trajectoryPositionOrientation, trajectory>(m, "trajectoryPositionOrientation", "position and "
-                                                                                      "orientation trajectory "
-                                                                                      "(#particles or #pairs "
-                                                                                      "of particles, approx size)")
+                                                                                                  "orientation trajectory "
+                                                                                                  "(#particles or #pairs "
+                                                                                                  "of particles, approx size)")
                 .def(py::init<int &, int &>())
-                .def("write2H5file", &trajectoryPositionOrientation::write2H5file<double,8>)
-                .def("writeChunk2H5file", &trajectoryPositionOrientation::writeChunk2H5file<double,8>);
+                .def("write2H5file", &trajectoryPositionOrientation::write2H5file<double, 8>)
+                .def("writeChunk2H5file", &trajectoryPositionOrientation::writeChunk2H5file<double, 8>);
 
 
         py::class_<patchyDimer, trajectoryPositionOrientation>(m, "patchyDimer", "discrete trajectory of patchy dimer"
-                                                                                 "exampole(#particles or #pairs "
+                                                                                 "example(#particles or #pairs "
                                                                                  "of particles, approx size)")
                 .def(py::init<int &, int &>())
+                .def(py::init<int &, int &, double &, double &>())
                 .def("sampleDiscreteTrajectory", &patchyDimer::sampleDiscreteTrajectory)
                 .def("getState", &patchyDimer::getState)
                 .def("discretizeTrajectory", &patchyDimer::discretizeTrajectory)
                 .def("discretizeTrajectoryH5", &patchyDimer::discretizeTrajectoryH5);
 
 
-    }
 
+    }
 }
