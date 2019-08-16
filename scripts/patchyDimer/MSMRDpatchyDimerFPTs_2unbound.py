@@ -25,11 +25,11 @@ initialState = 'B'
 numBoundStates = 8
 maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyDimer discretization
-relativeDistanceCutOff = radialBounds[1]
+minimumUnboundRadius = 2.5
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
 # Other important parameters
-lagtime = 600
+lagtime = 300
 boxsize = 6
 angleDiff = 3*np.pi/5.0
 
@@ -158,17 +158,17 @@ def MSMRDsimulationFPT(trajectorynum):
     '''
 
     # Define dummy trajectory to extract bound states from python (needed to use getState function)
-    dummyTraj = msmrd2.trajectories.patchyDimer(2,1)
+    dummyTraj = msmrd2.trajectories.patchyDimer(2, 1, radialBounds[0], minimumUnboundRadius)
 
     # Define discretization
-    discretization = msmrd2.discretizations.positionOrientationPartition(relativeDistanceCutOff,
+    discretization = msmrd2.discretizations.positionOrientationPartition(radialBounds[1],
                                             numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat)
 
     # Define boundary
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/pickled_data/ratedictionary_dimer_t3.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     rateDictionary = pickle.load(pickle_in)
 

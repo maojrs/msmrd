@@ -20,14 +20,15 @@ bodytype = 'rigidbody'
 D = 1.0
 Drot = 1.0
 initialState = 'B'
-relativeDistanceCutOff = 2.2
+radialBounds = [1.25, 2.25] # must match patchyDimer discretization
+minimumUnboundRadius = 2.5
 numTrajectories = 10000
 # Other important parameters
 boxsize = 6
 
 # Parameters of patchy Particle potential with angular dependence (make sure it is consistent with msmrd data)
 sigma = 1.0
-strength = 75.0
+strength = 60.0
 angularStrength = 10.0
 angleDiff = 3*np.pi/5.0
 patch1 = np.array([np.cos(angleDiff/2),np.sin(angleDiff/2),0.])
@@ -126,7 +127,7 @@ def simulationFPT(trajectorynum):
     '''
 
     # Define dummy trajectory to extract bound states from python (needed to use getState function)
-    dummyTraj = msmrd2.trajectories.patchyDimer(2,1)
+    dummyTraj = msmrd2.trajectories.patchyDimer(2, 1, radialBounds[0], minimumUnboundRadius)
 
     # Define simulation boundaries (choose either spherical or box)
     boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')

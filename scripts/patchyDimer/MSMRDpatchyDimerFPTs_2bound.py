@@ -24,11 +24,11 @@ bodytype = 'rigidbody'
 numBoundStates = 8
 maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyDimer discretization
-relativeDistanceCutOff = radialBounds[1]
+minimumUnboundRadius = 2.5
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
 # Other important parameters
-lagtime = 600
+lagtime = 300
 boxsize = 6
 
 # Discretization parameters (need to be consistent with the on used to generate the rate dictionary
@@ -75,14 +75,14 @@ def MSMRDsimulationFPT(trajectorynum):
     '''
 
     # Define discretization
-    discretization = msmrd2.discretizations.positionOrientationPartition(relativeDistanceCutOff,
+    discretization = msmrd2.discretizations.positionOrientationPartition(radialBounds[1],
                                             numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat)
 
     # Define boundary
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/ratedictionary_dimer_t2.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/pickled_data/ratedictionary_dimer_t3.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     rateDictionary = pickle.load(pickle_in)
 
@@ -107,7 +107,7 @@ def MSMRDsimulationFPT(trajectorynum):
     # Generate random position and orientation particle list with two particles
     seed = int(trajectorynum)
     partlist = particleTools.randomParticleMSList(numParticles, boxsize,
-                                                  relativeDistanceCutOff, partTypes, [unboundMSM], seed)
+                                                  minimumUnboundRadius, partTypes, [unboundMSM], seed)
 
     # Calculates the first passage times for a given bound state. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.

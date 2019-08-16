@@ -19,14 +19,15 @@ dt = 0.0001 #0.00001 #0.000005
 bodytype = 'rigidbody'
 D = 1.0
 Drot = 1.0
-relativeDistanceCutOff = 2.25
+radialBounds = [1.25, 2.25] # must match patchyDimer discretization
+minimumUnboundRadius = 2.5
 numTrajectories = 10000
 # Other important parameters
 boxsize = 6
 
 # Parameters of patchy Particle potential with angular dependence (make sure it is consistent with msmrd data)
 sigma = 1.0
-strength = 75.0
+strength = 60.0
 angularStrength = 10.0
 angleDiff = 3*np.pi/5.0
 patch1 = np.array([np.cos(angleDiff/2),np.sin(angleDiff/2),0.])
@@ -76,7 +77,7 @@ def simulationFPT(trajectorynum):
 
     # Generate random position and orientation particle list with two particles
     seed = int(trajectorynum)
-    partlist = particleTools.randomParticleList(numparticles, boxsize, relativeDistanceCutOff, D, Drot, seed)
+    partlist = particleTools.randomParticleList(numparticles, boxsize, minimumUnboundRadius, D, Drot, seed)
 
     # Calculates the first passage times for a given bound state. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.
