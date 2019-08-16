@@ -173,6 +173,56 @@ def generateTCL_patchyParticles(numparticles = 10, outfname = "patchyParticles",
     file.write('display rendermode GLSL \n')
     file.close()
 
+def generateTCL_patchyParticlesMultiColor(numparticles = 10, outfname = "patchyParticles",
+                                          tclfname = "../../data/vmd/patchyParticles2vmd.tcl"):
+    file = open(tclfname, 'w')
+    file.write('set name ' + outfname + '\n')
+    file.write('mol load xyz ./$name.xyz  \n \n')
+    file.write('mol delrep 0 top \n')
+    file.write('mol default style VDW \n')
+    file.write('display resetview \n \n')
+
+    # Define particle types
+    # For main particle 1
+    file.write('mol representation VDW 0.35000 0.5 \n')
+    file.write('mol selection name type_00 \n')
+    file.write('mol color ColorID 23 \n')
+    file.write('mol material Opaque \n')
+    file.write('mol addrep top \n \n')
+    # For main particle 2
+    file.write('mol representation VDW 0.35000 0.5 \n')
+    file.write('mol selection name type_01 \n')
+    file.write('mol color ColorID 22 \n')
+    file.write('mol material Opaque \n')
+    file.write('mol addrep top \n \n')
+    # For patches type1
+    file.write('mol representation VDW 0.20000 0.5 \n')
+    file.write('mol selection name type_1 \n')
+    file.write('mol color ColorID 31 \n')
+    file.write('mol material AOShiny \n')
+    file.write('mol addrep top \n \n')
+    # For patches type2
+    file.write('mol representation VDW 0.20000 0.5 \n')
+    file.write('mol selection name type_2 \n')
+    file.write('mol color ColorID 32 \n')
+    file.write('mol material AOShiny \n')
+    file.write('mol addrep top \n \n')
+
+    # Define display options
+    file.write('axes location off \n')
+    file.write('color Display Background white \n')
+    file.write('display projection orthographic \n')
+    file.write('display resize 800 800 \n')
+    file.write('display nearclip set 0.0 \n')
+    file.write('display depthcue off \n')
+    file.write('#display cuedensity 0.20000  \n')
+    file.write('#display cuemode Exp2  \n')
+    file.write('display shadows on \n')
+    file.write('display ambientocclusion on \n')
+    file.write('display antialias on \n')
+    file.write('display rendermode GLSL \n')
+    file.close()
+
 def generateTCL_patchyProteins(numparticles = 2, outfname = "patchyProteins", tclfname = "../../data/vmd/patchyProteins2vmd.tcl"):
     file = open(tclfname, 'w')
     file.write('set name ' + outfname + '\n')
