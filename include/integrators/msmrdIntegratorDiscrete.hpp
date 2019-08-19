@@ -1,19 +1,22 @@
 //
-// Created by maojrs on 2/6/19.
+// Created by maojrs on 8/19/19.
 //
+
 
 #pragma once
 
+#include <utility>
 #include "discretizations/positionOrientationPartition.hpp"
 #include "eventManager.hpp"
 #include "integrators/overdampedLangevinMarkovSwitch.hpp"
-#include "markovModels/msmrdMarkovModel.hpp"
+#include "markovModels/msmrdMarkovModelDiscrete.hpp"
 #include "tools.hpp"
 
 namespace msmrd {
+
     using msm = msmrd::discreteTimeMarkovStateModel;
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
-    using msmrdMSM = msmrd::msmrdMarkovModel;
+    using msmrdMSMDiscrete = msmrd::msmrdMarkovModelDiscrete;
     using fullPartition = msmrd::positionOrientationPartition;
 
     /**
@@ -21,14 +24,14 @@ namespace msmrd {
      * @tparam templateMSM template can be an msm or a ctmsm
      */
     template <typename templateMSM>
-    class msmrdIntegrator : public overdampedLangevinMarkovSwitch<templateMSM> {
+    class msmrdIntegratorDiscrete : public overdampedLangevinMarkovSwitch<templateMSM> {
     private:
         std::array<double,2> radialBounds;
         int numParticleTypes;
         bool firstrun = true;
     public:
         eventManager eventMgr = eventManager();
-        msmrdMSM markovModel;
+        msmrdMSMDiscrete markovModel;
         spherePartition *positionPart;
         fullPartition *positionOrientationPart;
 
@@ -44,7 +47,7 @@ namespace msmrd {
         * @param numParticleTypes define the number of particle types in the unbound states in the
         * simulation (usually 1 or 2).
         * @param eventManager class to manage order of events (reactions/transitions).
-        * @param markovModel pointer to class msmrdMarkovModel, which is the markovModel class specialized for
+        * @param markovModel pointer to class msmrdMSMDiscrete, which is the markovModel class specialized for
         * the MSM/RD scheme. It controls the markov Model in the bound state and the msmrd coupling.
         * @param positionPart pointer to spherical partition of relative distance, only used when rotation
         * is disabled in the integrator
@@ -55,26 +58,25 @@ namespace msmrd {
         * switching). Its size should match the number of unbound particle types in the simulation, one MSM
         * per particle type. Size 1 is also acceptable, which assumes all aprticles share the same MSM.
         */
-        msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                        std::array<double,2> radialBound, std::vector<templateMSM> MSMlist, msmrdMSM markovModel);
+        msmrdIntegratorDiscrete(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
+                        std::array<double,2> radialBound, std::vector<templateMSM> MSMlist,
+                                msmrdMSMDiscrete markovModel);
 
-        msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                        std::array<double,2> radialBound, templateMSM MSMlist, msmrdMSM markovModel);
+        msmrdIntegratorDiscrete(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
+                        std::array<double,2> radialBound, templateMSM MSMlist, msmrdMSMDiscrete markovModel);
 
         // Redefine integrate function
         void integrate(std::vector<particleMS> &parts);
 
         void setDefaultDiscretization();
 
-        //void setDiscretization(spherePartition *thisPositionPartition);
-
         void setDiscretization(fullPartition *thisFullPartition);
+
+        int computeCurrentTransitionState(particleMS &part1, particleMS &part2);
 
         void computeTransitions2BoundStates(std::vector<particleMS> &parts);
 
         void computeTransitionsFromBoundStates(std::vector<particleMS> &parts);
-
-        void removeUnrealizedEvents(std::vector<particleMS> &parts);
 
         void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
@@ -82,9 +84,11 @@ namespace msmrd {
 
         void transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
-        void applyEvents(std::vector<particleMS> &parts);
+        void transitionBetweenTransitionStates(int iIndex, int jIndex);
 
-        float getRateFromKey(std::string);
+        void removeUnrealizedEvents(std::vector<particleMS> &parts);
+
+        void applyEvents(std::vector<particleMS> &parts);
 
 
     };
@@ -95,10 +99,11 @@ namespace msmrd {
      * Constructors for MSM/RD integration class, can take discrete time MSM (msm) or a continous-time MSM.
      */
     template <typename templateMSM>
-    msmrdIntegrator<templateMSM>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
-                                            int numParticleTypes, std::array<double,2> radialBounds,
-                                            std::vector<templateMSM> MSMlist, msmrdMSM markovModel) :
-            overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
+    msmrdIntegratorDiscrete<templateMSM>::msmrdIntegratorDiscrete(double dt, long seed,
+                               std::string particlesbodytype, int numParticleTypes, std::array<double,2> radialBounds,
+                               std::vector<templateMSM> MSMlist, msmrdMSMDiscrete markovModel) :
+            overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype),
+                    markovModel(std::move(markovModel)),
             numParticleTypes(numParticleTypes), radialBounds(radialBounds) {
 
         setDefaultDiscretization();
@@ -111,10 +116,11 @@ namespace msmrd {
     };
 
     template <typename templateMSM>
-    msmrdIntegrator<templateMSM>::msmrdIntegrator(double dt, long seed, std::string particlesbodytype,
-                                            int numParticleTypes, std::array<double,2> radialBounds,
-                                                  templateMSM MSMlist, msmrdMSM markovModel) :
-            overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype), markovModel(markovModel),
+    msmrdIntegratorDiscrete<templateMSM>::msmrdIntegratorDiscrete(double dt, long seed,
+                               std::string particlesbodytype, int numParticleTypes, std::array<double,2> radialBounds,
+                               templateMSM MSMlist, msmrdMSMDiscrete markovModel) :
+            overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype),
+                    markovModel(std::move(markovModel)),
             numParticleTypes(numParticleTypes), radialBounds(radialBounds) {
 
         setDefaultDiscretization();
@@ -125,7 +131,7 @@ namespace msmrd {
     /* Sets default discretization (partition). Sets both positionPart and positionOrientationPart in case either of
      * the two is required. Note only one will actually be used by code. */
     template <typename templateMSM>
-    void msmrdIntegrator<templateMSM>::setDefaultDiscretization() {
+    void msmrdIntegratorDiscrete<templateMSM>::setDefaultDiscretization() {
         int numSphericalSectionsPos = 7;
         int numRadialSectionsQuat = 5;
         int numSphericalSectionsQuat = 7;
@@ -135,25 +141,12 @@ namespace msmrd {
                                                     numRadialSectionsQuat, numSphericalSectionsQuat);
     }
 
-//    // Sets pointer to discretization chosen (no rotation discretization).
-//    template <typename templateMSM>
-//    void msmrdIntegrator<templateMSM>::setDiscretization(spherePartition *thisPositionPartition) {
-//        delete positionPart;
-//        positionPart = thisPositionPartition;
-//    }
-
     // Sets pointer to discretization chosen (discretization taking into account rotation).
     template <typename templateMSM>
-    void msmrdIntegrator<templateMSM>::setDiscretization(fullPartition *thisFullPartition) {
+    void msmrdIntegratorDiscrete<templateMSM>::setDiscretization(fullPartition *thisFullPartition) {
         delete positionOrientationPart;
         positionOrientationPart = thisFullPartition;
     }
-
-    template <typename templateMSM>
-    float msmrdIntegrator<templateMSM>::getRateFromKey(std::string key) {
-        return markovModel.getRate(key);
-    };
-
 
 
 }

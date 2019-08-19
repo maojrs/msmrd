@@ -10,13 +10,13 @@ namespace msmrd {
 
     /* Adds an event to the event dictionary. This requires specifying the wait time until event happens, the end state
      * for the event/transition, the indexes (in partList) of the particles involved (part1Index < part2Index) and
-     * a string eventType: "binding", "unbinding", "bound2boundTransition" and "empty". */
+     * a string eventType: "binding", "unbinding", "bound2bound", "transition2transition" and "empty". */
     void eventManager::addEvent(double waitTime, int part1Index, int part2Index,
                                 int originState, int endState, std::string eventType) {
         if ((eventType != "binding") and (eventType != "unbinding") and
-            (eventType != "bound2boundTransition") and (eventType != "empty")) {
-            std::range_error("Events can only take 'binding', 'unbinding', 'bound2boundTransition' or 'empty' "
-                             "strings as last argument");
+            (eventType != "bound2bound") and (eventType != "transition2transition") and (eventType != "empty")) {
+            std::range_error("Events can only take 'binding', 'unbinding', 'bound2bound', "
+                             "'transition2transition' or 'empty' strings as last argument");
         }
         // Create key and new event
         std::string eventKey = std::to_string(part1Index) + "--" + std::to_string(part2Index);

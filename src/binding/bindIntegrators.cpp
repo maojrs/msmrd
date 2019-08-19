@@ -2,12 +2,16 @@
 #include "integrators/overdampedLangevin.hpp"
 #include "integrators/overdampedLangevinMarkovSwitch.hpp"
 #include "integrators/msmrdIntegrator.hpp"
+#include "integrators/msmrdIntegratorDiscrete.hpp"
 
 namespace msmrd {
     // Aliases for classes with long names.
     using msm = msmrd::discreteTimeMarkovStateModel;
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
-    using msmrdMSM = msmrd::msmrdMarkovStateModel;
+    using msmrdMSM = msmrd::msmrdMarkovModel;
+    using msmrdMSMDiscrete = msmrd::msmrdMarkovModelDiscrete;
+
+
     /*
      * pyBinders for the c++ integrators classes
      */
@@ -37,6 +41,17 @@ namespace msmrd {
                 .def("getRateFromKey", &msmrdIntegrator<ctmsm>::getRateFromKey)
                 .def("setDiscretization", &msmrdIntegrator<ctmsm>::setDiscretization)
                 .def("integrate", &msmrdIntegrator<ctmsm>::integrate);
+
+        py::class_<msmrdIntegratorDiscrete<ctmsm>, overdampedLangevinMarkovSwitch<ctmsm>>(m, "msmrdIntegrator",
+                                                                                  "Integrator for msmrd algorithm "
+                                                                                  "(timestep, seed, particlesbodytype, "
+                                                                                  "numParticleTypes, relativeDistanceCutOff,"
+                                                                                  "MSMlist, mainMarkovModel, "
+                                                                                  "positionOrientationPartition)")
+                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &,
+                        ctmsm &, msmrdMSMDiscrete &>())
+                .def("setDiscretization", &msmrdIntegratorDiscrete<ctmsm>::setDiscretization)
+                .def("integrate", &msmrdIntegratorDiscrete<ctmsm>::integrate);
 
         // Created c++ compatible particle list/vector/array of particles in python
         py::bind_vector<std::vector<particle>>(m, "particleList", py::module_local());

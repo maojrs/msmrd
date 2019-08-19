@@ -52,7 +52,7 @@ TEST_CASE("Initialization of dictionary in msmrdMarkovModel class", "[msmrdMarko
                                                     {"b2->11", 2.0}, {"b2->12", 1.5},
                                                     {"b1->b2", 0.7}, {"b2->b1", 1.2}};
     // Create an msmMarkovModel
-    auto myMSM = msmrdMarkovStateModel(nBoundStates, nTransitionStates, -1, rateDictionary);
+    auto myMSM = msmrdMarkovModel(nBoundStates, nTransitionStates, -1, rateDictionary);
     // Check if the initialization of ctmsms in msmrdMarkovmodel is done correctly.
     auto rate1b1 = myMSM.getRate("11->b1");
     auto rate2b1 = myMSM.getRate("12->b1");

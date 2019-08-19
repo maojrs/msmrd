@@ -43,12 +43,14 @@ set(SOURCES
         src/discretizations/spherePartition.cpp
         src/integrators/integrator.cpp
         src/integrators/msmrdIntegrator.cpp
+        src/integrators/msmrdIntegratorDiscrete.cpp
         src/integrators/overdampedLangevin.cpp
         src/integrators/overdampedLangevinMarkovSwitch.cpp
         src/markovModels/continuousTimeMarkovModel.cpp
         src/markovModels/discreteTimeMarkovModel.cpp
         src/markovModels/markovModel.cpp
         src/markovModels/msmrdMarkovModel.cpp
+        src/markovModels/msmrdMarkovModelDiscrete.cpp
         src/potentials/dipole.cpp
         src/potentials/gaussians3D.cpp
         src/potentials/gayBerne.cpp
@@ -94,12 +96,14 @@ set(PY_SOURCES
         include/discretizations/spherePartition.hpp
         include/integrators/integrator.hpp
         include/integrators/msmrdIntegrator.hpp
+        include/integrators/msmrdIntegratorDiscrete.hpp
         include/integrators/overdampedLangevin.hpp
         include/integrators/overdampedLangevinMarkovSwitch.hpp
         include/markovModels/continuousTimeMarkovModel.hpp
         include/markovModels/discreteTimeMarkovModel.hpp
         include/markovModels/markovModel.hpp
         include/markovModels/msmrdMarkovModel.hpp
+        include/markovModels/msmrdMarkovModelDiscrete.hpp
         include/potentials/potentials.hpp
         include/potentials/dipole.hpp
         include/potentials/gaussians3D.hpp

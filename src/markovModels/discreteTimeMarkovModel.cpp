@@ -47,8 +47,9 @@ namespace msmrd{
         }
     };
 
-    // Propagates the discrete Markov chain for ksteps, without any particles involved
-    int discreteTimeMarkovStateModel::propagateMSM(int initialState, int ksteps) {
+    /* Propagates the discrete Markov chain for ksteps, without any particles involved, returns
+     * total lagtime and final state */
+    std::tuple<double, int> discreteTimeMarkovStateModel::propagateMSM(int initialState, int ksteps) {
         double r1;
         double sum;
         int state = initialState;
@@ -63,6 +64,7 @@ namespace msmrd{
                 }
             }
         }
+        return std::make_tuple(lagtime*ksteps, state);
     };
 
     // Propagates the discrete Markov chain for ksteps without updating

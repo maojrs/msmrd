@@ -16,7 +16,7 @@ namespace msmrd {
 
         void propagate(particleMS &part, int ksteps) override;
 
-        int propagateMSM(int initialState, int ksteps);
+        std::tuple<double, int> propagateMSM(int initialState, int ksteps);
 
         void propagateNoUpdate(particleMS &part, int ksteps);
 

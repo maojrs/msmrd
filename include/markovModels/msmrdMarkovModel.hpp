@@ -20,7 +20,7 @@ namespace msmrd {
      * between bound states. It does NOT manage the Markov dynamics in the unbound states. That is done by the MSMs
      * in MSMlist in the msmrdIntegrator.
      */
-    class msmrdMarkovStateModel {
+    class msmrdMarkovModel {
     protected:
         long seed;
         std::map<std::string, float> rateDictionary;
@@ -50,7 +50,7 @@ namespace msmrd {
 
         */
 
-        msmrdMarkovStateModel(unsigned int numBoundStates, unsigned int numTransitionStates,
+        msmrdMarkovModel(unsigned int numBoundStates, unsigned int numTransitionStates,
                          long seed, std::map<std::string, float> &rateDictionary);
 
         std::tuple<double, int> computeTransition2BoundState(int transitionState);

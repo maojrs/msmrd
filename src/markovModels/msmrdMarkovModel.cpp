@@ -8,7 +8,7 @@ namespace msmrd{
     /**
      * Implementation of Markov model class specializes for MSM/RD.
      */
-    msmrdMarkovStateModel::msmrdMarkovStateModel(unsigned int numBoundStates,
+    msmrdMarkovModel::msmrdMarkovModel(unsigned int numBoundStates,
                                                  unsigned int numTransitionStates, long seed,
                                                  std::map<std::string, float> &rateDictionary)
             : numBoundStates(numBoundStates), numTransitionStates(numTransitionStates), seed(seed),
@@ -20,7 +20,7 @@ namespace msmrd{
 
     /* Computes transition time and end state starting from a given transition step. The end states correspond
      * to one of the bound states (indexing of bound states begins in 1)*/
-    std::tuple<double, int> msmrdMarkovStateModel::computeTransition2BoundState(int transitionState) {
+    std::tuple<double, int> msmrdMarkovModel::computeTransition2BoundState(int transitionState) {
         std::vector<float> rates(numBoundStates);
 
         double transitionTime;
@@ -60,7 +60,7 @@ namespace msmrd{
 
     /* Computes transition time and end state starting from a given bound state. The end states correspond
      * to either another bound state or a transition state (indexing of bound states begins in 1)*/
-    std::tuple<double, int> msmrdMarkovStateModel::computeTransitionFromBoundState(int boundState) {
+    std::tuple<double, int> msmrdMarkovModel::computeTransitionFromBoundState(int boundState) {
         std::vector<float> rates(maxNumberBoundStates + numTransitionStates);
         double transitionTime;
         int index0 = maxNumberBoundStates;
@@ -109,7 +109,7 @@ namespace msmrd{
 
     /* @param key is in the form of "state1->state2", e.g. "b1->14" or "32->b2",
      * where the states starting with "b" are bound states and the rest correspond to transition states*/
-    float msmrdMarkovStateModel::getRate(std::string key) {
+    float msmrdMarkovModel::getRate(std::string key) {
         auto search = rateDictionary.find(key);
         if (search != rateDictionary.end()) {
             return search->second;
@@ -123,7 +123,7 @@ namespace msmrd{
      * Note size of vectors must match numBoundStates. This functions NEEDS
      * to be called to fill in diffusion coefficients. */
 
-    void msmrdMarkovStateModel::setDbound(std::vector<double> &D, std::vector<double> &Drot) {
+    void msmrdMarkovModel::setDbound(std::vector<double> &D, std::vector<double> &Drot) {
         if ( (D.size() != numBoundStates ) or (Drot.size() != numBoundStates) ) {
             std::__throw_range_error("Vectors of diffusion coefficients must match number of bound states");
         }

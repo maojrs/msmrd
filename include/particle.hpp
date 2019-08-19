@@ -142,8 +142,9 @@ namespace msmrd {
         bool propagateTMSM = true;
         bool activeMSM = true;
         int boundTo = -1;
+        int boundState = -1;
         /**
-         * @param state particle current state
+         * @param state particle current unbound state. If -1, then particle is in bound state.
          * @param nextState particle next state given and changed by the msm/ctmsm
          * @param lagtime saves the current lagtime from the MSM
          * @param tcount counts time in between MSM/CTMSM iterations
@@ -154,6 +155,8 @@ namespace msmrd {
          * @param boundTo determines if particle is bound and to which particle in the particle list. If -1 the
          * particle is not bound, otherwise the value of boundTo is the index of the other particle in the particle
          * list.
+         * @param boundState determines the state of the particle if it is bound to another particle. If it is not
+         * bound, boundState = -1 and the state is given by the 'state' variable.
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
@@ -186,13 +189,25 @@ namespace msmrd {
 
         int getBoundTo() const { return boundTo; }
 
-        void setState(int newstate) { state = newstate; }
+        int getBoundState() const { return boundState; }
+
+        void setState(int newstate) {
+            state = newstate;
+            boundState = -1;
+            boundTo = -1;
+        }
 
         void setNextState(int nextstate) { nextState = nextstate; }
 
         void setLagtime(double newlagtime) { lagtime = newlagtime; }
 
         void setBoundTo(int particleIndex) { boundTo = particleIndex; }
+
+        void setBoundState(int newBoundState) {
+            state = -1;
+            boundState = newBoundState;
+            activeMSM = false;
+        }
 
         void setNextType(int nexttype) { nextType = nexttype; }
 
