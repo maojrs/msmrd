@@ -42,7 +42,7 @@ namespace msmrd {
                 .def("setDiscretization", &msmrdIntegrator<ctmsm>::setDiscretization)
                 .def("integrate", &msmrdIntegrator<ctmsm>::integrate);
 
-        py::class_<msmrdIntegratorDiscrete<ctmsm>, overdampedLangevinMarkovSwitch<ctmsm>>(m, "msmrdIntegrator",
+        py::class_<msmrdIntegratorDiscrete<ctmsm>, overdampedLangevinMarkovSwitch<ctmsm>>(m, "msmrdIntegratorDiscrete",
                                                                                   "Integrator for msmrd algorithm "
                                                                                   "(timestep, seed, particlesbodytype, "
                                                                                   "numParticleTypes, relativeDistanceCutOff,"

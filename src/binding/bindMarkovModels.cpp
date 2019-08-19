@@ -1,16 +1,20 @@
 //
 // Created by maojrs on 9/7/18.
 //
+#include <integrators/msmrdIntegratorDiscrete.hpp>
 #include "binding.hpp"
 #include "markovModels/discreteTimeMarkovModel.hpp"
 #include "markovModels/continuousTimeMarkovModel.hpp"
 #include "markovModels/msmrdMarkovModel.hpp"
+#include "markovModels/msmrdMarkovModelDiscrete.hpp"
 
 namespace msmrd {
     // Aliases for classes with long names.
     using msm = msmrd::discreteTimeMarkovStateModel;
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
     using msmrdMSM = msmrd::msmrdMarkovModel;
+    using msmrdMSMDiscrete = msmrd::msmrdMarkovModelDiscrete;
+
     /*
      * pyBinders for the c++ Markov state models (MSMs) classes
      */
@@ -28,15 +32,26 @@ namespace msmrd {
                 .def("propagate", &ctmsm::propagate)
                 .def("propagateMSM", &ctmsm::propagateMSM);
 
-        py::class_<msmrdMSM>(m, "msmrdMarkovStateModel", "continuous time Markov state model specialized to use with"
-                                                            "MSM/RD integration (num. of bound states, num. transition"
-                                                            "states, seed, rate dictionary")
+        py::class_<msmrdMSM>(m, "msmrdMarkovModel", "continuous time Markov state model specialized to use with"
+                                                    "MSM/RD integration (num. of bound states, num. transition"
+                                                    "states, seed, rate dictionary")
                 .def(py::init<unsigned int &, unsigned int &, long &, std::map<std::string, float> &>())
                 .def("getRate", &msmrdMSM::getRate)
                 .def("computeTransition2BoundState", &msmrdMSM::computeTransition2BoundState)
                 .def("computeTransitionFromoundState", &msmrdMSM::computeTransitionFromBoundState)
                 .def("setDbound", &msmrdMSM::setDbound)
                 .def("setMaxNumberBoundStates", &msmrdMSM::setMaxNumberBoundStates);
+
+        py::class_<msmrdMSMDiscrete, msm>(m, "msmrdMarkovModelDiscrete", "discrete time Markov state model "
+                                        "specialized to  use with MSM/RD integration (num. of bound states, "
+                                        "max number of bound states, transition probability matrix, MSM active set,"
+                                        "seed")
+                .def(py::init<unsigned int &, unsigned int &, std::vector<std::vector<double>> &,
+                        std::vector<int> &, float &, long &>())
+                .def("calculateTransition", &msmrdMSMDiscrete::calculateTransition)
+                .def("setDbound", &msmrdMSMDiscrete::setDbound)
+                .def("setMaxNumberBoundStates", &msmrdMSMDiscrete::setMaxNumberBoundStates);
+
     }
 
 }
