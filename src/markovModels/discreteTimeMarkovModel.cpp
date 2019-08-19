@@ -47,6 +47,24 @@ namespace msmrd{
         }
     };
 
+    // Propagates the discrete Markov chain for ksteps, without any particles involved
+    int discreteTimeMarkovStateModel::propagateMSM(int initialState, int ksteps) {
+        double r1;
+        double sum;
+        int state = initialState;
+        for (int m = 0; m < ksteps; m++){
+            sum = 0;
+            r1 = randg.uniformRange(0, 1);
+            for (int i = 0; i < nstates; i++ ){
+                sum += tmatrix[state][i];
+                if (r1 <= sum) {
+                    state = i;
+                    break;
+                }
+            }
+        }
+    };
+
     // Propagates the discrete Markov chain for ksteps without updating
     void discreteTimeMarkovStateModel::propagateNoUpdate(particleMS &part, int ksteps) {
         double r1;

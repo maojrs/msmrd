@@ -87,7 +87,7 @@ namespace msmrd {
         }
     };
 
-    // Propagates CTMSM using the Gillespie algorithm, updates state immediately.
+    // Propagates CTMSM in particles using the Gillespie algorithm, updates state  of particles immediately.
     void continuousTimeMarkovStateModel::propagate(particleMS &part, int ksteps) {
         double lagt = 0;
         double r1, r2;
@@ -112,6 +112,33 @@ namespace msmrd {
             part.setLagtime(lagt);
             lagtime = lagt;
         }
+    }
+
+    /* Propagates CTMSM given an initial state for ksteps timesteps. Returns tuple with total lagtime
+     * and final state. Unlike propagate fucntion, this function doesn't involve any particles.*/
+    std::tuple<double, int> continuousTimeMarkovStateModel::propagateMSM(int initialState, int ksteps) {
+        double lagt = 0;
+        double r1, r2;
+        int state = initialState;
+        int newState;
+        for (int m = 0; m < ksteps; m++) {
+            // Begins Gillespie algorithm, calculates which transition and when will it occur.
+            r1 = randg.uniformRange(0, 1);
+            r2 = randg.uniformRange(0, 1);
+            lagt += std::log(1.0 / r1) / lambda0[state];
+            for (int col = 0; col < nstates; col++) {
+                if (r2 * lambda0[state] <= ratescumsum[state][col]) {
+                    if (col < state) {
+                        newState = col;
+                    } else {
+                        newState = col + 1;
+                    }
+                    break;
+                }
+            }
+            state = newState;
+        }
+        return std::make_tuple(lagt, state);
     }
     
 }

@@ -18,12 +18,15 @@ namespace msmrd {
         py::class_<msm, markovModel>(m, "discreteTimeMarkovStateModel", "discrete time Markov state model (MSM ID, "
                                                            "transition matrix, lagtime, seed)")
                 .def(py::init<int &, std::vector<std::vector<double>> &, double &, long &>())
-                .def("propagate", &msm::propagate);
+                .def("propagate", &msm::propagate)
+                .def("propagateMSM", &msm::propagateMSM);
+
 
         py::class_<ctmsm, markovModel>(m, "continuousTimeMarkovStateModel", "continuous time Markov state model (MSM ID, "
                                                                "transition rate matrix, seed)")
                 .def(py::init<int &, std::vector<std::vector<double>> &, long &>())
-                .def("propagate", &ctmsm::propagate);
+                .def("propagate", &ctmsm::propagate)
+                .def("propagateMSM", &ctmsm::propagateMSM);
 
         py::class_<msmrdMSM>(m, "msmrdMarkovStateModel", "continuous time Markov state model specialized to use with"
                                                             "MSM/RD integration (num. of bound states, num. transition"
