@@ -37,10 +37,12 @@ namespace msmrd {
         return currentTransitionState;
     }
 
-    /* Computes possible transitions to bound states or within transition states from particles sufficiently
-     * close to each other (in transition states) and saves them in the event manager. Used by integrate function. */
+
+    /* Computes possible transitions from transition states to bound states or other transition states from
+     * particles sufficiently close to each other (in transition states) and saves them in the event manager.
+     * Used by integrate function. */
     template<>
-    void msmrdIntegratorDiscrete<ctmsm>::computeTransitions2BoundStates(std::vector<particleMS> &parts) {
+    void msmrdIntegratorDiscrete<ctmsm>::computeTransitionsFromTransitionStates(std::vector<particleMS> &parts) {
         int currentTransitionState;
         double transitionTime;
         int nextState;
@@ -222,15 +224,18 @@ namespace msmrd {
         // Set state for particle
         parts[iIndex].setBoundState(endState);
         parts[jIndex].setBoundState(endState);
-        // Set diffusion coefficients in bound state (note states start counting from 1, not zero)
-        // TODO: Not accurate when not all bound states are in the active set. However, that is unlikely.
-        parts[iIndex].setDs(markovModel.Dlist[endState-1], markovModel.Drotlist[endState-1]);
+        /* Set diffusion coefficients in bound state (although not always neccesary for bound states,
+         * we convert to the proper indexing.) */
+        int MSMindex = markovModel.getMSMindex(endState);
+        parts[iIndex].setDs(markovModel.Dlist[MSMindex], markovModel.Drotlist[MSMindex]);
     }
 
     /* Transitions of particles in transition region with indexes iIndex and jIndex in the particle list
      * to another transition state. */
     template<>
     void msmrdIntegratorDiscrete<ctmsm>::transitionBetweenTransitionStates(int iIndex, int jIndex) {
+        /* Add label to event to indicate to computeTransitionsFromTransitionStates function that
+         * a new event needs to be calculated, using previousEvent.endState as the initial state */
         auto previousEvent = eventMgr.getEvent(iIndex, jIndex);
         previousEvent.eventType = "inTransition";
     }
@@ -238,8 +243,8 @@ namespace msmrd {
 
     /* Removes unrealized events where unbound particles drifted a distance apart beyond the upper radial bound,
      * or when zero rates yielded infinite values. This can be more optimally included inside the
-     * computeTransitions2BoundStates function. However, the code is more clear if left separate. Better left for
-     * future code optimization. */
+     * computeTransitionsFromTransitionStates function. However, the code is more clear if left separate.
+     * Better left for future code optimization. */
     template<>
     void msmrdIntegratorDiscrete<ctmsm>::removeUnrealizedEvents(std::vector<particleMS> &parts) {
         // Important not to use range loop, iterator loop better since events are being erased.
@@ -338,7 +343,7 @@ namespace msmrd {
         removeUnrealizedEvents(parts);
 
         // Compute transitions to bound states (from unbound states) and add them to the event manager.
-        computeTransitions2BoundStates(parts);
+        computeTransitionsFromTransitionStates(parts);
 
         // Compute transitions from bound states (to unbound or other bound states) and add them to event manager.
         computeTransitionsFromBoundStates(parts);

@@ -74,7 +74,7 @@ namespace msmrd {
 
         int computeCurrentTransitionState(particleMS &part1, particleMS &part2);
 
-        void computeTransitions2BoundStates(std::vector<particleMS> &parts);
+        void computeTransitionsFromTransitionStates(std::vector<particleMS> &parts);
 
         void computeTransitionsFromBoundStates(std::vector<particleMS> &parts);
 
