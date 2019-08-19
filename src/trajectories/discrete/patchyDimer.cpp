@@ -12,9 +12,9 @@ namespace msmrd {
      */
     patchyDimer::patchyDimer(unsigned long Nparticles, int bufferSize) :
     trajectoryPositionOrientation(Nparticles, bufferSize) {
-        int numSphericalSectionsPos = 7;
-        int numRadialSectionsQuat = 5;
-        int numSphericalSectionsQuat = 7;
+        int numSphericalSectionsPos = 7; //7;
+        int numRadialSectionsQuat = 3; //5;
+        int numSphericalSectionsQuat = 6; //7;
         discreteTrajectoryData.reserve(bufferSize);
         positionOrientationPart = std::make_unique<positionOrientationPartition>(rUpperBound, numSphericalSectionsPos,
                                                                                  numRadialSectionsQuat,
@@ -24,9 +24,9 @@ namespace msmrd {
 
     patchyDimer::patchyDimer(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound) :
         trajectoryPositionOrientation(Nparticles, bufferSize), rLowerBound(rLowerBound), rUpperBound(rUpperBound) {
-        int numSphericalSectionsPos = 7;
-        int numRadialSectionsQuat = 5;
-        int numSphericalSectionsQuat = 7;
+        int numSphericalSectionsPos = 7; //7;
+        int numRadialSectionsQuat = 3; //5;
+        int numSphericalSectionsQuat = 6; //7;
         discreteTrajectoryData.reserve(bufferSize);
         positionOrientationPart = std::make_unique<positionOrientationPartition>(rUpperBound, numSphericalSectionsPos,
                                                                                  numRadialSectionsQuat,
