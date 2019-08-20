@@ -2,10 +2,11 @@ import numpy as np
 import pickle
 import multiprocessing
 from multiprocessing import Pool
+import pyemma
 import msmrd2
 from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
-from msmrd2.markovModels import msmrdMarkovModel as msmrdMSM
-from msmrd2.integrators import msmrdIntegrator
+from msmrd2.markovModels import msmrdMarkovModelDiscrete as msmrdMSMDiscrete
+from msmrd2.integrators import msmrdIntegratorDiscrete
 import msmrd2.tools.particleTools as particleTools
 import os
 
@@ -27,9 +28,14 @@ radialBounds = [1.25, 2.25] # must match patchyDimer discretization
 minimumUnboundRadius = 2.5
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
+
 # Other important parameters
 lagtime = 300
 boxsize = 6
+angleDiff = 3*np.pi/5.0
+dtMDsimulation = 0.00001
+stride = 25
+realLagtime = lagtime*dtMDsimulation*stride
 
 # Discretization parameters (need to be consistent with the on used to generate the rate dictionary
 numSphericalSectionsPos = 7 #7
@@ -82,9 +88,11 @@ def MSMRDsimulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/ratedictionary_dimer_t3.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/pickled_data/MSM_dimer_t3.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
-    rateDictionary = pickle.load(pickle_in)
+    mainMSM = pickle.load(pickle_in)
+    tmatrix = mainMSM[0]
+    activeSet = mainMSM[1]
 
     # Set unbound MSM
     seed = int(-2*trajectorynum) # Negative seed, uses random device as seed
@@ -94,13 +102,12 @@ def MSMRDsimulationFPT(trajectorynum):
 
     # Set coupling MSM
     seed = int(-3*trajectorynum) # Negative seed, uses random device as seed
-    couplingMSM = msmrdMSM(numBoundStates, numTransitionsStates, seed, rateDictionary)
+    couplingMSM = msmrdMSMDiscrete(numBoundStates, maxNumBoundStates,  tmatrix, activeSet, realLagtime, seed)
     couplingMSM.setDbound(Dbound, DboundRot)
-    couplingMSM.setMaxNumberBoundStates(maxNumBoundStates)
 
     # Define integrator, boundary and discretization
     seed = -int(1*trajectorynum) # Negative seed, uses random device as seed
-    integrator = msmrdIntegrator(dt, seed, bodytype, numParticleTypes, radialBounds, unboundMSM, couplingMSM)
+    integrator = msmrdIntegratorDiscrete(dt, seed, bodytype, numParticleTypes, radialBounds, unboundMSM, couplingMSM)
     integrator.setBoundary(boxBoundary)
     integrator.setDiscretization(discretization)
 
@@ -114,7 +121,7 @@ def MSMRDsimulationFPT(trajectorynum):
     unbound = True
     while(unbound):
         integrator.integrate(partlist)
-        currentState = partlist[0].state
+        currentState = partlist[0].boundState
         if currentState in boundStatesA:
             unbound = False
             return 'A', integrator.clock

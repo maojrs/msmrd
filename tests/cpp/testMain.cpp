@@ -310,4 +310,8 @@ TEST_CASE("Event manager functionality", "[eventManager]") {
     auto oneLastEvent = eventMgr.getEvent(45,43);
     residualTime = oneLastEvent.waitTime;
     REQUIRE(residualTime == std::numeric_limits<double>::infinity());
+    // Test setting eventType
+    eventMgr.setEventType("testType", 1, 2);
+    auto finalEvent = eventMgr.getEvent(1,2);
+    REQUIRE(finalEvent.eventType == "testType");
 }

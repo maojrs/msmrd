@@ -212,38 +212,32 @@ namespace msmrd {
 
 
     /* Removes unrealized events where unbound particles drifted a distance apart beyond the upper radial bound,
-     * or when zero rates yielded infinite values. This can be more optimally included inside the
-     * computeTransitions2BoundStates function. However, the code is more clear if left separate. Better left for
-     * future code optimization. */
+     * or when zero rates yielded infinite values. */
     template<>
     void msmrdIntegrator<ctmsm>::removeUnrealizedEvents(std::vector<particleMS> &parts) {
-        // Important not to use range loop, iterator loop better since events are being erased.
-        auto it = eventMgr.eventDictionary.begin();
-        while(it != eventMgr.eventDictionary.end()) {
+        std::list<std::map<std::string, decltype(eventMgr.emptyEvent)>::const_iterator> iteratorList;
+        vec3<double> relativePosition;
+        // Loop over all events to flag events that should be erased (loop over iterator)
+        for (auto it = eventMgr.eventDictionary.cbegin(); it != eventMgr.eventDictionary.cend(); it++) {
             auto transitionTime = it->second.waitTime;
             auto iIndex = it->second.part1Index;
             auto jIndex = it->second.part2Index;
-            vec3<double> relativePosition;
-            // Remove event if transition time is infinity
+            // Flag event to be removed if transition time is infinity
             if (std::isinf(transitionTime)) {
-                //eventMgr.removeEvent(iIndex, jIndex);
-                //erase() will return the next iterator
-                it = eventMgr.eventDictionary.erase(it);
-                continue;
+                iteratorList.push_back(it);
             }
-            // If particles in unbound state and relative position is larger than cutOff, remove event.
+            // If particles in unbound state and relative position larger than cutOff, flag event to be removed.
             if (parts[iIndex].boundTo == -1 and parts[jIndex].boundTo == -1) {
-
                 relativePosition = calculateRelativePosition(parts[iIndex].nextPosition, parts[jIndex].nextPosition);
-
                 // Remove event if particles drifted apart
                 if (relativePosition.norm() >= radialBounds[1]) {
-                    //eventMgr.removeEvent(iIndex, jIndex);
-                    it = eventMgr.eventDictionary.erase(it);
-                    continue;
+                    iteratorList.push_back(it);
                 }
             }
-            it++;
+        }
+        // Erase events flagged to be erased
+        for (auto it : iteratorList) {
+            eventMgr.eventDictionary.erase(it);
         }
     }
 

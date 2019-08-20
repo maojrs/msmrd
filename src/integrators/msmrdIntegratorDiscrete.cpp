@@ -207,8 +207,15 @@ namespace msmrd {
             parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
         }
 
-        // Calculate new relative positions and orientations by sampling uniformly in spherical section.
-        auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
+        /* Calculate new relative positions and orientations by sampling either:
+         * nonuniformly on sphere section weighted on r close to the center,
+         * uniformly in spherical section, uniformly in outer shell section or
+         * uniformly in inner shell section. */
+        //auto rr = randg.uniformRange(radialBounds[0],radialBounds[1]);
+        //auto relPosition = rr * randg.uniformSphereSection(phiInterval, thetaInterval);
+        //auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
+        //auto relPosition = radialBounds[1] * randg.uniformSphereSection(phiInterval, thetaInterval);
+        auto relPosition = radialBounds[0] * randg.uniformSphereSection(phiInterval, thetaInterval);
 
         // Set next positions and orientations based on the relative ones (parts[iIndex] keeps track of position)
         parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
@@ -234,46 +241,39 @@ namespace msmrd {
      * to another transition state. */
     template<>
     void msmrdIntegratorDiscrete<ctmsm>::transitionBetweenTransitionStates(int iIndex, int jIndex) {
-        /* Add label to event to indicate to computeTransitionsFromTransitionStates function that
+        /* Change eventType label to indicate to computeTransitionsFromTransitionStates function that
          * a new event needs to be calculated, using previousEvent.endState as the initial state */
-        auto previousEvent = eventMgr.getEvent(iIndex, jIndex);
-        previousEvent.eventType = "inTransition";
+        eventMgr.setEventType("inTransition", iIndex, jIndex);
     }
 
 
     /* Removes unrealized events where unbound particles drifted a distance apart beyond the upper radial bound,
-     * or when zero rates yielded infinite values. This can be more optimally included inside the
-     * computeTransitionsFromTransitionStates function. However, the code is more clear if left separate.
-     * Better left for future code optimization. */
+     * or when zero rates yielded infinite values. */
     template<>
     void msmrdIntegratorDiscrete<ctmsm>::removeUnrealizedEvents(std::vector<particleMS> &parts) {
-        // Important not to use range loop, iterator loop better since events are being erased.
-        auto it = eventMgr.eventDictionary.begin();
-        while(it != eventMgr.eventDictionary.end()) {
+        std::list<std::map<std::string, decltype(eventMgr.emptyEvent)>::const_iterator> iteratorList;
+        vec3<double> relativePosition;
+        // Loop over all events to flag events that should be erased (loop over iterator)
+        for (auto it = eventMgr.eventDictionary.cbegin(); it != eventMgr.eventDictionary.cend(); it++) {
             auto transitionTime = it->second.waitTime;
             auto iIndex = it->second.part1Index;
             auto jIndex = it->second.part2Index;
-            vec3<double> relativePosition;
-            // Remove event if transition time is infinity
+            // Flag event to be removed if transition time is infinity
             if (std::isinf(transitionTime)) {
-                //eventMgr.removeEvent(iIndex, jIndex);
-                //erase() will return the next iterator
-                it = eventMgr.eventDictionary.erase(it);
-                continue;
+                iteratorList.push_back(it);
             }
-            // If particles in unbound state and relative position is larger than cutOff, remove event.
+            // If particles in unbound state and relative position larger than cutOff, flag event to be removed.
             if (parts[iIndex].boundTo == -1 and parts[jIndex].boundTo == -1) {
-
                 relativePosition = calculateRelativePosition(parts[iIndex].nextPosition, parts[jIndex].nextPosition);
-
                 // Remove event if particles drifted apart
                 if (relativePosition.norm() >= radialBounds[1]) {
-                    //eventMgr.removeEvent(iIndex, jIndex);
-                    it = eventMgr.eventDictionary.erase(it);
-                    continue;
+                    iteratorList.push_back(it);
                 }
             }
-            it++;
+        }
+        // Erase events flagged to be erased
+        for (auto it : iteratorList) {
+            eventMgr.eventDictionary.erase(it);
         }
     }
 

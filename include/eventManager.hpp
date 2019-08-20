@@ -7,13 +7,12 @@
 #include <tuple>
 #include <vector>
 
-
 namespace msmrd {
     /**
      * Class to manage events (mainly transitions and/or reactions) in MSM/RD algorithm.
      */
     class eventManager {
-    private:
+    public:
         struct event {
             double waitTime;
             int part1Index;
@@ -23,8 +22,7 @@ namespace msmrd {
             std::string eventType;
         };
         struct event emptyEvent = {.waitTime = std::numeric_limits<double>::infinity(),
-               .part1Index = -1, .part2Index = -1, .originState = -1,  .endState = -1, .eventType = "empty"};
-    public:
+                .part1Index = -1, .part2Index = -1, .originState = -1,  .endState = -1, .eventType = "empty"};
         std::map<std::string, event> eventDictionary;
 
         /*
@@ -45,11 +43,13 @@ namespace msmrd {
 
         void removeEvent(int part1Index, int part2Index);
 
-        double getEventTime(int part1Index, int part2Index);
+        void advanceTime(double timeStep);
 
         struct event getEvent(int part1Index, int part2Index);
 
-        void advanceTime(double timeStep);
+        void setEventType(std::string newEventType, int part1Index, int part2Index);
+
+        double getEventTime(int part1Index, int part2Index);
 
         int getNumEvents() { return eventDictionary.size(); }
 

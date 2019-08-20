@@ -4,9 +4,10 @@ import multiprocessing
 from multiprocessing import Pool
 import msmrd2
 import random
+import pyemma
 from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
-from msmrd2.markovModels import msmrdMarkovModel as msmrdMSM
-from msmrd2.integrators import msmrdIntegrator
+from msmrd2.markovModels import msmrdMarkovModelDiscrete as msmrdMSMDiscrete
+from msmrd2.integrators import msmrdIntegratorDiscrete
 import msmrd2.tools.quaternions as quaternions
 import os
 
@@ -28,10 +29,14 @@ radialBounds = [1.25, 2.25] # must match patchyDimer discretization
 minimumUnboundRadius = 2.5
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
+
 # Other important parameters
 lagtime = 300
 boxsize = 6
 angleDiff = 3*np.pi/5.0
+dtMDsimulation = 0.00001
+stride = 25
+realLagtime = lagtime*dtMDsimulation*stride
 
 # Discretization parameters (need to be consistent with the on used to generate the rate dictionary
 numSphericalSectionsPos = 7 #7
@@ -137,9 +142,11 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
         substate = random.choice([3,4,7,8])
         position2 = pos2[substate - 1]
         orientation2 = quatRotations[substate - 1]
-    part1 = msmrd2.particleMS(types[0], substate, D1, Drot1, position1, orientation1)
-    part2 = msmrd2.particleMS(types[1], substate, D2, Drot2, position2, orientation2)
+    part1 = msmrd2.particleMS(types[0], -1, D1, Drot1, position1, orientation1)
+    part2 = msmrd2.particleMS(types[1], -1, D2, Drot2, position2, orientation2)
     # Set up bound particles as if done by the code (deactivate one of them)
+    part1.setBoundState(substate)
+    part2.setBoundState(substate)
     part1.setBoundTo(1)
     part2.setBoundTo(0)
     part1.deactivateMSM()
@@ -168,9 +175,11 @@ def MSMRDsimulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/ratedictionary_dimer_t3.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/pickled_data/MSM_dimer_t3.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
-    rateDictionary = pickle.load(pickle_in)
+    mainMSM = pickle.load(pickle_in)
+    tmatrix = mainMSM[0]
+    activeSet = mainMSM[1]
 
     # Set unbound MSM
     seed = int(-2*trajectorynum) # Negative seed, uses random device as seed
@@ -180,13 +189,12 @@ def MSMRDsimulationFPT(trajectorynum):
 
     # Set coupling MSM
     seed = int(-3*trajectorynum) # Negative seed, uses random device as seed
-    couplingMSM = msmrdMSM(numBoundStates, numTransitionsStates, seed, rateDictionary)
+    couplingMSM = msmrdMSMDiscrete(numBoundStates, maxNumBoundStates,  tmatrix, activeSet, realLagtime, seed)
     couplingMSM.setDbound(Dbound, DboundRot)
-    couplingMSM.setMaxNumberBoundStates(maxNumBoundStates)
 
     # Define integrator, boundary and discretization
     seed = -int(1*trajectorynum) # Negative seed, uses random device as seed
-    integrator = msmrdIntegrator(dt, seed, bodytype, numParticleTypes, radialBounds, unboundMSM, couplingMSM)
+    integrator = msmrdIntegratorDiscrete(dt, seed, bodytype, numParticleTypes, radialBounds, unboundMSM, couplingMSM)
     integrator.setBoundary(boxBoundary)
     integrator.setDiscretization(discretization)
 
@@ -229,3 +237,14 @@ def multiprocessingHandler():
 
 # Run parallel code
 multiprocessingHandler()
+
+# Serial code for testing with gdb
+# trajNumList = list(range(numTrajectories))
+# with open(filename, 'w') as file:
+#     for index in range(numTrajectories):
+#         state, time = MSMRDsimulationFPT(index)
+#         if state == 'A' or state == 'B':
+#             file.write(state + ' ' + str(time) + '\n')
+#             print("Simulation " + str(index) + ", done. Success!")
+#         else:
+#             print("Simulation " + str(index) + ", done. Failed :(")

@@ -43,6 +43,7 @@ namespace msmrd {
         eventDictionary.erase(eventKey);
     }
 
+
     // Returns time of event in eventList corresponding to the index provided
     double eventManager::getEventTime(int part1Index, int part2Index) {
         std::string eventKey = std::to_string(part1Index) + "--" + std::to_string(part2Index);
@@ -62,6 +63,14 @@ namespace msmrd {
             return search->second;
         } else {
             return emptyEvent;
+        }
+    }
+
+    void eventManager::setEventType(std::string newEventType, int part1Index, int part2Index) {
+        std::string eventKey = std::to_string(part1Index) + "--" + std::to_string(part2Index);
+        auto numKeys = eventDictionary.count(eventKey);
+        if (numKeys == 1) {
+            eventDictionary[eventKey].eventType = newEventType;
         }
     }
 

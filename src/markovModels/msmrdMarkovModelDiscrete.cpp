@@ -21,8 +21,7 @@ namespace msmrd {
 
     std::tuple<double, int> msmrdMarkovModelDiscrete::calculateTransition(int initialState) {
         // Find index of initialState in the transition matrix
-        int localState;
-        localState = getMSMindex(initialState);
+        int localState = getMSMindex(initialState);
         // Return empty event if initialState is not in activeSet
         if (localState == -1) {
             return std::make_tuple(std::numeric_limits<double>::infinity(), -1);
@@ -54,19 +53,16 @@ namespace msmrd {
     };
 
     int msmrdMarkovModelDiscrete::getMSMindex(int MSMRDindex){
-        int localState;
-        // Find index of initialState in the transition matrix
+        // Find index (MSMindex) of initialState (MSMRDindex) in the transition matrix
         std::vector<int>::iterator itr = std::find(activeSet.begin(), activeSet.end(), MSMRDindex);
         if (itr != activeSet.cend()) {
-            // Element found, local index set
-            localState = std::distance(activeSet.begin(), itr);
+            // Element found, return corresponding MSM index
+            return std::distance(activeSet.begin(), itr);
         }
         else {
-            // Element not found, so return -1
-            localState = -1;
+            // Element not found, return -1
+            return -1;
         }
-        return localState;
-
     }
 
 
