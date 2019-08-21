@@ -42,7 +42,7 @@ namespace msmrd {
         int sample = sampleDiscreteState(particleList[0], particleList[1]);
 
         // Save previous value and push into trajectory
-        prevsample = sample;
+        prevsample = 1*sample;
         discreteTrajectoryData.push_back(std::vector<int>{sample});
     };
 

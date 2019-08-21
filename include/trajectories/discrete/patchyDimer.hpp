@@ -30,8 +30,8 @@ namespace msmrd {
         int maxNumberBoundStates = 10;
         double rLowerBound = 1.25; //1.3; //1.4; //1.25; # 1.4 and 2.2 was a good combination;
         double rUpperBound = 2.25;  //2.5; //2.2  //2.2;   # 1.25 and 2.2 the original configuration. 1.4 and 2.4 the latest
-        double tolerancePosition = 0.15;
-        double toleranceOrientation = 0.15*2*M_PI;
+        double tolerancePosition = 0.12; //0.15
+        double toleranceOrientation = 0.12*2*M_PI; //0.15*2*M_PI
         int prevsample = 0;
     public:
         /*

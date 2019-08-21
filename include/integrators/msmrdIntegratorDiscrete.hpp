@@ -68,6 +68,8 @@ namespace msmrd {
         // Redefine integrate function
         void integrate(std::vector<particleMS> &parts);
 
+        void integrateDiffusion(std::vector<particleMS> &parts, double dt);
+
         void setDefaultDiscretization();
 
         void setDiscretization(fullPartition *thisFullPartition);

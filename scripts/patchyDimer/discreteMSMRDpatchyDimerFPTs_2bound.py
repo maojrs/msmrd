@@ -2,7 +2,6 @@ import numpy as np
 import pickle
 import multiprocessing
 from multiprocessing import Pool
-import pyemma
 import msmrd2
 from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
 from msmrd2.markovModels import msmrdMarkovModelDiscrete as msmrdMSMDiscrete
@@ -19,7 +18,7 @@ written to '../data/dimer/first_passage_times/MSMRDfilename_here.
 
 # Main parameters for particle and integrator
 numParticles = 2
-partTypes = 0
+partTypes = 0 # All particles are type 0
 dt = 0.0001 #0.002 # should be smaller than Gillespie inverse transition rates
 bodytype = 'rigidbody'
 numBoundStates = 8
@@ -30,7 +29,7 @@ numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
 
 # Other important parameters
-lagtime = 300
+lagtime = 300 #300
 boxsize = 6
 angleDiff = 3*np.pi/5.0
 dtMDsimulation = 0.00001
@@ -91,8 +90,8 @@ def MSMRDsimulationFPT(trajectorynum):
     pickle_in = open("../../data/pickled_data/MSM_dimer_t3.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
-    tmatrix = mainMSM[0]
-    activeSet = mainMSM[1]
+    tmatrix = mainMSM['transition_matrix']
+    activeSet = mainMSM['active_set']
 
     # Set unbound MSM
     seed = int(-2*trajectorynum) # Negative seed, uses random device as seed

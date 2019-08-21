@@ -56,9 +56,11 @@ namespace msmrd {
                      * the first time, i.e. empty event and relativeDistance < radialBounds[1], or if
                      * particles transitioned between transition states. */
                     auto previousEvent = eventMgr.getEvent(i, j);
-                    if (previousEvent.eventType == "empty") { // returns -1 if |relativePosition| > radialBounds[1]
+                    if (previousEvent.eventType == "empty") {
+                        // returns -1 if |relativePosition| > radialBounds[1]
                         currentTransitionState = computeCurrentTransitionState(parts[i], parts[j]);
                     } else if (previousEvent.eventType == "inTransition") {
+                        //previous endState is current starting state
                         currentTransitionState = previousEvent.endState;
                         eventMgr.removeEvent(i, j);
                     }
@@ -128,7 +130,8 @@ namespace msmrd {
         parts[iIndex].setBoundState(endState);
         parts[jIndex].setBoundState(endState);
         // Set diffusion coefficients in bound state (note states start counting from 1, not zero)
-        parts[iIndex].setDs(markovModel.Dlist[endState-1], markovModel.Drotlist[endState-1]);
+        int MSMindex = markovModel.getMSMindex(endState);
+        parts[iIndex].setDs(markovModel.Dlist[MSMindex], markovModel.Drotlist[MSMindex]);
         // Average bound particle position and orientation (save on particle with smaller index).
         if (rotation) {
             parts[iIndex].nextOrientation = msmrdtools::quaternionSlerp(parts[iIndex].orientation,
@@ -209,13 +212,16 @@ namespace msmrd {
 
         /* Calculate new relative positions and orientations by sampling either:
          * nonuniformly on sphere section weighted on r close to the center,
-         * uniformly in spherical section, uniformly in outer shell section or
-         * uniformly in inner shell section. */
+         * uniformly in spherical section, uniformly in outer shell section,
+         * uniformly in inner shell section or custom */
         //auto rr = randg.uniformRange(radialBounds[0],radialBounds[1]);
         //auto relPosition = rr * randg.uniformSphereSection(phiInterval, thetaInterval);
-        //auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
+        auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
         //auto relPosition = radialBounds[1] * randg.uniformSphereSection(phiInterval, thetaInterval);
-        auto relPosition = radialBounds[0] * randg.uniformSphereSection(phiInterval, thetaInterval);
+        //auto relPosition = radialBounds[0] * randg.uniformSphereSection(phiInterval, thetaInterval);
+        //double rr  = radialBounds[0] + 0.2*(radialBounds[1] - radialBounds[0]);
+        //auto relPosition = rr * randg.uniformSphereSection(phiInterval, thetaInterval);
+
 
         // Set next positions and orientations based on the relative ones (parts[iIndex] keeps track of position)
         parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
@@ -285,7 +291,7 @@ namespace msmrd {
             auto transitionTime = thisEvent.second.waitTime;
             /* Only apply events that should happen in during this
              * timestep (they correspond to transitionTime < 0) */
-            if (transitionTime < 0) {
+            if (transitionTime <= 0) {
                 // Load event data
                 auto iIndex = thisEvent.second.part1Index;
                 auto jIndex = thisEvent.second.part2Index;
@@ -302,7 +308,28 @@ namespace msmrd {
                     transitionBetweenBoundStates(parts, iIndex, jIndex, endState);
                     eventMgr.removeEvent(iIndex, jIndex);
                 } else if (eventType == "transition2transition") {
+                    /* Note event is not removed until a new event is computed later in
+                     * the computeTransitionsFromTransitionStates routine */
                     transitionBetweenTransitionStates(iIndex, jIndex);
+                }
+            }
+        }
+    }
+
+    /* Integrates translational and rotation diffusion for on dt step. (Calls the integrateOne fucntions
+     * of the parent classes) */
+    template<>
+    void msmrdIntegratorDiscrete<ctmsm>::integrateDiffusion(std::vector<particleMS> &parts, double dt) {
+        /* Integrate only active particles and save next positions/orientations in parts[i].next.
+         * Non-active particles will usually correspond to one of the particles of a bound pair of particles */
+        for (int i = 0; i < parts.size(); i++) {
+            if (parts[i].isActive()) {
+                /* Choose basic integration depending if particle MSM is
+                 * active (this corresponds only to the MSM in the unbound state) */
+                if (parts[i].activeMSM) {
+                    integrateOneMS(i, parts, dt);
+                } else {
+                    integrateOne(i, parts, dt);
                 }
             }
         }
@@ -320,36 +347,19 @@ namespace msmrd {
             firstrun = false;
         }
 
-        /* Integrate only active particles and save next positions/orientations in parts[i].next.
-         * Non-active particles will usually correspond to one of the particles of a bound pair of particles */
-        for (int i = 0; i < parts.size(); i++) {
-            if (parts[i].isActive()) {
-                /* Choose basic integration depending if particle MSM is
-                 * active (this corresponds only to the MSM in the unbound state) */
-                if (parts[i].activeMSM) {
-                    integrateOneMS(i, parts, dt);
-                } else {
-                    integrateOne(i, parts, dt);
-                }
-            }
-        }
+        // Integrates diffusion for one time step.
+        integrateDiffusion(parts, dt);
 
         /* Advance global time and in event manager (to make events happen). Useful to draw a timeline to
          * understand order of events. */
         clock += dt;
         eventMgr.advanceTime(dt);
 
-        // Remove unrealized previous events (see function for detailed description).
-        removeUnrealizedEvents(parts);
-
-        // Compute transitions to bound states (from unbound states) and add them to the event manager.
-        computeTransitionsFromTransitionStates(parts);
-
-        // Compute transitions from bound states (to unbound or other bound states) and add them to event manager.
-        computeTransitionsFromBoundStates(parts);
-
         // Check for events in event manager that should happen during this time step [t,t+dt) and make them happen.
         applyEvents(parts);
+
+        // Remove unrealized previous events (see function for detailed description).
+        removeUnrealizedEvents(parts);
 
         // Enforce boundary and set new positions into parts[i].nextPosition (only if particle is active).
         enforceBoundary(parts);
@@ -358,6 +368,13 @@ namespace msmrd {
          * calculated by integrator and boundary as current position/orientation). Note states
          * are modified directly and don't need to be updated. */
         updatePositionOrientation(parts);
+
+        // Compute future transitions to bound states (from unbound states) and add them to the event manager.
+        computeTransitionsFromTransitionStates(parts);
+
+        // Compute future transitions from bound states (to unbound or other bound states); add them to event manager.
+        computeTransitionsFromBoundStates(parts);
+
 
     }
 
