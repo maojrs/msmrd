@@ -53,7 +53,7 @@ namespace msmrdtools {
     // Rotates vector p by rotation represented by quaternion q.
     vec3<double> rotateVec(vec3<double> p, quaternion<double> q) {
         vec3<double> result;
-        quaternion<double> resultquat = 1.0*quaternion<double>(p);
+        auto resultquat = quaternion<double>(p);
         resultquat = q*(resultquat*q.conj());
         result[0] = resultquat[1];
         result[1] = resultquat[2];

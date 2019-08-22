@@ -34,7 +34,8 @@ namespace msmrd {
         py::class_<msmrdIntegrator<ctmsm>, overdampedLangevinMarkovSwitch<ctmsm>>(m, "msmrdIntegrator",
                                                                               "Integrator for msmrd algorithm "
                                                                               "(timestep, seed, particlesbodytype, "
-                                                                              "numParticleTypes, relativeDistanceCutOff,"
+                                                                              "numParticleTypes, "
+                                                                              "relativeDistanceCutOff,"
                                                                               "MSMlist, mainMarkovModel, "
                                                                               "positionOrientationPartition)")
                 .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, ctmsm &, msmrdMSM &>())
@@ -45,7 +46,8 @@ namespace msmrd {
         py::class_<msmrdIntegratorDiscrete<ctmsm>, overdampedLangevinMarkovSwitch<ctmsm>>(m, "msmrdIntegratorDiscrete",
                                                                                   "Integrator for msmrd algorithm "
                                                                                   "(timestep, seed, particlesbodytype, "
-                                                                                  "numParticleTypes, relativeDistanceCutOff,"
+                                                                                  "numParticleTypes, "
+                                                                                  "relativeDistanceCutOff,"
                                                                                   "MSMlist, mainMarkovModel, "
                                                                                   "positionOrientationPartition)")
                 .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &,

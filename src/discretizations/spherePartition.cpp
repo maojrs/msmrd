@@ -136,8 +136,8 @@ namespace msmrd{
                 break;
             }
         }
-        sectionNum = std::accumulate(std::begin(regionsPerCollar),
-                                     std::next(std::begin(regionsPerCollar), currentCollarIndex), 0) + currentThetaIndex + 1;
+        sectionNum = std::accumulate(std::begin(regionsPerCollar), std::next(std::begin(regionsPerCollar),
+                                     currentCollarIndex), 0) + currentThetaIndex + 1;
 
         return sectionNum;
     }

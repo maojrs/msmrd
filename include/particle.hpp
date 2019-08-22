@@ -62,8 +62,8 @@ namespace msmrd {
             type = 0;
             orientvector = vec3<double>(0., 0., 1.);
             orientvector = msmrdtools::rotateVec(orientvector, orientation);
-            std::vector<double> nextPosition(position);
-            std::vector<double> nextOrientation(orientation);
+            nextPosition = vec3<double>(position);
+            nextOrientation = quaternion<double>(orientation);
             nextOrientvector = 1.0 * orientvector;
             symmetryQuaternions.resize(0);
         };
