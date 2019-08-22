@@ -29,7 +29,7 @@ numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
 
 # Other important parameters
-lagtime = 300 #300
+lagtime = 200 #300
 boxsize = 6
 angleDiff = 3*np.pi/5.0
 dtMDsimulation = 0.00001
@@ -37,9 +37,9 @@ stride = 25
 realLagtime = lagtime*dtMDsimulation*stride
 
 # Discretization parameters (need to be consistent with the on used to generate the rate dictionary
-numSphericalSectionsPos = 7 #7
-numRadialSectionsQuat = 3 #5
-numSphericalSectionsQuat = 6 #7
+numSphericalSectionsPos = 7 #7 #7
+numRadialSectionsQuat = 5 #3 #5
+numSphericalSectionsQuat = 7 #6 #7
 totalnumSecsQuat = numSphericalSectionsQuat*(numRadialSectionsQuat -1) + 1
 numTransitionsStates = numSphericalSectionsPos * totalnumSecsQuat #203
 
@@ -151,4 +151,14 @@ def multiprocessingHandler():
 
 
 # Run parallel code
-multiprocessingHandler()
+#multiprocessingHandler()
+
+# Serial code for testing with gdb
+with open(filename, 'w') as file:
+    for index in range(numTrajectories):
+        state, time = MSMRDsimulationFPT(index)
+        if state == 'A' or state == 'B':
+            file.write(state + ' ' + str(time) + '\n')
+            print("Simulation " + str(index) + ", done. Success!")
+        else:
+            print("Simulation " + str(index) + ", done. Failed :(")

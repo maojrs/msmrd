@@ -149,7 +149,6 @@ namespace msmrd {
     template<>
     void msmrdIntegratorDiscrete<ctmsm>::transition2UnboundState(std::vector<particleMS> &parts, int iIndex,
                                                          int jIndex, int endState) {
-
         int iNewState;
         int jNewState;
         // Redefine endstate indexing, so it is understood by the partition/discretization.
@@ -216,9 +215,9 @@ namespace msmrd {
          * uniformly in inner shell section or custom */
         //auto rr = randg.uniformRange(radialBounds[0],radialBounds[1]);
         //auto relPosition = rr * randg.uniformSphereSection(phiInterval, thetaInterval);
-        auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
+        //auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
         //auto relPosition = radialBounds[1] * randg.uniformSphereSection(phiInterval, thetaInterval);
-        //auto relPosition = radialBounds[0] * randg.uniformSphereSection(phiInterval, thetaInterval);
+        auto relPosition = radialBounds[0] * randg.uniformSphereSection(phiInterval, thetaInterval);
         //double rr  = radialBounds[0] + 0.2*(radialBounds[1] - radialBounds[0]);
         //auto relPosition = rr * randg.uniformSphereSection(phiInterval, thetaInterval);
 
@@ -347,19 +346,29 @@ namespace msmrd {
             firstrun = false;
         }
 
+        /* NOTE: the ordering of the following routines is veryy important, draw a timeline if necessary.*/
+
+        // Compute future transitions to bound states (from unbound states) and add them to the event manager.
+        computeTransitionsFromTransitionStates(parts);
+
+        // Compute future transitions from bound states (to unbound or other bound states); add them to event manager.
+        computeTransitionsFromBoundStates(parts);
+
         // Integrates diffusion for one time step.
         integrateDiffusion(parts, dt);
+
+        // Remove unrealized previous events (see function for detailed description).
+        removeUnrealizedEvents(parts);
 
         /* Advance global time and in event manager (to make events happen). Useful to draw a timeline to
          * understand order of events. */
         clock += dt;
         eventMgr.advanceTime(dt);
 
-        // Check for events in event manager that should happen during this time step [t,t+dt) and make them happen.
+        /* Check for events in event manager that should happen during this time step [t,t+dt) and
+         * make them happen. Note if the lag-time is a multiple of dt (n*dt), which is likely the case,
+         * events will happen at end of the timestep exactly */
         applyEvents(parts);
-
-        // Remove unrealized previous events (see function for detailed description).
-        removeUnrealizedEvents(parts);
 
         // Enforce boundary and set new positions into parts[i].nextPosition (only if particle is active).
         enforceBoundary(parts);
@@ -368,12 +377,6 @@ namespace msmrd {
          * calculated by integrator and boundary as current position/orientation). Note states
          * are modified directly and don't need to be updated. */
         updatePositionOrientation(parts);
-
-        // Compute future transitions to bound states (from unbound states) and add them to the event manager.
-        computeTransitionsFromTransitionStates(parts);
-
-        // Compute future transitions from bound states (to unbound or other bound states); add them to event manager.
-        computeTransitionsFromBoundStates(parts);
 
 
     }

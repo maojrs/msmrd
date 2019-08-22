@@ -138,6 +138,7 @@ namespace msmrd {
         int numRadialSectionsQuat = 5;
         int numSphericalSectionsQuat = 7;
         double relativeDistanceCutOff = radialBounds[1];
+        // TODO: Release memory of these pointers after use, or convert to smart pointers.
         positionPart = new spherePartition(numSphericalSectionsPos);
         positionOrientationPart = new fullPartition(relativeDistanceCutOff, numSphericalSectionsPos,
                                                     numRadialSectionsQuat, numSphericalSectionsQuat);
