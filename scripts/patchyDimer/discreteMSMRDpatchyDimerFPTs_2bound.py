@@ -29,7 +29,7 @@ numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
 
 # Other important parameters
-lagtime = 200 #300
+lagtime = 300 #150 #300
 boxsize = 6
 angleDiff = 3*np.pi/5.0
 dtMDsimulation = 0.00001
@@ -151,14 +151,14 @@ def multiprocessingHandler():
 
 
 # Run parallel code
-#multiprocessingHandler()
+multiprocessingHandler()
 
-# Serial code for testing with gdb
-with open(filename, 'w') as file:
-    for index in range(numTrajectories):
-        state, time = MSMRDsimulationFPT(index)
-        if state == 'A' or state == 'B':
-            file.write(state + ' ' + str(time) + '\n')
-            print("Simulation " + str(index) + ", done. Success!")
-        else:
-            print("Simulation " + str(index) + ", done. Failed :(")
+# # Serial code for testing with gdb
+# with open(filename, 'w') as file:
+#     for index in range(numTrajectories):
+#         state, time = MSMRDsimulationFPT(index)
+#         if state == 'A' or state == 'B':
+#             file.write(state + ' ' + str(time) + '\n')
+#             print("Simulation " + str(index) + ", done. Success!")
+#         else:
+#             print("Simulation " + str(index) + ", done. Failed :(")

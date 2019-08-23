@@ -21,7 +21,7 @@ numParticles = 2
 partTypes = 0 # All particles are type 0
 dt = 0.0001 #0.002 # should be smaller than Gillespie inverse transition rates
 bodytype = 'rigidbody'
-initialState = 'B'
+initialState = 'A'
 numBoundStates = 8
 maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyDimer discretization
@@ -30,7 +30,7 @@ numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
 
 # Other important parameters
-lagtime = 200 #300
+lagtime = 150 #150 #300
 boxsize = 6
 angleDiff = 3*np.pi/5.0
 dtMDsimulation = 0.00001
