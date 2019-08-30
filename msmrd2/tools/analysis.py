@@ -3,24 +3,24 @@ import pickle
 
 # Functions to help analyze data
 
-def bootstrappingMFPTs(fptList, numBootstrapSamples):
+def bootstrapping(valuesList, numBootstrapSamples):
     '''
-    Computes the bootsrapping statistic of a list of first passage time.
-    :param fptList: list or array of first passage times
+    Computes the bootsrapping statistic of a list of arbitrary values.
+    :param valuesList: list or array of values to calculate bootstrap statistics on
     :param numBootstrapSamples: number of bottstrapped samples used to calculate the
-    mean first passage time and its standard deviation
-    :return: mean first passage time and its standard deviation
+    mean value and its standard deviation
+    :return: mean value and its standard deviation
     '''
-    numValues = len(fptList)
-    mfpts = np.zeros(numBootstrapSamples)
+    numValues = len(valuesList)
+    values = np.zeros(numBootstrapSamples)
     # Calculate boostrapped samples
     for i in range(numBootstrapSamples):
-        bootstrapSample = np.random.choice(fptList, size = numValues, replace = True)
-        mfpts[i] = bootstrapSample.mean()
+        bootstrapSample = np.random.choice(valuesList, size = numValues, replace = True)
+        values[i] = bootstrapSample.mean()
     # Compute mean and standard deviation over bootstrapped samples
-    mfpt = mfpts.mean()
-    fptStdDev = np.std(mfpts)
-    return mfpt, fptStdDev
+    meanValues = values.mean()
+    valuesStdDev = np.std(values)
+    return meanValues, valuesStdDev
 
 def writeParameters(filename, parameterDictionary):
     '''
