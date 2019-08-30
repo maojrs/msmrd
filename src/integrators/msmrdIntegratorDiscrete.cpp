@@ -286,32 +286,38 @@ namespace msmrd {
     /* Apply events in event manager that should happen during the current time step. */
     template<>
     void msmrdIntegratorDiscrete<ctmsm>::applyEvents(std::vector<particleMS> &parts) {
-        for (auto &thisEvent : eventMgr.eventDictionary) {
-            auto transitionTime = thisEvent.second.waitTime;
+        std::list<std::map<std::string, decltype(eventMgr.emptyEvent)>::const_iterator> iteratorList;
+        // Loop over dictionary using iterators
+        for (auto it = eventMgr.eventDictionary.cbegin(); it != eventMgr.eventDictionary.cend(); it++) {
+            auto transitionTime = it->second.waitTime;
             /* Only apply events that should happen in during this
              * timestep (they correspond to transitionTime < 0) */
             if (transitionTime <= 0) {
                 // Load event data
-                auto iIndex = thisEvent.second.part1Index;
-                auto jIndex = thisEvent.second.part2Index;
-                auto endState = thisEvent.second.endState;
-                auto eventType = thisEvent.second.eventType;
+                auto iIndex = it->second.part1Index;
+                auto jIndex = it->second.part2Index;
+                auto endState = it->second.endState;
+                auto eventType = it->second.eventType;
                 // Make event happen (depending on event type) and remove event once it has happened
                 if (eventType == "binding") {
                     transition2BoundState(parts, iIndex, jIndex, endState);
-                    eventMgr.removeEvent(iIndex, jIndex);
+                    iteratorList.push_back(it);
                 } else if (eventType == "unbinding") {
                     transition2UnboundState(parts, iIndex, jIndex, endState);
-                    eventMgr.removeEvent(iIndex, jIndex);
+                    iteratorList.push_back(it);
                 } else if (eventType == "bound2bound") {
                     transitionBetweenBoundStates(parts, iIndex, jIndex, endState);
-                    eventMgr.removeEvent(iIndex, jIndex);
+                    iteratorList.push_back(it);
                 } else if (eventType == "transition2transition") {
                     /* Note event is not removed until a new event is computed later in
                      * the computeTransitionsFromTransitionStates routine */
                     transitionBetweenTransitionStates(iIndex, jIndex);
                 }
             }
+        }
+        // Erase events that just were applied
+        for (auto it : iteratorList) {
+            eventMgr.eventDictionary.erase(it);
         }
     }
 
