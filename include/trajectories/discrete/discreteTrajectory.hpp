@@ -31,7 +31,8 @@ namespace msmrd {
         /*
          * @positionOrientationPart full six dimensional partition of phase space of relative position and orientation.
          * This is required to sample the discrete trajectory in the transition regions given by this discretization.
-         * IMPORTANT: The MSMRD integrator must use the same partition.
+         * IMPORTANT: The MSMRD integrator must use the same partition. Also this pointer should be set in constructor
+         * of child class.
          * @boundStates vector of tuples. Each tuple contains a vector and a quaternion indicating each one of the
          * bound states. The vector corresponds to the relative position (pos2-pos1) in the frame of reference of
          * particle 1. (smaller index) between particle 1 and 2. The fixed frame of reference also assumes particle 1
@@ -110,28 +111,14 @@ namespace msmrd {
     template<int numBoundStates>
     discreteTrajectory<numBoundStates>::discreteTrajectory(unsigned long Nparticles, int bufferSize) :
             trajectoryPositionOrientation(Nparticles, bufferSize) {
-        int numSphericalSectionsPos = 7; //7; //7;
-        int numRadialSectionsQuat = 5; // 3; //5;
-        int numSphericalSectionsQuat =7; // 6; //7;
         discreteTrajectoryData.reserve(bufferSize);
-        positionOrientationPart = std::make_unique<positionOrientationPartition>(rUpperBound, numSphericalSectionsPos,
-                                                                                 numRadialSectionsQuat,
-                                                                                 numSphericalSectionsQuat);
-        setBoundStates();
     };
 
     template<int numBoundStates>
     discreteTrajectory<numBoundStates>::discreteTrajectory(unsigned long Nparticles, int bufferSize,
                                                            double rLowerBound, double rUpperBound) :
             trajectoryPositionOrientation(Nparticles, bufferSize), rLowerBound(rLowerBound), rUpperBound(rUpperBound) {
-        int numSphericalSectionsPos = 7; //7; //7;
-        int numRadialSectionsQuat = 5; // 3; //5;
-        int numSphericalSectionsQuat =7; // 6; //7;
         discreteTrajectoryData.reserve(bufferSize);
-        positionOrientationPart = std::make_unique<positionOrientationPartition>(rUpperBound, numSphericalSectionsPos,
-                                                                                 numRadialSectionsQuat,
-                                                                                 numSphericalSectionsQuat);
-        setBoundStates();
     };
 
     /* Samples discrete trajectory directly from the particle list. This is done for every timestep and saved into

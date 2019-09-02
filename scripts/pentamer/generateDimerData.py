@@ -26,9 +26,9 @@ numSimulations = 600 #500 #1000 #20 #200
 timesteps = 3000000 #2000000 #5000000 #400000 #20000000
 bufferSize = 1024
 stride = 25
-outTxt = False
-outH5 = True
-outChunked = True
+outTxt = True
+outH5 = False
+outChunked = False
 trajtype = "patchyDimer"
 
 # Define patchy Particle potential with angular dependence
@@ -52,7 +52,7 @@ parentDirectory = "../../data/pentamer/"
 # parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/"
 
 # Create folder for data
-foldername = "dimer"
+foldername = "dimertest"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)

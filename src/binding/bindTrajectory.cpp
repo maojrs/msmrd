@@ -27,15 +27,18 @@ namespace msmrd {
                 .def("writeChunk2H5file", &trajectoryPositionOrientation::writeChunk2H5file<double, 8>);
 
 
-        py::class_<patchyDimer, trajectoryPositionOrientation>(m, "patchyDimer", "discrete trajectory of patchy dimer"
-                                                                                 "example(#particles or #pairs "
-                                                                                 "of particles, approx size)")
+
+        // Not defined as child class since prent class is a virtual template
+        py::class_<patchyDimer>(m, "patchyDimer", "discrete trajectory of patchy dimer"
+                                                  "example(#particles or #pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
                 .def(py::init<int &, int &, double &, double &>())
                 .def("sampleDiscreteTrajectory", &patchyDimer::sampleDiscreteTrajectory)
                 .def("getState", &patchyDimer::getState)
                 .def("discretizeTrajectory", &patchyDimer::discretizeTrajectory)
-                .def("discretizeTrajectoryH5", &patchyDimer::discretizeTrajectoryH5);
+                .def("discretizeTrajectoryH5", &patchyDimer::discretizeTrajectoryH5)
+                .def("write2H5file", &patchyDimer::write2H5file<double, 8>)
+                .def("writeChunk2H5file", &patchyDimer::writeChunk2H5file<double, 8>);
 
 
 

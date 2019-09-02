@@ -116,6 +116,7 @@ set(PY_SOURCES
         include/trajectories/trajectory.hpp
         include/trajectories/trajectoryPosition.hpp
         include/trajectories/trajectoryPositionOrientation.hpp
+        include/trajectories/discrete/discreteTrajectory.hpp
         include/trajectories/discrete/patchyDimer.hpp
         include/trajectories/discrete/patchyProtein.hpp
         )
