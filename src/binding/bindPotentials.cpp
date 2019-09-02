@@ -39,7 +39,8 @@ namespace msmrd {
                                                              "explicit angular dependence(sigma, strength, "
                                                              "patchesCoordinates)")
                 .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
-                .def(py::init<double &, double &, double &, std::vector<std::vector<double>> &>());
+                .def(py::init<double &, double &, double &, std::vector<std::vector<double>> &>())
+                .def("setNumAngularMinima", &patchyParticleAngular::setNumAngularMinima);
 
 
         py::class_<patchyProtein, pairPotential>(m, "patchyProtein",

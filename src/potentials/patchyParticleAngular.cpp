@@ -20,12 +20,22 @@ namespace msmrd {
             angularStrength(angularStrength), patchyParticle(sigma, strength, patchesCoordinates) {};
 
 
+    // Sets number of minimas of angular part of potential. Currently it only accepts one or two.
+    void patchyParticleAngular::setNumAngularMinima(int newNumAngularMinima) {
+        if ( (newNumAngularMinima != 1) and (newNumAngularMinima != 2) ) {
+            std::__throw_range_error("Only values of 1 or 2 are currently supported for number"
+                                     "of angular potential minima.");
+        }
+            numAngularMinima = newNumAngularMinima;
+    }
+
+
     // Evaluates potential at given positions and orientations of two particles
     double patchyParticleAngular::evaluate(const particle &part1, const particle &part2) {
         double repulsivePotential;
         double attractivePotential;
         double patchesPotential = 0.0;
-        double angularPotential;
+        double angularPotential = 1.0;
         vec3<double> patch1;
         vec3<double> patch2;
         vec3<double> patchNormal1;
@@ -72,9 +82,17 @@ namespace msmrd {
             plane1 = plane1/plane1.norm();
             plane2 = plane2/plane2.norm();
 
-            // Additional rotational potential depending on how well aligned the planes are. (-cos(theta)^8)
-            double cosSquared = (plane1*plane2)*(plane1*plane2);
-            angularPotential = -0.5*sigma*angularStrength*cosSquared*cosSquared*cosSquared*cosSquared;
+            /* Additional rotational potential depending on how well aligned
+             * the planes are, (-cos(theta)^8) it has two minima */
+            if (numAngularMinima == 2) {
+                double cosSquared = (plane1 * plane2) * (plane1 * plane2);
+                angularPotential = -0.5 * sigma * angularStrength * cosSquared * cosSquared * cosSquared * cosSquared;
+            } else {
+                //Alternative angular potential with only one minima -(0.5*cos(theta)+0.5)^8
+                double cosTermSquared = (0.5 * plane1 * plane2 + 0.5) * (0.5 * plane1 * plane2 + 0.5);
+                angularPotential = -0.5 * sigma * angularStrength * cosTermSquared * cosTermSquared *
+                        cosTermSquared * cosTermSquared;
+            }
         }
 
 
@@ -164,10 +182,21 @@ namespace msmrd {
             plane1 = plane1/plane1.norm();
             plane2 = plane2/plane2.norm();
 
-            // Additional torques depending on how well aligned the planes are. (Derivative of -cos(theta)^8)
-            double cosSquared = (plane1*plane2)*(plane1*plane2);
-            double cosSeventh = cosSquared*cosSquared*cosSquared*(plane1*plane2);
-            vec3<double> derivativeAngluarPotential = 0.5*angularStrength*sigma*8*cosSeventh*plane1.cross(plane2);
+            // Additional torques depending on how well aligned the planes are.
+            vec3<double> derivativeAngluarPotential;
+            // It two minimas, use potential of -cos(theta)^8
+            if (numAngularMinima == 2) {
+                double cosSquared = (plane1 * plane2) * (plane1 * plane2);
+                double cosSeventh = cosSquared * cosSquared * cosSquared * (plane1 * plane2);
+                derivativeAngluarPotential =
+                        0.5 * angularStrength * sigma * 8 * cosSeventh * plane1.cross(plane2);
+            } else{
+                // If one minima use potential -(0.5*cos(theta)+0.5)^8
+                double cosTermSquared = (0.5 * plane1 * plane2 + 0.5) * (0.5 * plane1 * plane2 + 0.5);
+                double cosTermSeven = cosTermSquared * cosTermSquared * cosTermSquared * (0.5 * plane1 * plane2 + 0.5);
+                derivativeAngluarPotential =
+                        0.5 * angularStrength * sigma * 8 * cosTermSeven * 0.5* plane1.cross(plane2);
+            }
             torque1 += derivativeAngluarPotential;
             torque2 -= derivativeAngluarPotential;
         }
