@@ -154,7 +154,7 @@ def simulationFPT(trajectorynum):
         if boundState == 0:
             bound = False
             return initialState, integrator.clock
-        elif integrator.clock >= 2000.0:
+        elif integrator.clock >= 10000.0:
             bound = False
             return 'Failed at:', integrator.clock
 

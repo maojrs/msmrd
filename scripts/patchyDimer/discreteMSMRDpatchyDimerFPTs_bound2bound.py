@@ -214,7 +214,7 @@ def MSMRDsimulationFPT(trajectorynum):
         elif targetState == 'B' and currentState in boundStatesB:
             intransition = False
             return 'B', integrator.clock
-        elif integrator.clock >= 2000.0:
+        elif integrator.clock >= 10000.0:
             intransition = False
             return 'Failed at:', integrator.clock
 

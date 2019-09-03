@@ -12,10 +12,19 @@
 
 namespace msmrd {
     /**
-     * Base class for to create patchyDimer trajectories
-     * @tparam numBoundStates number of bound states in current trajectory discretization
+     * Base class to create discrete trajectories. The main difference with the general class
+     * trajectoryPositionOrientation is that this class can sample the discrete trajectory that is
+     * specific for the application. In short words, it chooses how to discretize the full
+     * trajectory of two particles into a discretized trajectory to be analyzed and extracted into
+     * a Markov state model. In general the discretizations will follow the core MSM approach. It
+     * also implements functionality to discretize trajectories directly loaded from a python array.
+     *
+     * @tparam numBoundStates number of bound states in current trajectory discretization. Note
+     * the max number of bound states is calculated from this value (8 bound states = 10 max
+     * number bound states; 74 states = 100 max number of bound states). This is useful to start
+     * the indexing of transition states from a "nice number".
      */
-    //template <int numBoundStates>
+
     template<int numBoundStates>
     class discreteTrajectory : public trajectoryPositionOrientation {
     protected:

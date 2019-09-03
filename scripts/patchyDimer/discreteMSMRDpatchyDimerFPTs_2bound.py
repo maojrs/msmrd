@@ -29,8 +29,8 @@ numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 10000
 
 # Other important parameters
-lagtime = 300 #150 #300
-boxsize = 6
+lagtime = 150 #300
+boxsize = 6 #8 #6
 angleDiff = 3*np.pi/5.0
 dtMDsimulation = 0.00001
 stride = 25
@@ -127,7 +127,7 @@ def MSMRDsimulationFPT(trajectorynum):
         elif currentState in boundStatesB:
             unbound = False
             return 'B', integrator.clock
-        elif integrator.clock >= 2000.0:
+        elif integrator.clock >= 10000.0:
             unbound = False
             return 'Failed at:', integrator.clock
 

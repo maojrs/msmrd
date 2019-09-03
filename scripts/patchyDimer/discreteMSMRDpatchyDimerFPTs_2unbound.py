@@ -211,7 +211,7 @@ def MSMRDsimulationFPT(trajectorynum):
         if (partlist[0].boundTo == -1) and (currentState == 0):
             bound = False
             return initialState, integrator.clock
-        elif integrator.clock >= 2000.0:
+        elif integrator.clock >= 10000.0:
             unbound = False
             return 'Failed at:', integrator.clock
 

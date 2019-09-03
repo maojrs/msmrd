@@ -40,6 +40,18 @@ namespace msmrd {
                 .def("write2H5file", &patchyDimer::write2H5file<double, 8>)
                 .def("writeChunk2H5file", &patchyDimer::writeChunk2H5file<double, 8>);
 
+        // Not defined as child class since prent class is a virtual template
+        py::class_<patchyDimer2>(m, "patchyDimer2", "discrete trajectory of patchy dimer 2"
+                                                  "example(#particles or #pairs of particles, approx size)")
+                .def(py::init<int &, int &>())
+                .def(py::init<int &, int &, double &, double &>())
+                .def("sampleDiscreteTrajectory", &patchyDimer2::sampleDiscreteTrajectory)
+                .def("getState", &patchyDimer2::getState)
+                .def("discretizeTrajectory", &patchyDimer2::discretizeTrajectory)
+                .def("discretizeTrajectoryH5", &patchyDimer2::discretizeTrajectoryH5)
+                .def("write2H5file", &patchyDimer2::write2H5file<double, 8>)
+                .def("writeChunk2H5file", &patchyDimer2::writeChunk2H5file<double, 8>);
+
 
 
     }
