@@ -14,7 +14,6 @@ namespace msmrd {
      */
     class patchyParticleAngular : public patchyParticle {
     protected:
-        int numAngularMinima = 2; // Either 1 or 2
         double patchPotentialScaling = 0.5; // 0.3 original value
         double angularStrength = 2.0;
     public:
@@ -27,8 +26,6 @@ namespace msmrd {
 
         patchyParticleAngular(double sigma, double strength, double angularStrength,
                               std::vector<vec3<double>> patchesCoordinates);
-
-        void setNumAngularMinima(int newNumAngularMinima);
 
         double evaluate(const particle &part1, const particle &part2) override;
 

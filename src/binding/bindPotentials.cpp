@@ -6,6 +6,7 @@
 #include "potentials/gayBerne.hpp"
 #include "potentials/patchyParticle.hpp"
 #include "potentials/patchyParticleAngular.hpp"
+#include "potentials/patchyParticleAngular2.hpp"
 #include "potentials/patchyProtein.hpp"
 #include "potentials/patchyProteinMarkovSwitch.hpp"
 
@@ -39,8 +40,15 @@ namespace msmrd {
                                                              "explicit angular dependence(sigma, strength, "
                                                              "patchesCoordinates)")
                 .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
-                .def(py::init<double &, double &, double &, std::vector<std::vector<double>> &>())
-                .def("setNumAngularMinima", &patchyParticleAngular::setNumAngularMinima);
+                .def(py::init<double &, double &, double &, std::vector<std::vector<double>> &>());
+
+
+        py::class_<patchyParticleAngular2, patchyParticleAngular>(m, "patchyParticleAngular2", "Patchy particle "
+                                                                     "potential with explicit angular dependence in "
+                                                                     "terms of quaternions (sigma, strength, "
+                                                                     "patchesCoordinates)")
+                .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
+                .def(py::init<double &, double &, double &, std::vector<std::vector<double>> &>());
 
 
         py::class_<patchyProtein, pairPotential>(m, "patchyProtein",

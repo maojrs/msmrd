@@ -23,7 +23,7 @@ radialBounds = [1.25, 2.25] # must match patchyDimer discretization
 minimumUnboundRadius = 2.5
 numTrajectories = 10000
 # Other important parameters
-boxsize = 10 #8 #6
+boxsize = 6 #8 #6
 
 # Parameters of patchy Particle potential with angular dependence (make sure it is consistent with msmrd data)
 sigma = 1.0
@@ -49,7 +49,7 @@ except OSError as error:
     print("First passage times directory already exists. Simulation continues.")
 
 # Create empty files to save the data in parallel algorithm
-filename = parentDirectory  + 'patchyDimerFPTs_2bound_trajs' + str(numTrajectories) \
+filename = parentDirectory  + 'testpatchyDimerFPTs_2bound_trajs' + str(numTrajectories) \
            +'_boxsize' + str(boxsize) + '.xyz'
 
 def simulationFPT(trajectorynum):

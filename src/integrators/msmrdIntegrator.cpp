@@ -33,7 +33,8 @@ namespace msmrd {
                         relativePosition = calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition);
                         if (relativePosition.norm() < radialBounds[1]) {
                             if (rotation) {
-                                relativeOrientation = parts[i].nextOrientation.conj() * parts[j].nextOrientation;
+                                //relativeOrientation = parts[i].nextOrientation.conj() * parts[j].nextOrientation;
+                                relativeOrientation = parts[j].nextOrientation * parts[i].nextOrientation.conj();
                                 refQuaternion = parts[i].nextOrientation.conj();
                                 currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
                                                                                                    relativeOrientation,

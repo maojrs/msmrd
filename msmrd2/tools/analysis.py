@@ -3,15 +3,16 @@ import pickle
 
 # Functions to help analyze data
 
-def bootstrapping(valuesList, numBootstrapSamples):
+def bootstrapping(valuesList, numBootstrapSamples, numValues = None):
     '''
     Computes the bootsrapping statistic of a list of arbitrary values.
     :param valuesList: list or array of values to calculate bootstrap statistics on
-    :param numBootstrapSamples: number of bottstrapped samples used to calculate the
+    :param numBootstrapSamples: number of bootstrapped samples used to calculate the
     mean value and its standard deviation
     :return: mean value and its standard deviation
     '''
-    numValues = len(valuesList)
+    if numValues == None:
+        numValues = len(valuesList)
     values = np.zeros(numBootstrapSamples)
     # Calculate boostrapped samples
     for i in range(numBootstrapSamples):

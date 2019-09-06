@@ -68,7 +68,7 @@ except OSError as error:
     print("First passage times directory already exists. Simulation continues.")
 
 # Chooses filename for output file with the results of the parallel simulation
-filename = parentDirectory + 'MSMRDpatchyDimerFPTs_2bound_trajs' + str(numTrajectories) + \
+filename = parentDirectory + 'testMSMRDpatchyDimerFPTs_2bound_trajs' + str(numTrajectories) + \
            '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
 def MSMRDsimulationFPT(trajectorynum):
@@ -87,7 +87,7 @@ def MSMRDsimulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/MSM_dimer_t3.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/pickled_data/newMSM_dimer_t3.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']

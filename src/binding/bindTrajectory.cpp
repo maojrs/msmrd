@@ -28,11 +28,17 @@ namespace msmrd {
 
 
 
-        // Not defined as child class since prent class is a virtual template
+        /* Not defined as child class since parent class is a virtual template, so need to add all functions
+         * from parent classes manually (all the way to the original trajectory.hpp parent)*/
         py::class_<patchyDimer>(m, "patchyDimer", "discrete trajectory of patchy dimer"
                                                   "example(#particles or #pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
                 .def(py::init<int &, int &, double &, double &>())
+                .def("setBoundary", &patchyDimer::setBoundary)
+                .def("sample", &patchyDimer::sample)
+                .def("sampleRelative", &patchyDimer::sampleRelative)
+                .def("write2file", &patchyDimer::write2file<double>)
+                .def("emptyBuffer", &patchyDimer::emptyBuffer)
                 .def("sampleDiscreteTrajectory", &patchyDimer::sampleDiscreteTrajectory)
                 .def("getState", &patchyDimer::getState)
                 .def("discretizeTrajectory", &patchyDimer::discretizeTrajectory)
@@ -45,6 +51,11 @@ namespace msmrd {
                                                   "example(#particles or #pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
                 .def(py::init<int &, int &, double &, double &>())
+                .def("setBoundary", &patchyDimer2::setBoundary)
+                .def("sample", &patchyDimer2::sample)
+                .def("sampleRelative", &patchyDimer2::sampleRelative)
+                .def("write2file", &patchyDimer2::write2file<double>)
+                .def("emptyBuffer", &patchyDimer2::emptyBuffer)
                 .def("sampleDiscreteTrajectory", &patchyDimer2::sampleDiscreteTrajectory)
                 .def("getState", &patchyDimer2::getState)
                 .def("discretizeTrajectory", &patchyDimer2::discretizeTrajectory)

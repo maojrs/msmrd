@@ -164,7 +164,9 @@ namespace msmrd {
 
         // Calculate relative orientation (w/respect to particle 1)
         quaternion<double> relativeOrientation;
-        relativeOrientation = part1.orientation.conj() * part2.orientation;
+        //relativeOrientation = part1.orientation.conj() * part2.orientation;
+        relativeOrientation =  part2.orientation * part1.orientation.conj();
+
 
         // Extract current state, save into sample and return sample
         int secNum;
@@ -338,7 +340,9 @@ namespace msmrd {
         quaternion<double> quatReference = {1,0,0,0}; // we can then define reference quaternion as identity.
 
         // Calculate relative orientation (w/respect to particle 1)
-        quaternion<double> relativeOrientation = part1.orientation.conj() * part2.orientation;
+        //quaternion<double> relativeOrientation = part1.orientation.conj() * part2.orientation;
+        quaternion<double> relativeOrientation =  part2.orientation * part1.orientation.conj();
+
 
         // Check if it matches a bound state, if so return the corresponding state. Otherwise return -1.
         int secNum;
