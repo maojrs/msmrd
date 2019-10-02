@@ -132,7 +132,8 @@ namespace msmrd {
         patchesDistances[2] = (part1Patch2 - part2Patch1).norm();
         patchesDistances[3] = (part1Patch2 - part2Patch2).norm();
         // Find minimum distance and match corresponding expected orientation (see setMetastableRegions())
-        auto minIndex = std::min_element(patchesDistances.begin(), patchesDistances.end()) - patchesDistances.begin();
+        auto minIndex = static_cast<int> (std::min_element(patchesDistances.begin(), patchesDistances.end()) -
+                patchesDistances.begin());
 
         // Calculate rotation of orthonormal basis (i,j,k)
         vec3<double> iUnitary = vec3<double>(1.0, 0.0, 0.0);
