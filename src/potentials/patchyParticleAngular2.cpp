@@ -100,7 +100,7 @@ namespace msmrd {
         }
 
         /* Explicit angular dependence using quaternions. */
-        if (rvec.norm() <= 2 * sigma) {
+        if (rvec.norm() <= 1.5 * sigma) {
             vec3<double> derivativeAngularPotential = calculateQuaternionTorque(part1, part2);
             derivativeAngularPotential = angularStrength * derivativeAngularPotential;
             torque1 += derivativeAngularPotential;
@@ -117,10 +117,14 @@ namespace msmrd {
         //quaternion<double> relativeOrientation = part2.orientation * part1.orientation.conj();
 
         // Calculate positions of patches
-        vec3<double> part1Patch1 = part1.position + msmrdtools::rotateVec(patchesCoordinates[0], part1.orientation);
-        vec3<double> part1Patch2 = part1.position + msmrdtools::rotateVec(patchesCoordinates[1], part1.orientation);
-        vec3<double> part2Patch1 = part2.position + msmrdtools::rotateVec(patchesCoordinates[0], part2.orientation);
-        vec3<double> part2Patch2 = part2.position + msmrdtools::rotateVec(patchesCoordinates[1], part2.orientation);
+        vec3<double> part1Patch1 = part1.position +
+                0.5*sigma * msmrdtools::rotateVec(patchesCoordinates[0], part1.orientation);
+        vec3<double> part1Patch2 = part1.position +
+                0.5*sigma * msmrdtools::rotateVec(patchesCoordinates[1], part1.orientation);
+        vec3<double> part2Patch1 = part2.position +
+                0.5*sigma * msmrdtools::rotateVec(patchesCoordinates[0], part2.orientation);
+        vec3<double> part2Patch2 = part2.position +
+                0.5*sigma * msmrdtools::rotateVec(patchesCoordinates[1], part2.orientation);
         // Calculate the 4 relevant distances between patches
         std::vector<double> patchesDistances(4);
         patchesDistances[0] = (part1Patch1 - part2Patch1).norm();
@@ -128,13 +132,12 @@ namespace msmrd {
         patchesDistances[2] = (part1Patch2 - part2Patch1).norm();
         patchesDistances[3] = (part1Patch2 - part2Patch2).norm();
         // Find minimum distance and match corresponding expected orientation (see setMetastableRegions())
-        int minIndex = std::min_element(patchesDistances.begin(),
-                patchesDistances.end()) - patchesDistances.begin();
+        auto minIndex = std::min_element(patchesDistances.begin(), patchesDistances.end()) - patchesDistances.begin();
 
         // Calculate rotation of orthonormal basis (i,j,k)
-        vec3<double> iUnitary(1.0, 0.0, 0.0);
-        vec3<double> jUnitary(0.0, 1.0, 0.0);
-        vec3<double> kUnitary(0.0, 0.0, 1.0);
+        vec3<double> iUnitary = vec3<double>(1.0, 0.0, 0.0);
+        vec3<double> jUnitary = vec3<double>(0.0, 1.0, 0.0);
+        vec3<double> kUnitary = vec3<double>(0.0, 0.0, 1.0);
         // Obtain orthonormal basis fixed to particle 1
         vec3<double> iPart1 = msmrdtools::rotateVec(iUnitary, part1.orientation);
         vec3<double> jPart1 = msmrdtools::rotateVec(jUnitary, part1.orientation);
@@ -151,19 +154,19 @@ namespace msmrd {
 
         /* The goal is to produce a torque that always brings the orthonormal basis of
          * particle 2, closer to the expected one. This can be simply done with the cross product
-         * (equivalent to a potential of -cos(theta_i) or a more complicated one like -(cos(theta) + 1)^8, where
-         * theta is the angle between the orthonormal basis of particle 2 and its expected one.)*/
-        vec3<double> torque(0.0, 0.0, 0.0);
+         * (equivalent to a potential of -cos(theta_i) or a more complicated one -1.0 *like -(cos(theta_i) + 1)^8,
+         * where theta is the angle between the orthonormal basis of particle 2 and its expected one.)*/
+        vec3<double> torque = vec3<double>(0.0, 0.0, 0.0);
         // Derivative of potential -(cos(theta) + 1)^8
-//        double cos1sqr = (iPart2 * iPart2Expected + 1) * (iPart2 * iPart2Expected + 1);
-//        double cos2sqr = (jPart2 * jPart2Expected + 1) * (jPart2 * jPart2Expected + 1);
-//        double cos3sqr = (kPart2 * kPart2Expected + 1) * (kPart2 * kPart2Expected + 1);
-//        torque += 8 * cos1sqr * cos1sqr * cos1sqr * (iPart2 * iPart2Expected + 1) * iPart2.cross(iPart2Expected);
-//        torque += 8 * cos2sqr * cos2sqr * cos2sqr * (jPart2 * jPart2Expected + 1) * jPart2.cross(jPart2Expected);
-//        torque += 8 * cos3sqr * cos3sqr * cos3sqr * (kPart2 * kPart2Expected + 1) * kPart2.cross(kPart2Expected);
-        torque += iPart2.cross(iPart2Expected);
-        torque += jPart2.cross(jPart2Expected);
-        torque += kPart2.cross(kPart2Expected);
+        double cos1sqr = (iPart2 * iPart2Expected + 1) * (iPart2 * iPart2Expected + 1);
+        double cos2sqr = (jPart2 * jPart2Expected + 1) * (jPart2 * jPart2Expected + 1);
+        double cos3sqr = (kPart2 * kPart2Expected + 1) * (kPart2 * kPart2Expected + 1);
+        torque += 8 * cos1sqr * cos1sqr * cos1sqr * (iPart2 * iPart2Expected + 1) * iPart2.cross(iPart2Expected);
+        torque += 8 * cos2sqr * cos2sqr * cos2sqr * (jPart2 * jPart2Expected + 1) * jPart2.cross(jPart2Expected);
+        torque += 8 * cos3sqr * cos3sqr * cos3sqr * (kPart2 * kPart2Expected + 1) * kPart2.cross(kPart2Expected);
+//        torque += iPart2.cross(iPart2Expected);
+//        torque += jPart2.cross(jPart2Expected);
+//        torque += kPart2.cross(kPart2Expected);
 
         /* The minus one is to make it consistent with the sign choice in forceTorque function. */
         return -1.0 * torque;
