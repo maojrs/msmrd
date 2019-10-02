@@ -114,25 +114,59 @@ namespace msmrd {
      * the torque that should be applied. */
     vec3<double> patchyParticleAngular2::calculateQuaternionTorque(particle part1, particle part2) {
         // Calculate relative orientation
-        quaternion<double> relativeOrientation;
-        relativeOrientation = part2.orientation * part1.orientation.conj();
+        //quaternion<double> relativeOrientation = part2.orientation * part1.orientation.conj();
 
-        // Find closest stable orientation
-        int minindex = 0;
-        int minDistance = 2*M_PI;
-        for (int i = 0; i<4; i++) {
-            double rotDistance = msmrdtools::quaternionAngleDistance(relativeOrientation, quatRotations[i]);
-            if (rotDistance < minDistance) { minindex = i;}
-        }
+        // Calculate positions of patches
+        vec3<double> part1Patch1 = part1.position + msmrdtools::rotateVec(patchesCoordinates[0], part1.orientation);
+        vec3<double> part1Patch2 = part1.position + msmrdtools::rotateVec(patchesCoordinates[1], part1.orientation);
+        vec3<double> part2Patch1 = part2.position + msmrdtools::rotateVec(patchesCoordinates[0], part2.orientation);
+        vec3<double> part2Patch2 = part2.position + msmrdtools::rotateVec(patchesCoordinates[1], part2.orientation);
+        // Calculate the 4 relevant distances between patches
+        std::vector<double> patchesDistances(4);
+        patchesDistances[0] = (part1Patch1 - part2Patch1).norm();
+        patchesDistances[1] = (part1Patch1 - part2Patch2).norm();
+        patchesDistances[2] = (part1Patch2 - part2Patch1).norm();
+        patchesDistances[3] = (part1Patch2 - part2Patch2).norm();
+        // Find minimum distance and match corresponding expected orientation (see setMetastableRegions())
+        int minIndex = std::min_element(patchesDistances.begin(),
+                patchesDistances.end()) - patchesDistances.begin();
 
-        // Calculate angular distance to closest stable orientation (between 0 and pi).
-        //double angDistance = msmrdtools::quaternionAngleDistance(relativeOrientation, quatRotations[minindex]);
+        // Calculate rotation of orthonormal basis (i,j,k)
+        vec3<double> iUnitary(1.0, 0.0, 0.0);
+        vec3<double> jUnitary(0.0, 1.0, 0.0);
+        vec3<double> kUnitary(0.0, 0.0, 1.0);
+        // Obtain orthonormal basis fixed to particle 1
+        vec3<double> iPart1 = msmrdtools::rotateVec(iUnitary, part1.orientation);
+        vec3<double> jPart1 = msmrdtools::rotateVec(jUnitary, part1.orientation);
+        vec3<double> kPart1 = msmrdtools::rotateVec(kUnitary, part1.orientation);
+        // Obtain current orthonormal basis fixed to particle 2
+        vec3<double> iPart2 = msmrdtools::rotateVec(iUnitary, part2.orientation);
+        vec3<double> jPart2 = msmrdtools::rotateVec(jUnitary, part2.orientation);
+        vec3<double> kPart2 = msmrdtools::rotateVec(kUnitary, part2.orientation);
+        /* Obtain expected orthonormal basis of particle2, corresponds to an orientation
+         * minima, i.e. the orientation we wish the system to relax to.*/
+        vec3<double> iPart2Expected = msmrdtools::rotateVec(iPart1, quatRotations[minIndex]);
+        vec3<double> jPart2Expected = msmrdtools::rotateVec(jPart1, quatRotations[minIndex]);
+        vec3<double> kPart2Expected = msmrdtools::rotateVec(kPart1, quatRotations[minIndex]);
 
-        // Calculate slerp with parameter s proportional to angle
-        //double s = 0.5*angDistance/M_PI;
-        quaternion<double> resultingRotation = msmrdtools::quaternionSlerp(relativeOrientation,
-                quatRotations[minindex], 1.0);
-        return msmrdtools::quaternion2axisangle(resultingRotation.conj());
+        /* The goal is to produce a torque that always brings the orthonormal basis of
+         * particle 2, closer to the expected one. This can be simply done with the cross product
+         * (equivalent to a potential of -cos(theta_i) or a more complicated one like -(cos(theta) + 1)^8, where
+         * theta is the angle between the orthonormal basis of particle 2 and its expected one.)*/
+        vec3<double> torque(0.0, 0.0, 0.0);
+        // Derivative of potential -(cos(theta) + 1)^8
+//        double cos1sqr = (iPart2 * iPart2Expected + 1) * (iPart2 * iPart2Expected + 1);
+//        double cos2sqr = (jPart2 * jPart2Expected + 1) * (jPart2 * jPart2Expected + 1);
+//        double cos3sqr = (kPart2 * kPart2Expected + 1) * (kPart2 * kPart2Expected + 1);
+//        torque += 8 * cos1sqr * cos1sqr * cos1sqr * (iPart2 * iPart2Expected + 1) * iPart2.cross(iPart2Expected);
+//        torque += 8 * cos2sqr * cos2sqr * cos2sqr * (jPart2 * jPart2Expected + 1) * jPart2.cross(jPart2Expected);
+//        torque += 8 * cos3sqr * cos3sqr * cos3sqr * (kPart2 * kPart2Expected + 1) * kPart2.cross(kPart2Expected);
+        torque += iPart2.cross(iPart2Expected);
+        torque += jPart2.cross(jPart2Expected);
+        torque += kPart2.cross(kPart2Expected);
+
+        /* The minus one is to make it consistent with the sign choice in forceTorque function. */
+        return -1.0 * torque;
     }
 
 
@@ -146,18 +180,17 @@ namespace msmrd {
         refRelativePositions[1] = {std::cos(angleDiff / 2.0), std::sin(-angleDiff / 2.0), 0};
         vec3<double> relPos1orthogonal = {-1.0 * std::sin(angleDiff / 2.0), std::cos(angleDiff / 2.0), 0.0};
         vec3<double> relPos2orthogonal = {std::sin(angleDiff / 2.0), std::cos(angleDiff / 2.0), 0.0};
-        /* Relative rotations (from particle 1) of particle 2 that yield the 8 bound states
+        /* Relative rotations (from particle 1) of particle 2 that yield the 4 bound states
          * in the axis-angle representation. (One needs to make drawing to understand)*/
         std::array<vec3<double>, 4> rotations;
-        rotations[0] = M_PI * relPos1orthogonal; //ok
-        rotations[1] = {0.0, 0.0, -2 * M_PI / 5.0}; //ok
+        rotations[0] = M_PI * relPos1orthogonal; // part1Patch1 with part2Patch1 (see calculateQuaternionTorque)
+        rotations[1] = {0.0, 0.0, -2 * M_PI / 5.0}; // part1Patch1 with part2Patch2
         // --first 2 rotations correspond to binding on top patch of particle 1, next 2 rotations to bottom patch
-        rotations[2] = M_PI * relPos2orthogonal; //ok
-        rotations[3] = {0.0, 0.0, 2 * M_PI / 5.0}; //ok
+        rotations[2] = {0.0, 0.0, 2 * M_PI / 5.0}; // part1Patch2 with part2Patch1
+        rotations[3] = M_PI * relPos2orthogonal; // part1Patch2 with part2Patch2
         for (int i = 0; i < 4; i++) {
             quatRotations[i] = msmrdtools::axisangle2quaternion(rotations[i]);
         }
-
     }
 
 }

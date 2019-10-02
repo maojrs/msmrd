@@ -48,9 +48,9 @@ def conjugate(q):
     return qout
 
 def relativeOrientation(q1,q2):
-    '''Return relative quaternion between q1 and q2, measured from q1'''
+    '''Return relative quaternion between q1 and q2, measured from q1 (how much one
+    needs to rotate from orientation q1 to reach orientation q2). '''
     q1conj = conjugate(q1)
-    #qout = multiply(q1conj, q2) # Order very important qrel = q_1^c * q2
     qout = multiply(q2, q1conj) # Order very important qrel = q_2 * q_1^c
     return qout
 
