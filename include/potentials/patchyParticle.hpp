@@ -15,6 +15,7 @@ namespace msmrd {
         std::vector<vec3<double>> patchesCoordinates;
         double sigma = 1.0;
         double strength = 100.0;
+        double patchPotentialScaling = 1.0;
         // Strength of potentials
         double epsRepulsive;
         double epsAttractive;
@@ -30,6 +31,8 @@ namespace msmrd {
 
         double quadraticPotential(double r, double sig, double eps, double a, double rstar);
         double derivativeQuadraticPotential(double r, double sig, double eps, double a, double rstar);
+        std::tuple<vec3<double>, vec3<double>, vec3<double>, vec3<double>> forceTorquePatches(
+                const particle &part1, const particle &part2, const vec3<double> pos1virtual);
 
     public:
         /*

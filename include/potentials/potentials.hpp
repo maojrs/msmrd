@@ -59,7 +59,7 @@ namespace msmrd {
         // Additional useful functions so potentials can deal with possible periodic boundaries.
         void setBoundary(boundary *bndry);
 
-        vec3<double> relativePosition(vec3<double> p1, vec3<double> p2);
+        vec3<double> relativePosition(const vec3<double> p1, const vec3<double> p2);
 
         std::array<vec3<double>, 2> relativePositionComplete(vec3<double> p1, vec3<double> p2);
 

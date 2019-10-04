@@ -28,7 +28,7 @@ namespace msmrd {
     }
 
     // Calculates relative distance (p2-p1) of two vectors, p1, p2, taking into account possible periodic boundary
-    vec3<double> pairPotential::relativePosition(vec3<double> p1, vec3<double> p2) {
+    vec3<double> pairPotential::relativePosition(const vec3<double> p1, const vec3<double> p2) {
         // Calculate relative distance. If box periodic boundary, take that into account.
         if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {
             auto boxsize = domainBoundary->boxsize;

@@ -14,7 +14,6 @@ namespace msmrd {
      */
     class patchyParticleAngular : public patchyParticle {
     protected:
-        double patchPotentialScaling = 0.5; // 0.3 original value
         double angularStrength = 2.0;
     public:
         // Inherit parent class constructor
