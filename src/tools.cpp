@@ -63,7 +63,7 @@ namespace msmrdtools {
 
     /* Calculate distance between quaternions/rotations. Gives 0 when rotations are the same
      * and 1 when represent rotations 180 degress apart. */
-    double quaternionDistance(quaternion<double> q1, quaternion<double> q2) {
+    double quaternionDistance(const quaternion<double> q1, const quaternion<double> q2) {
         double innerProduct = q1[0]*q2[0] + q1[1]*q2[1] + q1[2]*q2[2] + q1[3]*q2[3];
         return 1.0 - innerProduct*innerProduct;
     }
@@ -77,7 +77,7 @@ namespace msmrdtools {
     }
 
     // Calculates relative distance (p2-p1) of two vectors (p1, p2) in a periodic box, returns relative distance.
-    vec3<double> distancePeriodicBox(vec3<double> p1, vec3<double> p2, vec3<double> edgeslength) {
+    vec3<double> distancePeriodicBox(const vec3<double> p1, const vec3<double> p2, const vec3<double> edgeslength) {
         vec3<double> p1Periodic = 1.0*p1;
         // Loop over three coordinates (x,y,z)
         for (int i = 0; i < 3; i++){
@@ -93,8 +93,8 @@ namespace msmrdtools {
 
     /* Calculates relative distance (p2-p1) of two vectors (p1, p2) in a periodic box, returns tuple with
      * "virtual" position of p1 as first entry and relative distance as second entry */
-    std::array<vec3<double>, 2> distancePeriodicBoxComplete(vec3<double> p1, vec3<double> p2,
-                                                                       vec3<double> edgeslength) {
+    std::array<vec3<double>, 2> distancePeriodicBoxComplete(const vec3<double> p1, const vec3<double> p2,
+                                                            const vec3<double> edgeslength) {
         vec3<double> p1Periodic = 1.0*p1;
         // Loop over three coordinates (x,y,z)
         for (int i = 0; i < 3; i++){
@@ -109,8 +109,8 @@ namespace msmrdtools {
     }
 
     // Calculates relative position between two particles taking into account possible periodic boundary.
-    vec3<double> calculateRelativePosition(vec3<double> pos1, vec3<double> pos2, bool boundaryActive,
-                                           std::string boundaryType, vec3<double> boxsize){
+    vec3<double> calculateRelativePosition(const vec3<double> pos1, const vec3<double> pos2, const bool boundaryActive,
+                                           const std::string boundaryType, const vec3<double> boxsize){
         vec3<double> relPosition;
         if (boundaryActive and boundaryType == "periodic") {
             relPosition = distancePeriodicBox(pos1, pos2, boxsize);
@@ -120,7 +120,7 @@ namespace msmrdtools {
         return relPosition;
     }
 
-    double dotQuaternion(quaternion<double> q0, quaternion<double> q1) {
+    double dotQuaternion(const quaternion<double> q0, const quaternion<double> q1) {
         return q0[0]*q1[0] + q0[1]*q1[1] + q0[2]*q1[2]+ q0[3]*q1[3];
     }
 

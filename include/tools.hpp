@@ -61,25 +61,25 @@ namespace msmrdtools {
     vec3<double> rotateVec(vec3<double> p, quaternion<double> q);
 
     // Calculate distance between quaternions/rotations
-    double quaternionDistance(quaternion<double> q1, quaternion<double> q2);
+    double quaternionDistance(const quaternion<double> q1, const quaternion<double> q2);
 
     // Calculate minimum rotation angle along some axis to reach q2 from q1.
     double quaternionAngleDistance(quaternion<double> q1, quaternion<double> q2);
 
     // Calculates relative distance of two vectors (p1, p2) in a periodic box
-    vec3<double> distancePeriodicBox(vec3<double> p1, vec3<double> p2, vec3<double> edgeslength);
+    vec3<double> distancePeriodicBox(const vec3<double> p1, const vec3<double> p2, const vec3<double> edgeslength);
 
     /* Calculates relative distance of two vectors (p1, p2) in a periodic box and returns
      * virtual position of p1 + relative distance */
-    std::array<vec3<double>, 2> distancePeriodicBoxComplete(vec3<double> p1, vec3<double> p2,
-                                                                       vec3<double> edgeslength);
+    std::array<vec3<double>, 2> distancePeriodicBoxComplete(const vec3<double> p1, const vec3<double> p2,
+                                                            const vec3<double> edgeslength);
 
     // Calculates relative position between two particles taking into account possible periodic boundary
-    vec3<double> calculateRelativePosition(vec3<double> pos1, vec3<double> pos2, bool boundaryActive,
-                                           std::string boundaryType, vec3<double> boxsize);
+    vec3<double> calculateRelativePosition(const vec3<double> pos1, const vec3<double> pos2, const bool boundaryActive,
+                                           const std::string boundaryType, const vec3<double> boxsize);
 
     // Calculates dot product between quaternions
-    double dotQuaternion(quaternion<double> q0, quaternion<double> q1);
+    double dotQuaternion(const quaternion<double> q0, const quaternion<double> q1);
 
     // Calculates slerp (spherical linear interpolation) between quaternions, t between (0,1).
     quaternion<double> quaternionSlerp(quaternion<double> q0, quaternion<double> q1, double t);
