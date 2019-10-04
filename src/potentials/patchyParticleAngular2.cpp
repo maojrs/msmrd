@@ -101,7 +101,7 @@ namespace msmrd {
 
         /* Explicit angular dependence using quaternions. */
         if (rvec.norm() <= 1.5 * sigma) {
-            vec3<double> derivativeAngularPotential = calculateQuaternionTorque(part1, part2);
+            vec3<double> derivativeAngularPotential = calculateTorque(part1, part2);
             derivativeAngularPotential = angularStrength * derivativeAngularPotential;
             torque1 += derivativeAngularPotential;
             torque2 -= derivativeAngularPotential;
@@ -110,21 +110,23 @@ namespace msmrd {
         return {force + force1, torque1, -1.0 * force + force2, torque2};
     }
 
-    /* Given two quaternions/orientations, returns a rotation in the axis-angle representation, representing
-     * the torque that should be applied. */
-    vec3<double> patchyParticleAngular2::calculateQuaternionTorque(particle part1, particle part2) {
+
+    /* Given two quaternions/orientations, returns a torque that should be applied. */
+    vec3<double> patchyParticleAngular2::calculateTorque(particle part1, particle part2) {
         // Calculate relative orientation
         //quaternion<double> relativeOrientation = part2.orientation * part1.orientation.conj();
 
+        // Calculate all normal vectors to first two patches for both particles
+        vec3<double> part1PatchNormal1 = msmrdtools::rotateVec(patchesCoordinates[0], part1.orientation);
+        vec3<double> part1PatchNormal2 = msmrdtools::rotateVec(patchesCoordinates[1], part1.orientation);
+        vec3<double> part2PatchNormal1 = msmrdtools::rotateVec(patchesCoordinates[0], part2.orientation);
+        vec3<double> part2PatchNormal2 = msmrdtools::rotateVec(patchesCoordinates[1], part2.orientation);
+
         // Calculate positions of patches
-        vec3<double> part1Patch1 = part1.position +
-                0.5*sigma * msmrdtools::rotateVec(patchesCoordinates[0], part1.orientation);
-        vec3<double> part1Patch2 = part1.position +
-                0.5*sigma * msmrdtools::rotateVec(patchesCoordinates[1], part1.orientation);
-        vec3<double> part2Patch1 = part2.position +
-                0.5*sigma * msmrdtools::rotateVec(patchesCoordinates[0], part2.orientation);
-        vec3<double> part2Patch2 = part2.position +
-                0.5*sigma * msmrdtools::rotateVec(patchesCoordinates[1], part2.orientation);
+        vec3<double> part1Patch1 = part1.position + 0.5*sigma * part1PatchNormal1;
+        vec3<double> part1Patch2 = part1.position + 0.5*sigma * part1PatchNormal2;
+        vec3<double> part2Patch1 = part2.position + 0.5*sigma * part2PatchNormal1;
+        vec3<double> part2Patch2 = part2.position + 0.5*sigma * part2PatchNormal2;
         // Calculate the 4 relevant distances between patches
         std::vector<double> patchesDistances(4);
         patchesDistances[0] = (part1Patch1 - part2Patch1).norm();
@@ -133,48 +135,36 @@ namespace msmrd {
         patchesDistances[3] = (part1Patch2 - part2Patch2).norm();
         // Find minimum distance and match corresponding expected orientation (see setMetastableRegions())
         auto minIndex = static_cast<int> (std::min_element(patchesDistances.begin(), patchesDistances.end()) -
-                patchesDistances.begin());
+                                          patchesDistances.begin());
 
-        // Calculate rotation of orthonormal basis (i,j,k)
-        vec3<double> iUnitary = vec3<double>(1.0, 0.0, 0.0);
-        vec3<double> jUnitary = vec3<double>(0.0, 1.0, 0.0);
-        vec3<double> kUnitary = vec3<double>(0.0, 0.0, 1.0);
-        // Obtain orthonormal basis fixed to particle 1
-        vec3<double> iPart1 = msmrdtools::rotateVec(iUnitary, part1.orientation);
-        vec3<double> jPart1 = msmrdtools::rotateVec(jUnitary, part1.orientation);
-        vec3<double> kPart1 = msmrdtools::rotateVec(kUnitary, part1.orientation);
-        // Obtain current orthonormal basis fixed to particle 2
-        vec3<double> iPart2 = msmrdtools::rotateVec(iUnitary, part2.orientation);
-        vec3<double> jPart2 = msmrdtools::rotateVec(jUnitary, part2.orientation);
-        vec3<double> kPart2 = msmrdtools::rotateVec(kUnitary, part2.orientation);
-        /* Obtain expected orthonormal basis of particle2, corresponds to an orientation
-         * minima, i.e. the orientation we wish the system to relax to.*/
-        vec3<double> iPart2Expected = msmrdtools::rotateVec(iPart1, quatRotations[minIndex]);
-        vec3<double> jPart2Expected = msmrdtools::rotateVec(jPart1, quatRotations[minIndex]);
-        vec3<double> kPart2Expected = msmrdtools::rotateVec(kPart1, quatRotations[minIndex]);
+        // Calculate unitary vectors describing planes where particle center and first two patches are
+        vec3<double> plane1;
+        vec3<double> plane2;
+        if (minIndex == 0 or minIndex == 3) {
+            // Bound thorugh pathches (1,1) or (2,2)
+            plane1 = part1PatchNormal1.cross(part1PatchNormal2);
+            plane2 = part2PatchNormal1.cross(part2PatchNormal2);
+        } else {
+            // Bound thorugh pathches (1,2) or (2,1)
+            plane1 = part1PatchNormal1.cross(part1PatchNormal2);
+            plane2 = part2PatchNormal2.cross(part2PatchNormal1);
+        }
 
-        /* The goal is to produce a torque that always brings the orthonormal basis of
-         * particle 2, closer to the expected one. This can be simply done with the cross product
-         * (equivalent to a potential of -cos(theta_i) or a more complicated one -1.0 *like -(cos(theta_i) + 1)^8,
-         * where theta is the angle between the orthonormal basis of particle 2 and its expected one.)*/
-        vec3<double> torque = vec3<double>(0.0, 0.0, 0.0);
-        // Derivative of potential -(cos(theta) + 1)^8
-        double cos1sqr = (iPart2 * iPart2Expected + 1) * (iPart2 * iPart2Expected + 1);
-        double cos2sqr = (jPart2 * jPart2Expected + 1) * (jPart2 * jPart2Expected + 1);
-        double cos3sqr = (kPart2 * kPart2Expected + 1) * (kPart2 * kPart2Expected + 1);
-        torque += 8 * cos1sqr * cos1sqr * cos1sqr * (iPart2 * iPart2Expected + 1) * iPart2.cross(iPart2Expected);
-        torque += 8 * cos2sqr * cos2sqr * cos2sqr * (jPart2 * jPart2Expected + 1) * jPart2.cross(jPart2Expected);
-        torque += 8 * cos3sqr * cos3sqr * cos3sqr * (kPart2 * kPart2Expected + 1) * kPart2.cross(kPart2Expected);
-//        torque += iPart2.cross(iPart2Expected);
-//        torque += jPart2.cross(jPart2Expected);
-//        torque += kPart2.cross(kPart2Expected);
+        plane1 = plane1/plane1.norm();
+        plane2 = plane2/plane2.norm();
 
-        /* The minus one is to make it consistent with the sign choice in forceTorque function. */
-        return -1.0 * torque;
+        // Additional torques depending on how well aligned the planes are.
+        vec3<double> torque;
+        // It one minima, use potential of -(1/250)*(cos(theta) + 1)^8
+        double cosSquared = (plane1 * plane2 + 1) * (plane1 * plane2 + 1);
+        double cosSeventh = cosSquared * cosSquared * cosSquared * (plane1 * plane2 + 1);
+        torque = (8.0/250.0) * cosSeventh * plane1.cross(plane2);
+        return -1.0*torque;
     }
 
 
-    /* Sets bound states (metastable regions) of this patchy dimer implementation. Same to setBoundStates
+    /* DEPRECATED, no longer needed by calculateTorque, left for reference of metastable regions or future uses.
+     * Sets bound states (metastable regions) of this patchy dimer implementation. Same to setBoundStates
      * in patchyDimer2 in trajectory/discrete/patchyDimer. */
     void patchyParticleAngular2::setMetastableRegions() {
         double angleDiff = 3 * M_PI / 5; // angle difference to form a pentamer

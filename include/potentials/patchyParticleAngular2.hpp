@@ -33,7 +33,7 @@ namespace msmrd {
         std::array<vec3<double>, 4>
         forceTorque(const particle &part1, const particle &part2) override;
 
-        vec3<double> calculateQuaternionTorque(particle part1, particle part2);
+        vec3<double> calculateTorque(particle part1, particle part2);
 
         void setMetastableRegions();
     };
