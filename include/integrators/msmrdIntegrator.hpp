@@ -17,6 +17,7 @@ namespace msmrd {
     using fullPartition = msmrd::positionOrientationPartition;
 
     /**
+     * DEPRECATED: failed for off rates. Now using msmrdIntegratorDiscrete.
      * Base class for msmrd integration (coupling MSM and reaction-diffusion)
      * @tparam templateMSM template can be an msm or a ctmsm
      */

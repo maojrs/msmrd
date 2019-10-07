@@ -44,6 +44,7 @@ set(SOURCES
         src/integrators/integrator.cpp
         src/integrators/msmrdIntegrator.cpp
         src/integrators/msmrdIntegratorDiscrete.cpp
+        src/integrators/msmrdMultiParticleIntegrator.cpp
         src/integrators/overdampedLangevin.cpp
         src/integrators/overdampedLangevinMarkovSwitch.cpp
         src/markovModels/continuousTimeMarkovModel.cpp
@@ -98,6 +99,7 @@ set(PY_SOURCES
         include/integrators/integrator.hpp
         include/integrators/msmrdIntegrator.hpp
         include/integrators/msmrdIntegratorDiscrete.hpp
+        include/integrators/msmrdMultiParticleIntegrator.hpp
         include/integrators/overdampedLangevin.hpp
         include/integrators/overdampedLangevinMarkovSwitch.hpp
         include/markovModels/continuousTimeMarkovModel.hpp
