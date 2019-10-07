@@ -19,7 +19,7 @@ numAngularMinima = 1
 D = 1
 Drot = 1
 separationDistance = 1.25 # minimum separation distance for initial condition
-numSimulations = 6 #500 #1000 #20 #200
+numSimulations = 600 #500 #1000 #20 #200
 
 
 # Simulation parameters
