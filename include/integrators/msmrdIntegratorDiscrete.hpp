@@ -74,23 +74,26 @@ namespace msmrd {
 
         void setDiscretization(fullPartition *thisFullPartition);
 
-        int computeCurrentTransitionState(particleMS &part1, particleMS &part2);
+        /* Define following functions as virtual in case we want to override them in derived classes to modify
+         * fucntionality */
 
-        void computeTransitionsFromTransitionStates(std::vector<particleMS> &parts);
+        virtual int computeCurrentTransitionState(particleMS &part1, particleMS &part2);
 
-        void computeTransitionsFromBoundStates(std::vector<particleMS> &parts);
+        virtual void computeTransitionsFromTransitionStates(std::vector<particleMS> &parts);
 
-        void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+        virtual void computeTransitionsFromBoundStates(std::vector<particleMS> &parts);
 
-        void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+        virtual void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
-        void transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+        virtual void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
-        void transitionBetweenTransitionStates(int iIndex, int jIndex);
+        virtual void transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
-        void removeUnrealizedEvents(std::vector<particleMS> &parts);
+        virtual void transitionBetweenTransitionStates(int iIndex, int jIndex);
 
-        void applyEvents(std::vector<particleMS> &parts);
+        virtual void removeUnrealizedEvents(std::vector<particleMS> &parts);
+
+        virtual void applyEvents(std::vector<particleMS> &parts);
 
 
     };

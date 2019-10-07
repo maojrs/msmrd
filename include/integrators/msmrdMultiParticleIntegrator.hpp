@@ -14,14 +14,28 @@ namespace msmrd {
     using fullPartition = msmrd::positionOrientationPartition;
 
     /**
-     * Class for multi-particle msmrd integration based on patchy particles.
+     * Class for multi-particle msmrd integration based on patchy particles. Uses base functionality from
+     * msmrdIntegratorDiscrete, but extends its methods for multiparticle MSM/RD integration.
      */
     template <typename templateMSM>
     class msmrdMultiParticleIntegrator : public msmrdIntegratorDiscrete<ctmsm> {
     public:
         using msmrdIntegratorDiscrete<ctmsm>::msmrdIntegratorDiscrete;
 
-        void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+        void computeTransitionsFromTransitionStates(std::vector<particleMS> &parts) override;
+
+        void computeTransitionsFromBoundStates(std::vector<particleMS> &parts) override;
+
+        void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState) override;
+
+        void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState) override;
+
+        void transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex,
+                                          int jIndex, int endState) override;
+
+        void removeUnrealizedEvents(std::vector<particleMS> &parts) override;
+
+
     };
 
 };

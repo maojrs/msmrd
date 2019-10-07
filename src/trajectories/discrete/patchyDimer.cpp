@@ -141,14 +141,14 @@ namespace msmrd {
         vec3<double> relPos2 = {std::cos(angleDiff / 2.0), std::sin(-angleDiff / 2.0), 0};
         vec3<double> relPos1orthogonal = {-1.0 * std::sin(angleDiff / 2.0), std::cos(angleDiff / 2.0), 0.0};
         vec3<double> relPos2orthogonal = {std::sin(angleDiff / 2.0), std::cos(angleDiff / 2.0), 0.0};
-        /* Relative rotations (from particle 1) of particle 2 that yield the 8 bound states
+        /* Relative rotations (from particle 1) of particle 2 that yield the 4 bound states
          * in the axis-angle representation. (One needs to make drawing to understand)*/
         std::array<vec3<double>, 4> rotations;
-        rotations[0] = M_PI * relPos1orthogonal; //ok
-        rotations[1] = {0.0, 0.0, -2 * M_PI / 5.0}; //ok
-        // --first 2 rotations correspond to binding on top patch of particle 1, next 2 rotations to bottom patch
-        rotations[2] = M_PI * relPos2orthogonal; //ok
-        rotations[3] = {0.0, 0.0, 2 * M_PI / 5.0}; //ok
+        rotations[0] = M_PI * relPos1orthogonal; // part1Patch1 with part2patch1
+        rotations[1] = {0.0, 0.0, -2 * M_PI / 5.0}; // part1Patch1 with part2patch2
+        // --first 2 rotations correspond to binding on top patch (1) of part1, next 2 rotations to bottom patch (2).
+        rotations[2] = {0.0, 0.0, 2 * M_PI / 5.0}; // part1Patch2 with part2patch1
+        rotations[3] = M_PI * relPos2orthogonal; // part1Patch2 with part2patch2
         /*Convert rotations in the axis angle representation to quaternions */
         std::array<quaternion<double>, 4> quatRotations;
         for (int i = 0; i < 4; i++) {

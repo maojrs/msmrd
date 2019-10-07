@@ -143,6 +143,8 @@ namespace msmrd {
         bool activeMSM = true;
         int boundTo = -1;
         int boundState = -1;
+        std::vector<int> boundList;
+        std::vector<int> boundStates;
         /**
          * @param state particle current unbound state. If -1, then particle is in bound state.
          * @param nextState particle next state given and changed by the msm/ctmsm
@@ -157,6 +159,12 @@ namespace msmrd {
          * list.
          * @param boundState determines the state of the particle if it is bound to another particle. If it is not
          * bound, boundState = -1 and the state is given by the 'state' variable.
+         * @param boundList alternative to boundTo for multiparticle bindings. If empty, particle is not bound.
+         * Otherwise the indexes stored in the vector correspond to the indices of the particles to which it is
+         * bound in the particle list.
+         * @param boundStates alternative to boundState for multiparticle bindings. If empty, particle is not bound.
+         * Otherwise, the values correspond to the bound states of each of the corresponding particles in the boundList.
+         * The indexes should be such that it is the same index as in the boundList.
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
