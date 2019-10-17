@@ -39,6 +39,12 @@ namespace msmrd {
 
         //void removeUnrealizedEvents(std::vector<particleMS> &parts) override;
 
+        /* Functions exclusive to multiparticle MSM/RD*/
+
+        void addComplex(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+
+        void updateParticleComplexesVector(std::vector<particleMS> &parts);
+
 
     };
 

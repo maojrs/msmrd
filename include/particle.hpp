@@ -114,6 +114,7 @@ namespace msmrd {
         int boundState = -1;
         std::vector<int> boundList;
         std::vector<int> boundStates;
+        int complexIndex = -1;
         /**
          * @param state particle current unbound state. If -1, then particle is in bound state.
          * @param nextState particle next state given and changed by the msm/ctmsm
@@ -128,12 +129,17 @@ namespace msmrd {
          * list.
          * @param boundState determines the state of the particle if it is bound to another particle. If it is not
          * bound, boundState = -1 and the state is given by the 'state' variable.
+         *
+         * NEXT VARIABLES ARE EXCLUSIVE AND ONLY ACTIVE FOR MULTIPARTICLE MSM/RD FUNCTIONALITY
          * @param boundList alternative to boundTo for multiparticle bindings. If empty, particle is not bound.
          * Otherwise the indexes stored in the vector correspond to the indices of the particles to which it is
          * bound in the particle list.
          * @param boundStates alternative to boundState for multiparticle bindings. If empty, particle is not bound.
          * Otherwise, the values correspond to the bound states of each of the corresponding particles in the boundList.
          * The indexes should be such that it is the same index as in the boundList.
+         * @param complexIndex if the particle is part of a particle complex; it corresponds to the index
+         * in the particleComplexes vector in the multiparticle MSM/RD integrator. If it is -1, it means either
+         * the particle does not belong to any particle complex, or that this functionality is not in use.
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
@@ -189,22 +195,36 @@ namespace msmrd {
         vec3<double> position = vec3<double>();
         quaternion<double> orientation = quaternion<double>();
         std::map<std::tuple<int,int>, int> boundPairsDictionary = {};
+        bool active = true;
         /**
-         * @param position: position of particle complex
-         * @param orientation: orientation of particle complex
-         * @param boundPairsDictionary: dictionary, which key corresponds to the tuple of pairs of indexes of the
+         * @param position position of particle complex
+         * @param orientation orientation of particle complex
+         * @param boundPairsDictionary dictionary, which key corresponds to the tuple of pairs of indexes of the
          * particles bound with each other within the complex. The value is the state in which
          * the corresponding pair of particles is bound in.
+         * @param active if true the complex is active, if false it is no longer active and can be deleted.
          */
+
+         /* Constructors for particle complex. */
+
          particleComplex() {};
 
          particleComplex(vec3<double> position, quaternion<double> orientation) : position(position),
                                                                                   orientation(orientation) {};
+
+         particleComplex(std::vector<double> &position, std::vector<double> &orientation) : position(position),
+                                                                                           orientation(orientation) {};
+
          particleComplex(vec3<double> position, quaternion<double> orientation,
                         std::map<std::tuple<int,int>, int> boundPairsDictionary) :
                  position(position), orientation(orientation), boundPairsDictionary(boundPairsDictionary) {};
 
+         particleComplex(std::vector<double> &position, std::vector<double> &orientation,
+                        std::map<std::tuple<int,int>, int> boundPairsDictionary) :
+                position(position), orientation(orientation), boundPairsDictionary(boundPairsDictionary) {};
+
          void joinParticleComplex(particleComplex partComplex);
+
 
     };
 }

@@ -32,8 +32,7 @@ namespace msmrd {
                 .def("setType", &particleMS::setType)
                 .def("setPosition", &particle::setPositionPyBind)
                 .def("setOrientVector", &particle::setOrientVectorPyBind)
-                .def("setOrientation", &particle::setOrientationPyBind)
-                .def("setSymmetryQuaternions", &particle::setSymmetryQuaternions);
+                .def("setOrientation", &particle::setOrientationPyBind);
 
 
         py::class_<particleMS, particle>(m, "particleMS", "particle with Markovian switch (type, state, "
@@ -52,6 +51,12 @@ namespace msmrd {
                 .def("setLagtime", &particleMS::setLagtime)
                 .def("setMSMoff", &particleMS::setMSMoff)
                 .def("setMSMon", &particleMS::setMSMon);
+
+        py::class_<particleComplex>(m, "particleComplex", "particle complex class that keeps track of"
+                                                          "all bound complexes in multiparticle MSM/RD.")
+                .def(py::init<>())
+                .def(py::init<std::vector<double> &, std::vector<double> &>())
+                .def(py::init<std::vector<double> &, std::vector<double> &, std::map<std::tuple<int,int>, int> &>());
     }
 
 }
