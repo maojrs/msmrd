@@ -31,6 +31,7 @@ add_subdirectory(libraries/pybind11)
 set(bindings_python_version 3.6)
 set(SOURCES
         src/eventManager.cpp
+        src/particle.cpp
         src/randomgen.cpp
         src/simulation.cpp
         src/tools.cpp

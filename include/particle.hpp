@@ -3,13 +3,14 @@
 //
 
 #pragma once
+#include <map>
 #include "quaternion.hpp"
 #include "tools.hpp"
 #include "vec3.hpp"
 
 namespace msmrd {
     /**
-     * Declaration of the class for particles
+     * Declaration of the class for particles. One line implementations in headers; otherwise in particle.cpp.
      */
     class particle {
     protected:
@@ -41,41 +42,18 @@ namespace msmrd {
          * @param nextPosition saves next position for integrator to update
          * @param nextOrientvector saves next orientation vector for integrator to update
          * @param nextOrientation saves next orientation quaternions for integrator to update
-         * @param symmetryQuats list of quaternions that represent symmetry rotations for the particle.
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
-        particle(double D, double Drot, vec3<double> position, quaternion<double> orientation)
-                : D(D), Drot(Drot), position(position), orientation(orientation) {
-            type = 0;
-            orientvector = vec3<double>(0., 0., 1.);
-            orientvector = msmrdtools::rotateVec(orientvector, orientation);
-            nextPosition = 1.0 * position;
-            nextOrientation = 1.0 * orientation;
-            nextOrientvector = 1.0 * orientvector;
-            symmetryQuaternions.resize(0);
-        };
+        particle(double D, double Drot, vec3<double> position, quaternion<double> orientation);
 
-        particle(double D, double Drot, std::vector<double> &position,
-                 std::vector<double> &orientation)
-                : D(D), Drot(Drot), position(position), orientation(orientation) {
-            type = 0;
-            orientvector = vec3<double>(0., 0., 1.);
-            orientvector = msmrdtools::rotateVec(orientvector, orientation);
-            nextPosition = vec3<double>(position);
-            nextOrientation = quaternion<double>(orientation);
-            nextOrientvector = 1.0 * orientvector;
-            symmetryQuaternions.resize(0);
-        };
+        particle(double D, double Drot, std::vector<double> &position, std::vector<double> &orientation);
 
         /* Additional functions and getters and setters. Some used by c++ and python,
          * some only to be used by pyhon with python bindings. */
-        void updatePosition() { position = 1.0 * nextPosition; };
+        void updatePosition();
 
-        void updateOrientation() {
-            orientvector = 1 * nextOrientvector;
-            orientation = 1 * nextOrientation;
-        };
+        void updateOrientation();
 
         void activate() { active = true; }
 
@@ -115,17 +93,8 @@ namespace msmrd {
 
         void setNextOrientation(quaternion<double> nextorientation) { nextOrientation = nextorientation; }
 
-        void setOrientationPyBind(std::vector<double> neworientation) {
-            quaternion<double> quat(neworientation);
-            orientation = quat;
-        }
+        void setOrientationPyBind(std::vector<double> neworientation);
 
-        void setSymmetryQuaternions(int numQuats, std::vector<std::vector<double>> &symQuaternionsList) {
-            symmetryQuaternions.resize(numQuats);
-            for (int i = 0; i < numQuats; i ++){
-                symmetryQuaternions[i] = symQuaternionsList[i];
-            }
-        }
     };
 
     /**
@@ -169,16 +138,10 @@ namespace msmrd {
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
         particleMS(int type0, int state, double D, double Drot, vec3<double> position,
-                   quaternion<double> orientation)
-                : state(state), particle(D, Drot, position, orientation) {
-            type = type0;
-        };
+                   quaternion<double> orientation);
 
         particleMS(int type0, int state, double D, double Drot, std::vector<double> &position,
-                   std::vector<double> &orientation)
-                : state(state), particle(D, Drot, position, orientation) {
-            type = type0;
-        };
+                   std::vector<double> &orientation);
 
         // Additional functions and getters and setters for particleMS
         void updateState() { state = 1 * nextState; };
@@ -199,11 +162,7 @@ namespace msmrd {
 
         int getBoundState() const { return boundState; }
 
-        void setState(int newstate) {
-            state = newstate;
-            boundState = -1;
-            boundTo = -1;
-        }
+        void setState(int newstate);
 
         void setNextState(int nextstate) { nextState = nextstate; }
 
@@ -211,11 +170,7 @@ namespace msmrd {
 
         void setBoundTo(int particleIndex) { boundTo = particleIndex; }
 
-        void setBoundState(int newBoundState) {
-            state = -1;
-            boundState = newBoundState;
-            activeMSM = false;
-        }
+        void setBoundState(int newBoundState);
 
         void setNextType(int nexttype) { nextType = nexttype; }
 
@@ -224,6 +179,34 @@ namespace msmrd {
         void setMSMon() {activeMSM = true; }
     };
 
+
+    /**
+     * Declaration of particle Complex class. This is just a wrapper to easily keep track which particles
+     * are bound together in multiparticle MSM/RD.
+     */
+    class particleComplex {
+    public:
+        vec3<double> position = vec3<double>();
+        quaternion<double> orientation = quaternion<double>();
+        std::map<std::tuple<int,int>, int> boundPairsDictionary = {};
+        /**
+         * @param position: position of particle complex
+         * @param orientation: orientation of particle complex
+         * @param boundPairsDictionary: dictionary, which key corresponds to the tuple of pairs of indexes of the
+         * particles bound with each other within the complex. The value is the state in which
+         * the corresponding pair of particles is bound in.
+         */
+         particleComplex() {};
+
+         particleComplex(vec3<double> position, quaternion<double> orientation) : position(position),
+                                                                                  orientation(orientation) {};
+         particleComplex(vec3<double> position, quaternion<double> orientation,
+                        std::map<std::tuple<int,int>, int> boundPairsDictionary) :
+                 position(position), orientation(orientation), boundPairsDictionary(boundPairsDictionary) {};
+
+         void joinParticleComplex(particleComplex partComplex);
+
+    };
 }
 
 
