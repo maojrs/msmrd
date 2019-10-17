@@ -17,7 +17,6 @@ namespace msmrd {
     /* Computes possible transitions from transition states to bound states or other transition states from
      * particles sufficiently close to each other (in transition states) and saves them in the event manager.
      * Used by integrate function. */
-    template<>
     void msmrdMultiParticleIntegrator::computeTransitionsFromTransitionStates(std::vector<particleMS> &parts) {
         int currentTransitionState;
         double transitionTime;
@@ -61,8 +60,7 @@ namespace msmrd {
 
     /* Computes possible transitions from bound states to other bound states or unbound states (transition states)
      * and saves them in the event manager. Used by integrate function. */
-    template<>
-    void msmrdIntegratorDiscrete<ctmsm>::computeTransitionsFromBoundStates(std::vector<particleMS> &parts) {
+    void msmrdMultiParticleIntegrator::computeTransitionsFromBoundStates(std::vector<particleMS> &parts) {
         double transitionTime;
         int nextState;
         std::tuple<double, int> transition;
@@ -101,8 +99,7 @@ namespace msmrd {
      * Makes particles with indexes iIndex and jIndex in the particle list transition to a bound state. Note
      * always iIndex < jIndex should hold. Also particle with smaller index is the one that remains active
      * to model position/orientation of bound complex. */
-    template<>
-    void msmrdMultiParticleIntegrator<ctmsm>::transition2BoundState(std::vector<particleMS> &parts, int iIndex,
+    void msmrdMultiParticleIntegrator::transition2BoundState(std::vector<particleMS> &parts, int iIndex,
                                                              int jIndex, int endState) {
 
         /* Establish pair connection in particle class and deactivate particle with larger index ( only

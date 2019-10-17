@@ -36,7 +36,7 @@ namespace msmrd {
          * but efficiency is not a problem in this example). Alternative version as patchyParticleAngular */
         double angularPotential = 0.0;
         if (rvec.norm() <= 2.0 * sigma) {
-            /* Get planes needed to be aligned by torque, based on use potential of -(1/256)*(cos(theta) + 1)^8
+            /* Get planes needed to be aligned by torque, based on use potential of -[(cos(theta) + 1)/2]^8
              * with only one minima */
             vec3<double> plane1;
             vec3<double> plane2;

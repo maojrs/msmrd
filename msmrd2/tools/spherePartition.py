@@ -74,7 +74,7 @@ def plotPartitionedSphere(numPartitions = None, save = None, plotState = None, c
     if save == None:
         save = False
     if plotState != None:
-        if plotState > numPartitions or plotState <= 0:
+        if plotState > numPartitions or (plotState <= 0 and plotState != -1):
             print("State to plot out of range")
             return
     numRegionsCollar, phis, thetas = partitionSphere(numPartitions)
@@ -91,14 +91,14 @@ def plotPartitionedSphere(numPartitions = None, save = None, plotState = None, c
         maxth = 2*np.pi
 
     # Plot inner white sphere
-    r=1
+    r=1.0
     if plotState == None:
         u = np.linspace(0, 2 * np.pi, 400)
         v = np.linspace(0, np.pi, 400)
         xx = r * np.outer(np.cos(u), np.sin(v))
         yy = r * np.outer(np.sin(u), np.sin(v))
         zz = r * np.outer(np.ones(np.size(u)), np.cos(v))
-        ax.plot_surface(xx, yy, zz, color='white', linewidth=0, antialiased=False, alpha = 1.0)
+        ax.plot_surface(xx, yy, zz, color='white', linewidth=0, antialiased=False, alpha = 0.2)
 
     # Plot collars
     for phi in phis:
@@ -123,7 +123,7 @@ def plotPartitionedSphere(numPartitions = None, save = None, plotState = None, c
     
     # Find location of state in plotState (counts from one onwards)
     # First find collar (phis)
-    if plotState != None:
+    if plotState != None and plotState != -1:
         collar = 0
         while (sum(numRegionsCollar[0:collar+1])) < plotState:
             collar += 1
@@ -187,7 +187,7 @@ def plotPartitionedSphere(numPartitions = None, save = None, plotState = None, c
     # Plot the surface
     #ax.set_aspect('equal')
     ax.view_init(0,270)
-    ax.dist = 5.65
+    ax.dist = 6
     if save:
         plt.savefig('spherePartion_' + str(numPartitions) + '.png')
         

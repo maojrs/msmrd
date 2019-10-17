@@ -17,9 +17,13 @@ namespace msmrd {
      * Class for multi-particle msmrd integration based on patchy particles. Uses base functionality from
      * msmrdIntegratorDiscrete, but extends its methods for multiparticle MSM/RD integration.
      */
-    template <typename templateMSM>
     class msmrdMultiParticleIntegrator : public msmrdIntegratorDiscrete<ctmsm> {
     public:
+        std::vector<particleComplex> particleComplexes;
+        /**
+         * @param particleComplexes: vector containing particle complexex to track particles that are bound together.
+         */
+
         using msmrdIntegratorDiscrete<ctmsm>::msmrdIntegratorDiscrete;
 
         void computeTransitionsFromTransitionStates(std::vector<particleMS> &parts) override;
@@ -28,12 +32,12 @@ namespace msmrd {
 
         void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState) override;
 
-        void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState) override;
+        //void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState) override;
 
-        void transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex,
-                                          int jIndex, int endState) override;
+        //void transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex,
+        //                                  int jIndex, int endState) override;
 
-        void removeUnrealizedEvents(std::vector<particleMS> &parts) override;
+        //void removeUnrealizedEvents(std::vector<particleMS> &parts) override;
 
 
     };
