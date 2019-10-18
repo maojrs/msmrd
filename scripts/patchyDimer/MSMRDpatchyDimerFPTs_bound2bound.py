@@ -6,7 +6,7 @@ import msmrd2
 import random
 from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
 from msmrd2.markovModels import msmrdMarkovModelDiscrete as msmrdMSMDiscrete
-from msmrd2.integrators import msmrdIntegratorDiscrete
+from msmrd2.integrators import msmrdIntegrator
 import msmrd2.tools.quaternions as quaternions
 import os
 
@@ -194,7 +194,7 @@ def MSMRDsimulationFPT(trajectorynum):
 
     # Define integrator, boundary and discretization
     seed = -int(1*trajectorynum) # Negative seed, uses random device as seed
-    integrator = msmrdIntegratorDiscrete(dt, seed, bodytype, numParticleTypes, radialBounds, unboundMSM, couplingMSM)
+    integrator = msmrdIntegrator(dt, seed, bodytype, numParticleTypes, radialBounds, unboundMSM, couplingMSM)
     integrator.setBoundary(boxBoundary)
     integrator.setDiscretization(discretization)
 

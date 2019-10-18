@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "integrators/msmrdIntegratorDiscrete.hpp"
+#include "integrators/msmrdIntegrator.hpp"
 
 namespace msmrd {
 
@@ -17,14 +17,14 @@ namespace msmrd {
      * Class for multi-particle msmrd integration based on patchy particles. Uses base functionality from
      * msmrdIntegratorDiscrete, but extends its methods for multiparticle MSM/RD integration.
      */
-    class msmrdMultiParticleIntegrator : public msmrdIntegratorDiscrete<ctmsm> {
+    class msmrdMultiParticleIntegrator : public msmrdIntegrator<ctmsm> {
     public:
         std::vector<particleComplex> particleComplexes;
         /**
          * @param particleComplexes: vector containing particle complexex to track particles that are bound together.
          */
 
-        using msmrdIntegratorDiscrete<ctmsm>::msmrdIntegratorDiscrete;
+        using msmrdIntegrator<ctmsm>::msmrdIntegrator;
 
         void computeTransitionsFromTransitionStates(std::vector<particleMS> &parts) override;
 

@@ -1,57 +1,87 @@
 //
-// Created by maojrs on 2/6/19.
+// Created by maojrs on 8/19/19.
 //
 
 #include "integrators/msmrdIntegrator.hpp"
-
 
 namespace msmrd {
 
     // Template constructors in header
 
-
-    /* Computes possible transitions to bound states from particles sufficiently close to each other (in transition
-     * states) and saves them in the event manager. Used by integrate function. */
+    /* Computes the current transition state in the discretization for an unbound pair of
+     * particles. If their relative position is larger than the discretization limit (radialBounds[1]),
+     * it returns -1. Otherwise it returns the transition state (in the original discrete trajectories indexing)
+     * of the two particles in the discretization.*/
     template<>
-    void msmrdIntegrator<ctmsm>::computeTransitions2BoundStates(std::vector<particleMS> &parts) {
+    int msmrdIntegrator<ctmsm>::computeCurrentTransitionState(particleMS &part1, particleMS &part2) {
+        int currentTransitionState = -1;
         vec3<double> relativePosition;
         quaternion<double> relativeOrientation;
         quaternion<double> refQuaternion;
+        int index0 = markovModel.getMaxNumberBoundStates();
+        // Need special function to calculate relative position, in case we have a periodic boundary.
+        relativePosition = calculateRelativePosition(part1.nextPosition, part2.nextPosition);
+        if (relativePosition.norm() < radialBounds[1]) {
+            if (rotation) {
+                //relativeOrientation = part1.nextOrientation.conj() * part2.nextOrientation;
+                relativeOrientation = part2.nextOrientation * part1.nextOrientation.conj();
+                refQuaternion = part1.nextOrientation.conj();
+                currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
+                                                                                   relativeOrientation,
+                                                                                   refQuaternion);
+            } else {
+                currentTransitionState = positionPart->getSectionNumber(relativePosition);
+            }
+            // Calculate transition with Markov model, note reindexing by index0 required.
+            currentTransitionState = index0 + currentTransitionState;
+        }
+        return currentTransitionState;
+    }
+
+
+    /* Computes possible transitions from transition states to bound states or other transition states from
+     * particles sufficiently close to each other (in transition states) and saves them in the event manager.
+     * Used by integrate function. */
+    template<>
+    void msmrdIntegrator<ctmsm>::computeTransitionsFromTransitionStates(std::vector<particleMS> &parts) {
         int currentTransitionState;
         double transitionTime;
         int nextState;
+        int index0 = markovModel.getMaxNumberBoundStates();
         // Loop over all pairs of particles without repetition with i < j
         for (int i = 0; i < parts.size(); i++) {
             for (int j = i + 1; j < parts.size(); j++) {
-                // Only compute transitions if particles are in unbound state.
+                // Only compute transitions if both particles are in unbound state.
                 if (parts[i].boundTo == -1 and parts[j].boundTo == -1) {
-                    /* Only compute new transition if particles drifted into transition region for
-                     * the first time, i.e. empty event and relativeDistance < radialBounds[1] */
+                    /* Computes new transition if particles drifted into transition region for
+                     * the first time, i.e. empty event and relativeDistance < radialBounds[1], or if
+                     * particles transitioned between transition states. */
                     auto previousEvent = eventMgr.getEvent(i, j);
                     if (previousEvent.eventType == "empty") {
-                        // Need special function to calculate relative position, in case we have a periodic boundary.
-                        relativePosition = calculateRelativePosition(parts[i].nextPosition, parts[j].nextPosition);
-                        if (relativePosition.norm() < radialBounds[1]) {
-                            if (rotation) {
-                                //relativeOrientation = parts[i].nextOrientation.conj() * parts[j].nextOrientation;
-                                relativeOrientation = parts[j].nextOrientation * parts[i].nextOrientation.conj();
-                                refQuaternion = parts[i].nextOrientation.conj();
-                                currentTransitionState = positionOrientationPart->getSectionNumber(relativePosition,
-                                                                                                   relativeOrientation,
-                                                                                                   refQuaternion);
-                            } else {
-                                currentTransitionState = positionPart->getSectionNumber(relativePosition);
-                            }
-                            auto transition = markovModel.computeTransition2BoundState(currentTransitionState);
-                            transitionTime = std::get<0>(transition);
-                            nextState = std::get<1>(transition);
+                        // returns -1 if |relativePosition| > radialBounds[1]
+                        currentTransitionState = computeCurrentTransitionState(parts[i], parts[j]);
+                    } else if (previousEvent.eventType == "inTransition") {
+                        //previous endState is current starting state
+                        currentTransitionState = previousEvent.endState;
+                        eventMgr.removeEvent(i, j);
+                    }
+                    // If valid currentTransitionState (see computeCurrentTransitionState), calculate next transition.
+                    if (currentTransitionState != -1) {
+                        auto transition = markovModel.calculateTransition(currentTransitionState);
+                        transitionTime = std::get<0>(transition);
+                        nextState = std::get<1>(transition);
+                        if (nextState <= index0) {
                             eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState, "binding");
+                        } else {
+                            eventMgr.addEvent(transitionTime, i, j, currentTransitionState,
+                                              nextState, "transition2transition");
                         }
                     }
                 }
             }
         }
     }
+
 
     /* Computes possible transitions from bound states to other bound states or unbound states (transition states)
      * and saves them in the event manager. Used by integrate function. */
@@ -60,6 +90,7 @@ namespace msmrd {
         double transitionTime;
         int nextState;
         std::tuple<double, int> transition;
+        int index0 = markovModel.getMaxNumberBoundStates();
         for (int i = 0; i < parts.size(); i++) {
             // Only compute transition if particle is bound to another particle.
             // If particle[i] is bound, boundTo > 0; if bound pairs are only to be counted once, then boundTo > i
@@ -68,13 +99,13 @@ namespace msmrd {
                  * the first time, i.e. empty event */
                 auto previousEvent = eventMgr.getEvent(i, parts[i].boundTo);
                 if (previousEvent.eventType == "empty") {
-                    transition = markovModel.computeTransitionFromBoundState(parts[i].state);
+                    transition = markovModel.calculateTransition(parts[i].boundState);
                     transitionTime = std::get<0>(transition);
                     nextState = std::get<1>(transition);
-                    // Distinguish between events bound to bound transition) and unbinding events
-                    if (nextState <= markovModel.getMaxNumberBoundStates()) {
+                    // Distinguish between events bound to bound transition and unbinding events
+                    if (nextState <= index0) {
                         eventMgr.addEvent(transitionTime, i, parts[i].boundTo,
-                                          parts[i].state, nextState, "bound2boundTransition");
+                                          parts[i].state, nextState, "bound2bound");
                     } else {
                         eventMgr.addEvent(transitionTime, i, parts[i].boundTo,
                                           parts[i].state, nextState, "unbinding");
@@ -96,14 +127,12 @@ namespace msmrd {
         parts[iIndex].boundTo = jIndex;
         parts[jIndex].boundTo = iIndex;
         parts[jIndex].deactivate();
-        // Set state for particle
-        parts[iIndex].setState(endState);
-        parts[jIndex].setState(endState);
-        // Deactivate unbound MSM behavior if applicable
-        parts[iIndex].activeMSM = false;
-        parts[jIndex].activeMSM = false;
+        // Set bound state for particle
+        parts[iIndex].setBoundState(endState);
+        parts[jIndex].setBoundState(endState);
         // Set diffusion coefficients in bound state (note states start counting from 1, not zero)
-        parts[iIndex].setDs(markovModel.Dboundlist[endState-1], markovModel.DboundRotlist[endState-1]);
+        int MSMindex = markovModel.getMSMindex(endState);
+        parts[iIndex].setDs(markovModel.Dlist[MSMindex], markovModel.Drotlist[MSMindex]);
         // Average bound particle position and orientation (save on particle with smaller index).
         if (rotation) {
             parts[iIndex].nextOrientation = msmrdtools::quaternionSlerp(parts[iIndex].orientation,
@@ -120,18 +149,13 @@ namespace msmrd {
      * always iIndex < jIndex should hold.*/
     template<>
     void msmrdIntegrator<ctmsm>::transition2UnboundState(std::vector<particleMS> &parts, int iIndex,
-                                                       int jIndex, int endState) {
-
+                                                         int jIndex, int endState) {
         int iNewState;
         int jNewState;
         // Redefine endstate indexing, so it is understood by the partition/discretization.
-        int maxNumberBoundStates = markovModel.getMaxNumberBoundStates();
-        endState = endState - maxNumberBoundStates;
-        // Eliminate pair connection by resetting to default value -1 and activate particles.
-        parts[iIndex].boundTo = -1;
-        parts[jIndex].boundTo = -1;
-        parts[iIndex].activate();
-        parts[jIndex].activate();
+        int index0 = markovModel.getMaxNumberBoundStates();
+        endState = endState - index0;
+
         /* Calculates next states and activates MSM if there is a transition matrix (size larger than one).
          * More complex behavior to calculate new states possible */
         iNewState = 0;
@@ -146,10 +170,13 @@ namespace msmrd {
             parts[jIndex].activeMSM = true;
             jNewState = randg.uniformInteger(0, MSMlist[jPartType].tmatrix.size());
         }
-        // Set new states
+        /* Set new unbound states (which also eliminates pair connections by resetting boundTo and
+         * boundState to -1) and activate particles. */
         parts[iIndex].setState(iNewState);
         parts[jIndex].setState(jNewState);
-        // Set diffusion coefficients
+        parts[iIndex].activate();
+        parts[jIndex].activate();
+        // Sets diffusion coefficients
         auto iDiff = MSMlist[iPartType].Dlist[iNewState];
         auto iDiffRot = MSMlist[iPartType].Drotlist[iNewState];
         auto jDiff = MSMlist[jPartType].Dlist[jNewState];
@@ -185,13 +212,16 @@ namespace msmrd {
 
         /* Calculate new relative positions and orientations by sampling either:
          * nonuniformly on sphere section weighted on r close to the center,
-         * uniformly in spherical section, uniformly in outer shell section or
-         * uniformly in inner shell section. */
+         * uniformly in spherical section, uniformly in outer shell section,
+         * uniformly in inner shell section or custom */
         //auto rr = randg.uniformRange(radialBounds[0],radialBounds[1]);
         //auto relPosition = rr * randg.uniformSphereSection(phiInterval, thetaInterval);
         //auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
         //auto relPosition = radialBounds[1] * randg.uniformSphereSection(phiInterval, thetaInterval);
         auto relPosition = radialBounds[0] * randg.uniformSphereSection(phiInterval, thetaInterval);
+        //double rr  = radialBounds[0] + 0.2*(radialBounds[1] - radialBounds[0]);
+        //auto relPosition = rr * randg.uniformSphereSection(phiInterval, thetaInterval);
+
 
         // Set next positions and orientations based on the relative ones (parts[iIndex] keeps track of position)
         parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
@@ -203,12 +233,23 @@ namespace msmrd {
      * to another bound state. */
     template<>
     void msmrdIntegrator<ctmsm>::transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex,
-                                                       int jIndex, int endState) {
+                                                              int jIndex, int endState) {
         // Set state for particle
-        parts[iIndex].setState(endState);
-        parts[jIndex].setState(endState);
-        // Set diffusion coefficients in bound state (note states start counting from 1, not zero)
-        parts[iIndex].setDs(markovModel.Dboundlist[endState-1], markovModel.DboundRotlist[endState-1]);
+        parts[iIndex].setBoundState(endState);
+        parts[jIndex].setBoundState(endState);
+        /* Set diffusion coefficients in bound state (although not always neccesary for bound states,
+         * we convert to the proper indexing.) */
+        int MSMindex = markovModel.getMSMindex(endState);
+        parts[iIndex].setDs(markovModel.Dlist[MSMindex], markovModel.Drotlist[MSMindex]);
+    }
+
+    /* Transitions of particles in transition region with indexes iIndex and jIndex in the particle list
+     * to another transition state. */
+    template<>
+    void msmrdIntegrator<ctmsm>::transitionBetweenTransitionStates(int iIndex, int jIndex) {
+        /* Change eventType label to indicate to computeTransitionsFromTransitionStates function that
+         * a new event needs to be calculated, using previousEvent.endState as the initial state */
+        eventMgr.setEventType("inTransition", iIndex, jIndex);
     }
 
 
@@ -246,26 +287,56 @@ namespace msmrd {
     /* Apply events in event manager that should happen during the current time step. */
     template<>
     void msmrdIntegrator<ctmsm>::applyEvents(std::vector<particleMS> &parts) {
-        for (auto &thisEvent : eventMgr.eventDictionary) {
-            auto transitionTime = thisEvent.second.waitTime;
+        std::list<std::map<std::string, decltype(eventMgr.emptyEvent)>::const_iterator> iteratorList;
+        // Loop over dictionary using iterators
+        for (auto it = eventMgr.eventDictionary.cbegin(); it != eventMgr.eventDictionary.cend(); it++) {
+            auto transitionTime = it->second.waitTime;
             /* Only apply events that should happen in during this
              * timestep (they correspond to transitionTime < 0) */
-            if (transitionTime < 0) {
+            if (transitionTime <= 0) {
                 // Load event data
-                auto iIndex = thisEvent.second.part1Index;
-                auto jIndex = thisEvent.second.part2Index;
-                auto endState = thisEvent.second.endState;
-                auto eventType = thisEvent.second.eventType;
-                // Make event happen (depending on event type)
+                auto iIndex = it->second.part1Index;
+                auto jIndex = it->second.part2Index;
+                auto endState = it->second.endState;
+                auto eventType = it->second.eventType;
+                // Make event happen (depending on event type) and remove event once it has happened
                 if (eventType == "binding") {
                     transition2BoundState(parts, iIndex, jIndex, endState);
+                    iteratorList.push_back(it);
                 } else if (eventType == "unbinding") {
                     transition2UnboundState(parts, iIndex, jIndex, endState);
-                } else if (eventType == "bound2boundTransition") {
+                    iteratorList.push_back(it);
+                } else if (eventType == "bound2bound") {
                     transitionBetweenBoundStates(parts, iIndex, jIndex, endState);
+                    iteratorList.push_back(it);
+                } else if (eventType == "transition2transition") {
+                    /* Note event is not removed until a new event is computed later in
+                     * the computeTransitionsFromTransitionStates routine */
+                    transitionBetweenTransitionStates(iIndex, jIndex);
                 }
-                // Remove event from event list once it has happened
-                eventMgr.removeEvent(iIndex, jIndex);
+            }
+        }
+        // Erase events that just were applied
+        for (auto it : iteratorList) {
+            eventMgr.eventDictionary.erase(it);
+        }
+    }
+
+    /* Integrates translational and rotation diffusion for on dt step. (Calls the integrateOne fucntions
+     * of the parent classes) */
+    template<>
+    void msmrdIntegrator<ctmsm>::integrateDiffusion(std::vector<particleMS> &parts, double dt) {
+        /* Integrate only active particles and save next positions/orientations in parts[i].next.
+         * Non-active particles will usually correspond to one of the particles of a bound pair of particles */
+        for (int i = 0; i < parts.size(); i++) {
+            if (parts[i].isActive()) {
+                /* Choose basic integration depending if particle MSM is
+                 * active (this corresponds only to the MSM in the unbound state) */
+                if (parts[i].activeMSM) {
+                    integrateOneMS(i, parts, dt);
+                } else {
+                    integrateOne(i, parts, dt);
+                }
             }
         }
     }
@@ -282,35 +353,28 @@ namespace msmrd {
             firstrun = false;
         }
 
-        /* Integrate only active particles and save next positions/orientations in parts[i].next.
-         * Non-active particles will usually correspond to one of the particles of a bound pair of particles */
-        for (int i = 0; i < parts.size(); i++) {
-            if (parts[i].isActive()) {
-                /* Choose basic integration depending if particle MSM is
-                 * active (this corresponds only to the MSM in the unbound state) */
-                if (parts[i].activeMSM) {
-                    integrateOneMS(i, parts, dt);
-                } else {
-                    integrateOne(i, parts, dt);
-                }
-            }
-        }
+        /* NOTE: the ordering of the following routines is veryy important, draw a timeline if necessary.*/
+
+        // Compute future transitions to bound states (from unbound states) and add them to the event manager.
+        computeTransitionsFromTransitionStates(parts);
+
+        // Compute future transitions from bound states (to unbound or other bound states); add them to event manager.
+        computeTransitionsFromBoundStates(parts);
+
+        // Integrates diffusion for one time step.
+        integrateDiffusion(parts, dt);
+
+        // Remove unrealized previous events (see function for detailed description).
+        removeUnrealizedEvents(parts);
 
         /* Advance global time and in event manager (to make events happen). Useful to draw a timeline to
          * understand order of events. */
         clock += dt;
         eventMgr.advanceTime(dt);
 
-        // Remove unrealized previous events (see function for detailed description).
-        removeUnrealizedEvents(parts);
-
-        // Compute transitions to bound states (from unbound states) and add them to the event manager.
-        computeTransitions2BoundStates(parts);
-
-        // Compute transitions from bound states (to unbound or other bound states) and add them to event manager.
-        computeTransitionsFromBoundStates(parts);
-
-        // Check for events in event manager that should happen during this time step [t,t+dt) and make them happen.
+        /* Check for events in event manager that should happen during this time step [t,t+dt) and
+         * make them happen. Note if the lag-time is a multiple of dt (n*dt), which is likely the case,
+         * events will happen at end of the timestep exactly */
         applyEvents(parts);
 
         // Enforce boundary and set new positions into parts[i].nextPosition (only if particle is active).
@@ -320,6 +384,7 @@ namespace msmrd {
          * calculated by integrator and boundary as current position/orientation). Note states
          * are modified directly and don't need to be updated. */
         updatePositionOrientation(parts);
+
 
     }
 

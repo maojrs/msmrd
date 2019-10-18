@@ -1,7 +1,7 @@
 //
 // Created by maojrs on 9/7/18.
 //
-#include <integrators/msmrdIntegratorDiscrete.hpp>
+#include <integrators/msmrdIntegrator.hpp>
 #include "binding.hpp"
 #include "markovModels/discreteTimeMarkovModel.hpp"
 #include "markovModels/continuousTimeMarkovModel.hpp"
