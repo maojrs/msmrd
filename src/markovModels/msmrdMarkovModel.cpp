@@ -2,13 +2,13 @@
 // Created by maojrs on 8/19/19.
 //
 
-#include "markovModels/msmrdMarkovModelDiscrete.hpp"
+#include "markovModels/msmrdMarkovModel.hpp"
 
 namespace msmrd {
     /**
      * Implementation of Markov model class specializes for MSM/RD.
      */
-    msmrdMarkovModelDiscrete::msmrdMarkovModelDiscrete(int numBoundStates, int maxNumberBoundStates,
+    msmrdMarkovModel::msmrdMarkovModel(int numBoundStates, int maxNumberBoundStates,
                                                        std::vector<std::vector<double>> tmatrix,
                                                        std::vector<int> activeSet, double lagtime, long seed)
             : numBoundStates(numBoundStates), maxNumberBoundStates(maxNumberBoundStates), activeSet(activeSet),
@@ -19,7 +19,7 @@ namespace msmrd {
     };
 
 
-    std::tuple<double, int> msmrdMarkovModelDiscrete::calculateTransition(int initialState) {
+    std::tuple<double, int> msmrdMarkovModel::calculateTransition(int initialState) {
         // Find index of initialState in the transition matrix
         int localState = getMSMindex(initialState);
         // Return empty event if initialState is not in activeSet
@@ -39,7 +39,7 @@ namespace msmrd {
     /* This function sets the diffusion coefficients for the bound states of A and B.
     * Note size of vectors must match numBoundStates. This functions NEEDS
     * to be called to fill in the diffusion coefficients. */
-    void msmrdMarkovModelDiscrete::setDbound(std::vector<double> &D, std::vector<double> &Drot) {
+    void msmrdMarkovModel::setDbound(std::vector<double> &D, std::vector<double> &Drot) {
         if ( (D.size() != numBoundStates ) or (Drot.size() != numBoundStates) ) {
             std::__throw_range_error("Vectors of diffusion coefficients must match number of bound states");
         }
@@ -48,11 +48,11 @@ namespace msmrd {
     }
 
 
-    int msmrdMarkovModelDiscrete::getMSMRDindex(int MSMindex){
+    int msmrdMarkovModel::getMSMRDindex(int MSMindex){
         return activeSet[MSMindex];
     };
 
-    int msmrdMarkovModelDiscrete::getMSMindex(int MSMRDindex){
+    int msmrdMarkovModel::getMSMindex(int MSMRDindex){
         // Find index (MSMindex) of initialState (MSMRDindex) in the transition matrix
         std::vector<int>::iterator itr = std::find(activeSet.begin(), activeSet.end(), MSMRDindex);
         if (itr != activeSet.cend()) {

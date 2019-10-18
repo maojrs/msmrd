@@ -10,7 +10,7 @@ using msm = msmrd::discreteTimeMarkovStateModel;
 
 namespace msmrd {
 
-    class msmrdMarkovModelDiscrete : public msm {
+    class msmrdMarkovModel : public msm {
     protected:
         int numBoundStates;
         unsigned int maxNumberBoundStates;
@@ -33,7 +33,7 @@ namespace msmrd {
          * the ones used in the simulation
          */
 
-        msmrdMarkovModelDiscrete(int numBoundStates, int maxNumberBoundStates,
+        msmrdMarkovModel(int numBoundStates, int maxNumberBoundStates,
                                  std::vector <std::vector<double>> tmatrix, std::vector<int> activeSet,
                                  double lagtime, long seed);
 

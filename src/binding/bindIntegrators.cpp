@@ -7,7 +7,7 @@ namespace msmrd {
     // Aliases for classes with long names.
     using msm = msmrd::discreteTimeMarkovStateModel;
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
-    using msmrdMSM= msmrd::msmrdMarkovModelDiscrete;
+    using msmrdMSM= msmrd::msmrdMarkovModel;
 
 
     /*
@@ -37,7 +37,7 @@ namespace msmrd {
                                                                                   "MSMlist, mainMarkovModel, "
                                                                                   "positionOrientationPartition)")
                 .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &,
-                        ctmsm &, msmrdMSMDiscrete &>())
+                        ctmsm &, msmrdMSM &>())
                 .def("setDiscretization", &msmrdIntegrator<ctmsm>::setDiscretization)
                 .def("integrate", &msmrdIntegrator<ctmsm>::integrate);
 

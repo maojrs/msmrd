@@ -5,13 +5,13 @@
 #include "binding.hpp"
 #include "markovModels/discreteTimeMarkovModel.hpp"
 #include "markovModels/continuousTimeMarkovModel.hpp"
-#include "markovModels/msmrdMarkovModelDiscrete.hpp"
+#include "markovModels/msmrdMarkovModel.hpp"
 
 namespace msmrd {
     // Aliases for classes with long names.
     using msm = msmrd::discreteTimeMarkovStateModel;
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
-    using msmrdMSMDiscrete = msmrd::msmrdMarkovModelDiscrete;
+    using msmrdMSM = msmrd::msmrdMarkovModel;
 
     /*
      * pyBinders for the c++ Markov state models (MSMs) classes
@@ -31,15 +31,15 @@ namespace msmrd {
                 .def("propagateMSM", &ctmsm::propagateMSM);
 
 
-        py::class_<msmrdMSMDiscrete, msm>(m, "msmrdMarkovModelDiscrete", "discrete time Markov state model "
+        py::class_<msmrdMSM, msm>(m, "msmrdMarkovModel", "discrete time Markov state model "
                                         "specialized to  use with MSM/RD integration (num. of bound states, "
                                         "max number of bound states, transition probability matrix, MSM active set,"
                                         "seed")
                 .def(py::init<unsigned int &, unsigned int &, std::vector<std::vector<double>> &,
                         std::vector<int> &, float &, long &>())
-                .def("calculateTransition", &msmrdMSMDiscrete::calculateTransition)
-                .def("setDbound", &msmrdMSMDiscrete::setDbound)
-                .def("setMaxNumberBoundStates", &msmrdMSMDiscrete::setMaxNumberBoundStates);
+                .def("calculateTransition", &msmrdMSM::calculateTransition)
+                .def("setDbound", &msmrdMSM::setDbound)
+                .def("setMaxNumberBoundStates", &msmrdMSM::setMaxNumberBoundStates);
 
     }
 

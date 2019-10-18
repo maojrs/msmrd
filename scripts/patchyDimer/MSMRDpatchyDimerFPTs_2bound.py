@@ -4,7 +4,7 @@ import multiprocessing
 from multiprocessing import Pool
 import msmrd2
 from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
-from msmrd2.markovModels import msmrdMarkovModelDiscrete as msmrdMSMDiscrete
+from msmrd2.markovModels import msmrdMarkovModel as msmrdMSM
 from msmrd2.integrators import msmrdIntegrator
 import msmrd2.tools.particleTools as particleTools
 import os
@@ -101,7 +101,7 @@ def MSMRDsimulationFPT(trajectorynum):
 
     # Set coupling MSM
     seed = int(-3*trajectorynum) # Negative seed, uses random device as seed
-    couplingMSM = msmrdMSMDiscrete(numBoundStates, maxNumBoundStates,  tmatrix, activeSet, realLagtime, seed)
+    couplingMSM = msmrdMSM(numBoundStates, maxNumBoundStates,  tmatrix, activeSet, realLagtime, seed)
     couplingMSM.setDbound(Dbound, DboundRot)
 
     # Define integrator, boundary and discretization
