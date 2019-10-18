@@ -50,7 +50,6 @@ set(SOURCES
         src/markovModels/continuousTimeMarkovModel.cpp
         src/markovModels/discreteTimeMarkovModel.cpp
         src/markovModels/markovModel.cpp
-        src/markovModels/msmrdMarkovModel.cpp
         src/markovModels/msmrdMarkovModelDiscrete.cpp
         src/potentials/dipole.cpp
         src/potentials/gaussians3D.cpp
@@ -104,7 +103,6 @@ set(PY_SOURCES
         include/markovModels/continuousTimeMarkovModel.hpp
         include/markovModels/discreteTimeMarkovModel.hpp
         include/markovModels/markovModel.hpp
-        include/markovModels/msmrdMarkovModel.hpp
         include/markovModels/msmrdMarkovModelDiscrete.hpp
         include/potentials/potentials.hpp
         include/potentials/dipole.hpp

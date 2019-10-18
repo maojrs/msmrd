@@ -4,7 +4,7 @@
 #include <catch2/catch.hpp>
 #include "markovModels/discreteTimeMarkovModel.hpp"
 #include "markovModels/continuousTimeMarkovModel.hpp"
-#include "markovModels/msmrdMarkovModel.hpp"
+
 
 using namespace msmrd;
 using msm = msmrd::discreteTimeMarkovStateModel;
@@ -43,37 +43,37 @@ TEST_CASE("Fundamental CTMSM parameters and propagation test", "[ctmsm]") {
     }
 }
 
-TEST_CASE("Initialization of dictionary in msmrdMarkovModel class", "[msmrdMarkovModel]") {
-    int nBoundStates = 2;
-    int nTransitionStates = 2;
-    std::map<std::string, float> rateDictionary = { {"11->b1", 5.0}, {"11->b2", 3.0},
-                                                    {"12->b1", 4.0}, {"12->b2", 12.0},
-                                                    {"b1->11", 1.0}, {"b1->12", 0.5},
-                                                    {"b2->11", 2.0}, {"b2->12", 1.5},
-                                                    {"b1->b2", 0.7}, {"b2->b1", 1.2}};
-    // Create an msmMarkovModel
-    auto myMSM = msmrdMarkovModel(nBoundStates, nTransitionStates, -1, rateDictionary);
-    // Check if the initialization of ctmsms in msmrdMarkovmodel is done correctly.
-    auto rate1b1 = myMSM.getRate("11->b1");
-    auto rate2b1 = myMSM.getRate("12->b1");
-    auto rate1b2 = myMSM.getRate("11->b2");
-    auto rate2b2 = myMSM.getRate("12->b2");
-    REQUIRE(rate1b1 == 5.0);
-    REQUIRE(rate2b1 == 4.0);
-    REQUIRE(rate1b2 == 3.0);
-    REQUIRE(rate2b2 == 12.0);
-    // Check transitions to bound state
-    auto transition = myMSM.computeTransition2BoundState(1);
-    auto time = std::get<0>(transition);
-    auto endState = std::get<1>(transition);
-    REQUIRE(time > 0);
-    bool correctEndState = endState == 1 || endState == 2;
-    REQUIRE(correctEndState);
-    // Check transitions from bound states
-    auto transition2 = myMSM.computeTransitionFromBoundState(1);
-    auto time2 = std::get<0>(transition2);
-    auto endState2 = std::get<1>(transition2);
-    REQUIRE(time2 > 0);
-    bool correctEndState2 = endState2 == 11 || endState2 == 12 || endState2 == 2;
-    REQUIRE(correctEndState2);
-}
+//TEST_CASE("Initialization of dictionary in msmrdMarkovModel class", "[msmrdMarkovModel]") {
+//    int nBoundStates = 2;
+//    int nTransitionStates = 2;
+//    std::map<std::string, float> rateDictionary = { {"11->b1", 5.0}, {"11->b2", 3.0},
+//                                                    {"12->b1", 4.0}, {"12->b2", 12.0},
+//                                                    {"b1->11", 1.0}, {"b1->12", 0.5},
+//                                                    {"b2->11", 2.0}, {"b2->12", 1.5},
+//                                                    {"b1->b2", 0.7}, {"b2->b1", 1.2}};
+//    // Create an msmMarkovModel
+//    auto myMSM = msmrdMarkovModel(nBoundStates, nTransitionStates, -1, rateDictionary);
+//    // Check if the initialization of ctmsms in msmrdMarkovmodel is done correctly.
+//    auto rate1b1 = myMSM.getRate("11->b1");
+//    auto rate2b1 = myMSM.getRate("12->b1");
+//    auto rate1b2 = myMSM.getRate("11->b2");
+//    auto rate2b2 = myMSM.getRate("12->b2");
+//    REQUIRE(rate1b1 == 5.0);
+//    REQUIRE(rate2b1 == 4.0);
+//    REQUIRE(rate1b2 == 3.0);
+//    REQUIRE(rate2b2 == 12.0);
+//    // Check transitions to bound state
+//    auto transition = myMSM.computeTransition2BoundState(1);
+//    auto time = std::get<0>(transition);
+//    auto endState = std::get<1>(transition);
+//    REQUIRE(time > 0);
+//    bool correctEndState = endState == 1 || endState == 2;
+//    REQUIRE(correctEndState);
+//    // Check transitions from bound states
+//    auto transition2 = myMSM.computeTransitionFromBoundState(1);
+//    auto time2 = std::get<0>(transition2);
+//    auto endState2 = std::get<1>(transition2);
+//    REQUIRE(time2 > 0);
+//    bool correctEndState2 = endState2 == 11 || endState2 == 12 || endState2 == 2;
+//    REQUIRE(correctEndState2);
+//}
