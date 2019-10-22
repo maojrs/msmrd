@@ -43,7 +43,7 @@ namespace msmrd {
     protected:
         /* Functions exclusive to multiparticle MSM/RD*/
 
-        int addComplex(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+        int addCompound(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
         void updateParticleComplexesVector(std::vector<particleMS> &parts);
 

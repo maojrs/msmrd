@@ -110,7 +110,7 @@ namespace msmrd {
         parts[jIndex].boundStates.push_back(endState);
 
         // Add particle complex to particleComplexes vector.
-        int mainCompoundSize = addComplex(parts, iIndex, jIndex, endState);
+        int mainCompoundSize = addCompound(parts, iIndex, jIndex, endState);
 
         // Set average position and orientation of particle compound
         setCompoundPositionOrientation(parts, iIndex, jIndex, mainCompoundSize);
@@ -128,9 +128,60 @@ namespace msmrd {
     }
 
 
+    // CURRENTLY WORKING HERE BELOw
+
     void msmrdMultiParticleIntegrator::transition2UnboundState(std::vector<particleMS> &parts, int iIndex,
                                                                int jIndex, int endState) {
+        int iNewState;
+        int jNewState;
+        // Redefine endstate indexing, so it is understood by the partition/discretization.
+        int index0 = markovModel.getMaxNumberBoundStates();
+        endState = endState - index0;
 
+        /* Calculates next states and activates MSM if there is a transition matrix (size larger than one).
+         * More complex behavior to calculate new states possible */
+        iNewState = 0;
+        jNewState = 0;
+        auto iPartType = parts[iIndex].type;
+        auto jPartType = parts[jIndex].type;
+        if (MSMlist[iPartType].tmatrix.size() > 1) {
+            parts[iIndex].activeMSM = true;
+            iNewState = randg.uniformInteger(0, MSMlist[iPartType].tmatrix.size());
+        }
+        if (MSMlist[jPartType].tmatrix.size() > 1) {
+            parts[jIndex].activeMSM = true;
+            jNewState = randg.uniformInteger(0, MSMlist[jPartType].tmatrix.size());
+        }
+
+        /* Set new unbound states (which also eliminates pair connections by resetting boundTo and
+         * boundState to -1) and activate particles. */
+        parts[iIndex].setState(iNewState);
+        parts[jIndex].setState(jNewState);
+        parts[iIndex].activate();
+        parts[jIndex].activate();
+
+        // Sets diffusion coefficients
+        auto iDiff = MSMlist[iPartType].Dlist[iNewState];
+        auto iDiffRot = MSMlist[iPartType].Drotlist[iNewState];
+        auto jDiff = MSMlist[jPartType].Dlist[jNewState];
+        auto jDiffRot = MSMlist[jPartType].Drotlist[jNewState];
+        parts[iIndex].setDs(iDiff, iDiffRot);
+        parts[jIndex].setDs(jDiff, jDiffRot);
+
+        // Extract relative position and orientation from partition and endstate
+        auto relativePositionOrientation = getRelativePositionOrientation(endState);
+        auto relPosition = std::get<0>(relativePositionOrientation);
+
+        // Set next orientations based on the relative ones (parts[iIndex] keeps track of bound particle orientation)
+        if (rotation) {
+            auto relOrientation = std::get<1>(relativePositionOrientation);
+            parts[iIndex].nextOrientation = 1.0 * parts[iIndex].orientation;
+            parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
+        }
+
+        // Set next positions based on the relative ones (parts[iIndex] keeps track of bound particle position)
+        parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
+        parts[jIndex].nextPosition = parts[iIndex].nextPosition + relPosition;
     }
 
 
@@ -159,7 +210,7 @@ namespace msmrd {
      * it creates it. If both particles belong to different complexes, it merges them. It also updates
      * the compoundIndex of each particle, see particle.hpp. It also returns an integer corresponding to
      * the size of the main compound in the case of two compounds joining, or simply one otherwise. */
-    int msmrdMultiParticleIntegrator::addComplex(std::vector<particleMS> &parts, int iIndex,
+    int msmrdMultiParticleIntegrator::addCompound(std::vector<particleMS> &parts, int iIndex,
                                                   int jIndex, int endState) {
         int mainCompoundSize = 1;
         particleMS &iPart = parts[iIndex];
