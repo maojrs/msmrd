@@ -113,89 +113,109 @@ namespace msmrd {
         parts[iIndex].setDs(markovModel.Dlist[MSMindex], markovModel.Drotlist[MSMindex]);
 
         // Add particle complex to particleComplexes vector.
-        addComplex(parts, iIndex, jIndex, endState);
+        int mainCompoundSize = addComplex(parts, iIndex, jIndex, endState);
 
-        // CURRENTLY WORKING HERE...
-
-        // Set average positions and orientations of particles
-
-        // Average bound particle position and orientation (save on particle with smaller index).
-        if (rotation) {
-            parts[iIndex].nextOrientation = parts[iIndex].orientation;
-            //parts[jIndex].nextOrientation = USE RELATIVE ORIENTATION HERE!!!!
-        }
-        parts[iIndex].nextPosition = parts[iIndex].position;
-        // Assign constant distant position to inactive particle ( could be useful for visualization).
-        parts[jIndex].nextPosition = parts[jIndex].position;
+        // Set average position and orientation of particle compound
+        setCompoundPositionOrientation(parts, iIndex, jIndex, mainCompoundSize);
     }
 
 
+
+    /* Sets compound position to the average, its orientation is always set up initially at one and only changed
+     * by diffusion. It also sets the position reference and orientation reference for a newly created compound. */
+    void msmrdMultiParticleIntegrator::setCompoundPositionOrientation(std::vector<particleMS> &parts,
+                                                                     int iIndex, int jIndex, int mainCompoundSize) {
+        int compoundIndex = parts[iIndex].compoundIndex;
+        int compoundSize = particleCompounds[compoundIndex].compoundSize;
+        if (compoundSize == 2) {
+            // Set average position
+            particleCompounds[compoundIndex].position = 0.5*(parts[iIndex].position + parts[jIndex].position);
+            vec3<double> diffVec = parts[jIndex].position - parts[iIndex].position;
+            particleCompounds[compoundIndex].positionReference = parts[iIndex].position - 0.5*diffVec/diffVec.norm();
+            particleCompounds[compoundIndex].orientationReference = 1.0*parts[iIndex].orientation;
+        } else {
+            particleCompounds[compoundIndex].position = (mainCompoundSize * particleCompounds[compoundIndex].position +
+                    (compoundSize - mainCompoundSize) * parts[jIndex].position)/compoundSize;
+        }
+    };
 
 
 
     /* Add particle complex into vector particleComplexes if particles bounded. If complex doesn't exist,
      * it creates it. If both particles belong to different complexes, it merges them. It also updates
-     * the complexIndex of each particle, see particle.hpp.*/
-    void msmrdMultiParticleIntegrator::addComplex(std::vector<particleMS> &parts, int iIndex,
+     * the compoundIndex of each particle, see particle.hpp. It also returns an integer corresponding to
+     * the size of the main compound in the case of two compounds joining, or simply one otherwise. */
+    int msmrdMultiParticleIntegrator::addComplex(std::vector<particleMS> &parts, int iIndex,
                                                   int jIndex, int endState) {
+        int mainCompoundSize = 1;
         particleMS &iPart = parts[iIndex];
         particleMS &jPart = parts[jIndex];
         // If neither particle belongs to a complex, create one
-        if (iPart.complexIndex == -1 and jPart.complexIndex == -1) {
+        if (iPart.compoundIndex == -1 and jPart.compoundIndex == -1) {
             std::tuple<int,int> pairIndices = std::make_tuple(iIndex, jIndex);
             std::map<std::tuple<int,int>, int> boundPairsDictionary = {{pairIndices, endState}};
-            particleComplex pComplex = particleComplex(iPart.position, iPart.orientation, boundPairsDictionary);
-            particleComplexes.push_back(pComplex);
+            particleCompound pComplex = particleCompound(boundPairsDictionary);
+            particleCompounds.push_back(pComplex);
             // Set new particle complex indices.
-            iPart.complexIndex = particleComplexes.size() - 1;
-            jPart.complexIndex = particleComplexes.size() - 1;
+            iPart.compoundIndex = static_cast<int>(particleCompounds.size() - 1);
+            jPart.compoundIndex = static_cast<int>(particleCompounds.size() - 1);
         }
         // If one of the two doesn't belong to a complex, join the solo particle into the complex.
-        else if (iPart.complexIndex * jPart.complexIndex < 0) {
-            int complexIndex = std::min(iPart.complexIndex, jPart.complexIndex);
+        else if (iPart.compoundIndex * jPart.compoundIndex < 0) {
+            // Generate new binding description
+            int compoundIndex = std::min(iPart.compoundIndex, jPart.compoundIndex);
             std::tuple<int,int> pairIndices = std::make_tuple(iIndex, jIndex);
-            particleComplexes[complexIndex].boundPairsDictionary.insert (
+            //Insert new binding decription into complex
+            particleCompounds[compoundIndex].boundPairsDictionary.insert (
                     std::pair<std::tuple<int,int>, int>(pairIndices, endState) );
+            // Extract main compound size and increase complex size by one.
+            mainCompoundSize = particleCompounds[compoundIndex].compoundSize;
+            particleCompounds[compoundIndex].compoundSize ++;
             // Set new particle complex indices.
-            iPart.complexIndex = complexIndex;
-            jPart.complexIndex = complexIndex;
+            iPart.compoundIndex = compoundIndex;
+            jPart.compoundIndex = compoundIndex;
         }
         // If both belong to a complex, join the complexes together (keep the one with lower index)
         else {
             // Add new bound pair to particle complex
-            int iComplexIndex = std::min(iPart.complexIndex, jPart.complexIndex);
-            int jComplexIndex = std::max(iPart.complexIndex, jPart.complexIndex);
+            int iCompoundIndex = std::min(iPart.compoundIndex, jPart.compoundIndex);
+            int jCompoundIndex = std::max(iPart.compoundIndex, jPart.compoundIndex);
             std::tuple<int,int> pairIndices = std::make_tuple(iIndex, jIndex);
-            particleComplexes[iComplexIndex].boundPairsDictionary.insert (
+            particleCompounds[iCompoundIndex].boundPairsDictionary.insert (
                     std::pair<std::tuple<int,int>, int>(pairIndices, endState) );
             // Join complexes and flag complex with alrger index to be deleted.
-            particleComplexes[iComplexIndex].joinParticleComplex(particleComplexes[jComplexIndex]);
-            particleComplexes[jComplexIndex].active = false;
+            particleCompounds[iCompoundIndex].joinParticleCompound(particleCompounds[jCompoundIndex]);
+            particleCompounds[jCompoundIndex].active = false;
+            // Extract main compound size, increase complex size by one and make zero the empty one
+            mainCompoundSize = particleCompounds[iCompoundIndex].compoundSize;
+            particleCompounds[iCompoundIndex].compoundSize ++;
+            particleCompounds[jCompoundIndex].compoundSize = 0;
             // Set new particle complex indices to the one of the lower index.
-            iPart.complexIndex = iComplexIndex;
-            jPart.complexIndex = iComplexIndex;
+            iPart.compoundIndex = iCompoundIndex;
+            jPart.compoundIndex = iCompoundIndex;
         }
+        return mainCompoundSize;
     };
 
 
     // @TODO WRITE TEST ROUTINE FOR THE FUNCTION BELOW: THIS FUNCTION WILL NEED TO BE ADDED IN THE INTEGRATOR FUNCTION
 
     /* Deletes inactive complexes in particle complex vector, and updates indexes in particle list. Doesn't
-     * need to do at every time step, but every now and then to make free up memory. */
+     * need to do at every time step, but every now and then to free up memory. */
     void msmrdMultiParticleIntegrator::updateParticleComplexesVector(std::vector<particleMS> &parts) {
-        for (size_t i = particleComplexes.size(); i--;) {
-            if (particleComplexes[i].active == false) {
+        for (size_t i = particleCompounds.size(); i--;) {
+            if (particleCompounds[i].active == false) {
                 // Erase particle complex
-                particleComplexes.erase(particleComplexes.begin() + i);
+                particleCompounds.erase(particleCompounds.begin() + i);
                 // Readjust the indexes of particles
                 for (int j = 0; j < parts.size(); j++) {
                     // this should never happen
-                    if (parts[j].complexIndex == i) {
-                        parts[j].complexIndex = -1;
+                    if (parts[j].compoundIndex == i) {
+                        parts[j].compoundIndex = -1;
                     }
                     // move all the indices larger than i by -1 since we will delete one element
-                    if (parts[j].complexIndex > i) {
-                        parts[j].complexIndex--;
+                    if (parts[j].compoundIndex > i) {
+                        parts[j].compoundIndex--;
                     }
                 }
             }

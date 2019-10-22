@@ -19,9 +19,10 @@ namespace msmrd {
      */
     class msmrdMultiParticleIntegrator : public msmrdIntegrator<ctmsm> {
     public:
-        std::vector<particleComplex> particleComplexes;
+        std::vector<particleCompound> particleCompounds;
         /**
-         * @param particleComplexes: vector containing particle complexex to track particles that are bound together.
+         * @param particleCompounds: vector containing particle compounds (two or more particles bound
+         * together) to track them and diffuse them.
          */
 
         using msmrdIntegrator<ctmsm>::msmrdIntegrator;
@@ -39,11 +40,15 @@ namespace msmrd {
 
         //void removeUnrealizedEvents(std::vector<particleMS> &parts) override;
 
+    protected:
         /* Functions exclusive to multiparticle MSM/RD*/
 
-        void addComplex(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+        int addComplex(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
         void updateParticleComplexesVector(std::vector<particleMS> &parts);
+
+        void setCompoundPositionOrientation(std::vector<particleMS> &parts, int iIndex, int jIndex,
+                                            int mainComplexSize);
 
 
     };

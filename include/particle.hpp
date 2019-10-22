@@ -114,7 +114,7 @@ namespace msmrd {
         int boundState = -1;
         std::vector<int> boundList;
         std::vector<int> boundStates;
-        int complexIndex = -1;
+        int compoundIndex = -1;
         /**
          * @param state particle current unbound state. If -1, then particle is in bound state.
          * @param nextState particle next state given and changed by the msm/ctmsm
@@ -137,9 +137,9 @@ namespace msmrd {
          * @param boundStates alternative to boundState for multiparticle bindings. If empty, particle is not bound.
          * Otherwise, the values correspond to the bound states of each of the corresponding particles in the boundList.
          * The indexes should be such that it is the same index as in the boundList.
-         * @param complexIndex if the particle is part of a particle complex; it corresponds to the index
-         * in the particleComplexes vector in the multiparticle MSM/RD integrator. If it is -1, it means either
-         * the particle does not belong to any particle complex, or that this functionality is not in use.
+         * @param compoundIndex if the particle is part of a particle compund; it corresponds to the index
+         * in the particleCompounds vector in the multiparticle MSM/RD integrator. If it is -1, it means either
+         * the particle does not belong to any particle compound, or that this functionality is not in use.
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
@@ -187,43 +187,54 @@ namespace msmrd {
 
 
     /**
-     * Declaration of particle Complex class. This is just a wrapper to easily keep track which particles
-     * are bound together in multiparticle MSM/RD.
+     * Declaration of particle Compound class. This will easily keep track which particles
+     * are bound together in multiparticle MSM/RD, and their position with respect to the compund.
      */
-    class particleComplex {
+    class particleCompound {
     public:
         vec3<double> position = vec3<double>();
-        quaternion<double> orientation = quaternion<double>();
+        vec3<double> positionReference = vec3<double>();
+        quaternion<double> orientation = quaternion<double>(1.0, 0.0, 0.0, 0.0);
+        quaternion<double> orientationReference = quaternion<double>();
         std::map<std::tuple<int,int>, int> boundPairsDictionary = {};
+        int referenceIndex = -1;
+        int compoundSize = 2;
         bool active = true;
         /**
-         * @param position position of particle complex
-         * @param orientation orientation of particle complex
+         * @param position position of particle compound
+         * @param positonReference position of reference particle within compund. The other
+         * particles postion can be built from this value, the compound position and the bound states.
+         * @param orientation orientation of particle compound. It will always be created with identity
+         * orientation. Since the particle orientations can be reconstructed from reference particle.
+         * @param orientationReference orientation of reference particle within compund. The other
+         * particles orientation can be built from this value, the compound orientation and the bound states.
          * @param boundPairsDictionary dictionary, which key corresponds to the tuple of pairs of indexes of the
-         * particles bound with each other within the complex. The value is the state in which
+         * particles bound with each other within the compound. The value is the state in which
          * the corresponding pair of particles is bound in.
-         * @param active if true the complex is active, if false it is no longer active and can be deleted.
+         * @param referenceIndex index of reference particle in particleList. The reference particle will be chosen
+         * as the one with smallest index when the compund is created. Once the compound is created it will not
+         * change reference particle, unless the reference particle unbounds from complex.
+         * @param compoundSize number of particles contained in complex. Defaults to 2 for newly created
+         * compounds. If 0, it means compound is inactive.
+         * @param active if true the compound is active, if false it is no longer active and can be deleted
+         * by integrator to free up memory.
          */
 
          /* Constructors for particle complex. */
 
-         particleComplex() {};
+         particleCompound() {};
 
-         particleComplex(vec3<double> position, quaternion<double> orientation) : position(position),
-                                                                                  orientation(orientation) {};
+         particleCompound(vec3<double> position);
 
-         particleComplex(std::vector<double> &position, std::vector<double> &orientation) : position(position),
-                                                                                           orientation(orientation) {};
+         particleCompound(std::vector<double> &position);
 
-         particleComplex(vec3<double> position, quaternion<double> orientation,
-                        std::map<std::tuple<int,int>, int> boundPairsDictionary) :
-                 position(position), orientation(orientation), boundPairsDictionary(boundPairsDictionary) {};
+        particleCompound(std::map<std::tuple<int,int>, int> boundPairsDictionary);
 
-         particleComplex(std::vector<double> &position, std::vector<double> &orientation,
-                        std::map<std::tuple<int,int>, int> boundPairsDictionary) :
-                position(position), orientation(orientation), boundPairsDictionary(boundPairsDictionary) {};
+        particleCompound(vec3<double> position, std::map<std::tuple<int,int>, int> boundPairsDictionary);
 
-         void joinParticleComplex(particleComplex partComplex);
+         particleCompound(std::vector<double> &position, std::map<std::tuple<int,int>, int> boundPairsDictionary);
+
+         void joinParticleCompound(particleCompound partComplex);
 
 
     };

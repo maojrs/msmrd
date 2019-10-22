@@ -82,9 +82,25 @@ namespace msmrd {
      * Implementation of particleComplex class
      */
 
+    /* Consturctors */
+    particleCompound::particleCompound(vec3<double> position) : position(position){};
+
+    particleCompound::particleCompound(std::vector<double> &position) : position(position) {};
+
+    particleCompound::particleCompound(std::map<std::tuple<int,int>, int> boundPairsDictionary):
+            boundPairsDictionary(boundPairsDictionary) {};
+
+    particleCompound::particleCompound(vec3<double> position, std::map<std::tuple<int,int>, int> boundPairsDictionary):
+    position(position), boundPairsDictionary(boundPairsDictionary) {};
+
+    particleCompound::particleCompound(std::vector<double> &position,
+                                       std::map<std::tuple<int,int>, int> boundPairsDictionary) :
+    position(position), boundPairsDictionary(boundPairsDictionary) {};
+
+
     /* Joins another particle complex into this particle complex. The local dictionary has preference if
      * equal keys. However, that should never happen. */
-    void particleComplex::joinParticleComplex(particleComplex pComplex) {
+    void particleCompound::joinParticleCompound(particleCompound pComplex) {
         boundPairsDictionary.insert(pComplex.boundPairsDictionary.begin(),
                                     pComplex.boundPairsDictionary.end());
     };

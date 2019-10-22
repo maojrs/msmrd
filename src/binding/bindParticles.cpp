@@ -52,11 +52,12 @@ namespace msmrd {
                 .def("setMSMoff", &particleMS::setMSMoff)
                 .def("setMSMon", &particleMS::setMSMon);
 
-        py::class_<particleComplex>(m, "particleComplex", "particle complex class that keeps track of"
+        py::class_<particleCompound>(m, "particleCompound", "particle complex class that keeps track of"
                                                           "all bound complexes in multiparticle MSM/RD.")
                 .def(py::init<>())
-                .def(py::init<std::vector<double> &, std::vector<double> &>())
-                .def(py::init<std::vector<double> &, std::vector<double> &, std::map<std::tuple<int,int>, int> &>());
+                .def(py::init<std::vector<double> &>())
+                .def(py::init<std::map<std::tuple<int,int>, int> &>())
+                .def(py::init<std::vector<double> &, std::map<std::tuple<int,int>, int> &>());
     }
 
 }
