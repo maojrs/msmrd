@@ -21,7 +21,9 @@ namespace msmrd {
 
     /**
      * Base class for msmrd integration (coupling MSM and reaction-diffusion)
-     * @tparam templateMSM template can be an msm or a ctmsm
+     * @tparam templateMSM template can be an msm or a ctmsm. This only referes to the
+     * MSM used when the particles are unbound in MSM/RD. If they are bound, they use the only
+     * MSM available at the moment, which is based on a discrete-time MSM obtained with PyEmma.
      */
     template <typename templateMSM>
     class msmrdIntegrator : public overdampedLangevinMarkovSwitch<templateMSM> {

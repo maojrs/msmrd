@@ -135,8 +135,7 @@ namespace msmrd {
         parts[iIndex].setDs(markovModel.Dlist[MSMindex], markovModel.Drotlist[MSMindex]);
         // Average bound particle position and orientation (save on particle with smaller index).
         if (rotation) {
-            parts[iIndex].nextOrientation = msmrdtools::quaternionSlerp(parts[iIndex].orientation,
-                                                                        parts[jIndex].orientation, 0.5);
+            parts[iIndex].nextOrientation = 1.0 * parts[iIndex].orientation;
         }
         parts[iIndex].nextPosition = 0.5*(parts[iIndex].position + parts[jIndex].position);
         // Assign constant distant position to inactive particle ( could be useful for visualization).
