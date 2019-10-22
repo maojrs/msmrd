@@ -5,8 +5,84 @@
 #include "integrators/msmrdIntegrator.hpp"
 
 namespace msmrd {
-
     // Template constructors in header
+
+    /**
+     * Auxiliary functions to facilitate main fucntions readability and testing.
+     */
+
+
+    /* Integrates translational and rotation diffusion for on dt step. (Calls the integrateOne fucntions
+     * of the parent classes) */
+    template<>
+    void msmrdIntegrator<ctmsm>::integrateDiffusion(std::vector<particleMS> &parts, double dt) {
+        /* Integrate only active particles and save next positions/orientations in parts[i].next.
+         * Non-active particles will usually correspond to one of the particles of a bound pair of particles */
+        for (int i = 0; i < parts.size(); i++) {
+            if (parts[i].isActive()) {
+                /* Choose basic integration depending if particle MSM is
+                 * active (this corresponds only to the MSM in the unbound state) */
+                if (parts[i].activeMSM) {
+                    integrateOneMS(i, parts, dt);
+                } else {
+                    integrateOne(i, parts, dt);
+                }
+            }
+        }
+    }
+
+
+    /* Gets relative position and orientation corresponding to a given state in the partition. It takes into
+     * account if rotation is active */
+    template<>
+    std::tuple<vec3<double>, quaternion<double>> msmrdIntegrator<ctmsm>::getRelativePositionOrientation(int state) {
+        vec3<double> relPosition;
+        quaternion<double> relOrientation;
+        // Extract section intervals in partition corresponding to the state.
+        std::array<double, 2> phiInterval;
+        std::array<double, 2> thetaInterval;
+        if (not rotation) {
+            auto sections = positionPart->getAngles(state);
+            phiInterval = std::get<0>(sections); //polar
+            thetaInterval = std::get<1>(sections); //azimuthal
+        } else {
+            std::array<double, 2> quatRadInterval;
+            std::array<double, 2> quatPhiInterval;
+            std::array<double, 2> quatThetaInterval;
+            auto sections = positionOrientationPart->getSectionIntervals(state);
+            phiInterval = std::get<0>(sections); //polar
+            thetaInterval = std::get<1>(sections); //azimuthal
+            quatRadInterval = std::get<2>(sections);
+            quatPhiInterval = std::get<3>(sections); //polar
+            quatThetaInterval = std::get<4>(sections); //azimuthal
+            // Calculate relative orientation from discretization (partition)
+            auto randomQuat = randg.uniformShellSection(quatRadInterval, quatPhiInterval, quatThetaInterval);
+            double sQuat = std::sqrt(1 - randomQuat.norm());
+            // Recover quaternion from its representation as a vector inside the unit 3D sphere
+            relOrientation = {sQuat, randomQuat};
+        };
+        /* Calculate new relative positions and orientations by sampling either:
+         * --nonuniformly on sphere section weighted on r close to the center,
+         * --uniformly in spherical section, uniformly in outer shell section,
+         * --uniformly in inner shell section or
+         * --custom */
+        //auto rr = randg.uniformRange(radialBounds[0],radialBounds[1]);
+        //auto relPosition = rr * randg.uniformSphereSection(phiInterval, thetaInterval);
+        //auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
+        //auto relPosition = radialBounds[1] * randg.uniformSphereSection(phiInterval, thetaInterval);
+        relPosition = radialBounds[0] * randg.uniformSphereSection(phiInterval, thetaInterval);
+        //double rr  = radialBounds[0] + 0.2*(radialBounds[1] - radialBounds[0]);
+        //auto relPosition = rr * randg.uniformSphereSection(phiInterval, thetaInterval);
+
+        return std::make_tuple(relPosition, relOrientation);
+    }
+
+
+
+    /**
+     * Main MSM/RD integrator functions
+     */
+
 
     /* Computes the current transition state in the discretization for an unbound pair of
      * particles. If their relative position is larger than the discretization limit (radialBounds[1]),
@@ -169,12 +245,14 @@ namespace msmrd {
             parts[jIndex].activeMSM = true;
             jNewState = randg.uniformInteger(0, MSMlist[jPartType].tmatrix.size());
         }
+
         /* Set new unbound states (which also eliminates pair connections by resetting boundTo and
          * boundState to -1) and activate particles. */
         parts[iIndex].setState(iNewState);
         parts[jIndex].setState(jNewState);
         parts[iIndex].activate();
         parts[jIndex].activate();
+
         // Sets diffusion coefficients
         auto iDiff = MSMlist[iPartType].Dlist[iNewState];
         auto iDiffRot = MSMlist[iPartType].Drotlist[iNewState];
@@ -182,47 +260,19 @@ namespace msmrd {
         auto jDiffRot = MSMlist[jPartType].Drotlist[jNewState];
         parts[iIndex].setDs(iDiff, iDiffRot);
         parts[jIndex].setDs(jDiff, jDiffRot);
-        // Extract section intervals in partition corresponding to the endState.
-        std::array<double, 2> phiInterval;
-        std::array<double, 2> thetaInterval;
-        if (not rotation) {
-            auto sections = positionPart->getAngles(endState);
-            phiInterval = std::get<0>(sections); //polar
-            thetaInterval = std::get<1>(sections); //azimuthal
-        } else {
-            std::array<double, 2> quatRadInterval;
-            std::array<double, 2> quatPhiInterval;
-            std::array<double, 2> quatThetaInterval;
-            auto sections = positionOrientationPart->getSectionIntervals(endState);
-            phiInterval = std::get<0>(sections); //polar
-            thetaInterval = std::get<1>(sections); //azimuthal
-            quatRadInterval = std::get<2>(sections);
-            quatPhiInterval = std::get<3>(sections); //polar
-            quatThetaInterval = std::get<4>(sections); //azimuthal
-            // Calculate relative orientation from discretization (partition)
-            auto randomQuat = randg.uniformShellSection(quatRadInterval, quatPhiInterval, quatThetaInterval);
-            double sQuat = std::sqrt(1 - randomQuat.norm());
-            // Recover quaternion from its representation as a vector inside the unit 3D sphere
-            quaternion<double> relOrientation = {sQuat, randomQuat};
-            // More complicate approach for orientation is possible but likely uneccesary.
+
+        // Extract relative position and orientation from partition and endstate
+        auto relativePositionOrientation = getRelativePositionOrientation(endState);
+        auto relPosition = std::get<0>(relativePositionOrientation);
+
+        // Set next orientations based on the relative ones (parts[iIndex] keeps track of bound particle orientation)
+        if (rotation) {
+            auto relOrientation = std::get<1>(relativePositionOrientation);
             parts[iIndex].nextOrientation = 1.0 * parts[iIndex].orientation;
             parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
         }
 
-        /* Calculate new relative positions and orientations by sampling either:
-         * nonuniformly on sphere section weighted on r close to the center,
-         * uniformly in spherical section, uniformly in outer shell section,
-         * uniformly in inner shell section or custom */
-        //auto rr = randg.uniformRange(radialBounds[0],radialBounds[1]);
-        //auto relPosition = rr * randg.uniformSphereSection(phiInterval, thetaInterval);
-        //auto relPosition = randg.uniformShellSection(radialBounds, phiInterval, thetaInterval);
-        //auto relPosition = radialBounds[1] * randg.uniformSphereSection(phiInterval, thetaInterval);
-        auto relPosition = radialBounds[0] * randg.uniformSphereSection(phiInterval, thetaInterval);
-        //double rr  = radialBounds[0] + 0.2*(radialBounds[1] - radialBounds[0]);
-        //auto relPosition = rr * randg.uniformSphereSection(phiInterval, thetaInterval);
-
-
-        // Set next positions and orientations based on the relative ones (parts[iIndex] keeps track of position)
+        // Set next positions based on the relative ones (parts[iIndex] keeps track of bound particle position)
         parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
         parts[jIndex].nextPosition = parts[iIndex].nextPosition + relPosition;
     }
@@ -321,25 +371,6 @@ namespace msmrd {
         }
     }
 
-    /* Integrates translational and rotation diffusion for on dt step. (Calls the integrateOne fucntions
-     * of the parent classes) */
-    template<>
-    void msmrdIntegrator<ctmsm>::integrateDiffusion(std::vector<particleMS> &parts, double dt) {
-        /* Integrate only active particles and save next positions/orientations in parts[i].next.
-         * Non-active particles will usually correspond to one of the particles of a bound pair of particles */
-        for (int i = 0; i < parts.size(); i++) {
-            if (parts[i].isActive()) {
-                /* Choose basic integration depending if particle MSM is
-                 * active (this corresponds only to the MSM in the unbound state) */
-                if (parts[i].activeMSM) {
-                    integrateOneMS(i, parts, dt);
-                } else {
-                    integrateOne(i, parts, dt);
-                }
-            }
-        }
-    }
-
 
     /* Main integrate function */
     template<>
@@ -386,6 +417,9 @@ namespace msmrd {
 
 
     }
+
+
+
 
 
 }

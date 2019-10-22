@@ -67,14 +67,20 @@ namespace msmrd {
         msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
                         std::array<double,2> radialBound, templateMSM MSMlist, msmrdMSM markovModel);
 
+
         // Redefine integrate function
         void integrate(std::vector<particleMS> &parts);
 
+
+        // Other auxiliary functions
         void integrateDiffusion(std::vector<particleMS> &parts, double dt);
+
+        std::tuple<vec3<double>, quaternion<double>> getRelativePositionOrientation(int state);
 
         void setDefaultDiscretization();
 
         void setDiscretization(fullPartition *thisFullPartition);
+
 
         /* Define following functions as virtual in case we want to override them in derived classes to modify
          * fucntionality */
@@ -143,7 +149,7 @@ namespace msmrd {
         int numRadialSectionsQuat = 5;
         int numSphericalSectionsQuat = 7;
         double relativeDistanceCutOff = radialBounds[1];
-        // TODO: Release memory of these pointers after use, or convert to smart pointers.
+        // TODO: Implement releasing memory of these pointers after use, or convert to smart pointers.
         positionPart = new spherePartition(numSphericalSectionsPos);
         positionOrientationPart = new fullPartition(relativeDistanceCutOff, numSphericalSectionsPos,
                                                     numRadialSectionsQuat, numSphericalSectionsQuat);
