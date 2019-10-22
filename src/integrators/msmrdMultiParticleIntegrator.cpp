@@ -95,28 +95,42 @@ namespace msmrd {
 
     /* Applies transition to bound state if binding pocket is not taken by another binding.
      * Makes particles with indexes iIndex and jIndex in the particle list transition to a bound state. Note
-     * always iIndex < jIndex should hold. Also particle with smaller index is the one that remains active
-     * to model position/orientation of bound complex. */
+     * always iIndex < jIndex should hold. Also both particles are desactivated since their position will be
+     * tracked with a particle compound. */
     void msmrdMultiParticleIntegrator::transition2BoundState(std::vector<particleMS> &parts, int iIndex,
                                                              int jIndex, int endState) {
         /* Establish pair connection in particle class and deactivate particle with larger index ( only
          * particle with smaller index remains active to represent the movement of the bound particle) */
         parts[iIndex].boundList.push_back(jIndex);
         parts[jIndex].boundList.push_back(iIndex);
+        parts[iIndex].deactivate();
         parts[jIndex].deactivate();
         // Set bound state for particle
         parts[iIndex].boundStates.push_back(endState);
         parts[jIndex].boundStates.push_back(endState);
-
-        // Set diffusion coefficients in bound state (note states start counting from 1, not zero)
-        int MSMindex = markovModel.getMSMindex(endState);
-        parts[iIndex].setDs(markovModel.Dlist[MSMindex], markovModel.Drotlist[MSMindex]);
 
         // Add particle complex to particleComplexes vector.
         int mainCompoundSize = addComplex(parts, iIndex, jIndex, endState);
 
         // Set average position and orientation of particle compound
         setCompoundPositionOrientation(parts, iIndex, jIndex, mainCompoundSize);
+
+        /* Set diffusion coefficients of bound particle compound (note states start counting from 1, not zero).
+         * In general this should be a more complicated when binding larger complexes. */
+        int MSMindex = markovModel.getMSMindex(endState);
+        if (particleCompounds[parts[iIndex].compoundIndex].compoundSize == 2) {
+            particleCompounds[parts[iIndex].compoundIndex].setDs(markovModel.Dlist[MSMindex],
+                                                                 markovModel.Drotlist[MSMindex]);
+        }
+        /* TODO: implement diffusion coeffcients assignments for larger complexes (> 2 particles).
+         * Not too relevant in first implementation since all diffusion coefficients are constats,
+         * so left for future implemenation. */
+    }
+
+
+    void msmrdMultiParticleIntegrator::transition2UnboundState(std::vector<particleMS> &parts, int iIndex,
+                                                               int jIndex, int endState) {
+
     }
 
 

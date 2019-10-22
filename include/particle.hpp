@@ -192,6 +192,8 @@ namespace msmrd {
      */
     class particleCompound {
     public:
+        double D;
+        double Drot;
         vec3<double> position = vec3<double>();
         vec3<double> positionReference = vec3<double>();
         quaternion<double> orientation = quaternion<double>(1.0, 0.0, 0.0, 0.0);
@@ -201,6 +203,8 @@ namespace msmrd {
         int compoundSize = 2;
         bool active = true;
         /**
+         * @param D diffusion constant
+         * @param Drot rotational diffusion constant
          * @param position position of particle compound
          * @param positonReference position of reference particle within compund. The other
          * particles postion can be built from this value, the compound position and the bound states.
@@ -228,13 +232,19 @@ namespace msmrd {
 
          particleCompound(std::vector<double> &position);
 
-        particleCompound(std::map<std::tuple<int,int>, int> boundPairsDictionary);
+         particleCompound(std::map<std::tuple<int,int>, int> boundPairsDictionary);
 
-        particleCompound(vec3<double> position, std::map<std::tuple<int,int>, int> boundPairsDictionary);
+         particleCompound(vec3<double> position, std::map<std::tuple<int,int>, int> boundPairsDictionary);
 
          particleCompound(std::vector<double> &position, std::map<std::tuple<int,int>, int> boundPairsDictionary);
 
          void joinParticleCompound(particleCompound partComplex);
+
+         void setD(double Dnew) { D = Dnew; }
+
+         void setDrot(double Drotnew) { Drot = Drotnew; }
+
+         void setDs(double Dnew, double Drotnew) { D = Dnew, Drot = Drotnew; }
 
 
     };

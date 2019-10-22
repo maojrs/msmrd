@@ -33,7 +33,7 @@ namespace msmrd {
 
         void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState) override;
 
-        //void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState) override;
+        void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState) override;
 
         //void transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex,
         //                                  int jIndex, int endState) override;

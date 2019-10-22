@@ -27,7 +27,7 @@ namespace msmrd {
      */
     template <typename templateMSM>
     class msmrdIntegrator : public overdampedLangevinMarkovSwitch<templateMSM> {
-    private:
+    protected:
         std::array<double,2> radialBounds;
         int numParticleTypes;
         bool firstrun = true;
