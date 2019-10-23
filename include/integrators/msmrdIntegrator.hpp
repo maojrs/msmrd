@@ -23,7 +23,8 @@ namespace msmrd {
      * Base class for msmrd integration (coupling MSM and reaction-diffusion)
      * @tparam templateMSM template can be an msm or a ctmsm. This only referes to the
      * MSM used when the particles are unbound in MSM/RD. If they are bound, they use the only
-     * MSM available at the moment, which is based on a discrete-time MSM obtained with PyEmma.
+     * MSM available at the moment for MSM/RD integration, which is based on a discrete-time MSM
+     * obtained with PyEmma.
      */
     template <typename templateMSM>
     class msmrdIntegrator : public overdampedLangevinMarkovSwitch<templateMSM> {
@@ -72,18 +73,22 @@ namespace msmrd {
         void integrate(std::vector<particleMS> &parts);
 
 
-        // Other auxiliary functions
+        // Auxiliary functions for main MSM/RD functions
         void integrateDiffusion(std::vector<particleMS> &parts, double dt);
 
         std::tuple<vec3<double>, quaternion<double>> getRelativePositionOrientation(int state);
+
+        int setNewUnboundState(std::vector<particleMS> &parts, int partIndex);
+
+        void setUnboundDiffusionCoefficients(std::vector<particleMS> &parts, int partIndex, int state);
 
         void setDefaultDiscretization();
 
         void setDiscretization(fullPartition *thisFullPartition);
 
 
-        /* Define following functions as virtual in case we want to override them in derived classes to modify
-         * fucntionality */
+        /* Main MSM/RD function. They are defined as virtual in case we want to override them in derived classes
+         * to modify fucntionality */
 
         virtual int computeCurrentTransitionState(particleMS &part1, particleMS &part2);
 

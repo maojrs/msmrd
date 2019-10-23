@@ -77,6 +77,34 @@ namespace msmrd {
         return std::make_tuple(relPosition, relOrientation);
     }
 
+    /* Calculates and set next unbound state and activates MSM if there is a transition matrix (size larger than one)
+     * for the unbound states. More complex behavior to calculate new states possible. It further returns the
+     * new state, so it can be directly used when calling this function. */
+    template<>
+    int msmrdIntegrator<ctmsm>::setNewUnboundState(std::vector<particleMS> &parts, int partIndex) {
+        int newState = 0;
+        auto partType = parts[partIndex].type;
+        if (MSMlist[partType].tmatrix.size() > 1) {
+            parts[partIndex].activeMSM = true;
+            newState = randg.uniformInteger(0, MSMlist[partType].tmatrix.size());
+        }
+        /* Set new unbound states (which also eliminates pair connections by resetting boundTo and
+         * boundState to -1) and activate particles. */
+        parts[partIndex].setState(newState);
+        parts[partIndex].activate();
+        return newState;
+    }
+
+    // Sets diffusion coefficients of particle parts[partIndex] based on the state of the unbound MSM.
+    template<>
+    void msmrdIntegrator<ctmsm>::setUnboundDiffusionCoefficients(std::vector<particleMS> &parts, int partIndex,
+                                                                 int state){
+        int partType = parts[partIndex].type;
+        auto diff = MSMlist[partType].Dlist[state];
+        auto diffRot = MSMlist[partType].Drotlist[state];
+        parts[partIndex].setDs(diff, diffRot);
+    };
+
 
 
     /**
@@ -224,42 +252,19 @@ namespace msmrd {
      * always iIndex < jIndex should hold.*/
     template<>
     void msmrdIntegrator<ctmsm>::transition2UnboundState(std::vector<particleMS> &parts, int iIndex,
-                                                         int jIndex, int endState) {
-        int iNewState;
-        int jNewState;
+                                                         int jIndex, int endStateAlt) {
+
         // Redefine endstate indexing, so it is understood by the partition/discretization.
         int index0 = markovModel.getMaxNumberBoundStates();
-        endState = endState - index0;
+        int endState = endStateAlt - index0;
 
-        /* Calculates next states and activates MSM if there is a transition matrix (size larger than one).
-         * More complex behavior to calculate new states possible */
-        iNewState = 0;
-        jNewState = 0;
-        auto iPartType = parts[iIndex].type;
-        auto jPartType = parts[jIndex].type;
-        if (MSMlist[iPartType].tmatrix.size() > 1) {
-            parts[iIndex].activeMSM = true;
-            iNewState = randg.uniformInteger(0, MSMlist[iPartType].tmatrix.size());
-        }
-        if (MSMlist[jPartType].tmatrix.size() > 1) {
-            parts[jIndex].activeMSM = true;
-            jNewState = randg.uniformInteger(0, MSMlist[jPartType].tmatrix.size());
-        }
+        // Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.
+        auto iNewState = setNewUnboundState(parts, iIndex);
+        auto jNewState = setNewUnboundState(parts, jIndex);
 
-        /* Set new unbound states (which also eliminates pair connections by resetting boundTo and
-         * boundState to -1) and activate particles. */
-        parts[iIndex].setState(iNewState);
-        parts[jIndex].setState(jNewState);
-        parts[iIndex].activate();
-        parts[jIndex].activate();
-
-        // Sets diffusion coefficients
-        auto iDiff = MSMlist[iPartType].Dlist[iNewState];
-        auto iDiffRot = MSMlist[iPartType].Drotlist[iNewState];
-        auto jDiff = MSMlist[jPartType].Dlist[jNewState];
-        auto jDiffRot = MSMlist[jPartType].Drotlist[jNewState];
-        parts[iIndex].setDs(iDiff, iDiffRot);
-        parts[jIndex].setDs(jDiff, jDiffRot);
+        // Sets diffusion coefficients corresponding to the new states.
+        setUnboundDiffusionCoefficients(parts, iIndex, iNewState);
+        setUnboundDiffusionCoefficients(parts, jIndex, jNewState);
 
         // Extract relative position and orientation from partition and endstate
         auto relativePositionOrientation = getRelativePositionOrientation(endState);
