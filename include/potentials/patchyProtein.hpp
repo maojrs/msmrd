@@ -10,9 +10,9 @@ namespace msmrd{
     /*
      * Declaration of potential function for patchy protein model. This class is a child from the
      * general pair potentials class that accepts quaternion-based orientation (rigidBody particle type).
-     * Some of its functionality is based on the patchy particles class. Note the
-     * potential will depend on the position of both particles, their orientation (quaternion<double>,
-     * quaternion<double), and their types (int, int).
+     * Some of its functionality is based on the patchy particles class. The main difference is that this class
+     * can take different type of patches. Note the potential will depend on the position of both particles,
+     * their orientation (quaternion<double>, quaternion<double), and their types (int, int).
      */
     class patchyProtein : public pairPotential {
     protected:
@@ -36,8 +36,11 @@ namespace msmrd{
         std::array<double, 2> rstarPatches;
 
         virtual void setPotentialParameters();
+
         std::vector<vec3<double>> assignPatches(int type);
+
         double quadraticPotential(double r, double sig, double eps, double a, double rstar);
+
         double derivativeQuadraticPotential(double r, double sig, double eps, double a, double rstar);
 
     public:
