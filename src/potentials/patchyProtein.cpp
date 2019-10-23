@@ -259,7 +259,7 @@ namespace msmrd {
             return patchesCoordinatesB;
         }
         else {
-            throw std::runtime_error("This potential only supports for two different types of particles.");
+            throw std::runtime_error("This potential only supports two different types of particles.");
         }
     }
 
