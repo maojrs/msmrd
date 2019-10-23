@@ -30,12 +30,14 @@ namespace msmrd {
         double rstarPatches;
 
         double quadraticPotential(double r, double sig, double eps, double a, double rstar);
+
         double derivativeQuadraticPotential(double r, double sig, double eps, double a, double rstar);
+
         std::tuple<vec3<double>, vec3<double>, vec3<double>, vec3<double>> forceTorquePatches(
                 const particle &part1, const particle &part2, const vec3<double> pos1virtual);
 
     public:
-        /*
+        /**
          * @param patchesCoordintates list of patches coordinates in a sphere of unit radius
          * @param sigma diameter of sphere at which patches are placed. Corresponds to the diameter of the particle.
          * @param strength overall strength of potential, eps values scaled in terms of this value.
@@ -45,9 +47,12 @@ namespace msmrd {
          * @param rstar*** range paramaters for the same three potentials.
          */
         patchyParticle() = default;
+
         patchyParticle(double sigma, double strength, std::vector<vec3<double>> patchesCoordinates);
+
         patchyParticle(double sigma, double strength, std::vector<std::vector<double>> patchesCoordinates);
 
+        // Main functions
 
         double evaluate(const particle &part1, const particle &part2) override;
 

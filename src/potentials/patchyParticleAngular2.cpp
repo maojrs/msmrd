@@ -7,20 +7,6 @@
 
 
 namespace msmrd {
-    /*
-     * Constructors inherited from patchyParticleAngular.
-     */
-    patchyParticleAngular2::patchyParticleAngular2(double sigma, double strength, double angularStrength,
-                           std::vector<std::vector<double>> patchesCoordinates) :
-            patchyParticleAngular(sigma, strength, angularStrength, patchesCoordinates) {
-        setMetastableRegions();
-    };
-
-    patchyParticleAngular2::patchyParticleAngular2(double sigma, double strength, double angularStrength,
-                                                   std::vector<vec3<double>> patchesCoordinates) :
-            patchyParticleAngular(sigma, strength, angularStrength, patchesCoordinates) {
-        setMetastableRegions();
-    };
 
 
     // Evaluates potential at given positions and orientations of two particles
@@ -130,31 +116,6 @@ namespace msmrd {
         plane2 = plane2/plane2.norm();
 
         return std::make_tuple(plane1, plane2);
-    }
-
-
-    /* DEPRECATED, no longer needed by calculateTorque, left for reference of metastable regions or future uses.
-     * Sets bound states (metastable regions) of this patchy dimer implementation. Same to setBoundStates
-     * in patchyDimer2 in trajectory/discrete/patchyDimer. */
-    void patchyParticleAngular2::setMetastableRegions() {
-        double angleDiff = 3 * M_PI / 5; // angle difference to form a pentamer
-        /* Define relative position vectors from particle 1 at the origin. These two patches
-         * point in the same direction as the two patches in the dimer. */
-        refRelativePositions[0] = {std::cos(angleDiff / 2.0), std::sin(angleDiff / 2.0), 0};
-        refRelativePositions[1] = {std::cos(angleDiff / 2.0), std::sin(-angleDiff / 2.0), 0};
-        vec3<double> relPos1orthogonal = {-1.0 * std::sin(angleDiff / 2.0), std::cos(angleDiff / 2.0), 0.0};
-        vec3<double> relPos2orthogonal = {std::sin(angleDiff / 2.0), std::cos(angleDiff / 2.0), 0.0};
-        /* Relative rotations (from particle 1) of particle 2 that yield the 4 bound states
-         * in the axis-angle representation. (One needs to make drawing to understand)*/
-        std::array<vec3<double>, 4> rotations;
-        rotations[0] = M_PI * relPos1orthogonal; // part1Patch1 with part2Patch1 (see calculateQuaternionTorque)
-        rotations[1] = {0.0, 0.0, -2 * M_PI / 5.0}; // part1Patch1 with part2Patch2
-        // --first 2 rotations correspond to binding on top patch of particle 1, next 2 rotations to bottom patch
-        rotations[2] = {0.0, 0.0, 2 * M_PI / 5.0}; // part1Patch2 with part2Patch1
-        rotations[3] = M_PI * relPos2orthogonal; // part1Patch2 with part2Patch2
-        for (int i = 0; i < 4; i++) {
-            quatRotations[i] = msmrdtools::axisangle2quaternion(rotations[i]);
-        }
     }
 
 }

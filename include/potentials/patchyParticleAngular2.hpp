@@ -14,18 +14,8 @@ namespace msmrd {
      * for pentamer formation.
      */
     class patchyParticleAngular2 : public patchyParticleAngular {
-    private:
-        std::array<vec3<double>, 2> refRelativePositions{};
-        std::array<vec3<double>, 4> rotations{};
-        std::array<quaternion<double>, 4> quatRotations{};
     public:
         // Inherit parent class constructor
-        patchyParticleAngular2(double sigma, double strength, double angularStrength,
-                               std::vector<std::vector<double>> patchesCoordinates);
-
-        patchyParticleAngular2(double sigma, double strength, double angularStrength,
-                               std::vector<vec3<double>> patchesCoordinates);
-
         using patchyParticleAngular::patchyParticleAngular;
 
         double evaluate(const particle &part1, const particle &part2) override;
@@ -34,9 +24,7 @@ namespace msmrd {
         forceTorque(const particle &part1, const particle &part2) override;
 
         std::tuple<vec3<double>, vec3<double>> calculatePlanes(particle part1, particle part2);
-
-        void setMetastableRegions();
-    };
+        };
 
 }
 

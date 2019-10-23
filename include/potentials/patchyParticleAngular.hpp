@@ -16,7 +16,11 @@ namespace msmrd {
     protected:
         double angularStrength = 2.0;
     public:
-        // Inherit parent class constructor
+        /**
+         * @param angularStrength give the angular strength of angular dependence of torque.
+         */
+
+        // Inherit parent class constructor (in case no angular strength is provided)
         using patchyParticle::patchyParticle;
 
         // Additionals constructors in case angular strength is provided
