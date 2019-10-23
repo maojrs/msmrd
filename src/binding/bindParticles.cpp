@@ -3,6 +3,8 @@
 //
 #include "binding.hpp"
 #include "particle.hpp"
+#include "particleCompound.hpp"
+
 
 namespace msmrd {
     /*

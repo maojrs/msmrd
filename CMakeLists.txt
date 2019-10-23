@@ -32,6 +32,7 @@ set(bindings_python_version 3.6)
 set(SOURCES
         src/eventManager.cpp
         src/particle.cpp
+        src/particleCompound.cpp
         src/randomgen.cpp
         src/simulation.cpp
         src/tools.cpp
@@ -82,6 +83,7 @@ set(PY_SOURCES
         src/binding/bindTrajectory.cpp
         include/eventManager.hpp
         include/particle.hpp
+        include/particleCompound.hpp
         include/quaternion.hpp
         include/randomgen.hpp
         include/simulation.hpp

@@ -128,45 +128,27 @@ namespace msmrd {
     }
 
 
-    // CURRENTLY WORKING HERE BELOw
+    /* CURRENTLY WORKING HERE BELOW, ENCOUNTERED ISSUE IN HOW PARTICLECOMPOUND SAVES TOPOLOGIES, NEED TO
+     * ADDRESS THAT FIRST, SEE particle.hpp */
 
     void msmrdMultiParticleIntegrator::transition2UnboundState(std::vector<particleMS> &parts, int iIndex,
-                                                               int jIndex, int endState) {
-        int iNewState;
-        int jNewState;
+                                                               int jIndex, int endStateAlt) {
+
+        // Check if particles unbinding belong to particleCompounds
+        parts[iIndex].compoundIndex;
+        parts[iIndex].compoundIndex;
+
         // Redefine endstate indexing, so it is understood by the partition/discretization.
         int index0 = markovModel.getMaxNumberBoundStates();
-        endState = endState - index0;
+        int endState = endStateAlt - index0;
 
-        /* Calculates next states and activates MSM if there is a transition matrix (size larger than one).
-         * More complex behavior to calculate new states possible */
-        iNewState = 0;
-        jNewState = 0;
-        auto iPartType = parts[iIndex].type;
-        auto jPartType = parts[jIndex].type;
-        if (MSMlist[iPartType].tmatrix.size() > 1) {
-            parts[iIndex].activeMSM = true;
-            iNewState = randg.uniformInteger(0, MSMlist[iPartType].tmatrix.size());
-        }
-        if (MSMlist[jPartType].tmatrix.size() > 1) {
-            parts[jIndex].activeMSM = true;
-            jNewState = randg.uniformInteger(0, MSMlist[jPartType].tmatrix.size());
-        }
+        // Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.
+        auto iNewState = setNewUnboundState(parts, iIndex);
+        auto jNewState = setNewUnboundState(parts, jIndex);
 
-        /* Set new unbound states (which also eliminates pair connections by resetting boundTo and
-         * boundState to -1) and activate particles. */
-        parts[iIndex].setState(iNewState);
-        parts[jIndex].setState(jNewState);
-        parts[iIndex].activate();
-        parts[jIndex].activate();
-
-        // Sets diffusion coefficients
-        auto iDiff = MSMlist[iPartType].Dlist[iNewState];
-        auto iDiffRot = MSMlist[iPartType].Drotlist[iNewState];
-        auto jDiff = MSMlist[jPartType].Dlist[jNewState];
-        auto jDiffRot = MSMlist[jPartType].Drotlist[jNewState];
-        parts[iIndex].setDs(iDiff, iDiffRot);
-        parts[jIndex].setDs(jDiff, jDiffRot);
+        // Sets diffusion coefficients corresponding to the new states.
+        setUnboundDiffusionCoefficients(parts, iIndex, iNewState);
+        setUnboundDiffusionCoefficients(parts, jIndex, jNewState);
 
         // Extract relative position and orientation from partition and endstate
         auto relativePositionOrientation = getRelativePositionOrientation(endState);
@@ -186,24 +168,9 @@ namespace msmrd {
 
 
 
-    /* Sets compound position to the average, its orientation is always set up initially at one and only changed
-     * by diffusion. It also sets the position reference and orientation reference for a newly created compound. */
-    void msmrdMultiParticleIntegrator::setCompoundPositionOrientation(std::vector<particleMS> &parts,
-                                                                     int iIndex, int jIndex, int mainCompoundSize) {
-        int compoundIndex = parts[iIndex].compoundIndex;
-        int compoundSize = particleCompounds[compoundIndex].compoundSize;
-        if (compoundSize == 2) {
-            // Set average position
-            particleCompounds[compoundIndex].position = 0.5*(parts[iIndex].position + parts[jIndex].position);
-            vec3<double> diffVec = parts[jIndex].position - parts[iIndex].position;
-            particleCompounds[compoundIndex].positionReference = parts[iIndex].position - 0.5*diffVec/diffVec.norm();
-            particleCompounds[compoundIndex].orientationReference = 1.0*parts[iIndex].orientation;
-        } else {
-            particleCompounds[compoundIndex].position = (mainCompoundSize * particleCompounds[compoundIndex].position +
-                    (compoundSize - mainCompoundSize) * parts[jIndex].position)/compoundSize;
-        }
-    };
-
+    /**
+     * Functions exclusive to multi-particle MSM/RD below
+     */
 
 
     /* Add particle complex into vector particleComplexes if particles bounded. If complex doesn't exist,
@@ -261,6 +228,40 @@ namespace msmrd {
         }
         return mainCompoundSize;
     };
+
+
+    /* Sets compound position to the average, its orientation is always set up initially at one and only changed
+     * by diffusion. It also sets the position reference and orientation reference for a newly created compound. */
+    void msmrdMultiParticleIntegrator::setCompoundPositionOrientation(std::vector<particleMS> &parts,
+                                                                      int iIndex, int jIndex, int mainCompoundSize) {
+        int compoundIndex = parts[iIndex].compoundIndex;
+        int compoundSize = particleCompounds[compoundIndex].compoundSize;
+        if (compoundSize == 2) {
+            // Set average position
+            particleCompounds[compoundIndex].position = 0.5*(parts[iIndex].position + parts[jIndex].position);
+            vec3<double> diffVec = parts[jIndex].position - parts[iIndex].position;
+            particleCompounds[compoundIndex].positionReference = parts[iIndex].position - 0.5*diffVec/diffVec.norm();
+            particleCompounds[compoundIndex].orientationReference = 1.0*parts[iIndex].orientation;
+        } else {
+            particleCompounds[compoundIndex].position = (mainCompoundSize * particleCompounds[compoundIndex].position +
+                                                         (compoundSize - mainCompoundSize) * parts[jIndex].position)/compoundSize;
+        }
+    };
+
+
+//    /* Checks ...*/
+//    std::tuple<bool, bool> msmrdMultiParticleIntegrator::checkUnbindingCompounds(std::vector<particleMS> &parts,
+//                                                                               int iIndex, int jIndex) {
+//        int cIndex = parts[iIndex].compoundIndex;
+//
+//        for (const auto &entry : particleCompounds[cIndex].boundPairsDictionary) {
+//            auto key = entry.first;
+//            auto value = entry.second
+//        }
+//
+//
+//    };
+
 
 
     // @TODO WRITE TEST ROUTINE FOR THE FUNCTION BELOW: THIS FUNCTION WILL NEED TO BE ADDED IN THE INTEGRATOR FUNCTION

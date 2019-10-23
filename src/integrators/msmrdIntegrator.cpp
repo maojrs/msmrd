@@ -78,8 +78,9 @@ namespace msmrd {
     }
 
     /* Calculates and set next unbound state and activates MSM if there is a transition matrix (size larger than one)
-     * for the unbound states. More complex behavior to calculate new states possible. It further returns the
-     * new state, so it can be directly used when calling this function. */
+     * for the unbound states. More complex behavior to calculate new states possible, currently new state assigned
+     * randomly and uniformly. It further returns the new state, so it can be directly used when calling this
+     * function. */
     template<>
     int msmrdIntegrator<ctmsm>::setNewUnboundState(std::vector<particleMS> &parts, int partIndex) {
         int newState = 0;
@@ -254,10 +255,6 @@ namespace msmrd {
     void msmrdIntegrator<ctmsm>::transition2UnboundState(std::vector<particleMS> &parts, int iIndex,
                                                          int jIndex, int endStateAlt) {
 
-        // Redefine endstate indexing, so it is understood by the partition/discretization.
-        int index0 = markovModel.getMaxNumberBoundStates();
-        int endState = endStateAlt - index0;
-
         // Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.
         auto iNewState = setNewUnboundState(parts, iIndex);
         auto jNewState = setNewUnboundState(parts, jIndex);
@@ -265,6 +262,10 @@ namespace msmrd {
         // Sets diffusion coefficients corresponding to the new states.
         setUnboundDiffusionCoefficients(parts, iIndex, iNewState);
         setUnboundDiffusionCoefficients(parts, jIndex, jNewState);
+
+        // Redefine endstate indexing, so it is understood by the partition/discretization.
+        int index0 = markovModel.getMaxNumberBoundStates();
+        int endState = endStateAlt - index0;
 
         // Extract relative position and orientation from partition and endstate
         auto relativePositionOrientation = getRelativePositionOrientation(endState);
@@ -277,7 +278,7 @@ namespace msmrd {
             parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
         }
 
-        // Set next positions based on the relative ones (parts[iIndex] keeps track of bound particle position)
+        // Set next positions based on the relative ones (remember parts[iIndex] keeps track of bound particle position)
         parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
         parts[jIndex].nextPosition = parts[iIndex].nextPosition + relPosition;
     }
@@ -296,6 +297,7 @@ namespace msmrd {
         int MSMindex = markovModel.getMSMindex(endState);
         parts[iIndex].setDs(markovModel.Dlist[MSMindex], markovModel.Drotlist[MSMindex]);
     }
+
 
     /* Transitions of particles in transition region with indexes iIndex and jIndex in the particle list
      * to another transition state. */

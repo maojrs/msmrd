@@ -5,6 +5,7 @@
 #pragma once
 
 #include "integrators/msmrdIntegrator.hpp"
+#include "particleCompound.hpp"
 
 namespace msmrd {
 
@@ -41,15 +42,17 @@ namespace msmrd {
         //void removeUnrealizedEvents(std::vector<particleMS> &parts) override;
 
     protected:
+
         /* Functions exclusive to multiparticle MSM/RD*/
 
         int addCompound(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
 
-        void updateParticleComplexesVector(std::vector<particleMS> &parts);
-
         void setCompoundPositionOrientation(std::vector<particleMS> &parts, int iIndex, int jIndex,
                                             int mainComplexSize);
 
+//        std::tuple<bool, bool> checkUnbindingCompounds(std::vector<particleMS> &parts, int iIndex, int jIndex);
+
+        void updateParticleComplexesVector(std::vector<particleMS> &parts);
 
     };
 
