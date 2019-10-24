@@ -73,7 +73,8 @@ namespace msmrd {
 
     /* Given two quaternions/orientations, returns planes(unit vectors) to be aligned by torque. These
      * may vary depending on the physical arrangement of your molecules. */
-    std::tuple<vec3<double>, vec3<double>> patchyParticleAngular2::calculatePlanes(particle part1, particle part2) {
+    std::tuple<vec3<double>, vec3<double>> patchyParticleAngular2::calculatePlanes(const particle &part1,
+                                                                                   const particle &part2) {
 
         // Calculate all normal vectors to first two patches for both particles
         vec3<double> part1PatchNormal1 = msmrdtools::rotateVec(patchesCoordinates[0], part1.orientation);

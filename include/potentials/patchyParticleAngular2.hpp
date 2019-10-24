@@ -23,7 +23,11 @@ namespace msmrd {
         std::array<vec3<double>, 4>
         forceTorque(const particle &part1, const particle &part2) override;
 
-        std::tuple<vec3<double>, vec3<double>> calculatePlanes(particle part1, particle part2);
+
+        // Additional auxiliary functions
+
+        std::tuple<vec3<double>, vec3<double>> calculatePlanes(const particle &part1, const particle &part2);
+
         };
 
 }

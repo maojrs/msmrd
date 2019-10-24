@@ -7,7 +7,7 @@
 namespace msmrd{
 
     // Evaluates potential at given positions and orientations of two particles
-    double patchyProteinAngular::evaluate(const particle &part1, const particle &part2) {
+    double patchyProteinAngular::evaluate(const particleMS &part1, const particleMS &part2) {
         // Decalre variables used in loop
         double patchesPotential = 0.0;
         vec3<double> patch1;
@@ -29,9 +29,10 @@ namespace msmrd{
         auto patchesCoords1 = assignPatches(part1.type);
         auto patchesCoords2 = assignPatches(part2.type);
 
+        // WORKING HERE
 
-        // Check for patches interactions
-        if (rvec.norm() <= 2*sigma) {
+        // Check for patches interactions, only if particle 2 is in state 0
+        if ((rvec.norm() <= 2*sigma) and part2.state == 1) {
             // Loop over all patches
             for (int i = 0; i < patchesCoords1.size(); i++) {
                 patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], part1.orientation);
@@ -59,7 +60,7 @@ namespace msmrd{
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyProteinAngular::forceTorque(const particle &part1, const particle &part2)  {
+    std::array<vec3<double>, 4> patchyProteinAngular::forceTorque(const particleMS &part1, const particleMS &part2)  {
 
         vec3<double> force1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> force2 = vec3<double> (0.0, 0.0, 0.0);
@@ -134,6 +135,63 @@ namespace msmrd{
             }
         }
         return {force + force1, torque1, -1.0*force + force2, torque2};
+    }
+
+
+    /* Given two quaternions/orientations, returns planes(unit vectors) to be aligned by torque. These
+     * may vary depending on the physical arrangement of your molecules and how the patches are ordered and
+     * selected. Currently set up for particle 1 with 6 binding patches and particle 2 only with one.*/
+    std::tuple<vec3<double>, vec3<double>> patchyProteinAngular::calculatePlanes(const particleMS &part1,
+                                                                 const particleMS &part2,
+                                                                 const std::vector<vec3<double>> patches1,
+                                                                 const std::vector<vec3<double>> patches2) {
+
+        std::vector<vec3<double>> part1PatchNormals;
+        std::vector<vec3<double>> part2PatchNormals;
+        vec3<double> patchRef = vec3<double> (0.0, 0.0, 1.0);
+        for (auto &patch : patches1) {
+            part1PatchNormals.push_back(msmrdtools::rotateVec(patch, part1.orientation));
+        }
+        for (auto &patch : patches2) {
+            part2PatchNormals.push_back(msmrdtools::rotateVec(patch, part2.orientation));
+        }
+
+        // Calculate positions of patches
+        std::vector<vec3<double>> part1PatchPositions;
+        std::vector<vec3<double>> part2PatchPositions;
+        for(auto &patchNormal : part1PatchNormals) {
+            part1PatchPositions.push_back(part1.position + 0.5*sigma * patchNormal);
+        }
+        for(auto &patchNormal : part2PatchNormals) {
+            part2PatchPositions.push_back(part2.position + 0.5*sigma * patchNormal);
+        }
+
+
+        /* Calculate all the relevant distances between patches (initially coded for 6 patches in particle1 and
+         * 1 patch in particle2) */
+        std::vector<double> patchesDistances;
+        for (auto part1Patch : part1PatchPositions) {
+            for (auto part2Patch : part2PatchPositions) {
+                patchesDistances.push_back((part1Patch - part2Patch).norm());
+            }
+        }
+
+        /* Find minimum distance and match corresponding expected orientation (0, 1, 2 ... 7 in original implementation)
+         * depending on the patches that are closer to each other) */
+        auto minIndex = static_cast<int> (std::min_element(patchesDistances.begin(), patchesDistances.end()) -
+                                          patchesDistances.begin());
+
+        // Calculate unitary vectors describing planes where particle center and first two patches are
+        vec3<double> plane1;
+        vec3<double> plane2;
+
+        // Planes to align  selection dependent on implementation
+        int secondIndex = (minIndex + 1) % 8; // 8=part1PatchNormals.size()
+        patchRef = msmrdtools::rotateVec(patchRef, part2.orientation);
+        plane1 = part1PatchNormals[minIndex].cross(part1PatchNormals[secondIndex]); // should always be perpendicular.
+        plane2 = part2PatchNormals[0].cross(patchRef);
+
+        return std::make_tuple(plane1, plane2);
     }
 
 
