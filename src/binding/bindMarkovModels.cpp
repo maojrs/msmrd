@@ -19,6 +19,7 @@ namespace msmrd {
     void bindMarkovModels(py::module &m) {
         py::class_<msm, markovModel>(m, "discreteTimeMarkovStateModel", "discrete time Markov state model (MSM ID, "
                                                            "transition matrix, lagtime, seed)")
+                .def(py::init<int &, double &, long &>())
                 .def(py::init<int &, std::vector<std::vector<double>> &, double &, long &>())
                 .def("propagate", &msm::propagate)
                 .def("propagateMSM", &msm::propagateMSM);
@@ -26,6 +27,7 @@ namespace msmrd {
 
         py::class_<ctmsm, markovModel>(m, "continuousTimeMarkovStateModel", "continuous time Markov state model (MSM ID, "
                                                                "transition rate matrix, seed)")
+                .def(py::init<int &, long &>())
                 .def(py::init<int &, std::vector<std::vector<double>> &, long &>())
                 .def("propagate", &ctmsm::propagate)
                 .def("propagateMSM", &ctmsm::propagateMSM);

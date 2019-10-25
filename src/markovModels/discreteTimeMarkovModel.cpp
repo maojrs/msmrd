@@ -8,6 +8,11 @@ namespace msmrd{
     /**
     * Implementation of discrete-time msm (msm) class, see msmbase parent class for parameter description.
     */
+    discreteTimeMarkovStateModel::discreteTimeMarkovStateModel(int msmid, double lagtime, long seed) :
+            markovModel(msmid, 0.0, seed) {
+        tmatrix = {{1.0}};
+    };
+
     discreteTimeMarkovStateModel::discreteTimeMarkovStateModel(int msmid, std::vector<std::vector<double>> tmatrix,
                                                                double lagtime, long seed)
             : markovModel(msmid, tmatrix, lagtime, seed) {

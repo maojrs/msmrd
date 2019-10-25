@@ -9,6 +9,12 @@ namespace msmrd {
     /**
      * Implementation of continuous-time msm (ctmsm) class, see msmbase parent class for parameter description.
      */
+    continuousTimeMarkovStateModel::continuousTimeMarkovStateModel(int msmid, long seed)
+        : markovModel(msmid, 0.0, seed) {
+        calculateParameters();
+        lagtime = 0;
+    };
+
     continuousTimeMarkovStateModel::continuousTimeMarkovStateModel(int msmid,
                                                                    std::vector<std::vector<double>> tmatrix,
                                                                    long seed)

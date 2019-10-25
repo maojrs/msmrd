@@ -11,6 +11,9 @@ namespace msmrd {
      */
     class discreteTimeMarkovStateModel : public markovModel {
     public:
+
+        discreteTimeMarkovStateModel(int msmid, double lagtime, long seed);
+
         discreteTimeMarkovStateModel(int msmid, std::vector <std::vector<double>> tmatrix, double lagtime,
                                      long seed);
 

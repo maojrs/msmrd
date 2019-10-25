@@ -17,6 +17,14 @@ namespace msmrd {
      *  value, for CTMSM it will change in each iteration.
      *  @param seed variable for random number generation (Note values of seed <= -1 correspond to random device)
      */
+    markovModel::markovModel(int msmid, double lagtime, long seed) : msmid(msmid), lagtime(lagtime), seed(seed) {
+        // Resize vectors by input matrix size and set seed of random number generator
+        nstates = static_cast<int>(tmatrix.size());
+        Dlist.resize(nstates);
+        Drotlist.resize(nstates);
+        randg.setSeed(seed);
+    }
+
     markovModel::markovModel(int msmid, std::vector<std::vector<double>> tmatrix, double lagtime, long seed)
             : msmid(msmid), tmatrix(tmatrix), lagtime(lagtime), seed(seed) {
 

@@ -21,7 +21,7 @@ namespace msmrd {
         randomgen randg;
     public:
         double lagtime;
-        std::vector<std::vector<double>> tmatrix;
+        std::vector<std::vector<double>> tmatrix = {{0.0}};
         unsigned int nstates = 1;
         std::vector<double> Dlist;
         std::vector<double> Drotlist;
@@ -37,7 +37,11 @@ namespace msmrd {
          * @param Drotlist list of rotational diffusion coefficients for each state
          */
 
-        // Base constructor, can receive std::vectior matrix or numpy array matrix (through pybind)
+        // Base constructors:
+
+        markovModel(int msmid, double lagtime, long seed);
+
+        // This one can receive std::vectior matrix or numpy array matrix (through pybind)
         markovModel(int msmid, std::vector<std::vector<double>> tmatrix, double lagtime, long seed);
 
         // Main functions definitions (=0 for abstract class)
