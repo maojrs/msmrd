@@ -52,7 +52,7 @@ namespace msmrd {
         vec3<double> rvec = relPos[1]; //pos2 - pos1;
 
         /* Explicit angular dependence. */
-        vec3<double> derivativeAngluarPotential;
+        vec3<double> derivativeAngluarPotential = vec3<double> (0.0, 0.0, 0.0);
         if (rvec.norm() <= 2.0 * sigma) {
             // Get planes needed to be aligned by torque
             vec3<double> plane1;

@@ -43,6 +43,16 @@ namespace msmrd{
 
         double derivativeQuadraticPotential(double r, double sig, double eps, double a, double rstar);
 
+        double evaluatePatchesPotential(const particle &part1, const particle &part2,
+                                        std::array<vec3<double>, 2> &relPosition,
+                                        std::vector<vec3<double>> &patchesCoords1,
+                                        std::vector<vec3<double>> &patchesCoords2);
+
+        std::array<vec3<double>, 4> forceTorquePatches(const particle &part1, const particle &part2,
+                                                                      std::array<vec3<double>, 2> &relPosition,
+                                                                      std::vector<vec3<double>> &patchesCoords1,
+                                                                      std::vector<vec3<double>> &patchesCoords2);
+
     public:
         patchyProtein() = default;
 
