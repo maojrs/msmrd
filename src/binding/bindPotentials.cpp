@@ -64,6 +64,9 @@ namespace msmrd {
                                                  "strength, patches coordinates A, patches coordinates B)")
                 .def(py::init<double &, double &,
                         std::vector<std::vector<double>> &,
+                        std::vector<std::vector<double>> &>())
+                .def(py::init<double &, double &, double &,
+                        std::vector<std::vector<double>> &,
                         std::vector<std::vector<double>> &>());
     }
 

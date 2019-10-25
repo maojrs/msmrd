@@ -1,115 +1,84 @@
 //
-// Created by maojrs on 1/11/19.
+// Created by maojrs on 10/23/19.
 //
+
+#include <utility>
 #include "potentials/patchyProteinMarkovSwitch.hpp"
-#include "quaternion.hpp"
-#include "tools.hpp"
 
-namespace msmrd {
+namespace msmrd{
     /*
-     * Constructors inherited from patchyProtein class.
+     * Constructor inherited from patchyProtein. This additional constructors are to incorporate
+     * angular potential strength
      */
+    patchyProteinMarkovSwitch::patchyProteinMarkovSwitch(double sigma, double strength, double angularStrength,
+                                 std::vector<vec3<double>> patchesCoordinatesA,
+                                 std::vector<vec3<double>> patchesCoordinatesB)
+            :  patchyProtein(sigma, strength, std::move(patchesCoordinatesA), std::move(patchesCoordinatesB)),
+               angularStrength(angularStrength) {};
 
-
-    /* Set potentials parameters for overall potential. Consists of isotropic attractive and
-     * repulsive parts plus two types of patches interactions. Needs to be redefined so parameters
-     * do not depend on patchyProtein parent class. */
-    void patchyProteinMarkovSwitch::setPotentialParameters() {
-        // Check pacthes coordinates have unit norm
-        for (auto &patch : patchesCoordinatesA) {
-            if (patch.norm() != 1) {
-                throw std::range_error("Patches coordinates must have norm one");
-            }
-        }
-        for (auto &patch : patchesCoordinatesB) {
-            if (patch.norm() != 1) {
-                throw std::range_error("Patches coordinates must have norm one");
-            }
-        }
-
-        // Set strengths of potential parts
-        epsRepulsive = 1.0*strength;
-        epsAttractive = -0.15*strength;
-        epsPatches[0] = -0.15*strength;
-        epsPatches[1] = -0.20*strength; // Special binding site
-
-        // Set stiffness of potentials parts
-        aRepulsive = 1.5;
-        aAttractive = 0.75;
-        aPatches[0] = 40.0;
-        aPatches[1] = 40.0; // Special binding site
-
-        // Set range parameter potentials parts
-        rstarRepulsive = 0.75*sigma;
-        rstarAttractive = 0.85*sigma;
-        rstarPatches[0] = 0.1*sigma;
-        rstarPatches[1] = 0.1*sigma; // Special binding site
-    }
-
-
-    /* Checks is MSM must be deactivated in certain particles. In this case, if bounded or close to bounded
-     * disable MSM in particle withs type 1 and state 0. This needs to be hardcoded here for each example. */
-    void patchyProteinMarkovSwitch::enableDisableMSM(particleMS &part1, particleMS &part2) {
-        vec3<double> distance = relativePosition(part2.position, part1.position); //part1.position - part2.position;
-        if (distance.norm() <= 1.2 && part2.type == 1 && part2.state == 0) {
-                part2.activeMSM = false;
-        } else {
-                part2.activeMSM = true;
-        }
-    }
+    patchyProteinMarkovSwitch::patchyProteinMarkovSwitch(double sigma, double strength, double angularStrength,
+                                 std::vector<std::vector<double>> patchesCoordsA,
+                                 std::vector<std::vector<double>> patchesCoordsB)
+            :  patchyProtein(sigma, strength, patchesCoordinatesA, patchesCoordinatesB),
+               angularStrength(angularStrength) {};
 
     // Evaluates potential at given positions and orientations of two particles
-    double patchyProteinMarkovSwitch::evaluate(particleMS &part1, particleMS &part2) {
-        vec3<double> pos1 = part1.position;
-        vec3<double> pos2 = part2.position;
-        quaternion<double> theta1 = part1.orientation;
-        quaternion<double> theta2 = part2.orientation;
-
-        std::vector<vec3<double>> patchesCoords1;
-        std::vector<vec3<double>> patchesCoords2;
-        double repulsivePotential;
-        double attractivePotential;
+    double patchyProteinMarkovSwitch::evaluate(const particleMS &part1, const particleMS &part2) {
+        // Decalre variables used in loop
         double patchesPotential = 0.0;
         vec3<double> patch1;
         vec3<double> patch2;
         vec3<double> patchNormal1;
         vec3<double> patchNormal2;
         vec3<double> rpatch;
-        std::array<vec3<double>, 2> relPos = relativePositionComplete(pos1, pos2);
-        vec3<double> pos1virtual = relPos[0]; // virtual pos1 if periodic boundary; otherwise pos1.
-        vec3<double> rvec = relPos[1]; //pos2 - pos1;
 
-        repulsivePotential = quadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
-        attractivePotential = quadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
+        // Calculates relative position
+        auto relPos = relativePositionComplete(part1.position, part2.position);
+        vec3<double> pos1virtual = relPos[0]; // virtual part1.position if periodic boundary; otherwise part1.position.
+        vec3<double> rvec = relPos[1]; // part2.position - part1.position;
+
+        // Calculate isotropic potential
+        auto repulsivePotential = quadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
+        auto attractivePotential = quadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
 
         /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
-        patchesCoords1 = assignPatches(part1.type);
-        patchesCoords2 = assignPatches(part2.type);
+        auto patchesCoords1 = assignPatches(part1.type);
+        auto patchesCoords2 = assignPatches(part2.type);
 
-        /* Enables/Disables MSM following potential hardcoded rules. In this case, if bounded or close to bounded
-         * disable the MSM on particles type 1 and state 0. */
-        enableDisableMSM(part1, part2);
+        // WORKING HERE
 
-        // Interaction if particles are different and if part2 in attractive state 0
-        if (rvec.norm() <= 2*sigma && part2.state == 0) {
+        // Check for patches interactions, if close enough and if particle 2 is in state 0
+        if ((rvec.norm() <= 2*sigma) and part2.state == 1) {
             // Loop over all patches
             for (int i = 0; i < patchesCoords1.size(); i++) {
-                patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], theta1);
+                patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], part1.orientation);
                 patch1 = pos1virtual + 0.5*sigma*patchNormal1;
                 for (int j = 0; j < patchesCoords2.size(); j++) {
-                    patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], theta2);
-                    patch2 = pos2 + 0.5*sigma*patchNormal2;
+                    patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], part2.orientation);
+                    patch2 = part2.position + 0.5*sigma*patchNormal2;
                     rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
                     // Assumes the first patch from type1 has a different type of interaction,
                     if ( (i == 0 && part1.type == 0) || (j == 0 && part2.type == 0) ) {
-                        patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[1], aPatches[1], rstarPatches[1]);
+                        patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[1],
+                                                               aPatches[1], rstarPatches[1]);
                     }
                         // while all the other patches combinations have another type of interaction.
                     else{
-                        patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[0], aPatches[0], rstarPatches[0]);
+                        patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[0],
+                                                               aPatches[0], rstarPatches[0]);
                     }
                 }
             }
+            /* Add angular dependence based on patches of the two particles (not most efficient approach
+             * but efficiency is not a problem in this example). See caculatePlanes functions */
+            double angularPotential = 0.0;
+                /* Get planes needed to be aligned by torque, based on use potential of -[(cos(theta) + 1)/2]^8
+                 * with only one minima */
+                vec3<double> plane1;
+                vec3<double> plane2;
+                std::tie(plane1, plane2) = calculatePlanes(part1, part2, patchesCoords1, patchesCoords2);
+                double cosSquared = (plane1 * plane2 + 1) * (plane1 * plane2 + 1);
+                angularPotential = - (1.0/256.0) * angularStrength * cosSquared * cosSquared * cosSquared * cosSquared;
         }
 
         return repulsivePotential + attractivePotential + patchesPotential;
@@ -117,26 +86,19 @@ namespace msmrd {
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(particleMS &part1, particleMS &part2) {
-        vec3<double> pos1 = part1.position;
-        vec3<double> pos2 = part2.position;
-        quaternion<double> theta1 = part1.orientation;
-        quaternion<double> theta2 = part2.orientation;
+    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(particleMS &part1, particleMS &part2)  {
 
-        vec3<double> force;
         vec3<double> force1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> force2 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> torque1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> torque2 = vec3<double> (0.0, 0.0, 0.0);
-        std::array<vec3<double>, 2> relPos = relativePositionComplete(pos1, pos2);
-        vec3<double> pos1virtual = relPos[0]; // virtual pos1 if periodic boundary; otherwise pos1.
-        vec3<double> rvec = relPos[1]; //pos2 - pos1;
 
-        std::vector<vec3<double>> patchesCoords1;
-        std::vector<vec3<double>> patchesCoords2;
+        // Calculate relative position
+        std::array<vec3<double>, 2> relPos = relativePositionComplete(part1.position, part2.position);
+        vec3<double> pos1virtual = relPos[0]; // virtual part1.position if periodic boundary; otherwise part1.position.
+        vec3<double> rvec = relPos[1]; //part2.position - part1.position;
+
         // auxiliary variables to calculate force and torque
-        double repulsiveForceNorm;
-        double attractiveForceNorm;
         double patchesForceNorm;
         vec3<double> patchForce;
         vec3<double> patch1;
@@ -147,40 +109,45 @@ namespace msmrd {
 
         /* Calculate and add forces due to repulsive and attractive isotropic potentials.
          *  Note correct sign/direction of force given by rvec/rvec.norm*() */
-        repulsiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
-        // Attractive force only on conformation state 0 from particle 2; otherwise 0
-        attractiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
-        force = (repulsiveForceNorm + attractiveForceNorm)*rvec/rvec.norm();
+        auto repulsiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsRepulsive,
+                                                               aRepulsive, rstarRepulsive);
+        auto attractiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsAttractive,
+                                                                aAttractive, rstarAttractive);
+        auto force = (repulsiveForceNorm + attractiveForceNorm)*rvec/rvec.norm();
+
+        /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
+        auto patchesCoords1 = assignPatches(part1.type);
+        auto patchesCoords2 = assignPatches(part2.type);
 
         /* Enables/Disables MSM following potential hardcoded rules. In this case, if bounded or close to bounded
          * disable the MSM on particles type 1 and state 0. */
-        enableDisableMSM(part1, part2);
+        enableDisableMSM(rvec, part1, part2);
 
-        /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
-        patchesCoords1 = assignPatches(part1.type);
-        patchesCoords2 = assignPatches(part2.type);
-
-        // Calculate forces and torque due to patches interaction if part2 in attractive state 0
-        if (rvec.norm() <= 2*sigma && part2.state == 0) {
+        // Calculate forces and torque due to patches interaction
+        if (rvec.norm() <= 2*sigma) {
             // Loop over all patches of particle 1
             for (int i = 0; i < patchesCoords1.size(); i++) {
-                patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], theta1);
+                patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], part1.orientation);
                 patchNormal1 = patchNormal1/patchNormal1.norm();
                 patch1 = pos1virtual + 0.5*sigma*patchNormal1;
                 // Loop over all patches of particle 2
                 for (int j = 0; j < patchesCoords2.size(); j++) {
-                    patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], theta2);
+                    patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], part2.orientation);
                     patchNormal2 = patchNormal2/patchNormal2.norm();
-                    patch2 = pos2 + 0.5*sigma*patchNormal2;
+                    patch2 = part2.position + 0.5*sigma*patchNormal2;
+                    // Calculate distance between the two patches
                     rpatch = patch2 - patch1;
                     /* Calculate force vector between patches , correct sign of force given by rpatch/rpatch.norm().
                      * It also assumes the first patch from type = 0 has a different type of interaction. */
                     if ( (i == 0 && part1.type == 0) || (j == 0 && part2.type == 0) ) {
-                        patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[1], aPatches[1], rstarPatches[1]);
+                        patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[1],
+                                                                        aPatches[1], rstarPatches[1]);
                     }
                     else {
-                        patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[0], aPatches[0], rstarPatches[0]);
+                        patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[0],
+                                                                        aPatches[0], rstarPatches[0]);
                     }
+                    // Determine force vector avoiding division by zero
                     if (rpatch.norm() == 0) {
                         patchForce = vec3<double> (0, 0, 0);
                     }
@@ -200,12 +167,73 @@ namespace msmrd {
         return {force + force1, torque1, -1.0*force + force2, torque2};
     }
 
-    // Additional function to call forcetorque function from pybind
-    std::vector<std::vector<double>>
-    patchyProteinMarkovSwitch::forceTorquePyBind(particleMS &part1, particleMS &part2) {
-        std::array<vec3<double>, 4> forceTorquex = forceTorque(part1, part2);
-        return msmrdtools::array2Dtovec2D(forceTorquex);
+
+    /* Checks is MSM must be deactivated in certain particles. In this case, if bounded or close to bounded
+     * disable MSM in particle withs type 1 and state 0. This needs to be hardcoded here for each example. */
+    void patchyProteinMarkovSwitch::enableDisableMSM(vec3<double>relPosition, particleMS &part1, particleMS &part2) {
+        if (relPosition.norm() <= 1.2 && part2.type == 1 && part2.state == 0) {
+            part2.activeMSM = false;
+        } else {
+            part2.activeMSM = true;
+        }
+    }
+
+    /* Given two quaternions/orientations, returns planes(unit vectors) to be aligned by torque. These
+     * may vary depending on the physical arrangement of your molecules and how the patches are ordered and
+     * selected. Currently set up for particle 1 with 6 binding patches and particle 2 only with one.*/
+    std::tuple<vec3<double>, vec3<double>> patchyProteinMarkovSwitch::calculatePlanes(const particleMS &part1,
+                                                                 const particleMS &part2,
+                                                                 const std::vector<vec3<double>> patches1,
+                                                                 const std::vector<vec3<double>> patches2) {
+
+        std::vector<vec3<double>> part1PatchNormals;
+        std::vector<vec3<double>> part2PatchNormals;
+        vec3<double> patchRef = vec3<double> (0.0, 0.0, 1.0);
+        for (auto &patch : patches1) {
+            part1PatchNormals.push_back(msmrdtools::rotateVec(patch, part1.orientation));
+        }
+        for (auto &patch : patches2) {
+            part2PatchNormals.push_back(msmrdtools::rotateVec(patch, part2.orientation));
+        }
+
+        // Calculate positions of patches
+        std::vector<vec3<double>> part1PatchPositions;
+        std::vector<vec3<double>> part2PatchPositions;
+        for(auto &patchNormal : part1PatchNormals) {
+            part1PatchPositions.push_back(part1.position + 0.5*sigma * patchNormal);
+        }
+        for(auto &patchNormal : part2PatchNormals) {
+            part2PatchPositions.push_back(part2.position + 0.5*sigma * patchNormal);
+        }
+
+
+        /* Calculate all the relevant distances between patches (initially coded for 6 patches in particle1 and
+         * 1 patch in particle2) */
+        std::vector<double> patchesDistances;
+        for (auto part1Patch : part1PatchPositions) {
+            for (auto part2Patch : part2PatchPositions) {
+                patchesDistances.push_back((part1Patch - part2Patch).norm());
+            }
+        }
+
+        /* Find minimum distance and match corresponding expected orientation (0, 1, 2 ... 7 in original implementation)
+         * depending on the patches that are closer to each other) */
+        auto minIndex = static_cast<int> (std::min_element(patchesDistances.begin(), patchesDistances.end()) -
+                                          patchesDistances.begin());
+
+        // Calculate unitary vectors describing planes where particle center and first two patches are
+        vec3<double> plane1;
+        vec3<double> plane2;
+
+        // Planes to align  selection dependent on implementation
+        int secondIndex = (minIndex + 1) % 8; // 8=part1PatchNormals.size()
+        patchRef = msmrdtools::rotateVec(patchRef, part2.orientation);
+        plane1 = part1PatchNormals[minIndex].cross(part1PatchNormals[secondIndex]); // should always be perpendicular.
+        plane2 = part2PatchNormals[0].cross(patchRef);
+
+        return std::make_tuple(plane1, plane2);
     }
 
 
 }
+

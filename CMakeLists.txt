@@ -60,7 +60,6 @@ set(SOURCES
         src/potentials/patchyParticleAngular.cpp
         src/potentials/patchyParticleAngular2.cpp
         src/potentials/patchyProtein.cpp
-        src/potentials/patchyProteinAngular.cpp
         src/potentials/patchyProteinMarkovSwitch.cpp
         src/potentials/potentials.cpp
         src/trajectories/trajectory.cpp
@@ -116,7 +115,6 @@ set(PY_SOURCES
         include/potentials/patchyParticleAngular.hpp
         include/potentials/patchyParticleAngular2.hpp
         include/potentials/patchyProtein.hpp
-        include/potentials/patchyProteinAngular.hpp
         include/potentials/patchyProteinMarkovSwitch.hpp
         include/trajectories/trajectory.hpp
         include/trajectories/trajectoryPosition.hpp
