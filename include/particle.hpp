@@ -12,6 +12,8 @@ namespace msmrd {
     /**
      * Declaration of the class for particles. One line implementations in headers; otherwise in particle.cpp.
      */
+
+    // TODO: collapse particle and particleMS class into one?
     class particle {
     protected:
         int pid = 0;
@@ -48,6 +50,7 @@ namespace msmrd {
         particle(double D, double Drot, vec3<double> position, quaternion<double> orientation);
 
         particle(double D, double Drot, std::vector<double> &position, std::vector<double> &orientation);
+
 
         /* Additional functions and getters and setters. Some used by c++ and python,
          * some only to be used by pyhon with python bindings. */
@@ -105,7 +108,7 @@ namespace msmrd {
         int nextType;
         int nextState;
     public:
-        int state;
+        int state = 0;
         double lagtime = 0;
         double tcount = 0;
         bool propagateTMSM = true;
@@ -116,8 +119,8 @@ namespace msmrd {
         std::vector<int> boundStates;
         int compoundIndex = -1;
         /**
-         * @param state particle current unbound state. If -1, then particle is in bound state.
          * @param nextState particle next state given and changed by the msm/ctmsm
+         * @param state particle current unbound state. If -1, then particle is in bound state.
          * @param lagtime saves the current lagtime from the MSM
          * @param tcount counts time in between MSM/CTMSM iterations
          * @param propagateTMSM determines if MSM/CTMSM should be propagated on a given timestep

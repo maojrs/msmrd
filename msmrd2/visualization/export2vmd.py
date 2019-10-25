@@ -345,6 +345,12 @@ def generateTCL_patchyProteinsMS(numparticles = 2, outfname = "patchyProteinsMS"
     file.write('mol color ColorID 30 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
+    # For alternative particle
+    file.write('mol representation VDW 0.35000 0.5 \n')
+    file.write('mol selection name type_3 \n')
+    file.write('mol color ColorID 15 \n')
+    file.write('mol material AOShiny \n')
+    file.write('mol addrep top \n \n')
 
     # Define display options
     file.write('axes location off \n')

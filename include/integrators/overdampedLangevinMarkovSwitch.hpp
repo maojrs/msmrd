@@ -29,8 +29,8 @@ namespace msmrd {
         std::vector<templateMSM> MSMlist;
         /**
          * @param msmtype string to distinguish between msm and ctmsm
-         * @param MSMlist can be either a vector of msms or of ctmsms. It is possible to provide only one msm/ctmsm
-         * in constructor instead of a vector.
+         * @param MSMlist can be either a vector of msms or of ctmsms. It is possible to provide only one msm/ctmsm (if
+         * only one type of particles is being used) in constructor instead of a vector.
          */
 
         /* Constructors need to be defined in headers for template w/pybind, see parent

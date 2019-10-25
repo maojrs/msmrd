@@ -43,6 +43,8 @@ namespace msmrd {
         std::array<vec3<double>, 4> forceTorque(particleMS &part1, particleMS &part2);
 
 
+
+
         // Additional auxiliary functions
 
         std::vector<std::vector<double>> forceTorquePyBind(particleMS &part1, particleMS &part2);

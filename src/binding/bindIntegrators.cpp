@@ -27,6 +27,7 @@ namespace msmrd {
                                                                               "rod, rigidbody, pointmix, rodmix or "
                                                                               "rigidbodymix) )")
                 .def(py::init<ctmsm &, double &, long &, std::string &>())
+                .def(py::init<std::vector<ctmsm> &, double &, long &, std::string &>())
                 .def("integrate", &overdampedLangevinMarkovSwitch<ctmsm>::integrate);
 
         py::class_<msmrdIntegrator<ctmsm>, overdampedLangevinMarkovSwitch<ctmsm>>(m, "msmrdIntegrator",

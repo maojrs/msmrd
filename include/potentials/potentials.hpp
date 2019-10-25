@@ -54,7 +54,10 @@ namespace msmrd {
 
         virtual std::array<vec3<double>, 4> forceTorque(const particle &part1, const particle &part2) = 0;
 
+
+        // Function to translate forceTorque function to pyBind
         std::vector<std::vector<double>> forceTorquePyBind(const particle &part1, const particle &part2);
+
 
         // Additional useful functions so potentials can deal with possible periodic boundaries.
         void setBoundary(boundary *bndry);
