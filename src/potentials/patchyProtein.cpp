@@ -93,17 +93,22 @@ namespace msmrd {
         auto patchesCoords1 = assignPatches(part1.type);
         auto patchesCoords2 = assignPatches(part2.type);
 
-        // Evaluate patches potential, using auxiliary function
-        auto patchesPotential = evaluatePatchesPotential(part1, part2, relPos, patchesCoords1, patchesCoords2);
+        // Evaluate patches potential if particles are close enough
+        double patchesPotential = 0.0;
+        if (rvec.norm() <= 2*sigma) {
+            // Evaluate patches potential, using auxiliary function
+            patchesPotential = evaluatePatchesPotential(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
+        }
 
         return repulsivePotential + attractivePotential + patchesPotential;
+
     }
 
 
     /* Auxiliary function that calculates patches interaction contribution to potential. Called by main
      * evaluate function. */
     double patchyProtein::evaluatePatchesPotential(const particle &part1, const particle &part2,
-                                                   std::array<vec3<double>, 2> &relPosition,
+                                                   vec3<double> &pos1virtual,
                                                    std::vector<vec3<double>> &patchesCoords1,
                                                    std::vector<vec3<double>> &patchesCoords2){
         // Declare variables used in loop
@@ -114,34 +119,30 @@ namespace msmrd {
         vec3<double> patch2;
         vec3<double> rpatch;
 
-        // Extract quantities from relPositon
-        vec3<double> pos1virtual = relPosition[0]; // virtual part1.pos if periodic boundary; otherwise part1.position.
-        vec3<double> rvec = relPosition[1]; //part2.pos - part1.pos;
-
-        if (rvec.norm() <= 2*sigma) {
-            // Loop over all patches
-            for (int i = 0; i < patchesCoords1.size(); i++) {
-                patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], part1.orientation);
-                patch1 = pos1virtual + 0.5 * sigma * patchNormal1;
-                for (int j = 0; j < patchesCoords2.size(); j++) {
-                    patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], part2.orientation);
-                    patch2 = part2.position + 0.5 * sigma * patchNormal2;
-                    rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
-                    // Assumes the first patch from type1 has a different type of interaction,
-                    if ((i == 0 && part1.type == 0) || (j == 0 && part2.type == 0)) {
-                        patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[1],
-                                                               aPatches[1], rstarPatches[1]);
-                    }
-                    // while all the other patches combinations have another type of interaction.
-                    else {
-                        patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[0],
-                                                               aPatches[0], rstarPatches[0]);
-                    }
+        // Loop over all patches
+        for (int i = 0; i < patchesCoords1.size(); i++) {
+            patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], part1.orientation);
+            patch1 = pos1virtual + 0.5 * sigma * patchNormal1;
+            for (int j = 0; j < patchesCoords2.size(); j++) {
+                patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], part2.orientation);
+                patch2 = part2.position + 0.5 * sigma * patchNormal2;
+                rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
+                // Assumes the first patch from type1 has a different type of interaction,
+                if ((i == 0 && part1.type == 0) || (j == 0 && part2.type == 0)) {
+                    patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[1],
+                                                           aPatches[1], rstarPatches[1]);
+                }
+                // while all the other patches combinations have another type of interaction.
+                else {
+                    patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[0],
+                                                           aPatches[0], rstarPatches[0]);
                 }
             }
         }
+
         return patchesPotential;
     };
+
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
@@ -164,19 +165,24 @@ namespace msmrd {
         auto patchesCoords1 = assignPatches(part1.type);
         auto patchesCoords2 = assignPatches(part2.type);
 
-        // Calculate forces and torque due to patches interaction
-        auto forcTorqPatches = forceTorquePatches(part1, part2, relPos, patchesCoords1, patchesCoords2);
-        auto force1 = forcTorqPatches[0];
-        auto torque1 = forcTorqPatches[1];
-        auto force2 = forcTorqPatches[2];
-        auto torque2 = forcTorqPatches[3];
-
-        return {force + force1, torque1, -1.0*force + force2, torque2};
+        // Calculate forces and torque due to patches interaction if particles are close enough
+        if (rvec.norm() <= 2*sigma) {
+            auto forcTorqPatches = forceTorquePatches(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
+            auto force1 = forcTorqPatches[0];
+            auto torque1 = forcTorqPatches[1];
+            auto force2 = forcTorqPatches[2];
+            auto torque2 = forcTorqPatches[3];
+            return {force + force1, torque1, -1.0 * force + force2, torque2};
+        } else {
+            // Return only isotropic force if particles are far
+            auto zeroTorque = vec3<double> (0.0, 0.0, 0.0);
+            return {force, zeroTorque, -1.0 * force, zeroTorque};
+        }
     }
 
     /* Auxiliary function that calculates patches interaction forces. Called by main forceTorque function. */
     std::array<vec3<double>, 4> patchyProtein::forceTorquePatches(const particle &part1, const particle &part2,
-                                                                  std::array<vec3<double>, 2> &relPosition,
+                                                                  vec3<double> &pos1virtual,
                                                                   std::vector<vec3<double>> &patchesCoords1,
                                                                   std::vector<vec3<double>> &patchesCoords2){
         // Initialize forceas and torques due to patches
@@ -194,49 +200,43 @@ namespace msmrd {
         vec3<double> patchNormal2;
         vec3<double> rpatch;
 
-        // Extract quantities from relPositon
-        vec3<double> pos1virtual = relPosition[0]; // virtual part1.pos if periodic boundary; otherwise part1.position.
-        vec3<double> rvec = relPosition[1]; //part2.pos - part1.pos;
-
-        // Non-zero forces only if particles are close enough
-        if (rvec.norm() <= 2*sigma) {
-            // Loop over all patches of particle 1
-            for (int i = 0; i < patchesCoords1.size(); i++) {
-                patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], part1.orientation);
-                patchNormal1 = patchNormal1 / patchNormal1.norm();
-                patch1 = pos1virtual + 0.5 * sigma * patchNormal1;
-                // Loop over all patches of particle 2
-                for (int j = 0; j < patchesCoords2.size(); j++) {
-                    patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], part2.orientation);
-                    patchNormal2 = patchNormal2 / patchNormal2.norm();
-                    patch2 = part2.position + 0.5 * sigma * patchNormal2;
-                    // Calculate distance between the two patches
-                    rpatch = patch2 - patch1;
-                    /* Calculate force vector between patches , correct sign of force given by rpatch/rpatch.norm().
-                     * It also assumes the first patch from type = 0 has a different type of interaction. */
-                    if ((i == 0 && part1.type == 0) || (j == 0 && part2.type == 0)) {
-                        patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[1],
-                                                                        aPatches[1], rstarPatches[1]);
-                    } else {
-                        patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[0],
-                                                                        aPatches[0], rstarPatches[0]);
-                    }
-                    // Determine force vector avoiding division by zero
-                    if (rpatch.norm() == 0) {
-                        patchForce = vec3<double>(0, 0, 0);
-                    } else {
-                        patchForce = patchesForceNorm * rpatch / rpatch.norm();
-                    }
-                    // Calculate force and torque acting on particle 1 and add values to previous forces and torques
-                    force1 += patchForce;
-                    torque1 += 0.5 * sigma * patchNormal1.cross(patchForce);
-
-                    // Calculate force and torque acting on particle 2 and add values to previous forces and torques
-                    force2 += -1.0 * patchForce;
-                    torque2 += 0.5 * sigma * patchNormal2.cross(-1.0 * patchForce);
+        // Loop over all patches of particle 1
+        for (int i = 0; i < patchesCoords1.size(); i++) {
+            patchNormal1 = msmrdtools::rotateVec(patchesCoords1[i], part1.orientation);
+            patchNormal1 = patchNormal1 / patchNormal1.norm();
+            patch1 = pos1virtual + 0.5 * sigma * patchNormal1;
+            // Loop over all patches of particle 2
+            for (int j = 0; j < patchesCoords2.size(); j++) {
+                patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], part2.orientation);
+                patchNormal2 = patchNormal2 / patchNormal2.norm();
+                patch2 = part2.position + 0.5 * sigma * patchNormal2;
+                // Calculate distance between the two patches
+                rpatch = patch2 - patch1;
+                /* Calculate force vector between patches , correct sign of force given by rpatch/rpatch.norm().
+                 * It also assumes the first patch from type = 0 has a different type of interaction. */
+                if ((i == 0 && part1.type == 0) || (j == 0 && part2.type == 0)) {
+                    patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[1],
+                                                                    aPatches[1], rstarPatches[1]);
+                } else {
+                    patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[0],
+                                                                    aPatches[0], rstarPatches[0]);
                 }
+                // Determine force vector avoiding division by zero
+                if (rpatch.norm() == 0) {
+                    patchForce = vec3<double>(0, 0, 0);
+                } else {
+                    patchForce = patchesForceNorm * rpatch / rpatch.norm();
+                }
+                // Calculate force and torque acting on particle 1 and add values to previous forces and torques
+                force1 += patchForce;
+                torque1 += 0.5 * sigma * patchNormal1.cross(patchForce);
+
+                // Calculate force and torque acting on particle 2 and add values to previous forces and torques
+                force2 += -1.0 * patchForce;
+                torque2 += 0.5 * sigma * patchNormal2.cross(-1.0 * patchForce);
             }
         }
+
         return {force1, torque1, force2, torque2};
     };
 

@@ -22,6 +22,44 @@ namespace msmrd{
             :  patchyProtein(sigma, strength, patchesCoordinatesA, patchesCoordinatesB),
                angularStrength(angularStrength) {};
 
+
+
+
+    /* Set potentials parameters for overall potential. Consists of isotropic attractive and
+     * repulsive parts plus two types of patches interactions*/
+    void patchyProteinMarkovSwitch::setPotentialParameters() {
+        // Check pacthes coordinates have unit norm
+        for (auto &patch : patchesCoordinatesA) {
+            if (patch.norm() != 1) {
+                throw std::range_error("Patches coordinates must have norm one");
+            }
+        }
+        for (auto &patch : patchesCoordinatesB) {
+            if (patch.norm() != 1) {
+                throw std::range_error("Patches coordinates must have norm one");
+            }
+        }
+
+        // Set strengths of potential parts
+        epsRepulsive = 1.0*strength;
+        epsAttractive = -0.15*strength;
+        epsPatches[0] = -0.15*strength;
+        epsPatches[1] = -0.20*strength; // Special binding site
+
+        // Set stiffness of potentials parts
+        aRepulsive = 1.5;
+        aAttractive = 0.75;
+        aPatches[0] = 40.0;
+        aPatches[1] = 40.0; // Special binding site
+
+        // Set range parameter potentials parts
+        rstarRepulsive = 0.75*sigma;
+        rstarAttractive = 0.85*sigma;
+        rstarPatches[0] = 0.1*sigma;
+        rstarPatches[1] = 0.1*sigma; // Special binding site
+    }
+
+
     // Evaluates potential at given positions and orientations of two particles
     double patchyProteinMarkovSwitch::evaluate(const particle &part1, const particle &part2) {
         // Declare variables used in loop
@@ -41,10 +79,10 @@ namespace msmrd{
         auto patchesCoords1 = assignPatches(part1.type);
         auto patchesCoords2 = assignPatches(part2.type);
 
-        // Evaluate patches potential
-        if (part2.state == 1) {
+        // Evaluate patches potential if close enough and if particle 2 is in state 0
+        if (rvec.norm() <= 2*sigma and part2.state == 0) {
             // Use default patches auxiliary parent function without angular dependence
-            patchesPotential = evaluatePatchesPotential(part1, part2, relPos, patchesCoords1, patchesCoords2);
+            patchesPotential = evaluatePatchesPotential(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
             /* Get planes needed to be aligned by torque, based on use potential of -[(cos(theta) + 1)/2]^8
              * with only one minima. This adds the angular dependence based on planes calculated in calculatePlanes.
              * Implementation specific.*/
@@ -60,13 +98,7 @@ namespace msmrd{
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(particle &part1, particle &part2)  {
-
-        vec3<double> force1 = vec3<double> (0.0, 0.0, 0.0);
-        vec3<double> force2 = vec3<double> (0.0, 0.0, 0.0);
-        vec3<double> torque1 = vec3<double> (0.0, 0.0, 0.0);
-        vec3<double> torque2 = vec3<double> (0.0, 0.0, 0.0);
-        vec3<double> derivativeAngluarPotential = vec3<double> (0.0, 0.0, 0.0);
+    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(const particle &part1, const particle &part2)  {
 
         // Calculate relative position
         std::array<vec3<double>, 2> relPos = relativePositionComplete(part1.position, part2.position);
@@ -85,48 +117,35 @@ namespace msmrd{
         auto patchesCoords1 = assignPatches(part1.type);
         auto patchesCoords2 = assignPatches(part2.type);
 
-        /* Enables/Disables MSM following potential hardcoded rules. In this case, if bounded or close to bounded
-         * disable the MSM on particles type 1 and state 0. Not always necessary, but left commented just in case. */
-        //enableDisableMSM(rvec, part1, part2);
-
-        // Calculate forces and torque due to patches interaction, if close enough and if particle 2 is in state 1
-        if (part2.state == 1) {
+        // Calculate forces and torque due to patches interaction, if close enough and if particle 2 is in state 0
+        if (rvec.norm() <= 2*sigma and part2.state == 0) {
             // Calculate forces and torque due to patches interaction using auxiliary function
-            auto forcTorqPatches = forceTorquePatches(part1, part2, relPos, patchesCoords1, patchesCoords2);
-            force1 = forcTorqPatches[0];
-            torque1 = forcTorqPatches[1];
-            force2 = forcTorqPatches[2];
-            torque2 = forcTorqPatches[3];
+            auto forcTorqPatches = forceTorquePatches(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
+            auto force1 = forcTorqPatches[0];
+            auto torque1 = forcTorqPatches[1];
+            auto force2 = forcTorqPatches[2];
+            auto torque2 = forcTorqPatches[3];
 
             /* Explicit angular dependence. */
-            vec3<double> derivativeAngluarPotential;
-            if (rvec.norm() <= 2.0 * sigma) {
-                // Get planes needed to be aligned by torque
-                vec3<double> plane1;
-                vec3<double> plane2;
-                std::tie(plane1, plane2) = calculatePlanes(part1, part2, patchesCoords1, patchesCoords2);
-                /* If one uses only one minima, use potential of -(1/256)*(cos(theta) + 1)^8, with theta the angle
-                 * between the unitary vector of each plane */
-                double cosSquared = (plane1 * plane2 + 1) * (plane1 * plane2 + 1);
-                double cosSeventh = cosSquared * cosSquared * cosSquared * (plane1 * plane2 + 1);
-                derivativeAngluarPotential = 0.5 * angularStrength * sigma * (8.0/256.0) * cosSeventh * plane1.cross(plane2);
-                torque1 += derivativeAngluarPotential; // Plus sign since plane1 x plane2 defined torque in particle 1
-                torque2 -= derivativeAngluarPotential;
-            }
-        }
-        return {force + force1, torque1, -1.0*force + force2, torque2};
-    }
+            // Get planes needed to be aligned by torque
+            vec3<double> plane1;
+            vec3<double> plane2;
+            std::tie(plane1, plane2) = calculatePlanes(part1, part2, patchesCoords1, patchesCoords2);
+            /* If one uses only one minima, use potential of -(1/256)*(cos(theta) + 1)^8, with theta the angle
+             * between the unitary vector of each plane */
+            double cosSquared = (plane1 * plane2 + 1) * (plane1 * plane2 + 1);
+            double cosSeventh = cosSquared * cosSquared * cosSquared * (plane1 * plane2 + 1);
+            auto derivativeAngluarPotential = 0.5*angularStrength*sigma*(8.0/256.0) * cosSeventh * plane1.cross(plane2);
+            //torque1 += derivativeAngluarPotential; // Plus sign since plane1 x plane2 defined torque in particle 1
+            //torque2 -= derivativeAngluarPotential;
 
-
-    /* Checks is MSM must be deactivated in certain particles. In this case, if bounded or close to bounded
-     * disable MSM in particle withs type 1 and state 0. This needs to be hardcoded here for each example. */
-    void patchyProteinMarkovSwitch::enableDisableMSM(vec3<double>relPosition, particle &part1, particle &part2) {
-        if (relPosition.norm() <= 1.2 && part2.type == 1 && part2.state == 0) {
-            part2.activeMSM = false;
+            return {force + force1, torque1, -1.0*force + force2, torque2};
         } else {
-            part2.activeMSM = true;
+            auto zeroTorque = vec3<double> (0.0, 0.0, 0.0);
+            return {force, zeroTorque, -1.0 * force, zeroTorque};
         }
     }
+
 
     /* Given two quaternions/orientations, returns planes(unit vectors) to be aligned by torque. These
      * may vary depending on the physical arrangement of your molecules and how the patches are ordered and

@@ -15,9 +15,6 @@ namespace msmrd {
     class patchyProteinMarkovSwitch : public patchyProtein {
     protected:
         double angularStrength = 2.0;
-
-        void enableDisableMSM(vec3<double> relPosition, particle &part1, particle &part2);
-
     public:
         /**
          * @param angularStrength give the angular strength of angular dependence of torque.
@@ -38,14 +35,14 @@ namespace msmrd {
         /* Note evaluate and forceTorque functions do not override the ones of patchyProtein since these
          * ones take particle as arguments instead of particle. Therefore one must be careful the integrator
          * uses particle if we want these functions to be used. */
-        double evaluate(const particle &part1, const particle &part2);
+        double evaluate(const particle &part1, const particle &part2) override;
 
-        std::array<vec3<double>, 4> forceTorque(particle &part1, particle &part2);
-
-
+        std::array<vec3<double>, 4> forceTorque(const particle &part1, const particle &part2) override;
 
 
         // Additional auxiliary functions
+
+        void setPotentialParameters() override;
 
         std::vector<std::vector<double>> forceTorquePyBind(particle &part1, particle &part2);
 
