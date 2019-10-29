@@ -28,31 +28,31 @@ namespace msmrd {
 
         using msmrdIntegrator<ctmsm>::msmrdIntegrator;
 
-        void computeTransitionsFromTransitionStates(std::vector<particleMS> &parts) override;
+        void computeTransitionsFromTransitionStates(std::vector<particle> &parts) override;
 
-        void computeTransitionsFromBoundStates(std::vector<particleMS> &parts) override;
+        void computeTransitionsFromBoundStates(std::vector<particle> &parts) override;
 
-        void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState) override;
+        void transition2BoundState(std::vector<particle> &parts, int iIndex, int jIndex, int endState) override;
 
-        void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState) override;
+        void transition2UnboundState(std::vector<particle> &parts, int iIndex, int jIndex, int endState) override;
 
-        //void transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex,
+        //void transitionBetweenBoundStates(std::vector<particle> &parts, int iIndex,
         //                                  int jIndex, int endState) override;
 
-        //void removeUnrealizedEvents(std::vector<particleMS> &parts) override;
+        //void removeUnrealizedEvents(std::vector<particle> &parts) override;
 
     protected:
 
         /* Functions exclusive to multiparticle MSM/RD*/
 
-        int addCompound(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+        int addCompound(std::vector<particle> &parts, int iIndex, int jIndex, int endState);
 
-        void setCompoundPositionOrientation(std::vector<particleMS> &parts, int iIndex, int jIndex,
+        void setCompoundPositionOrientation(std::vector<particle> &parts, int iIndex, int jIndex,
                                             int mainComplexSize);
 
-//        std::tuple<bool, bool> checkUnbindingCompounds(std::vector<particleMS> &parts, int iIndex, int jIndex);
+//        std::tuple<bool, bool> checkUnbindingCompounds(std::vector<particle> &parts, int iIndex, int jIndex);
 
-        void updateParticleComplexesVector(std::vector<particleMS> &parts);
+        void updateParticleComplexesVector(std::vector<particle> &parts);
 
     };
 

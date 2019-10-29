@@ -21,9 +21,9 @@ namespace msmrd {
     protected:
         std::string msmtype;
 
-        void integrateOne(int partIndex, std::vector<particleMS> &parts, double timestep);
+        void integrateOne(int partIndex, std::vector<particle> &parts, double timestep);
 
-        void integrateOneMS(int partIndex, std::vector<particleMS> &parts, double timestep);
+        void integrateOneMS(int partIndex, std::vector<particle> &parts, double timestep);
 
     public:
         std::vector<templateMSM> MSMlist;
@@ -56,7 +56,7 @@ namespace msmrd {
             msmtype = "discrete-time";
         };
 
-        void integrate(std::vector<particleMS> &parts);
+        void integrate(std::vector<particle> &parts);
     };
 
 }

@@ -26,7 +26,7 @@ namespace msmrd {
         std::vector<double> Dlist;
         std::vector<double> Drotlist;
         /**
-         * @param msmid ID of the msm, corresponds to the particle type
+         * @param msmid ID of the msm, corresponds to the particle type (must start in zero, and increase one by one)
          * @param tolerance tolerance limit for MSM integrity check
          * @param seed variable for random number generation; seed = -1 corresponds to random_device;
          * @param randg random number generator class based on mt19937
@@ -45,7 +45,7 @@ namespace msmrd {
         markovModel(int msmid, std::vector<std::vector<double>> tmatrix, double lagtime, long seed);
 
         // Main functions definitions (=0 for abstract class)
-        virtual void propagate(particleMS &part, int ksteps) = 0;
+        virtual void propagate(particle &part, int ksteps) = 0;
 
         // Get and set functions (**some needed for pybindinng)
         int getID() const { return msmid; }

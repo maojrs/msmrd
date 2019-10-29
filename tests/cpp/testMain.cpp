@@ -211,14 +211,14 @@ TEST_CASE("Particle class basic functionality", "[particle]") {
     REQUIRE(part.orientation == neworientation);
 }
 
-TEST_CASE("ParticleMS class basic functionality", "[particleMS]") {
+TEST_CASE("Particle class Markovian switching functionality", "[particleMS]") {
     int type = 0;
     int state = 2;
     double D = 1.0;
     double Drot = 0.5;
     auto position = vec3<double> {0.0, 0.0, 0.0};
     auto orientation = quaternion<double> {1.0, 0.0, 0.0, 0.0};
-    particleMS partMS = particleMS(type, state, D, Drot, position, orientation);
+    particle partMS = particle(type, state, D, Drot, position, orientation);
     // Constructor consistency test
     REQUIRE(partMS.getType() == type);
     REQUIRE(partMS.getState() == state);
@@ -228,25 +228,20 @@ TEST_CASE("ParticleMS class basic functionality", "[particleMS]") {
     REQUIRE(partMS.orientation == orientation);
     // Some functionality testing
     int newstate = 0;
-    int newtype = 1;
     auto newposition = vec3<double> {1.0, 2.5, 3.0};
     auto neworientation = quaternion<double> {0.0, 0.0, 0.0, 1.0};
-    partMS.setNextType(newtype);
     partMS.setNextState(newstate);
     partMS.setNextPosition(newposition);
     partMS.setNextOrientation(neworientation);
     // Check main values haven't been changed
-    REQUIRE(partMS.getType() == type);
     REQUIRE(partMS.getState() == state);
     REQUIRE(partMS.position == position);
     REQUIRE(partMS.orientation == orientation);
     // Update current values with new ones ("nextValues")
     partMS.updatePosition();
     partMS.updateOrientation();
-    partMS.updateType();
     partMS.updateState();
     // Check values indeed were changed
-    REQUIRE(partMS.getType() == newtype);
     REQUIRE(partMS.getState() == newstate);
     REQUIRE(partMS.position == newposition);
     REQUIRE(partMS.orientation == neworientation);

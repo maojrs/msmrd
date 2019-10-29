@@ -71,8 +71,8 @@ def randomParticleMSList(numparticles, boxsize, separationDistance, types, unbou
     :param randomSeed seed for pyton random generator. Important to specify in parallel runs. Default value of -1
     will use the default seed.
     :return:
-    Generates list of particleMS with uniformly random position and orientation. It also enforces the particles don't
-    overlap over a distance given by the relative distance cut off.
+    Generates list of particles (with Markovian switch) with uniformly random position and orientation. It
+    also enforces the particles don't overlap over a distance given by the relative distance cut off.
     '''
 
     # Set numpy seed if provided (important when running parallel processes, otherwise not required)
@@ -120,11 +120,11 @@ def randomParticleMSList(numparticles, boxsize, separationDistance, types, unbou
         orientation = orientation/np.linalg.norm(orientation)
         D = unboundMSMs[types[i]].D[states[i]]
         Drot = unboundMSMs[types[i]].Drot[states[i]]
-        part = msmrd2.particleMS(types[i], states[i], D, Drot, position, orientation)
+        part = msmrd2.particle(types[i], states[i], D, Drot, position, orientation)
         # Deactivate inner unbound MSM if there is only one state.
         if len(unboundMSMs[types[i]].D) == 1:
             part.deactivateMSM()
         pyPartlist.append(part)
 
-    partlist = msmrd2.integrators.particleMSList(pyPartlist)
+    partlist = msmrd2.integrators.particleList(pyPartlist)
     return partlist

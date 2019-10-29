@@ -142,8 +142,8 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
         substate = random.choice([3,4,7,8])
         position2 = pos2[substate - 1]
         orientation2 = quatRotations[substate - 1]
-    part1 = msmrd2.particleMS(types[0], -1, D1, Drot1, position1, orientation1)
-    part2 = msmrd2.particleMS(types[1], -1, D2, Drot2, position2, orientation2)
+    part1 = msmrd2.particle(types[0], -1, D1, Drot1, position1, orientation1)
+    part2 = msmrd2.particle(types[1], -1, D2, Drot2, position2, orientation2)
     # Set up bound particles as if done by the code (deactivate one of them)
     part1.setBoundState(substate)
     part2.setBoundState(substate)
@@ -153,7 +153,7 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
     part2.deactivateMSM()
     part2.deactivate()
     part2.setPosition([10000000.0, 10000000.0, 10000000.0])
-    partlist = msmrd2.integrators.particleMSList([part1, part2])
+    partlist = msmrd2.integrators.particleList([part1, part2])
     return partlist
 
 def MSMRDsimulationFPT(trajectorynum):

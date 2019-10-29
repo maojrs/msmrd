@@ -70,17 +70,17 @@ namespace msmrd {
 
 
         // Redefine integrate function
-        void integrate(std::vector<particleMS> &parts);
+        void integrate(std::vector<particle> &parts);
 
 
         // Auxiliary functions for main MSM/RD functions
-        void integrateDiffusion(std::vector<particleMS> &parts, double dt);
+        void integrateDiffusion(std::vector<particle> &parts, double dt);
 
         std::tuple<vec3<double>, quaternion<double>> getRelativePositionOrientation(int state);
 
-        int setNewUnboundState(std::vector<particleMS> &parts, int partIndex);
+        int setNewUnboundState(std::vector<particle> &parts, int partIndex);
 
-        void setUnboundDiffusionCoefficients(std::vector<particleMS> &parts, int partIndex, int state);
+        void setUnboundDiffusionCoefficients(std::vector<particle> &parts, int partIndex, int state);
 
         void setDefaultDiscretization();
 
@@ -90,23 +90,23 @@ namespace msmrd {
         /* Main MSM/RD function. They are defined as virtual in case we want to override them in derived classes
          * to modify fucntionality */
 
-        virtual int computeCurrentTransitionState(particleMS &part1, particleMS &part2);
+        virtual int computeCurrentTransitionState(particle &part1, particle &part2);
 
-        virtual void computeTransitionsFromTransitionStates(std::vector<particleMS> &parts);
+        virtual void computeTransitionsFromTransitionStates(std::vector<particle> &parts);
 
-        virtual void computeTransitionsFromBoundStates(std::vector<particleMS> &parts);
+        virtual void computeTransitionsFromBoundStates(std::vector<particle> &parts);
 
-        virtual void transition2BoundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+        virtual void transition2BoundState(std::vector<particle> &parts, int iIndex, int jIndex, int endState);
 
-        virtual void transition2UnboundState(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+        virtual void transition2UnboundState(std::vector<particle> &parts, int iIndex, int jIndex, int endState);
 
-        virtual void transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex, int jIndex, int endState);
+        virtual void transitionBetweenBoundStates(std::vector<particle> &parts, int iIndex, int jIndex, int endState);
 
         virtual void transitionBetweenTransitionStates(int iIndex, int jIndex);
 
-        virtual void removeUnrealizedEvents(std::vector<particleMS> &parts);
+        virtual void removeUnrealizedEvents(std::vector<particle> &parts);
 
-        virtual void applyEvents(std::vector<particleMS> &parts);
+        virtual void applyEvents(std::vector<particle> &parts);
 
 
     };

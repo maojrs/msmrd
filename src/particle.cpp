@@ -10,7 +10,8 @@ namespace msmrd {
      * Implementation of particle class
      */
 
-    // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
+    /* Constructors of normal particles: receive input from vec3/quaternion or std::vector and
+     * numpy arrays (through pybind) */
     particle::particle(double D, double Drot, vec3<double> position, quaternion<double> orientation)
             : D(D), Drot(Drot), position(position), orientation(orientation) {
         type = 0;
@@ -31,6 +32,24 @@ namespace msmrd {
         nextOrientvector = 1.0 * orientvector;
     };
 
+
+    /* Constructors of particles with Markovian switch: receive input from vec3/quaternion or std::vector and
+     * numpy arrays (through pybind) */
+    particle::particle(int type0, int state, double D, double Drot, vec3<double> position,
+                       quaternion<double> orientation)
+            : state(state), D(D), Drot(Drot), position(position), orientation(orientation) {
+        type = type0;
+    };
+
+    particle::particle(int type0, int state, double D, double Drot, std::vector<double> &position,
+                       std::vector<double> &orientation)
+            : state(state), D(D), Drot(Drot), position(position), orientation(orientation) {
+        type = type0;
+    };
+
+
+    // Implementation of normal particles
+
     void particle::updatePosition() {
         position = 1.0 * nextPosition;
     };
@@ -46,32 +65,19 @@ namespace msmrd {
     }
 
 
-    /**
-     * Implementation of particleMS class
-     */
 
+    //Implementation of particle class with Markovian switch
 
-    particleMS::particleMS(int type0, int state, double D, double Drot, vec3<double> position,
-               quaternion<double> orientation)
-            : state(state), particle(D, Drot, position, orientation) {
-        type = type0;
-    };
-
-    particleMS::particleMS(int type0, int state, double D, double Drot, std::vector<double> &position,
-               std::vector<double> &orientation)
-            : state(state), particle(D, Drot, position, orientation) {
-        type = type0;
-    };
 
     // Sets unbound state of particle (the state corresponding to its independent conformation)
-    void particleMS::setState(int newstate) {
+    void particle::setState(int newstate) {
         state = newstate;
         boundState = -1;
         boundTo = -1;
     }
 
     // Sets bound state of particle
-    void particleMS::setBoundState(int newBoundState) {
+    void particle::setBoundState(int newBoundState) {
         state = -1;
         boundState = newBoundState;
         activeMSM = false;

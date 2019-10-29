@@ -23,7 +23,7 @@ namespace msmrd{
                angularStrength(angularStrength) {};
 
     // Evaluates potential at given positions and orientations of two particles
-    double patchyProteinMarkovSwitch::evaluate(const particleMS &part1, const particleMS &part2) {
+    double patchyProteinMarkovSwitch::evaluate(const particle &part1, const particle &part2) {
         // Declare variables used in loop
         double patchesPotential = 0.0;
         double angularPotential = 0.0;
@@ -60,7 +60,7 @@ namespace msmrd{
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(particleMS &part1, particleMS &part2)  {
+    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(particle &part1, particle &part2)  {
 
         vec3<double> force1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> force2 = vec3<double> (0.0, 0.0, 0.0);
@@ -120,7 +120,7 @@ namespace msmrd{
 
     /* Checks is MSM must be deactivated in certain particles. In this case, if bounded or close to bounded
      * disable MSM in particle withs type 1 and state 0. This needs to be hardcoded here for each example. */
-    void patchyProteinMarkovSwitch::enableDisableMSM(vec3<double>relPosition, particleMS &part1, particleMS &part2) {
+    void patchyProteinMarkovSwitch::enableDisableMSM(vec3<double>relPosition, particle &part1, particle &part2) {
         if (relPosition.norm() <= 1.2 && part2.type == 1 && part2.state == 0) {
             part2.activeMSM = false;
         } else {
@@ -131,8 +131,8 @@ namespace msmrd{
     /* Given two quaternions/orientations, returns planes(unit vectors) to be aligned by torque. These
      * may vary depending on the physical arrangement of your molecules and how the patches are ordered and
      * selected. Currently set up for particle 1 with 6 binding patches and particle 2 only with one.*/
-    std::tuple<vec3<double>, vec3<double>> patchyProteinMarkovSwitch::calculatePlanes(const particleMS &part1,
-                                                                 const particleMS &part2,
+    std::tuple<vec3<double>, vec3<double>> patchyProteinMarkovSwitch::calculatePlanes(const particle &part1,
+                                                                 const particle &part2,
                                                                  const std::vector<vec3<double>> patches1,
                                                                  const std::vector<vec3<double>> patches2) {
 

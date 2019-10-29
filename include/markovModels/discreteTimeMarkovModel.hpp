@@ -17,11 +17,11 @@ namespace msmrd {
         discreteTimeMarkovStateModel(int msmid, std::vector <std::vector<double>> tmatrix, double lagtime,
                                      long seed);
 
-        void propagate(particleMS &part, int ksteps) override;
+        void propagate(particle &part, int ksteps) override;
 
         std::tuple<double, int> propagateMSM(int initialState, int ksteps);
 
-        void propagateNoUpdate(particleMS &part, int ksteps);
+        void propagateNoUpdate(particle &part, int ksteps);
 
 
     };

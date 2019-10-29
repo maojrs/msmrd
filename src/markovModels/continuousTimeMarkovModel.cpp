@@ -66,7 +66,7 @@ namespace msmrd {
 
     /* Propagates CTMSM using the Gillespie algorithm without updating the state in the particle, useful for
      * integration with diffusion and rotation integrator */
-    void continuousTimeMarkovStateModel::propagateNoUpdate(particleMS &part, int ksteps) {
+    void continuousTimeMarkovStateModel::propagateNoUpdate(particle &part, int ksteps) {
         double lagt = 0;
         double r1, r2;
         int state = 0;
@@ -94,7 +94,7 @@ namespace msmrd {
     };
 
     // Propagates CTMSM in particles using the Gillespie algorithm, updates state  of particles immediately.
-    void continuousTimeMarkovStateModel::propagate(particleMS &part, int ksteps) {
+    void continuousTimeMarkovStateModel::propagate(particle &part, int ksteps) {
         double lagt = 0;
         double r1, r2;
         int state = 0;

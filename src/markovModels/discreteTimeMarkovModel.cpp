@@ -33,7 +33,7 @@ namespace msmrd{
     };
 
     // Propagates the discrete Markov chain for ksteps
-    void discreteTimeMarkovStateModel::propagate(particleMS &part, int ksteps) {
+    void discreteTimeMarkovStateModel::propagate(particle &part, int ksteps) {
         double r1;
         double sum;
         int currentState = 1 * part.state;
@@ -73,7 +73,7 @@ namespace msmrd{
     };
 
     // Propagates the discrete Markov chain for ksteps without updating
-    void discreteTimeMarkovStateModel::propagateNoUpdate(particleMS &part, int ksteps) {
+    void discreteTimeMarkovStateModel::propagateNoUpdate(particle &part, int ksteps) {
         double r1;
         double sum;
         int currentState = 1 * part.state;

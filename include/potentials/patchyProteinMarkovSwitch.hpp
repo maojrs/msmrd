@@ -16,7 +16,7 @@ namespace msmrd {
     protected:
         double angularStrength = 2.0;
 
-        void enableDisableMSM(vec3<double> relPosition, particleMS &part1, particleMS &part2);
+        void enableDisableMSM(vec3<double> relPosition, particle &part1, particle &part2);
 
     public:
         /**
@@ -36,20 +36,20 @@ namespace msmrd {
                       std::vector<std::vector<double>> patchesCoordinatesB);
 
         /* Note evaluate and forceTorque functions do not override the ones of patchyProtein since these
-         * ones take particleMS as arguments instead of particle. Therefore one must be careful the integrator
-         * uses particleMS if we want these functions to be used. */
-        double evaluate(const particleMS &part1, const particleMS &part2);
+         * ones take particle as arguments instead of particle. Therefore one must be careful the integrator
+         * uses particle if we want these functions to be used. */
+        double evaluate(const particle &part1, const particle &part2);
 
-        std::array<vec3<double>, 4> forceTorque(particleMS &part1, particleMS &part2);
+        std::array<vec3<double>, 4> forceTorque(particle &part1, particle &part2);
 
 
 
 
         // Additional auxiliary functions
 
-        std::vector<std::vector<double>> forceTorquePyBind(particleMS &part1, particleMS &part2);
+        std::vector<std::vector<double>> forceTorquePyBind(particle &part1, particle &part2);
 
-        std::tuple<vec3<double>, vec3<double>> calculatePlanes(const particleMS &part1, const particleMS &part2,
+        std::tuple<vec3<double>, vec3<double>> calculatePlanes(const particle &part1, const particle &part2,
                                                                const std::vector<vec3<double>> patches1,
                                                                const std::vector<vec3<double>> patches2);
     };

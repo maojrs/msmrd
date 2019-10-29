@@ -29,10 +29,10 @@ TEST_CASE("Fundamental CTMSM parameters and propagation test", "[ctmsm]") {
     double Drot = 0.5;
     auto position = vec3<double> {0.0, 0.0, 0.0};
     auto orientation = quaternion<double> {1.0, 0.0, 0.0, 0.0};
-    particleMS partMS = particleMS(type, state, D, Drot, position, orientation);
+    particle partMS = particle(type, state, D, Drot, position, orientation);
     // Create a second particle and a second ctmsm with same seed
     ctmsm ctmsmTest2 = ctmsm(msmid, tmatrix, seed);
-    particleMS partMS2 = particleMS(type, state, D, Drot, position, orientation);
+    particle partMS2 = particle(type, state, D, Drot, position, orientation);
     /* Propagate each particle using the same seed but the update and noupdate method,
      * respectively, and compare output at each timestep. */
     for (int i=0; i<100; i++) {

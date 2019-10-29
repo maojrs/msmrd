@@ -17,7 +17,7 @@ namespace msmrd {
     /* Computes possible transitions from transition states to bound states or other transition states from
      * particles sufficiently close to each other (in transition states) and saves them in the event manager.
      * Used by integrate function. */
-    void msmrdMultiParticleIntegrator::computeTransitionsFromTransitionStates(std::vector<particleMS> &parts) {
+    void msmrdMultiParticleIntegrator::computeTransitionsFromTransitionStates(std::vector<particle> &parts) {
         int currentTransitionState;
         double transitionTime;
         int nextState;
@@ -60,7 +60,7 @@ namespace msmrd {
 
     /* Computes possible transitions from bound states to other bound states or unbound states (transition states)
      * and saves them in the event manager. Used by integrate function. */
-    void msmrdMultiParticleIntegrator::computeTransitionsFromBoundStates(std::vector<particleMS> &parts) {
+    void msmrdMultiParticleIntegrator::computeTransitionsFromBoundStates(std::vector<particle> &parts) {
         double transitionTime;
         int nextState;
         std::tuple<double, int> transition;
@@ -97,7 +97,7 @@ namespace msmrd {
      * Makes particles with indexes iIndex and jIndex in the particle list transition to a bound state. Note
      * always iIndex < jIndex should hold. Also both particles are desactivated since their position will be
      * tracked with a particle compound. */
-    void msmrdMultiParticleIntegrator::transition2BoundState(std::vector<particleMS> &parts, int iIndex,
+    void msmrdMultiParticleIntegrator::transition2BoundState(std::vector<particle> &parts, int iIndex,
                                                              int jIndex, int endState) {
         /* Establish pair connection in particle class and deactivate particle with larger index ( only
          * particle with smaller index remains active to represent the movement of the bound particle) */
@@ -131,7 +131,7 @@ namespace msmrd {
     /* CURRENTLY WORKING HERE BELOW, ENCOUNTERED ISSUE IN HOW PARTICLECOMPOUND SAVES TOPOLOGIES, NEED TO
      * ADDRESS THAT FIRST, SEE particle.hpp */
 
-    void msmrdMultiParticleIntegrator::transition2UnboundState(std::vector<particleMS> &parts, int iIndex,
+    void msmrdMultiParticleIntegrator::transition2UnboundState(std::vector<particle> &parts, int iIndex,
                                                                int jIndex, int endStateAlt) {
 
         // Check if particles unbinding belong to particleCompounds
@@ -177,11 +177,11 @@ namespace msmrd {
      * it creates it. If both particles belong to different complexes, it merges them. It also updates
      * the compoundIndex of each particle, see particle.hpp. It also returns an integer corresponding to
      * the size of the main compound in the case of two compounds joining, or simply one otherwise. */
-    int msmrdMultiParticleIntegrator::addCompound(std::vector<particleMS> &parts, int iIndex,
+    int msmrdMultiParticleIntegrator::addCompound(std::vector<particle> &parts, int iIndex,
                                                   int jIndex, int endState) {
         int mainCompoundSize = 1;
-        particleMS &iPart = parts[iIndex];
-        particleMS &jPart = parts[jIndex];
+        particle &iPart = parts[iIndex];
+        particle &jPart = parts[jIndex];
         // If neither particle belongs to a complex, create one
         if (iPart.compoundIndex == -1 and jPart.compoundIndex == -1) {
             std::tuple<int,int> pairIndices = std::make_tuple(iIndex, jIndex);
@@ -232,7 +232,7 @@ namespace msmrd {
 
     /* Sets compound position to the average, its orientation is always set up initially at one and only changed
      * by diffusion. It also sets the position reference and orientation reference for a newly created compound. */
-    void msmrdMultiParticleIntegrator::setCompoundPositionOrientation(std::vector<particleMS> &parts,
+    void msmrdMultiParticleIntegrator::setCompoundPositionOrientation(std::vector<particle> &parts,
                                                                       int iIndex, int jIndex, int mainCompoundSize) {
         int compoundIndex = parts[iIndex].compoundIndex;
         int compoundSize = particleCompounds[compoundIndex].compoundSize;
@@ -250,7 +250,7 @@ namespace msmrd {
 
 
 //    /* Checks ...*/
-//    std::tuple<bool, bool> msmrdMultiParticleIntegrator::checkUnbindingCompounds(std::vector<particleMS> &parts,
+//    std::tuple<bool, bool> msmrdMultiParticleIntegrator::checkUnbindingCompounds(std::vector<particle> &parts,
 //                                                                               int iIndex, int jIndex) {
 //        int cIndex = parts[iIndex].compoundIndex;
 //
@@ -268,7 +268,7 @@ namespace msmrd {
 
     /* Deletes inactive complexes in particle complex vector, and updates indexes in particle list. Doesn't
      * need to do at every time step, but every now and then to free up memory. */
-    void msmrdMultiParticleIntegrator::updateParticleComplexesVector(std::vector<particleMS> &parts) {
+    void msmrdMultiParticleIntegrator::updateParticleComplexesVector(std::vector<particle> &parts) {
         for (size_t i = particleCompounds.size(); i--;) {
             if (particleCompounds[i].active == false) {
                 // Erase particle complex

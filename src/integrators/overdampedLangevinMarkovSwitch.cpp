@@ -17,10 +17,10 @@ namespace msmrd {
 
     /* Integrates diffusion and rotation of one particle, called by the integrateOneMS (visible only
      * inside the class). Note it cannot be inherited from overdampedLangevin::integrateOne since it
-     * uses a particleMS list instead of a particle list. Using list of pointers possible but not ideal
+     * uses a particle list instead of a particle list. Using list of pointers possible but not ideal
      * due to dependencies. */
     template<>
-    void overdampedLangevinMarkovSwitch<ctmsm>::integrateOne(int partIndex, std::vector<particleMS> &parts, double timestep) {
+    void overdampedLangevinMarkovSwitch<ctmsm>::integrateOne(int partIndex, std::vector<particle> &parts, double timestep) {
         vec3<double> force;
         vec3<double> torque;
         force = forceField[partIndex];
@@ -35,7 +35,7 @@ namespace msmrd {
     /* Integrates rotation/translation and Markovian switch of one particle, with pair interactions
      * (visible only inside the class) */
     template<>
-    void overdampedLangevinMarkovSwitch<ctmsm>::integrateOneMS(int partIndex, std::vector<particleMS> &parts, double timestep) {
+    void overdampedLangevinMarkovSwitch<ctmsm>::integrateOneMS(int partIndex, std::vector<particle> &parts, double timestep) {
         auto &part = parts[partIndex];
         auto tmsm = MSMlist[part.type];
         // Do diffusion/rotation propagation taking MSM/CTMSM into account
@@ -101,12 +101,12 @@ namespace msmrd {
      * Next function should remain at end of file to avoid instantiation before specialization
      */
 
-    /* Integrates list of particleMS particles (needs to override parent function because it is
-     * template based and uses particleMS) */
+    /* Integrates list of particle particles (needs to override parent function because it is
+     * template based and uses particle) */
     template<>
-    void overdampedLangevinMarkovSwitch<ctmsm>::integrate(std::vector<particleMS> &parts) {
+    void overdampedLangevinMarkovSwitch<ctmsm>::integrate(std::vector<particle> &parts) {
         // Calculate forces and torques and save them into forceField and torqueField
-        calculateForceTorqueFields<particleMS>(parts);
+        calculateForceTorqueFields<particle>(parts);
 
         // Integrate and save next positions/orientations in parts[i].next***
         for (int i = 0; i < parts.size(); i++) {

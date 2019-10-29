@@ -44,7 +44,6 @@ namespace msmrd {
 
         // Created c++ compatible particle list/vector/array of particles in python
         py::bind_vector<std::vector<particle>>(m, "particleList", py::module_local());
-        py::bind_vector<std::vector<particleMS>>(m, "particleMSList", py::module_local());
     }
 
 }

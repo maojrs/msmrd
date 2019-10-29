@@ -12,9 +12,7 @@
 /* Needed to connect lists/arrays of particles in python with cpp integrator methods.
  * PyBind classes defined at end of bindIntegrators.cpp*/
 using myParticle = msmrd::particle;
-using myParticleMS = msmrd::particleMS;
 PYBIND11_MAKE_OPAQUE(std::vector<myParticle>);
-PYBIND11_MAKE_OPAQUE(std::vector<myParticleMS>);
 
 
 namespace py = pybind11;

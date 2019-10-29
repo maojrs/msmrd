@@ -15,7 +15,7 @@ namespace msmrd {
     /* Integrates translational and rotation diffusion for on dt step. (Calls the integrateOne fucntions
      * of the parent classes) */
     template<>
-    void msmrdIntegrator<ctmsm>::integrateDiffusion(std::vector<particleMS> &parts, double dt) {
+    void msmrdIntegrator<ctmsm>::integrateDiffusion(std::vector<particle> &parts, double dt) {
         /* Integrate only active particles and save next positions/orientations in parts[i].next.
          * Non-active particles will usually correspond to one of the particles of a bound pair of particles */
         for (int i = 0; i < parts.size(); i++) {
@@ -82,7 +82,7 @@ namespace msmrd {
      * randomly and uniformly. It further returns the new state, so it can be directly used when calling this
      * function. */
     template<>
-    int msmrdIntegrator<ctmsm>::setNewUnboundState(std::vector<particleMS> &parts, int partIndex) {
+    int msmrdIntegrator<ctmsm>::setNewUnboundState(std::vector<particle> &parts, int partIndex) {
         int newState = 0;
         auto partType = parts[partIndex].type;
         if (MSMlist[partType].tmatrix.size() > 1) {
@@ -98,7 +98,7 @@ namespace msmrd {
 
     // Sets diffusion coefficients of particle parts[partIndex] based on the state of the unbound MSM.
     template<>
-    void msmrdIntegrator<ctmsm>::setUnboundDiffusionCoefficients(std::vector<particleMS> &parts, int partIndex,
+    void msmrdIntegrator<ctmsm>::setUnboundDiffusionCoefficients(std::vector<particle> &parts, int partIndex,
                                                                  int state){
         int partType = parts[partIndex].type;
         auto diff = MSMlist[partType].Dlist[state];
@@ -118,7 +118,7 @@ namespace msmrd {
      * it returns -1. Otherwise it returns the transition state (in the original discrete trajectories indexing)
      * of the two particles in the discretization.*/
     template<>
-    int msmrdIntegrator<ctmsm>::computeCurrentTransitionState(particleMS &part1, particleMS &part2) {
+    int msmrdIntegrator<ctmsm>::computeCurrentTransitionState(particle &part1, particle &part2) {
         int currentTransitionState = -1;
         vec3<double> relativePosition;
         quaternion<double> relativeOrientation;
@@ -148,7 +148,7 @@ namespace msmrd {
      * particles sufficiently close to each other (in transition states) and saves them in the event manager.
      * Used by integrate function. */
     template<>
-    void msmrdIntegrator<ctmsm>::computeTransitionsFromTransitionStates(std::vector<particleMS> &parts) {
+    void msmrdIntegrator<ctmsm>::computeTransitionsFromTransitionStates(std::vector<particle> &parts) {
         int currentTransitionState;
         double transitionTime;
         int nextState;
@@ -191,7 +191,7 @@ namespace msmrd {
     /* Computes possible transitions from bound states to other bound states or unbound states (transition states)
      * and saves them in the event manager. Used by integrate function. */
     template<>
-    void msmrdIntegrator<ctmsm>::computeTransitionsFromBoundStates(std::vector<particleMS> &parts) {
+    void msmrdIntegrator<ctmsm>::computeTransitionsFromBoundStates(std::vector<particle> &parts) {
         double transitionTime;
         int nextState;
         std::tuple<double, int> transition;
@@ -225,7 +225,7 @@ namespace msmrd {
      * always iIndex < jIndex should hold. Also particle with smaller index is the one that remains active
      * to model position/orientation of bound complex. */
     template<>
-    void msmrdIntegrator<ctmsm>::transition2BoundState(std::vector<particleMS> &parts, int iIndex,
+    void msmrdIntegrator<ctmsm>::transition2BoundState(std::vector<particle> &parts, int iIndex,
                                                        int jIndex, int endState) {
         /* Establish pair connection in particle class and deactivate particle with larger index ( only
          * particle with smaller index remains active to represent the movement of the bound particle) */
@@ -252,7 +252,7 @@ namespace msmrd {
     /* Makes particles with indexes iIndex and jIndex in the particle list transition to an unbound state. Note
      * always iIndex < jIndex should hold.*/
     template<>
-    void msmrdIntegrator<ctmsm>::transition2UnboundState(std::vector<particleMS> &parts, int iIndex,
+    void msmrdIntegrator<ctmsm>::transition2UnboundState(std::vector<particle> &parts, int iIndex,
                                                          int jIndex, int endStateAlt) {
 
         // Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.
@@ -287,7 +287,7 @@ namespace msmrd {
     /* Transitions of already bound particles with indexes iIndex and jIndex in the particle list
      * to another bound state. */
     template<>
-    void msmrdIntegrator<ctmsm>::transitionBetweenBoundStates(std::vector<particleMS> &parts, int iIndex,
+    void msmrdIntegrator<ctmsm>::transitionBetweenBoundStates(std::vector<particle> &parts, int iIndex,
                                                               int jIndex, int endState) {
         // Set state for particle
         parts[iIndex].setBoundState(endState);
@@ -312,7 +312,7 @@ namespace msmrd {
     /* Removes unrealized events where unbound particles drifted a distance apart beyond the upper radial bound,
      * or when zero rates yielded infinite values. */
     template<>
-    void msmrdIntegrator<ctmsm>::removeUnrealizedEvents(std::vector<particleMS> &parts) {
+    void msmrdIntegrator<ctmsm>::removeUnrealizedEvents(std::vector<particle> &parts) {
         std::list<std::map<std::string, decltype(eventMgr.emptyEvent)>::const_iterator> iteratorList;
         vec3<double> relativePosition;
         // Loop over all events to flag events that should be erased (loop over iterator)
@@ -342,7 +342,7 @@ namespace msmrd {
 
     /* Apply events in event manager that should happen during the current time step. */
     template<>
-    void msmrdIntegrator<ctmsm>::applyEvents(std::vector<particleMS> &parts) {
+    void msmrdIntegrator<ctmsm>::applyEvents(std::vector<particle> &parts) {
         std::list<std::map<std::string, decltype(eventMgr.emptyEvent)>::const_iterator> iteratorList;
         // Loop over dictionary using iterators
         for (auto it = eventMgr.eventDictionary.cbegin(); it != eventMgr.eventDictionary.cend(); it++) {
@@ -381,12 +381,12 @@ namespace msmrd {
 
     /* Main integrate function */
     template<>
-    void msmrdIntegrator<ctmsm>::integrate(std::vector<particleMS> &parts) {
+    void msmrdIntegrator<ctmsm>::integrate(std::vector<particle> &parts) {
 
         /* Calculate forces and torques and save them into forceField and torqueField. For the MSM/RD this will
          * in general be zero, so only needs to be run once. */
         if (firstrun) {
-            calculateForceTorqueFields<particleMS>(parts);
+            calculateForceTorqueFields<particle>(parts);
             firstrun = false;
         }
 
