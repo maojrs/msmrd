@@ -15,9 +15,14 @@ namespace msmrd {
     class patchyProteinMarkovSwitch : public patchyProtein {
     protected:
         double angularStrength = 2.0;
+        vec3<double> patchRef = vec3<double> (0.0, 0.0, 1.0);
     public:
         /**
          * @param angularStrength give the angular strength of angular dependence of torque.
+         * @param patchRef reference patch to calculate torque when in need of precise metastable region
+         * in orientation quaternion space. Helps to define 3 degree of freedom orientation if only one patch
+         * is given for a particle. In current implementation, helps define orientation and calculate torque of
+         * particle2 since it is assumed it only has one patch.
          */
 
         // Inherit parent class contructor
@@ -43,6 +48,10 @@ namespace msmrd {
         // Additional auxiliary functions
 
         void setPotentialParameters() override;
+
+        void setReferencePatch(vec3<double> patchref) { patchRef = patchref; }
+
+        void setReferencePatchPyBind(std::vector<double> patchref) { patchRef = patchref; }
 
         std::vector<std::vector<double>> forceTorquePyBind(particle &part1, particle &part2);
 

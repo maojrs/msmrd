@@ -42,7 +42,7 @@ namespace msmrd{
 
         // Set strengths of potential parts
         epsRepulsive = 1.0*strength;
-        epsAttractive = -0.15*strength;
+        epsAttractive = -0.05*strength;
         epsPatches[0] = -0.15*strength;
         epsPatches[1] = -0.20*strength; // Special binding site
 
@@ -96,6 +96,8 @@ namespace msmrd{
         return repulsivePotential + attractivePotential + patchesPotential + angularPotential;
     }
 
+    // TODO: Check calculaPlanes fucntion more, and plot ligand as triple L-shaped particle with three points, one the patch.
+
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
     std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(const particle &part1, const particle &part2)  {
@@ -136,8 +138,8 @@ namespace msmrd{
             double cosSquared = (plane1 * plane2 + 1) * (plane1 * plane2 + 1);
             double cosSeventh = cosSquared * cosSquared * cosSquared * (plane1 * plane2 + 1);
             auto derivativeAngluarPotential = 0.5*angularStrength*sigma*(8.0/256.0) * cosSeventh * plane1.cross(plane2);
-            //torque1 += derivativeAngluarPotential; // Plus sign since plane1 x plane2 defined torque in particle 1
-            //torque2 -= derivativeAngluarPotential;
+            torque1 += derivativeAngluarPotential; // Plus sign since plane1 x plane2 defined torque in particle 1
+            torque2 -= derivativeAngluarPotential;
 
             return {force + force1, torque1, -1.0*force + force2, torque2};
         } else {
@@ -157,7 +159,6 @@ namespace msmrd{
 
         std::vector<vec3<double>> part1PatchNormals;
         std::vector<vec3<double>> part2PatchNormals;
-        vec3<double> patchRef = vec3<double> (0.0, 0.0, 1.0);
         for (auto &patch : patches1) {
             part1PatchNormals.push_back(msmrdtools::rotateVec(patch, part1.orientation));
         }
@@ -185,7 +186,7 @@ namespace msmrd{
             }
         }
 
-        /* Find minimum distance and match corresponding expected orientation (0, 1, 2 ... 7 in original implementation)
+        /* Find minimum distance and match corresponding expected orientation (0, 1, 2,...5 in original implementation)
          * depending on the patches that are closer to each other) */
         auto minIndex = static_cast<int> (std::min_element(patchesDistances.begin(), patchesDistances.end()) -
                                           patchesDistances.begin());
@@ -195,10 +196,14 @@ namespace msmrd{
         vec3<double> plane2;
 
         // Planes to align  selection dependent on implementation
-        int secondIndex = (minIndex + 1) % 8; // 8=part1PatchNormals.size()
-        patchRef = msmrdtools::rotateVec(patchRef, part2.orientation);
+        int secondIndex = (minIndex + 1) % 6; // 6=part1PatchNormals.size()
+        auto patchRefRotated = msmrdtools::rotateVec(patchRef, part2.orientation);
         plane1 = part1PatchNormals[minIndex].cross(part1PatchNormals[secondIndex]); // should always be perpendicular.
-        plane2 = part2PatchNormals[0].cross(patchRef);
+        plane2 = part2PatchNormals[0].cross(patchRefRotated); // should always be perpendicular.
+
+        // Not neccesary to renormalize; they must always be normal
+        //plane1 = plane1/plane1.norm();
+        //plane2 = plane2/plane2.norm();
 
         return std::make_tuple(plane1, plane2);
     }
