@@ -11,18 +11,17 @@ namespace msmrd {
      * child from patchyProtein class; it accepts quaternion-based orientation (rigidBody particle type). The main
      * idea is to have a potential with several different patches (patchy protein) that have a fixed angular
      * binding. It further allows that one of the patches can be turned on and off depending on the MSM state.
+     *
+     * Warning: since these classes are highly dependent on a given implementation, they have many hard coded
+     * values. If a new implemantation is desired, we recommend to create a new child class of patchyProtein
+     * in this file using the classes here as reference (see setPotentialParameters() and calculatePlanes()).
      */
     class patchyProteinMarkovSwitch : public patchyProtein {
     protected:
         double angularStrength = 2.0;
-        vec3<double> patchRef = vec3<double> (0.0, 0.0, 1.0);
     public:
         /**
          * @param angularStrength give the angular strength of angular dependence of torque.
-         * @param patchRef reference patch to calculate torque when in need of precise metastable region
-         * in orientation quaternion space. Helps to define 3 degree of freedom orientation if only one patch
-         * is given for a particle. In current implementation, helps define orientation and calculate torque of
-         * particle2 since it is assumed it only has one patch.
          */
 
         // Inherit parent class contructor
@@ -48,10 +47,6 @@ namespace msmrd {
         // Additional auxiliary functions
 
         void setPotentialParameters() override;
-
-        void setReferencePatch(vec3<double> patchref) { patchRef = patchref; }
-
-        void setReferencePatchPyBind(std::vector<double> patchref) { patchRef = patchref; }
 
         std::vector<std::vector<double>> forceTorquePyBind(particle &part1, particle &part2);
 

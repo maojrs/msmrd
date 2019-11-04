@@ -96,8 +96,6 @@ namespace msmrd{
         return repulsivePotential + attractivePotential + patchesPotential + angularPotential;
     }
 
-    // TODO: Check calculaPlanes fucntion more, and plot ligand as triple L-shaped particle with three points, one the patch.
-
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
     std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(const particle &part1, const particle &part2)  {
@@ -191,17 +189,26 @@ namespace msmrd{
         auto minIndex = static_cast<int> (std::min_element(patchesDistances.begin(), patchesDistances.end()) -
                                           patchesDistances.begin());
 
+        /* Assign using indexDict second patch in patchesCoordinatesA to do cross product with
+         * patchesCoordinatesA[minindex]. Dependent on implemenatiation. In this case, assume the patches
+         * follow this order: patchesCoordinatesA = [1.,0.,0.], [0.,1.,0.], [0.,0.,1.],
+         * [-1.,0.,0.], [0.,-1.,0.], [0.,0.,-1.]. Note the orientations should match the discrete trajectory
+         * definition; in this case, the one given by setBoundStates() in trajectories/discrete/patchyProtein.*/
+        std::array<int, 6> indexDict = {1, 3, 4, 4, 0, 4};
+        int secondIndex = indexDict[minIndex];
+
+        /* It further assumes, patchesCoordinatesB = [1.,0.,0.]; defining patchRef (orthogonal to previous patch), they
+         * define the orientation of particle 2.  */
+        vec3<double> patchRef = vec3<double> (0.0, 1.0, 0.0);
+
         // Calculate unitary vectors describing planes where particle center and first two patches are
         vec3<double> plane1;
         vec3<double> plane2;
-
-        // Planes to align  selection dependent on implementation
-        int secondIndex = (minIndex + 1) % 6; // 6=part1PatchNormals.size()
         auto patchRefRotated = msmrdtools::rotateVec(patchRef, part2.orientation);
         plane1 = part1PatchNormals[minIndex].cross(part1PatchNormals[secondIndex]); // should always be perpendicular.
         plane2 = part2PatchNormals[0].cross(patchRefRotated); // should always be perpendicular.
 
-        // Not neccesary to renormalize; they must always be normal
+        // Not neccesary to renormalize; they must always be normal (or close enough up to machine-eps)
         //plane1 = plane1/plane1.norm();
         //plane2 = plane2/plane2.norm();
 

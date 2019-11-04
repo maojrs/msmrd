@@ -67,8 +67,7 @@ namespace msmrd {
                         std::vector<std::vector<double>> &>())
                 .def(py::init<double &, double &, double &,
                         std::vector<std::vector<double>> &,
-                        std::vector<std::vector<double>> &>())
-                .def("setReferencePatch", &patchyProteinMarkovSwitch::setReferencePatchPyBind);
+                        std::vector<std::vector<double>> &>());
     }
 
 }
