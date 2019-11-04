@@ -65,7 +65,7 @@ set(SOURCES
         src/trajectories/trajectory.cpp
         src/trajectories/trajectoryPosition.cpp
         src/trajectories/trajectoryPositionOrientation.cpp
-        src/trajectories/discrete/patchyDimer.cpp
+        src/trajectories/discrete/patchyDimerTrajectory.cpp
         src/trajectories/discrete/patchyProteinTrajectory.cpp
         )
 
@@ -120,7 +120,7 @@ set(PY_SOURCES
         include/trajectories/trajectoryPosition.hpp
         include/trajectories/trajectoryPositionOrientation.hpp
         include/trajectories/discrete/discreteTrajectory.hpp
-        include/trajectories/discrete/patchyDimer.hpp
+        include/trajectories/discrete/patchyDimerTrajectory.hpp
         include/trajectories/discrete/patchyProteinTrajectory.hpp
         )
 

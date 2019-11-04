@@ -11,7 +11,7 @@
 #include "trajectories/trajectory.hpp"
 #include "trajectories/trajectoryPosition.hpp"
 #include "trajectories/trajectoryPositionOrientation.hpp"
-#include "trajectories/discrete/patchyDimer.hpp"
+#include "trajectories/discrete/patchyDimerTrajectory.hpp"
 #include "trajectories/discrete/patchyProteinTrajectory.hpp"
 
 namespace msmrd {

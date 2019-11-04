@@ -19,12 +19,12 @@ namespace msmrd {
      * bound states arise from from the four possible ways to bind through the patches combined
      * with two stable relative orientations. Used as a first toy example model to implement MSM/RD.
      * Use with patchyParticleAngular potential with numAngularMinima = 2. */
-    class patchyDimer : public discreteTrajectory<8> {
+    class patchyDimerTrajectory : public discreteTrajectory<8> {
     public:
 
-        patchyDimer(unsigned long Nparticles, int bufferSize);
+        patchyDimerTrajectory(unsigned long Nparticles, int bufferSize);
 
-        patchyDimer(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
+        patchyDimerTrajectory(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
 
         void setBoundStates() override;
 
@@ -35,12 +35,12 @@ namespace msmrd {
      * but with only one stable relative orientation between the particles. Used to construct
      * the base MSM model for the pentamer formation. Use with patchyParticleAngular potential
      * with numAngularMinima = 1. */
-    class patchyDimer2 : public discreteTrajectory<4> {
+    class patchyDimerTrajectory2 : public discreteTrajectory<4> {
     public:
 
-        patchyDimer2(unsigned long Nparticles, int bufferSize);
+        patchyDimerTrajectory2(unsigned long Nparticles, int bufferSize);
 
-        patchyDimer2(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
+        patchyDimerTrajectory2(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
 
         void setBoundStates() override;
 

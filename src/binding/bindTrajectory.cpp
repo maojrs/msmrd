@@ -1,7 +1,7 @@
 #include "binding.hpp"
 #include "trajectories/trajectoryPosition.hpp"
 #include "trajectories/trajectoryPositionOrientation.hpp"
-#include "trajectories/discrete/patchyDimer.hpp"
+#include "trajectories/discrete/patchyDimerTrajectory.hpp"
 #include "trajectories/discrete/patchyProteinTrajectory.hpp"
 
 
@@ -31,38 +31,38 @@ namespace msmrd {
 
         /* Not defined as child class since parent class is a virtual template, so need to add all functions
          * from parent classes manually (all the way to the original trajectory.hpp parent)*/
-        py::class_<patchyDimer>(m, "patchyDimer", "discrete trajectory of patchy dimer"
+        py::class_<patchyDimerTrajectory>(m, "patchyDimer", "discrete trajectory of patchy dimer"
                                                   "example(#particles or #pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
                 .def(py::init<int &, int &, double &, double &>())
-                .def("setBoundary", &patchyDimer::setBoundary)
-                .def("sample", &patchyDimer::sample)
-                .def("sampleRelative", &patchyDimer::sampleRelative)
-                .def("write2file", &patchyDimer::write2file<double>)
-                .def("emptyBuffer", &patchyDimer::emptyBuffer)
-                .def("sampleDiscreteTrajectory", &patchyDimer::sampleDiscreteTrajectory)
-                .def("getState", &patchyDimer::getState)
-                .def("discretizeTrajectory", &patchyDimer::discretizeTrajectory)
-                .def("discretizeTrajectoryH5", &patchyDimer::discretizeTrajectoryH5)
-                .def("write2H5file", &patchyDimer::write2H5file<double, 8>)
-                .def("writeChunk2H5file", &patchyDimer::writeChunk2H5file<double, 8>);
+                .def("setBoundary", &patchyDimerTrajectory::setBoundary)
+                .def("sample", &patchyDimerTrajectory::sample)
+                .def("sampleRelative", &patchyDimerTrajectory::sampleRelative)
+                .def("write2file", &patchyDimerTrajectory::write2file<double>)
+                .def("emptyBuffer", &patchyDimerTrajectory::emptyBuffer)
+                .def("sampleDiscreteTrajectory", &patchyDimerTrajectory::sampleDiscreteTrajectory)
+                .def("getState", &patchyDimerTrajectory::getState)
+                .def("discretizeTrajectory", &patchyDimerTrajectory::discretizeTrajectory)
+                .def("discretizeTrajectoryH5", &patchyDimerTrajectory::discretizeTrajectoryH5)
+                .def("write2H5file", &patchyDimerTrajectory::write2H5file<double, 8>)
+                .def("writeChunk2H5file", &patchyDimerTrajectory::writeChunk2H5file<double, 8>);
 
         // Not defined as child class since prent class is a virtual template
-        py::class_<patchyDimer2>(m, "patchyDimer2", "discrete trajectory of patchy dimer 2"
+        py::class_<patchyDimerTrajectory2>(m, "patchyDimer2", "discrete trajectory of patchy dimer 2"
                                                   "example(#particles or #pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
                 .def(py::init<int &, int &, double &, double &>())
-                .def("setBoundary", &patchyDimer2::setBoundary)
-                .def("sample", &patchyDimer2::sample)
-                .def("sampleRelative", &patchyDimer2::sampleRelative)
-                .def("write2file", &patchyDimer2::write2file<double>)
-                .def("emptyBuffer", &patchyDimer2::emptyBuffer)
-                .def("sampleDiscreteTrajectory", &patchyDimer2::sampleDiscreteTrajectory)
-                .def("getState", &patchyDimer2::getState)
-                .def("discretizeTrajectory", &patchyDimer2::discretizeTrajectory)
-                .def("discretizeTrajectoryH5", &patchyDimer2::discretizeTrajectoryH5)
-                .def("write2H5file", &patchyDimer2::write2H5file<double, 8>)
-                .def("writeChunk2H5file", &patchyDimer2::writeChunk2H5file<double, 8>);
+                .def("setBoundary", &patchyDimerTrajectory2::setBoundary)
+                .def("sample", &patchyDimerTrajectory2::sample)
+                .def("sampleRelative", &patchyDimerTrajectory2::sampleRelative)
+                .def("write2file", &patchyDimerTrajectory2::write2file<double>)
+                .def("emptyBuffer", &patchyDimerTrajectory2::emptyBuffer)
+                .def("sampleDiscreteTrajectory", &patchyDimerTrajectory2::sampleDiscreteTrajectory)
+                .def("getState", &patchyDimerTrajectory2::getState)
+                .def("discretizeTrajectory", &patchyDimerTrajectory2::discretizeTrajectory)
+                .def("discretizeTrajectoryH5", &patchyDimerTrajectory2::discretizeTrajectoryH5)
+                .def("write2H5file", &patchyDimerTrajectory2::write2H5file<double, 8>)
+                .def("writeChunk2H5file", &patchyDimerTrajectory2::writeChunk2H5file<double, 8>);
 
 
         /* Not defined as child class since parent class is a virtual template, so need to add all functions

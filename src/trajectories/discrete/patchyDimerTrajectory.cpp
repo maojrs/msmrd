@@ -1,7 +1,7 @@
 //
 // Created by maojrs on 1/22/19.
 //
-#include "trajectories/discrete/patchyDimer.hpp"
+#include "trajectories/discrete/patchyDimerTrajectory.hpp"
 
 namespace msmrd {
 
@@ -17,7 +17,7 @@ namespace msmrd {
      * with two stable angular configurations. Use with patchyParticleAngular potential with numAngularMinima = 2
      */
 
-    patchyDimer::patchyDimer(unsigned long Nparticles, int bufferSize) :
+    patchyDimerTrajectory::patchyDimerTrajectory(unsigned long Nparticles, int bufferSize) :
     discreteTrajectory(Nparticles, bufferSize) {
 
         setRadialBounds(1.25, 2.25);
@@ -32,7 +32,7 @@ namespace msmrd {
         setBoundStates();
     };
 
-    patchyDimer::patchyDimer(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound) :
+    patchyDimerTrajectory::patchyDimerTrajectory(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound) :
         discreteTrajectory(Nparticles, bufferSize, rLowerBound, rUpperBound) {
 
         setRadialBounds(rLowerBound, rUpperBound);
@@ -53,7 +53,7 @@ namespace msmrd {
      * each with two patches an angle angleDiff away with two stable relative orientations). The centers of the
      * metastable regions are given by a tuple of relative position and relative orientation. The size of the
      * regions are determined by tolerancePosition and toleranceOrientation*/
-    void patchyDimer::setBoundStates() {
+    void patchyDimerTrajectory::setBoundStates() {
         double angleDiff = 3 * M_PI / 5; // angle difference to form a pentamer
         /* Define relative position vectors from particle 1 at the origin. These two patches
          * point in the same direction as the two patches in the dimer. */
@@ -97,7 +97,7 @@ namespace msmrd {
      * potential with numAngularMinima = 2
      */
 
-    patchyDimer2::patchyDimer2(unsigned long Nparticles, int bufferSize) :
+    patchyDimerTrajectory2::patchyDimerTrajectory2(unsigned long Nparticles, int bufferSize) :
             discreteTrajectory(Nparticles, bufferSize) {
 
         setRadialBounds(1.25, 2.25);
@@ -113,7 +113,7 @@ namespace msmrd {
 
     };
 
-    patchyDimer2::patchyDimer2(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound) :
+    patchyDimerTrajectory2::patchyDimerTrajectory2(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound) :
             discreteTrajectory(Nparticles, bufferSize, rLowerBound, rUpperBound) {
 
         setRadialBounds(rLowerBound, rUpperBound);
@@ -133,7 +133,7 @@ namespace msmrd {
      * each with two patches an angle angleDiff away and with one stable relative orientation). The centers of
      * the metastable regions are given by a tuple of relative position and relative orientation. The size of
      * the regions are determined by tolerancePosition and toleranceOrientation*/
-    void patchyDimer2::setBoundStates() {
+    void patchyDimerTrajectory2::setBoundStates() {
         double angleDiff = 3 * M_PI / 5; // angle difference to form a pentamer
         /* Define relative position vectors from particle 1 at the origin. These two patches
          * point in the same direction as the two patches in the dimer. */
