@@ -4,46 +4,29 @@
 
 #pragma once
 #include <memory>
-#include "trajectories/trajectoryPositionOrientation.hpp"
+#include "trajectories/discrete/discreteTrajectory.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
 #include "tools.hpp"
 
 namespace msmrd {
     /**
-     * Trajectory class for patchy protein trajectories. Patchy protein here refers to two
-     * patchy particles each with a different number of patches. The main difference with the general class
-     * trajectoryPositionOrientation is that this class can sample the discrete trajectory that is
-     * specific for the patchy protein application. In short words,  it chooses how to discretize the full
-     * trajectory of two particles into a discretized trajectory to be analyzed and extracted into
-     * a Markov state model.
-     *
-     * Patchy protein will have one unbound state (0), two (or more) bound states (1,2) and
-     * Note in the current indexing implementation only up to 9 bound states are supported.
+     * Trajectory classes for patchy protein trajectories. Patchy protein here refers to two
+     * patchy particles each with a different number of patches. Patches can be of different types,
+     * and molecules conformations can be modeled by activating/deactivating patches. These classes sample the
+     * discrete trajectory, eahc one specific for a given patchy protein application. They just need to specify
+     * how to discretize the full trajectory by setting the bound states of the two particles.
      */
-    class patchyProtein : public trajectoryPositionOrientation {
-    private:
-        std::vector<quaternion<double>> rotMetastableStates;
-        std::unique_ptr<positionOrientationPartition> positionOrientationPart;
-        double tolerance = 0.15;
-        int prevsample = 0;
-        /*
-         * @param rotMetastableStates[X] correspond to the list of relative rotations that correspond to a
-         * metastable state/region X. Each rotation is represented by a quaternion.
-         * @param positionOrientationPart pointer to partition class to discretize relative position and orientation.
-         * @param tolerance is the maximum distance away from metastable state to still be considered metastable.
-         * @param prevsample keeps calue of previous sample when sampling discrete trajectory, useful for
-         * coreMSM approach
-         */
+
+     /* Patchy protein implementation with one unbound state (0) and 6 bound states (1,2,3,4,5,6).
+     * Note in the current indexing implementation only up to 9 bound states are supported. */
+    class patchyProtein : public discreteTrajectory<6> {
     public:
 
+        patchyProtein(unsigned long Nparticles, int bufferSize);
 
-        patchyProtein(unsigned long Nparticles, int bufferSize,
-                      double relativeDistanceCutOff, int numSphericalSectionsPos,
-                      int numRadialSectionsQuat, int numSphericalSectionsQuat);
+        patchyProtein(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
 
-        void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override;
-
-        void setMetastableRegions();
+        void setBoundStates() override;
 
     };
 
