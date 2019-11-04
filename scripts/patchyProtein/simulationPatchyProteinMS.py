@@ -39,8 +39,7 @@ patchesCoordinates1 = [np.array([1.,0.,0.]), np.array([0.,1.,0.]), np.array([0.,
 patchesCoordinates2 = [np.array([1.,0.,0.])]
 
 
-
-# Define simulaion boundaries parameters (choose either spherical or box)
+# Define simulation boundaries parameters (choose either spherical or box)
 boxsize = 5
 boundaryType = 'periodic'
 
@@ -60,19 +59,15 @@ except OSError as error:
     if proceed != 'y':
         sys.exit()
 
-# Create parameter dictionary to write to parameters reference file
+# Provides base filename (folder must exist (and preferably empty), otherwise H5 might fail)
+basefilename = os.path.join(filedirectory, "simPatchyProtein")
+
+# Create parameter dictionary and writes parameters to reference file
 parameterfilename = os.path.join(filedirectory, "parameters")
 parameterDictionary = {'numFiles' : numSimulations, 'numParticles' : Nparticles, 'dt' : dt, 'bodytype' : bodytype,
                        'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype,
                        'boxsize' : boxsize, 'boundaryType' : boundaryType, 'potentialStrength' : strength}
 analysisTools.writeParameters(parameterfilename, parameterDictionary)
-
-
-# Provides base filename (folder must exist (and preferably empty), otherwise H5 might fail)
-basefilename = os.path.join(filedirectory, "simPatchyProtein")
-
-
-
 
 
 # Simulation wrapper for parallel runs
@@ -105,17 +100,8 @@ def runParallelSims(simnumber):
 
 
     # Define particle list
-    #particleList = particleTools.randomParticleMSList(Nparticles, boxsize, separationDistance, particleTypes,
-    #                                              unboundMSMlist, seed)
-    p1type = 0
-    p2type = 0
-    p1state = 0
-    p2state = 1
-    positions = [np.array([1.,0,0]), np.array([-1.,0.,0.])]
-    orientations = [ np.array([1.,0.,0.,0.]), np.array([np.cos(np.pi/2),0.,0.,np.sin(np.pi/2)])]
-    part1 = msmrd2.particle(p1type, p1state, D0list[p1state], Drot0list[p1state], positions[0], orientations[0])
-    part2 = msmrd2.particle(p2type, p2state, D1list[p2state], Drot1list[p2state], positions[1], orientations[1])
-    particleList = msmrd2.integrators.particleList([part1, part2])
+    particleList = particleTools.randomParticleMSList(Nparticles, boxsize, separationDistance, particleTypes,
+                                                 unboundMSMlist, seed)
 
     # Defines patchy protein potential
     potentialPatchyProteinMS = patchyProteinMarkovSwitch(sigma, strength, patchesCoordinates1, patchesCoordinates2)
