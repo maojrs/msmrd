@@ -3,8 +3,10 @@
 //
 
 #include <catch2/catch.hpp>
+#include "randomgen.hpp"
 #include "potentials/gayBerne.hpp"
 #include "potentials/patchyParticle.hpp"
+#include "potentials/patchyProteinMarkovSwitch.hpp"
 
 using namespace msmrd;
 
@@ -52,3 +54,69 @@ TEST_CASE("Pair Potentials consistency", "[potentials]") {
     REQUIRE(forctorq1[1] == forctorq2[3]);
     REQUIRE(forctorq2[1] == forctorq1[3]);
 }
+
+TEST_CASE("patchyProteinMS potential: test calculatePlanes function", "[potentials]") {
+    // Define patchy protein potential
+    std::vector<vec3<double>> patchesCoordinatesA(6);
+    std::vector<vec3<double>> patchesCoordinatesB(1);
+    patchesCoordinatesA[0] = vec3<double> (1.,0.,0.);
+    patchesCoordinatesA[1] = vec3<double> (0.,1.,0.);
+    patchesCoordinatesA[2] = vec3<double> (0.,0.,1.);
+    patchesCoordinatesA[3] = vec3<double> (-1.,0.,0.);
+    patchesCoordinatesA[4] = vec3<double> (0.,-1.,0.);
+    patchesCoordinatesA[5] = vec3<double> (0.,0.,-1.);
+    patchesCoordinatesB[0] = vec3<double> (1.,0.,0.);
+    double sigma = 1.0;
+    double strength = 1.0;
+    auto potentialPPMS = patchyProteinMarkovSwitch(sigma, strength, strength, patchesCoordinatesA, patchesCoordinatesB);
+    // Define relative positions and orientations
+    std::vector<vec3<double>> relativePositions(6);
+    std::vector<vec3<double>> relativeOrientations(6);
+    relativePositions[0] = {1., 0., 0.};
+    relativePositions[1] = {0., 1., 0.};
+    relativePositions[2] = {0., 0., 1.};
+    relativePositions[3] = {-1., 0., 0.};
+    relativePositions[4] = {0., -1., 0.};
+    relativePositions[5] = {0., 0., -1.};
+    relativeOrientations[0] = {0.0, 0.0, M_PI};
+    relativeOrientations[1] = {0.0, 0.0, -M_PI / 2.0};
+    relativeOrientations[2] = {0.0, M_PI / 2.0, 0.0};
+    relativeOrientations[3] = {0.0, 0.0, 0.0};
+    relativeOrientations[4] = {0.0, 0.0, M_PI / 2.0};
+    relativeOrientations[5] = {0.0, -M_PI / 2.0, 0.0};
+    // Define particles variables
+    vec3<double> pos1;
+    vec3<double> pos2;
+    quaternion<double> th1;
+    quaternion<double> th2;
+    // Check output planes are the same if orientation is exact
+    for (int i = 0; i<6; i++) {
+        pos1 = vec3<double>(0.,0.,0.);
+        pos2 = relativePositions[i];
+        th1 = quaternion<double>(1., 0., 0., 0.);
+        th2 = msmrdtools::axisangle2quaternion(relativeOrientations[i]);
+        auto part1 = particle(0, 0, 1.0, 1.0, pos1, th1);
+        auto part2 = particle(0, 0, 1.0, 1.0, pos2, th2);
+        auto planes = potentialPPMS.calculatePlanes(part1, part2, patchesCoordinatesA, patchesCoordinatesB);
+        auto plane1 = std::get<0>(planes);
+        auto plane2 = std::get<1>(planes);
+        REQUIRE((plane1 - plane2).norm() <= 1E-10);
+        }
+    // Check output planes are close if orientation is not exact
+    randomgen randg = randomgen();
+    for (int k = 0; k <1000; k++) {
+        for (int i = 0; i < 6; i++) {
+            pos1 = vec3<double>(0., 0., 0.) + randg.normal3D(0, 0.01);
+            pos2 = relativePositions[i];
+            th1 = quaternion<double>(1., 0., 0., 0.);
+            th2 = msmrdtools::axisangle2quaternion(relativeOrientations[i] + randg.normal3D(0, 0.01));
+            auto part1 = particle(0, 0, 1.0, 1.0, pos1, th1);
+            auto part2 = particle(0, 0, 1.0, 1.0, pos2, th2);
+            auto planes = potentialPPMS.calculatePlanes(part1, part2, patchesCoordinatesA, patchesCoordinatesB);
+            auto plane1 = std::get<0>(planes);
+            auto plane2 = std::get<1>(planes);
+            REQUIRE((plane1 - plane2).norm() <= 0.1);
+        }
+    }
+}
+
