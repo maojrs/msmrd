@@ -56,7 +56,7 @@ namespace msmrd {
             msmtype = "discrete-time";
         };
 
-        void integrate(std::vector<particle> &parts);
+        void integrate(std::vector<particle> &parts) override;
     };
 
 }

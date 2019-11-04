@@ -70,7 +70,7 @@ namespace msmrd {
 
 
         // Redefine integrate function
-        void integrate(std::vector<particle> &parts);
+        void integrate(std::vector<particle> &parts) override;
 
 
         // Auxiliary functions for main MSM/RD functions

@@ -103,7 +103,7 @@ namespace msmrd {
         integrator(double dt, long seed, std::string particlesbodytype);
 
         // Main public functions definitions
-        void integrate(std::vector<particle> &parts);
+        virtual void integrate(std::vector<particle> &parts);
 
         vec3<double> calculateRelativePosition(vec3<double> p1, vec3<double> p2);
 

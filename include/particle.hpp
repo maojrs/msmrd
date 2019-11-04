@@ -90,10 +90,10 @@ namespace msmrd {
 
         /* Constructors of particle with Markovian switching activated. Receive input from vec3/quaternion or
          * std::vector and numpy arrays (through pybind) */
-        particle(int type0, int state, double D, double Drot, vec3<double> position,
+        particle(int type, int state, double D, double Drot, vec3<double> position,
                  quaternion<double> orientation);
 
-        particle(int type0, int state, double D, double Drot, std::vector<double> &position,
+        particle(int type, int state, double D, double Drot, std::vector<double> &position,
                  std::vector<double> &orientation);
 
         /* The functions below of the particle class are used by c++ and python,

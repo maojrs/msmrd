@@ -4,11 +4,6 @@
 
 //#include <random>
 #include "simulation.hpp"
-#include <memory>
-#include "trajectories/trajectory.hpp"
-#include "trajectories/trajectoryPosition.hpp"
-#include "trajectories/trajectoryPositionOrientation.hpp"
-#include "trajectories/discrete/patchyDimer.hpp"
 
 
 
@@ -39,6 +34,10 @@ namespace msmrd {
         if (trajtype == "patchyDimer") {
             outputDiscreteTraj = true;
             traj = std::make_unique<patchyDimer>(particleList.size(), bufferSize);
+            numcols = 8;
+        } else if (trajtype == "patchyProtein"){
+            outputDiscreteTraj = true;
+            traj = std::make_unique<patchyProteinTrajectory>(particleList.size(), bufferSize);
             numcols = 8;
         } else if (trajtype == "position"){
             traj = std::make_unique<trajectoryPosition>(particleList.size(), bufferSize);

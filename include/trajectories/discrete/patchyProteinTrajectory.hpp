@@ -17,14 +17,13 @@ namespace msmrd {
      * how to discretize the full trajectory by setting the bound states of the two particles.
      */
 
-     /* Patchy protein implementation with one unbound state (0) and 6 bound states (1,2,3,4,5,6).
-     * Note in the current indexing implementation only up to 9 bound states are supported. */
-    class patchyProtein : public discreteTrajectory<6> {
+     /* Patchy protein implementation with one unbound state (0) and 6 bound states (1,2,3,4,5,6) */
+    class patchyProteinTrajectory : public discreteTrajectory<6> {
     public:
 
-        patchyProtein(unsigned long Nparticles, int bufferSize);
+        patchyProteinTrajectory(unsigned long Nparticles, int bufferSize);
 
-        patchyProtein(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
+        patchyProteinTrajectory(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
 
         void setBoundStates() override;
 

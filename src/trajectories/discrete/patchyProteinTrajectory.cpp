@@ -2,7 +2,7 @@
 // Created by maojrs on 4/8/19.
 //
 
-#include "trajectories/discrete/patchyProtein.hpp"
+#include "trajectories/discrete/patchyProteinTrajectory.hpp"
 
 namespace msmrd {
 
@@ -12,7 +12,7 @@ namespace msmrd {
      * call setBoundStates in constructors of childs of discreteTrajectory.
      */
 
-    patchyProtein::patchyProtein(unsigned long Nparticles, int bufferSize) :
+    patchyProteinTrajectory::patchyProteinTrajectory(unsigned long Nparticles, int bufferSize) :
             discreteTrajectory(Nparticles, bufferSize) {
 
         setRadialBounds(1.25, 2.25);
@@ -27,7 +27,8 @@ namespace msmrd {
         setBoundStates();
     };
 
-    patchyProtein::patchyProtein(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound) :
+    patchyProteinTrajectory::patchyProteinTrajectory(unsigned long Nparticles, int bufferSize,
+                                                     double rLowerBound, double rUpperBound) :
             discreteTrajectory(Nparticles, bufferSize, rLowerBound, rUpperBound) {
 
         setRadialBounds(rLowerBound, rUpperBound);
@@ -47,16 +48,17 @@ namespace msmrd {
     * each with two patches an angle angleDiff away with two stable relative orientations). The centers of the
     * metastable regions are given by a tuple of relative position and relative orientation. The size of the
     * regions are determined by tolerancePosition and toleranceOrientation*/
-    void patchyProtein::setBoundStates() {
+    void patchyProteinTrajectory::setBoundStates() {
         double angleDiff = 3 * M_PI / 5; // angle difference to form a pentamer
         /* Define relative position vectors from particle 1 at the origin. These two patches
          * point in the same direction as the two patches in the dimer. */
-        vec3<double> relPos1 = {1., 0., 0.};
-        vec3<double> relPos2 = {0., 1., 0.};
-        vec3<double> relPos3 = {0., 0., 1.};
-        vec3<double> relPos4 = {-1., 0., 0.};
-        vec3<double> relPos5 = {0., -1., 0.};
-        vec3<double> relPos6 = {0., 0., -1.};
+        std::array<vec3<double>, 6> relPos;
+        relPos[0] = {1., 0., 0.};
+        relPos[1] = {0., 1., 0.};
+        relPos[2] = {0., 0., 1.};
+        relPos[3] = {-1., 0., 0.};
+        relPos[4] = {0., -1., 0.};
+        relPos[5] = {0., 0., -1.};
         /* Relative rotations (from particle 1) of particle 2 that yield the 6 bound states
          * in the axis-angle representation. (One needs to make drawing to understand)*/
         std::array<vec3<double>, 6> rotations;
@@ -72,12 +74,12 @@ namespace msmrd {
             quatRotations[i] = msmrdtools::axisangle2quaternion(rotations[i]);
         }
         // Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
-        boundStates[0] = std::make_tuple(relPos1, quatRotations[0]);
-        boundStates[1] = std::make_tuple(relPos2, quatRotations[1]);
-        boundStates[2] = std::make_tuple(relPos3, quatRotations[2]);
-        boundStates[3] = std::make_tuple(relPos4, quatRotations[3]);
-        boundStates[4] = std::make_tuple(relPos5, quatRotations[4]);
-        boundStates[5] = std::make_tuple(relPos6, quatRotations[5]);
+        boundStates[0] = std::make_tuple(relPos[0], quatRotations[0]);
+        boundStates[1] = std::make_tuple(relPos[1], quatRotations[1]);
+        boundStates[2] = std::make_tuple(relPos[2], quatRotations[2]);
+        boundStates[3] = std::make_tuple(relPos[3], quatRotations[3]);
+        boundStates[4] = std::make_tuple(relPos[4], quatRotations[4]);
+        boundStates[5] = std::make_tuple(relPos[5], quatRotations[5]);
     }
 
 

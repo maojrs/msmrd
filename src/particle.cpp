@@ -35,16 +35,24 @@ namespace msmrd {
 
     /* Constructors of particles with Markovian switch: receive input from vec3/quaternion or std::vector and
      * numpy arrays (through pybind) */
-    particle::particle(int type0, int state, double D, double Drot, vec3<double> position,
+    particle::particle(int type, int state, double D, double Drot, vec3<double> position,
                        quaternion<double> orientation)
-            : state(state), D(D), Drot(Drot), position(position), orientation(orientation) {
-        type = type0;
+            : type(type), state(state), D(D), Drot(Drot), position(position), orientation(orientation) {
+        orientvector = vec3<double>(0., 0., 1.);
+        orientvector = msmrdtools::rotateVec(orientvector, orientation);
+        nextPosition = 1.0 * position;
+        nextOrientation = 1.0 * orientation;
+        nextOrientvector = 1.0 * orientvector;
     };
 
-    particle::particle(int type0, int state, double D, double Drot, std::vector<double> &position,
+    particle::particle(int type, int state, double D, double Drot, std::vector<double> &position,
                        std::vector<double> &orientation)
-            : state(state), D(D), Drot(Drot), position(position), orientation(orientation) {
-        type = type0;
+            : type(type), state(state), D(D), Drot(Drot), position(position), orientation(orientation) {
+        orientvector = vec3<double>(0., 0., 1.);
+        orientvector = msmrdtools::rotateVec(orientvector, orientation);
+        nextPosition = position;
+        nextOrientation = orientation;
+        nextOrientvector = 1.0 * orientvector;
     };
 
 

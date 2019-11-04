@@ -2,6 +2,7 @@
 #include "trajectories/trajectoryPosition.hpp"
 #include "trajectories/trajectoryPositionOrientation.hpp"
 #include "trajectories/discrete/patchyDimer.hpp"
+#include "trajectories/discrete/patchyProteinTrajectory.hpp"
 
 
 
@@ -62,6 +63,25 @@ namespace msmrd {
                 .def("discretizeTrajectoryH5", &patchyDimer2::discretizeTrajectoryH5)
                 .def("write2H5file", &patchyDimer2::write2H5file<double, 8>)
                 .def("writeChunk2H5file", &patchyDimer2::writeChunk2H5file<double, 8>);
+
+
+        /* Not defined as child class since parent class is a virtual template, so need to add all functions
+         * from parent classes manually (all the way to the original trajectory.hpp parent)*/
+        py::class_<patchyProteinTrajectory>(m, "patchyProteinTrajectory", "discrete trajectory of patchy protein"
+                                                  "example(#particles or #pairs of particles, approx size)")
+                .def(py::init<int &, int &>())
+                .def(py::init<int &, int &, double &, double &>())
+                .def("setBoundary", &patchyProteinTrajectory::setBoundary)
+                .def("sample", &patchyProteinTrajectory::sample)
+                .def("sampleRelative", &patchyProteinTrajectory::sampleRelative)
+                .def("write2file", &patchyProteinTrajectory::write2file<double>)
+                .def("emptyBuffer", &patchyProteinTrajectory::emptyBuffer)
+                .def("sampleDiscreteTrajectory", &patchyProteinTrajectory::sampleDiscreteTrajectory)
+                .def("getState", &patchyProteinTrajectory::getState)
+                .def("discretizeTrajectory", &patchyProteinTrajectory::discretizeTrajectory)
+                .def("discretizeTrajectoryH5", &patchyProteinTrajectory::discretizeTrajectoryH5)
+                .def("write2H5file", &patchyProteinTrajectory::write2H5file<double, 8>)
+                .def("writeChunk2H5file", &patchyProteinTrajectory::writeChunk2H5file<double, 8>);
 
 
 

@@ -66,7 +66,7 @@ set(SOURCES
         src/trajectories/trajectoryPosition.cpp
         src/trajectories/trajectoryPositionOrientation.cpp
         src/trajectories/discrete/patchyDimer.cpp
-        src/trajectories/discrete/patchyProtein.cpp
+        src/trajectories/discrete/patchyProteinTrajectory.cpp
         )
 
 set(PY_SOURCES
@@ -121,7 +121,7 @@ set(PY_SOURCES
         include/trajectories/trajectoryPositionOrientation.hpp
         include/trajectories/discrete/discreteTrajectory.hpp
         include/trajectories/discrete/patchyDimer.hpp
-        include/trajectories/discrete/patchyProtein.hpp
+        include/trajectories/discrete/patchyProteinTrajectory.hpp
         )
 
 add_library(msmrd2core SHARED ${SOURCES})

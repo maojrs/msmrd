@@ -46,7 +46,7 @@ boundaryType = 'periodic'
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
 
 # Parent directory location
-parentDirectory = "../data/dimer/"
+parentDirectory = "../../data/dimer/"
 # parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/"
 
 # Create folder for data
