@@ -67,7 +67,7 @@ namespace msmrd {
 
         /* Not defined as child class since parent class is a virtual template, so need to add all functions
          * from parent classes manually (all the way to the original trajectory.hpp parent)*/
-        py::class_<patchyProteinTrajectory>(m, "patchyProteinTrajectory", "discrete trajectory of patchy protein"
+        py::class_<patchyProteinTrajectory>(m, "patchyProtein", "discrete trajectory of patchy protein"
                                                   "example(#particles or #pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
                 .def(py::init<int &, int &, double &, double &>())

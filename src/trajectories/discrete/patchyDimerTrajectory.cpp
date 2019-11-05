@@ -32,7 +32,8 @@ namespace msmrd {
         setBoundStates();
     };
 
-    patchyDimerTrajectory::patchyDimerTrajectory(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound) :
+    patchyDimerTrajectory::patchyDimerTrajectory(unsigned long Nparticles, int bufferSize,
+                                                 double rLowerBound, double rUpperBound) :
         discreteTrajectory(Nparticles, bufferSize, rLowerBound, rUpperBound) {
 
         setRadialBounds(rLowerBound, rUpperBound);

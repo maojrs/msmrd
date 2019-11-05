@@ -83,4 +83,21 @@ namespace msmrd {
     }
 
 
+    /* See parent function in discreteTrajectory class. In this case, it is assumed the
+     * particle2 only has two states 0 and 1. If in 0 it can bound, otherwise it returns state 0 (unbound).*/
+    void patchyProteinTrajectory::sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) {
+
+        int sample = 0;
+        // Only evaluate discrete state different than 0 if particle 2 is in state 0.
+        if (particleList[1].state == 0) {
+            // Initialize sample with value zero
+            sample = sampleDiscreteState(particleList[0], particleList[1]);
+        }
+
+        // Save previous value and push into trajectory
+        prevsample = 1*sample;
+        discreteTrajectoryData.push_back(std::vector<int>{sample});
+    };
+
+
 }
