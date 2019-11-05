@@ -78,7 +78,7 @@ namespace msmrd {
 
         void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override;
 
-        int sampleDiscreteState(particle part1, particle part2);
+        virtual int sampleDiscreteState(particle part1, particle part2);
 
         int getBoundState(vec3<double> relativePosition, quaternion<double> relativeOrientation);
 

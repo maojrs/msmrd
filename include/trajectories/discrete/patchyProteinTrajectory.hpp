@@ -27,7 +27,7 @@ namespace msmrd {
 
         void setBoundStates() override;
 
-        void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override;
+        int sampleDiscreteState(particle part1, particle part2) override;
 
     };
 

@@ -67,7 +67,7 @@ set(SOURCES
         src/trajectories/trajectoryPositionOrientation.cpp
         src/trajectories/discrete/patchyDimerTrajectory.cpp
         src/trajectories/discrete/patchyProteinTrajectory.cpp
-        )
+        include/integrators/msmrdPatchyProtein.hpp src/integrators/msmrdPatchyProtein.cpp)
 
 set(PY_SOURCES
         src/binding/binding.hpp

@@ -82,22 +82,50 @@ namespace msmrd {
         boundStates[5] = std::make_tuple(relPos[5], quatRotations[5]);
     }
 
+    /* Based on parent class discreteTrajectory function. It differs with the original since it takes
+     * the particle 2 state to choose a discrete state. It assumes particle can only bind, while particle 2
+     * is in state 0.*/
+    int patchyProteinTrajectory::sampleDiscreteState(particle part1, particle part2) {
+        // Initialize sample with value zero
+        int discreteState = 0;
 
-    /* See parent function in discreteTrajectory class. In this case, it is assumed the
-     * particle2 only has two states 0 and 1. If in 0 it can bound, otherwise it returns state 0 (unbound).*/
-    void patchyProteinTrajectory::sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) {
+        /* Calculate relative position taking into account periodic boundary measured
+         * from i to j (gets you from i to j). */
+        vec3<double> relativePosition = calculateRelativePosition(part1.position, part2.position);
 
-        int sample = 0;
-        // Only evaluate discrete state different than 0 if particle 2 is in state 0.
-        if (particleList[1].state == 0) {
-            // Initialize sample with value zero
-            sample = sampleDiscreteState(particleList[0], particleList[1]);
+        // Rotate relative position to match the reference orientation of particle 1. (VERY IMPORTANT)
+        relativePosition = msmrdtools::rotateVec(relativePosition, part1.orientation.conj());
+        quaternion<double> quatReference = {1,0,0,0}; // we can then define reference quaternion as identity.
+
+        // Calculate relative orientation (w/respect to particle 1)
+        quaternion<double> relativeOrientation;
+        //relativeOrientation = part1.orientation.conj() * part2.orientation;
+        relativeOrientation =  part2.orientation * part1.orientation.conj();
+
+
+        // Extract current state, save into sample and return sample
+        int secNum;
+        if (relativePosition.norm() < rLowerBound) {
+            // Only sample bound states if part2 is in state 0.
+            if (part2.state == 0) {
+                discreteState = getBoundState(relativePosition, relativeOrientation);
+            } else{
+                discreteState = prevsample;
+            }
+            // If sample doesn't correspond to any bound state in r<rLowerBound, assign previous state (CoreMSM)
+            if (discreteState == -1) {
+                discreteState = prevsample;
+            }
+        } else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
+            positionOrientationPart->numTotalSections;
+            // Get corresponding section numbers from spherical partition to classify its state
+            secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, quatReference);
+            // Take into account the state of particle 2 to define state numbering
+            secNum = part2.state * positionOrientationPart->numTotalSections +  secNum;
+            // Make sure bound states and transitions states correspond to different numbers
+            discreteState  = maxNumberBoundStates + secNum;
         }
-
-        // Save previous value and push into trajectory
-        prevsample = 1*sample;
-        discreteTrajectoryData.push_back(std::vector<int>{sample});
+        return discreteState;
     };
-
 
 }
