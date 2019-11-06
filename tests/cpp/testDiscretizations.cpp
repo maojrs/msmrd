@@ -235,7 +235,7 @@ TEST_CASE("position orientation partition", "[positionOrientationPartition]") {
     int numSphericalSectionsPos = 7;
     int numRadialSectionsQuat = 5;
     int numSphericalSectionsQuat = 7;
-    positionOrientationPartition* positionOrientationPart = new positionOrientationPartition(2.2,
+    auto positionOrientationPart = new positionOrientationPartition(2.2,
             numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat);
 
     int totalnumSecsQuat = numSphericalSectionsQuat*(numRadialSectionsQuat -1) + 1;
@@ -260,4 +260,6 @@ TEST_CASE("position orientation partition", "[positionOrientationPartition]") {
         REQUIRE(0 <= interval[0]);
         REQUIRE(interval[0] <= interval[1]);
     }
+    auto numTotalSecs = positionOrientationPart->numTotalSections;
+    REQUIRE(numTotalSecs == 203);
 }

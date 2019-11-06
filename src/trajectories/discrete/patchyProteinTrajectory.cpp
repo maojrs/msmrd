@@ -117,7 +117,7 @@ namespace msmrd {
             // Get corresponding section numbers from spherical partition to classify its state
             secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, quatReference);
             // Take into account the state of particle 2 to define state numbering
-            secNum = part2.state * positionOrientationPart->numTotalSections +  secNum;
+            secNum += part2.state * positionOrientationPart->numTotalSections;
             // Make sure bound states and transitions states correspond to different numbers
             discreteState  = maxNumberBoundStates + secNum;
         }

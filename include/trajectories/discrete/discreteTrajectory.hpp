@@ -133,8 +133,8 @@ namespace msmrd {
     template<int numBoundStates>
     void discreteTrajectory<numBoundStates>::sampleDiscreteTrajectory(double time,
                                                                       std::vector<particle> &particleList) {
-        // Sample discrete state.
-        int sample = sampleDiscreteState(particleList[0], particleList[1]);
+        // Sample discrete state (use "this->" to make sure it calls the virtual overriden method in child classes).
+        int sample = this->sampleDiscreteState(particleList[0], particleList[1]);
 
         // Apply coreMSM approach
         if (sample == -1) {
@@ -251,7 +251,7 @@ namespace msmrd {
             orientation2 = {part2Data[4], part2Data[5], part2Data[6], part2Data[7]};
             auto dummyParticle1 = particle(0, 0, position1, orientation1);
             auto dummyParticle2 = particle(0, 0, position2, orientation2);
-            discreteState = sampleDiscreteState(dummyParticle1, dummyParticle2);
+            discreteState = this->sampleDiscreteState(dummyParticle1, dummyParticle2);
             // If sampleDiscreteState returned -1, return previous sample (CoreMSM approach).
             if (discreteState == -1) {
                 discreteState = 1 * prevDiscreteState;
@@ -317,7 +317,7 @@ namespace msmrd {
             orientation2 = {trajectory[kk+4], trajectory[kk+5], trajectory[kk+6], trajectory[kk+7]};
             auto dummyParticle1 = particle(0, 0, position1, orientation1);
             auto dummyParticle2 = particle(0, 0, position2, orientation2);
-            discreteState = sampleDiscreteState(dummyParticle1, dummyParticle2);
+            discreteState = this->sampleDiscreteState(dummyParticle1, dummyParticle2);
             // If sampleDiscreteState returned -1, return previous value (CoreMSM approach).
             if (discreteState == -1) {
                 discreteState = 1 * prevDiscreteState;
