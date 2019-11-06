@@ -22,6 +22,19 @@ namespace msmrd{
         void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override {};
 
         void printTime();
+    };
+
+
+    /**
+     * Class to store trajectories with position, orientation and state
+     */
+    class trajectoryPositionOrientationState : public trajectoryPositionOrientation {
+    public:
+
+        using trajectoryPositionOrientation::trajectoryPositionOrientation;
+
+        void sample(double time, std::vector<particle> &particleList) override;
 
     };
+
 }

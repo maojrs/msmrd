@@ -5,7 +5,7 @@
 #include "trajectories/trajectoryPositionOrientation.hpp"
 
 namespace msmrd {
-    /**
+   /**
     *  Implementation of trajectory class to store trajectories with 3D position and
     *  orientation given by a quaternion
     */
@@ -56,6 +56,30 @@ namespace msmrd {
         std::cerr << "Number of elements: " << trajectoryData.size() << std::endl;
         for (int i=0; i<trajectoryData.size(); i++) {
             std::cerr << trajectoryData[i][0] << trajectoryData[i][1] << trajectoryData[i][2] << trajectoryData[i][3] << std::endl;
+        }
+    };
+
+
+
+    /**
+     *  Implementation of trajectory class to store trajectories with 3D position,
+     *  4D orientation and state.
+     */
+
+
+    // Override sample procedure from trajectoryPositionOrientation to include state
+    void trajectoryPositionOrientationState::sample(double time, std::vector<particle> &particleList) {
+        std::vector<double> sample(9);
+        for (int i = 0; i < particleList.size(); i++) {
+            sample[0] = time;
+            for (int k = 0; k < 3; k++) {
+                sample[k+1] = particleList[i].position[k];
+            }
+            for (int k = 0; k < 4; k++) {
+                sample[k+4] = particleList[i].orientation[k];
+            }
+            sample[8] = particleList[i].state;
+            trajectoryData.push_back(sample);
         }
     };
 
