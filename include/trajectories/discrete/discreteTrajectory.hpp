@@ -13,7 +13,7 @@
 namespace msmrd {
     /**
      * Base class to create discrete trajectories. The main difference with the general class
-     * trajectoryPositionOrientation is that this class can sample the discrete trajectory that is
+     * trajectoryPositionOrientationSsate is that this class can sample the discrete trajectory that is
      * specific for the application. In short words, it chooses how to discretize the full
      * trajectory of two particles into a discretized trajectory to be analyzed and extracted into
      * a Markov state model. In general the discretizations will follow the core MSM approach. It
@@ -23,10 +23,13 @@ namespace msmrd {
      * the max number of bound states is calculated from this value (8 bound states = 10 max
      * number bound states; 74 states = 100 max number of bound states). This is useful to start
      * the indexing of transition states from a "nice number".
+     *
+     * Note all derived classes must have a method setBoundStates called by the constructor to
+     * fill the boundStates variable below.
      */
 
     template<int numBoundStates>
-    class discreteTrajectory : public trajectoryPositionOrientation {
+    class discreteTrajectory : public trajectoryPositionOrientationState {
     protected:
         std::unique_ptr<positionOrientationPartition> positionOrientationPart;
         std::array< std::tuple<vec3<double>, quaternion<double>>, numBoundStates> boundStates{};
@@ -78,15 +81,10 @@ namespace msmrd {
 
         void sampleDiscreteTrajectory(double time, std::vector<particle> &particleList) override;
 
-        virtual int sampleDiscreteState(particle part1, particle part2);
+        virtual int sampleDiscreteState(particle part1, particle part2); // virtual since it is likely to be overriden.
 
         int getBoundState(vec3<double> relativePosition, quaternion<double> relativeOrientation);
 
-
-
-        // Virtual function that needs to be overriden by child classes
-
-        virtual void setBoundStates() = 0;
 
 
         // Functions are mostly only used when interacting with python or by pybind.
@@ -116,14 +114,15 @@ namespace msmrd {
      */
     template<int numBoundStates>
     discreteTrajectory<numBoundStates>::discreteTrajectory(unsigned long Nparticles, int bufferSize) :
-            trajectoryPositionOrientation(Nparticles, bufferSize) {
+            trajectoryPositionOrientationState(Nparticles, bufferSize) {
         discreteTrajectoryData.reserve(bufferSize);
     };
 
     template<int numBoundStates>
     discreteTrajectory<numBoundStates>::discreteTrajectory(unsigned long Nparticles, int bufferSize,
                                                            double rLowerBound, double rUpperBound) :
-            trajectoryPositionOrientation(Nparticles, bufferSize), rLowerBound(rLowerBound), rUpperBound(rUpperBound) {
+            trajectoryPositionOrientationState(Nparticles, bufferSize), rLowerBound(rLowerBound),
+            rUpperBound(rUpperBound) {
         discreteTrajectoryData.reserve(bufferSize);
     };
 
@@ -223,8 +222,8 @@ namespace msmrd {
      */
 
     /* From a given trajectory of the from (timestep, position, orientation), where repeated timesteps mean
-     * differente particles at same tieme step, obtain a discrete trajectory using the patchyDimer discretization.
-     * This is useful to load trajectories directly from python and discretize them.*/
+     * differente particles at same tieme step, obtain a discrete trajectory using a discretization given by
+     * sampleDiscreteState. This is useful to load trajectories directly from python and discretize them.*/
     template<int numBoundStates>
     std::vector<double> discreteTrajectory<numBoundStates>::discretizeTrajectory(
             std::vector<std::vector<double>> trajectory) {
@@ -238,6 +237,8 @@ namespace msmrd {
         vec3<double> position2;
         quaternion<double> orientation1;
         quaternion<double> orientation2;
+        int state1 = 0;
+        int state2 = 0;
 
         int prevDiscreteState = 0;
         int discreteState = 0;
@@ -249,8 +250,13 @@ namespace msmrd {
             position2 = {part2Data[1], part2Data[2], part2Data[3]};
             orientation1 = {part1Data[4], part1Data[5], part1Data[6], part1Data[7]};
             orientation2 = {part2Data[4], part2Data[5], part2Data[6], part2Data[7]};
-            auto dummyParticle1 = particle(0, 0, position1, orientation1);
-            auto dummyParticle2 = particle(0, 0, position2, orientation2);
+            // If state of particle is included in trajectory, load it as well. (for backward compatibility)
+            if (trajectory.size() > 8) {
+                state1 = static_cast<int>(part1Data[8]);
+                state2 = static_cast<int>(part2Data[8]);
+            }
+            auto dummyParticle1 = particle(0, state1, 0, 0, position1, orientation1);
+            auto dummyParticle2 = particle(0, state2, 0, 0, position2, orientation2);
             discreteState = this->sampleDiscreteState(dummyParticle1, dummyParticle2);
             // If sampleDiscreteState returned -1, return previous sample (CoreMSM approach).
             if (discreteState == -1) {
@@ -266,7 +272,7 @@ namespace msmrd {
 
 
     /* From a given trajectory H5 file of the from (timestep, position, orientation), where repeated timesteps mean
-     * differente particles at same tieme step, obtain a discrete trajectory using the discreteTrajectory discretization.
+     * different particles at same tieme step, obtain a discrete trajectory using the discreteTrajectory discretization.
      * This is the same as discretizeTrajectory, but loads the H5 file directly in c++ and later discretizes them.*/
     template<int numBoundStates>
     std::vector<double> discreteTrajectory<numBoundStates>::discretizeTrajectoryH5(std::string filename) {
@@ -275,6 +281,8 @@ namespace msmrd {
         vec3<double> position2;
         quaternion<double> orientation1;
         quaternion<double> orientation2;
+        int state1 = 0;
+        int state2 = 0;
 
         int prevDiscreteState = 0;
         int discreteState = 0;
@@ -315,8 +323,13 @@ namespace msmrd {
             position2 = {trajectory[kk+1], trajectory[kk+2], trajectory[kk+3]};
             orientation1 = {trajectory[jj+4], trajectory[jj+5], trajectory[jj+6], trajectory[jj+7]};
             orientation2 = {trajectory[kk+4], trajectory[kk+5], trajectory[kk+6], trajectory[kk+7]};
-            auto dummyParticle1 = particle(0, 0, position1, orientation1);
-            auto dummyParticle2 = particle(0, 0, position2, orientation2);
+            // If state of particle is included in trajectory, load it as well (for backward compatibility).
+            if (NX > 8) {
+                state1 = static_cast<int>(trajectory[jj+8]);
+                state2 = static_cast<int>(trajectory[kk+8]);
+            }
+            auto dummyParticle1 = particle(0, state1, 0, 0, position1, orientation1);
+            auto dummyParticle2 = particle(0, state2, 0, 0, position2, orientation2);
             discreteState = this->sampleDiscreteState(dummyParticle1, dummyParticle2);
             // If sampleDiscreteState returned -1, return previous value (CoreMSM approach).
             if (discreteState == -1) {

@@ -82,6 +82,7 @@ namespace msmrd {
         boundStates[5] = std::make_tuple(relPos[5], quatRotations[5]);
     }
 
+
     /* Based on parent class discreteTrajectory function. It differs with the original since it takes
      * the particle 2 state to choose a discrete state. It assumes particle can only bind, while particle 2
      * is in state 0.*/

@@ -28,6 +28,15 @@ namespace msmrd {
                 .def("writeChunk2H5file", &trajectoryPositionOrientation::writeChunk2H5file<double, 8>);
 
 
+        py::class_<trajectoryPositionOrientationState, trajectoryPositionOrientation>(m,
+                                                      "trajectoryPositionOrientationState", "position and "
+                                                      "orientation trajectory (#particles or #pairs of particles, "
+                                                      "approx size)")
+                .def(py::init<int &, int &>())
+                .def("write2H5file", &trajectoryPositionOrientation::write2H5file<double, 9>)
+                .def("writeChunk2H5file", &trajectoryPositionOrientation::writeChunk2H5file<double, 9>);
+
+
 
         /* Not defined as child class since parent class is a template with virtual fucntions, so need to
          * add all functions from parent classes manually (all the way to the original trajectory.hpp parent)*/

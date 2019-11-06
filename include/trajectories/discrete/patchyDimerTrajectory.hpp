@@ -26,7 +26,7 @@ namespace msmrd {
 
         patchyDimerTrajectory(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
 
-        void setBoundStates() override;
+        void setBoundStates();
 
     };
 
@@ -42,7 +42,7 @@ namespace msmrd {
 
         patchyDimerTrajectory2(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
 
-        void setBoundStates() override;
+        void setBoundStates();
 
     };
 
