@@ -29,8 +29,8 @@ namespace msmrd {
 
 
 
-        /* Not defined as child class since parent class is a virtual template, so need to add all functions
-         * from parent classes manually (all the way to the original trajectory.hpp parent)*/
+        /* Not defined as child class since parent class is a template with virtual fucntions, so need to
+         * add all functions from parent classes manually (all the way to the original trajectory.hpp parent)*/
         py::class_<patchyDimerTrajectory>(m, "patchyDimer", "discrete trajectory of patchy dimer"
                                                   "example(#particles or #pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
@@ -41,7 +41,7 @@ namespace msmrd {
                 .def("write2file", &patchyDimerTrajectory::write2file<double>)
                 .def("emptyBuffer", &patchyDimerTrajectory::emptyBuffer)
                 .def("sampleDiscreteTrajectory", &patchyDimerTrajectory::sampleDiscreteTrajectory)
-                .def("getState", &patchyDimerTrajectory::getState)
+                .def("sampleDiscreteState", &patchyDimerTrajectory::sampleDiscreteState)
                 .def("discretizeTrajectory", &patchyDimerTrajectory::discretizeTrajectory)
                 .def("discretizeTrajectoryH5", &patchyDimerTrajectory::discretizeTrajectoryH5)
                 .def("write2H5file", &patchyDimerTrajectory::write2H5file<double, 8>)
@@ -58,7 +58,7 @@ namespace msmrd {
                 .def("write2file", &patchyDimerTrajectory2::write2file<double>)
                 .def("emptyBuffer", &patchyDimerTrajectory2::emptyBuffer)
                 .def("sampleDiscreteTrajectory", &patchyDimerTrajectory2::sampleDiscreteTrajectory)
-                .def("getState", &patchyDimerTrajectory2::getState)
+                .def("sampleDiscreteState2", &patchyDimerTrajectory2::sampleDiscreteState)
                 .def("discretizeTrajectory", &patchyDimerTrajectory2::discretizeTrajectory)
                 .def("discretizeTrajectoryH5", &patchyDimerTrajectory2::discretizeTrajectoryH5)
                 .def("write2H5file", &patchyDimerTrajectory2::write2H5file<double, 8>)
@@ -77,7 +77,7 @@ namespace msmrd {
                 .def("write2file", &patchyProteinTrajectory::write2file<double>)
                 .def("emptyBuffer", &patchyProteinTrajectory::emptyBuffer)
                 .def("sampleDiscreteTrajectory", &patchyProteinTrajectory::sampleDiscreteTrajectory)
-                .def("getState", &patchyProteinTrajectory::getState)
+                .def("sampleDiscreteState", &patchyProteinTrajectory::sampleDiscreteState)
                 .def("discretizeTrajectory", &patchyProteinTrajectory::discretizeTrajectory)
                 .def("discretizeTrajectoryH5", &patchyProteinTrajectory::discretizeTrajectoryH5)
                 .def("write2H5file", &patchyProteinTrajectory::write2H5file<double, 8>)

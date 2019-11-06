@@ -86,7 +86,7 @@ namespace msmrd {
      * the particle 2 state to choose a discrete state. It assumes particle can only bind, while particle 2
      * is in state 0.*/
     int patchyProteinTrajectory::sampleDiscreteState(particle part1, particle part2) {
-        // Initialize sample with value zero
+        // Initialize sample with value zero (unbound state)
         int discreteState = 0;
 
         /* Calculate relative position taking into account periodic boundary measured
@@ -110,14 +110,10 @@ namespace msmrd {
             if (part2.state == 0) {
                 discreteState = getBoundState(relativePosition, relativeOrientation);
             } else{
-                discreteState = prevsample;
-            }
-            // If sample doesn't correspond to any bound state in r<rLowerBound, assign previous state (CoreMSM)
-            if (discreteState == -1) {
-                discreteState = prevsample;
+                // Returns -1 so functions in discretizeTrajectory can usbstitute with prevsample if using coreMSM.
+                discreteState = -1;
             }
         } else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
-            positionOrientationPart->numTotalSections;
             // Get corresponding section numbers from spherical partition to classify its state
             secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, quatReference);
             // Take into account the state of particle 2 to define state numbering

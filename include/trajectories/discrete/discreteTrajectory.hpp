@@ -83,6 +83,7 @@ namespace msmrd {
         int getBoundState(vec3<double> relativePosition, quaternion<double> relativeOrientation);
 
 
+
         // Virtual function that needs to be overriden by child classes
 
         virtual void setBoundStates() = 0;
@@ -94,10 +95,6 @@ namespace msmrd {
 
         // Load H5 directly and discretizes it
         std::vector<double> discretizeTrajectoryH5(std::string filename);
-
-        // Alternative to getBoundState, useful for python calculations.
-        int getState(particle part1, particle part2);
-
 
         // Setter functions so child classes can modify default values of parameters
 
@@ -136,8 +133,13 @@ namespace msmrd {
     template<int numBoundStates>
     void discreteTrajectory<numBoundStates>::sampleDiscreteTrajectory(double time,
                                                                       std::vector<particle> &particleList) {
-        // Initialize sample with value zero
+        // Sample discrete state.
         int sample = sampleDiscreteState(particleList[0], particleList[1]);
+
+        // Apply coreMSM approach
+        if (sample == -1) {
+            sample = 1*prevsample;
+        }
 
         // Save previous value and push into trajectory
         prevsample = 1*sample;
@@ -146,12 +148,14 @@ namespace msmrd {
 
 
     /* Main function to sample the discrete state of two particles. It returns the corresponding
-     * bound state, transition state or unbound state (0). In the bound region (r< rLowerBound), it uses
-     * the core MSM approach to assign a value (previous state if current state is not a bound or
-     * transition state). */
+     * bound state, transition state or unbound state (0). In the bound region (r< rLowerBound), it can
+     * also return -1 when not in any bound state. In this case, one would normally apply the coreMSM
+     * approach and choose the previous value. However, this is done directly on sampleDiscreteTrajectory or
+     * in discretizeTrajectoryH5 and discretizeTrajectory if discretizing directly a python array. This function
+     * is set a svirtual since it is likely the one that needs to be modified in child classes. */
     template<int numBoundStates>
     int discreteTrajectory<numBoundStates>::sampleDiscreteState(particle part1, particle part2) {
-        // Initialize sample with value zero
+        // Initialize sample with value zero (unbound state)
         int discreteState = 0;
 
         /* Calculate relative position taking into account periodic boundary measured
@@ -171,22 +175,25 @@ namespace msmrd {
         // Extract current state, save into sample and return sample
         int secNum;
         if (relativePosition.norm() < rLowerBound) {
+            // Returns discrete state or -1 if it is no in any bound state
             discreteState = getBoundState(relativePosition, relativeOrientation);
-            // If sample doesn't correspond to any bound state in r<rLowerBound, assign previous state (CoreMSM)
-            if (discreteState == -1) {
-                discreteState = prevsample;
-            }
-        } else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
+        }
+        // Returns a transitions state if it is in the transition region
+        else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
             // Get corresponding section numbers from spherical partition to classify its state
             secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, quatReference);
             discreteState  = maxNumberBoundStates + secNum;
         }
+        // If none of the statements before modified discreteState, it returns the unbound state (0)
         return discreteState;
     };
 
 
-    /* Given two particles, use their positions and orientations to determine if they are in one of
-     * the bound states. If not, return -1 (to later assign the value of the previous state) */
+
+
+    /* Auxiliary function used by sampleDiscreteState. Given two particles, use their positions and
+     * orientations to determine if they are in one of the bound states. If not, return -1 (the coreMSM
+     * approach can later assign the value of the previous state.) */
     template<int numBoundStates>
     int discreteTrajectory<numBoundStates>::getBoundState(vec3<double> relativePosition,
                                                           quaternion<double> relativeOrientation) {
@@ -244,8 +251,8 @@ namespace msmrd {
             orientation2 = {part2Data[4], part2Data[5], part2Data[6], part2Data[7]};
             auto dummyParticle1 = particle(0, 0, position1, orientation1);
             auto dummyParticle2 = particle(0, 0, position2, orientation2);
-            discreteState = getState(dummyParticle1, dummyParticle2);
-            // If getState returned -1, return previous (CoreMSM approach).
+            discreteState = sampleDiscreteState(dummyParticle1, dummyParticle2);
+            // If sampleDiscreteState returned -1, return previous sample (CoreMSM approach).
             if (discreteState == -1) {
                 discreteState = 1 * prevDiscreteState;
             }
@@ -310,8 +317,8 @@ namespace msmrd {
             orientation2 = {trajectory[kk+4], trajectory[kk+5], trajectory[kk+6], trajectory[kk+7]};
             auto dummyParticle1 = particle(0, 0, position1, orientation1);
             auto dummyParticle2 = particle(0, 0, position2, orientation2);
-            discreteState = getState(dummyParticle1, dummyParticle2);
-            // If getState returned -1, return previous (CoreMSM approach).
+            discreteState = sampleDiscreteState(dummyParticle1, dummyParticle2);
+            // If sampleDiscreteState returned -1, return previous value (CoreMSM approach).
             if (discreteState == -1) {
                 discreteState = 1 * prevDiscreteState;
             }
@@ -322,60 +329,6 @@ namespace msmrd {
         delete [] trajectory;
         return discreteTrajectory;
     }
-
-
-    /* Similar to getBoundState, but it returns the corresponding bound state, transition state or
-     * unbound state (0). If it returns -1, then the trajectory is below the rLowerBound, but it
-     * does not belong to any bound state; therefore, the previous state sould be assigned if computing a
-     * discrete trajectory. It is a mixture between sampleDiscreteState and getBoundState. It will
-     * specially useful for PyBind when calculating benchmarks in python interface and when using
-     * discretizeTrajectory to obtain discrete trajectories directly from python arrays.  */
-    template<int numBoundStates>
-    int discreteTrajectory<numBoundStates>::getState(particle part1, particle part2) {
-        // Calculate relative distance taking into account periodic boundary.
-        vec3<double> relativePosition = calculateRelativePosition(part1.position, part2.position);
-
-        // Rotate relative position to match the reference orientation of particle 1.
-        relativePosition = msmrdtools::rotateVec(relativePosition, part1.orientation.conj());
-        quaternion<double> quatReference = {1,0,0,0}; // we can then define reference quaternion as identity.
-
-        // Calculate relative orientation (w/respect to particle 1)
-        //quaternion<double> relativeOrientation = part1.orientation.conj() * part2.orientation;
-        quaternion<double> relativeOrientation =  part2.orientation * part1.orientation.conj();
-
-
-        // Check if it matches a bound state, if so return the corresponding state. Otherwise return -1.
-        int secNum;
-        int state;
-        vec3<double> relPosCenter;
-        quaternion<double> relQuatCenter;
-        double angleDistance;
-        // Returns bound state, -1 or transitionState if below rLowerBound region but not in any bound state
-        if (relativePosition.norm() < rLowerBound) {
-            for (int i = 0; i < boundStates.size(); i++) {
-                relPosCenter = std::get<0>(boundStates[i]);
-                relQuatCenter = std::get<1>(boundStates[i]);
-                // If in bound state, returns bound state
-                if ((relPosCenter - relativePosition).norm() <= tolerancePosition) {
-                    angleDistance = msmrdtools::quaternionAngleDistance(relQuatCenter, relativeOrientation);
-                    if (angleDistance < toleranceOrientation) {
-                        return i + 1; // returns bound state
-                    }
-                }
-            }
-            return -1; // returns -1 when not in bound state but in r<rLowerBound, so CoreMSM is later applied.
-        }
-            // Returns transition state
-        else if (relativePosition.norm() < rUpperBound) {
-            // Get corresponding section numbers from spherical partition to classify its state
-            secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, quatReference);
-            return maxNumberBoundStates + secNum;
-        }
-            // Returns unbound state
-        else {
-            return 0;
-        }
-    };
 
 
     /*
