@@ -22,6 +22,8 @@ namespace msmrd {
     public:
         using msmrdIntegrator<ctmsm>::msmrdIntegrator;
 
+        int computeCurrentTransitionState(particle &part1, particle &part2) override;
+
     };
 
 }
