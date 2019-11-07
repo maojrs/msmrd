@@ -34,24 +34,27 @@ namespace msmrd {
         if (trajtype == "patchyDimer") {
             outputDiscreteTraj = true;
             traj = std::make_unique<patchyDimerTrajectory>(particleList.size(), bufferSize);
-            numcols = 8;
+            numcols = 9; //(time, positionx3, orientationx4, state)
         } else if (trajtype == "patchyDimer2"){
             outputDiscreteTraj = true;
             traj = std::make_unique<patchyDimerTrajectory2>(particleList.size(), bufferSize);
-            numcols = 8;
+            numcols = 9; //(time, positionx3, orientationx4, state)
         } else if (trajtype == "patchyProtein"){
             outputDiscreteTraj = true;
             traj = std::make_unique<patchyProteinTrajectory>(particleList.size(), bufferSize);
-            numcols = 8;
+            numcols = 9; //(time, positionx3, orientationx4, state)
         } else if (trajtype == "position"){
             traj = std::make_unique<trajectoryPosition>(particleList.size(), bufferSize);
-            numcols = 4;
+            numcols = 4; //(time, positionx3)
         } else if (trajtype == "positionOrientation") {
             traj = std::make_unique<trajectoryPositionOrientation>(particleList.size(), bufferSize);
-            numcols = 8;
-        } else { // Otherwise use trajectoryPositionOrientation as default class
-            traj = std::make_unique<trajectoryPositionOrientation>(particleList.size(), bufferSize);
-            numcols = 8;
+            numcols = 8; //(time, positionx3, orientationx4)
+        } else if (trajtype == "positionOrientationState") {
+            traj = std::make_unique<trajectoryPositionOrientationState>(particleList.size(), bufferSize);
+            numcols = 9; //(time, positionx3, orientationx4, state)
+        } else { // Otherwise use trajectoryPositionOrientationState as default class
+            traj = std::make_unique<trajectoryPositionOrientationState>(particleList.size(), bufferSize);
+            numcols = 9; ////(time, positionx3, orientationx4, state)
         }
 
         // Set boundary in trajectory class
@@ -141,8 +144,10 @@ namespace msmrd {
             traj->createChunkedH5file<double, 4>(filename, "msmrd_data", traj->getTrajectoryData());
         } else if (numcols == 8) {
             traj->createChunkedH5file<double, 8>(filename, "msmrd_data", traj->getTrajectoryData());
-        }else {
-            throw std::range_error("Numcols needs to be 4 or 8. Custom number of columns per row "
+        } else if (numcols == 9) {
+            traj->createChunkedH5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
+        } else {
+            throw std::range_error("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
                                    "can be used but needs to be explicitly modified in "
                                    "simulation.cpp, write2H5file<numcols> ");
         }
@@ -160,8 +165,10 @@ namespace msmrd {
                 traj->writeChunk2H5file<double, 4>(filename, "msmrd_data", traj->getTrajectoryData());
             } else if (numcols == 8) {
                 traj->writeChunk2H5file<double, 8>(filename, "msmrd_data", traj->getTrajectoryData());
+            } else if (numcols == 9) {
+                traj->writeChunk2H5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
             } else {
-                throw std::range_error("Numcols needs to be 4 or 8. Custom number of columns per row "
+                throw std::range_error("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
                                        "can be used but needs to be explicitly modified in "
                                        "simulation.cpp, write2H5file<numcols> ");
             }
@@ -175,8 +182,10 @@ namespace msmrd {
                 traj->write2H5file<double, 4>(filename, "msmrd_data", traj->getTrajectoryData());
             } else if (numcols == 8) {
                 traj->write2H5file<double, 8>(filename, "msmrd_data", traj->getTrajectoryData());
+            } else if (numcols == 9) {
+                traj->write2H5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
             } else {
-                throw std::range_error("Numcols needs to be 4 or 8. Custom number of columns per row "
+                throw std::range_error("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
                                        "can be used but needs to be explicitly modified in "
                                        "simulation.cpp, write2H5file<numcols> ");
             }
