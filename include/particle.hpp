@@ -57,7 +57,7 @@ namespace msmrd {
          * @param nextOrientation saves next orientation quaternions for integrator to update
          *
          * Next variables only for Markovian switching behavior
-         * @param state particle current unbound state. If -1, then particle is in bound state.
+         * @param state particle current unbound state (begins in zero). If -1, then particle is in bound state.
          * @param nextState particle next state given and changed by the msm/ctmsm
          * @param lagtime saves the current lagtime from the MSM
          * @param tcount counts time in between MSM/CTMSM iterations

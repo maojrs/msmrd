@@ -35,6 +35,11 @@ namespace msmrd {
 //        sectionNumberingMultiplier = std::pow(10, numDigits + 1);
     };
 
+
+    /* Gets the section number in this partition given a relative position and relative orientation.
+     * Note in order to get consistent results relativePosition should be rotated by particle1.quat.conjugated(),
+     * which is passed in as quaternionReference. This is equivalent to fixing the spherical surface partition
+     * to particle1, so they rotate together. */
     int positionOrientationPartition::getSectionNumber(vec3<double> relativePosition,
                                                        quaternion<double> relativeOrientation,
                                                        quaternion<double> quaternionReference) {
@@ -52,12 +57,25 @@ namespace msmrd {
     };
 
 
+    /* Gets other two section numbers corresponding to the positionOrientationPartition section number.
+     * The function returns a tuple (secNumRelativePos, secNumRelativeQuat): the section number corresponding
+     * to the surface spherical partition, and the section number corresponding to the quaternion partition,
+     * respectively. The exact intervals can then be extracted by calling
+     * spherePartition->getAngles(secNumRelativePos) and quatPartition->getSectionIntervals(secNumRelativeQuat),
+     * as done in getSectionIntervals. */
     std::tuple<int, int> positionOrientationPartition::getSectionNumbers(int secNumber){
         int secNumRelativePos = static_cast<int>(std::ceil(1.0*secNumber/numTotalQuatSections));
         int secNumRelativeQuat = secNumber % numTotalQuatSections + 1;
         return std::make_tuple(secNumRelativePos, secNumRelativeQuat);
     };
 
+
+    /* Gets the exact intervals for all the involved partitions corresponding to a given section number. It uses
+     * the function getSectionNumbers to obtain the correspinding section numbers in the spherePartition and in
+     * the quaternionPartition and calls spherePartition->getAngles(secNumRelativePos) and
+     * quatPartition->getSectionIntervals(secNumRelativeQuat). The first two returned values in the tuple
+     * correspond to the angles intervals in the spherePartition and the next three correspond to the section
+     * intervals of the quaternion partition. */
     std::tuple<std::array<double, 2>, std::array<double, 2>,
             std::array<double, 2>, std::array<double, 2>, std::array<double, 2>>
     positionOrientationPartition::getSectionIntervals(int secNumber){
@@ -76,6 +94,12 @@ namespace msmrd {
         quaternion<double> relquaternion{relquat[0], relquat[1], relquat[2], relquat[3]};
         quaternion<double> quaternionref{qref[0], qref[1], qref[2], qref[3]};
         return getSectionNumber(relposition, relquaternion, quaternionref);
+    }
+
+    // Returns total number of sections, num radial sections and number of spherical sections (for pybind)
+    std::vector<int> positionOrientationPartition::getNumSections(){
+        return std::vector<int>{numTotalSections, numSphericalSectionsPos,
+                                numRadialSectionsQuat, numSphericalSectionsQuat};
     }
 
 

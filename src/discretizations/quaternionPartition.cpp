@@ -26,7 +26,8 @@ namespace msmrd {
         }
     };
 
-    // Obtains the section number in volumetric half sphere partition, given a coordinate within the half unit sphere.
+    /* Gets the section number in the volumetric partition of the half sphere given a coordinate
+     * inside the half unit sphere. Uses (s,x,z) as reduce coordinate */
     int quaternionPartition::getSectionNumber(quaternion<double> quatCoordinate) {
         int sectionNumber;
         double r = quatCoordinate.norm();
@@ -103,6 +104,11 @@ namespace msmrd {
     // Pybind version of getSectionNumber, uses arbitrary vectors instead of vec3.
     int quaternionPartition::getSectionNumberPyBind(std::vector<double> coord) {
         return getSectionNumber(quaternion<double>{coord[0], coord[1], coord[2], coord[3]});
+    }
+
+    // Returns total number of sections, num radial sections and number of spherical sections
+    std::vector<int> quaternionPartition::getNumSections(){
+        return std::vector<int>{numTotalSections, numRadialSections, numSphericalSections};
     }
 
 }
