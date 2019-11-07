@@ -8,7 +8,7 @@ namespace msmrd {
     // Template constructors in header
 
     /**
-     * Auxiliary functions to facilitate main fucntions readability and testing.
+     * Auxiliary functions to facilitate main functions readability and testing.
      */
 
 
@@ -39,16 +39,16 @@ namespace msmrd {
         vec3<double> relPosition;
         quaternion<double> relOrientation;
         // Extract section intervals in partition corresponding to the state.
-        std::array<double, 2> phiInterval;
-        std::array<double, 2> thetaInterval;
+        std::array<double, 2> phiInterval{};
+        std::array<double, 2> thetaInterval{};
         if (not rotation) {
             auto sections = positionPart->getAngles(state);
             phiInterval = std::get<0>(sections); //polar
             thetaInterval = std::get<1>(sections); //azimuthal
         } else {
-            std::array<double, 2> quatRadInterval;
-            std::array<double, 2> quatPhiInterval;
-            std::array<double, 2> quatThetaInterval;
+            std::array<double, 2> quatRadInterval{};
+            std::array<double, 2> quatPhiInterval{};
+            std::array<double, 2> quatThetaInterval{};
             auto sections = positionOrientationPart->getSectionIntervals(state);
             phiInterval = std::get<0>(sections); //polar
             thetaInterval = std::get<1>(sections); //azimuthal
@@ -82,29 +82,23 @@ namespace msmrd {
      * randomly and uniformly. It further returns the new state, so it can be directly used when calling this
      * function. */
     template<>
-    int msmrdIntegrator<ctmsm>::setNewUnboundState(std::vector<particle> &parts, int partIndex) {
+    int msmrdIntegrator<ctmsm>::setRandomUnboundState(std::vector<particle> &parts, int partIndex) {
         int newState = 0;
         auto partType = parts[partIndex].type;
         if (MSMlist[partType].tmatrix.size() > 1) {
             parts[partIndex].activeMSM = true;
-            newState = randg.uniformInteger(0, MSMlist[partType].tmatrix.size());
+            newState = randg.uniformInteger(0, static_cast<int>(MSMlist[partType].tmatrix.size()));
         }
         /* Set new unbound states (which also eliminates pair connections by resetting boundTo and
          * boundState to -1) and activate particles. */
         parts[partIndex].setState(newState);
         parts[partIndex].activate();
+        // Sets diffusion coefficients of new unbound state
+        auto diff = MSMlist[partType].Dlist[newState];
+        auto diffRot = MSMlist[partType].Drotlist[newState];
+        parts[partIndex].setDs(diff, diffRot);
         return newState;
     }
-
-    // Sets diffusion coefficients of particle parts[partIndex] based on the state of the unbound MSM.
-    template<>
-    void msmrdIntegrator<ctmsm>::setUnboundDiffusionCoefficients(std::vector<particle> &parts, int partIndex,
-                                                                 int state){
-        int partType = parts[partIndex].type;
-        auto diff = MSMlist[partType].Dlist[state];
-        auto diffRot = MSMlist[partType].Drotlist[state];
-        parts[partIndex].setDs(diff, diffRot);
-    };
 
 
 
@@ -255,13 +249,10 @@ namespace msmrd {
     void msmrdIntegrator<ctmsm>::transition2UnboundState(std::vector<particle> &parts, int iIndex,
                                                          int jIndex, int endStateAlt) {
 
-        // Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.
-        auto iNewState = setNewUnboundState(parts, iIndex);
-        auto jNewState = setNewUnboundState(parts, jIndex);
-
-        // Sets diffusion coefficients corresponding to the new states.
-        setUnboundDiffusionCoefficients(parts, iIndex, iNewState);
-        setUnboundDiffusionCoefficients(parts, jIndex, jNewState);
+        /* Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.
+         * It also sets the correct diffusion coefficients */
+        setRandomUnboundState(parts, iIndex);
+        setRandomUnboundState(parts, jIndex);
 
         // Redefine endstate indexing, so it is understood by the partition/discretization.
         int index0 = markovModel.getMaxNumberBoundStates();

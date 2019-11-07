@@ -73,14 +73,12 @@ namespace msmrd {
         void integrate(std::vector<particle> &parts) override;
 
 
-        // Auxiliary functions for main MSM/RD functions
+        // Auxiliary functions for main MSM/RD functions (can be set to virtual if they need to be overriden)
         void integrateDiffusion(std::vector<particle> &parts, double dt);
 
         std::tuple<vec3<double>, quaternion<double>> getRelativePositionOrientation(int state);
 
-        int setNewUnboundState(std::vector<particle> &parts, int partIndex);
-
-        void setUnboundDiffusionCoefficients(std::vector<particle> &parts, int partIndex, int state);
+        int setRandomUnboundState(std::vector<particle> &parts, int partIndex);
 
         void setDefaultDiscretization();
 

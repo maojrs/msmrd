@@ -143,12 +143,8 @@ namespace msmrd {
         int endState = endStateAlt - index0;
 
         // Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.
-        auto iNewState = setNewUnboundState(parts, iIndex);
-        auto jNewState = setNewUnboundState(parts, jIndex);
-
-        // Sets diffusion coefficients corresponding to the new states.
-        setUnboundDiffusionCoefficients(parts, iIndex, iNewState);
-        setUnboundDiffusionCoefficients(parts, jIndex, jNewState);
+        setRandomUnboundState(parts, iIndex);
+        setRandomUnboundState(parts, jIndex);
 
         // Extract relative position and orientation from partition and endstate
         auto relativePositionOrientation = getRelativePositionOrientation(endState);
