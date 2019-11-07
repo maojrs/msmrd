@@ -25,7 +25,7 @@ namespace msmrd {
 
         double uniformRange(double rmin, double rmax);
 
-        double uniformInteger(int imin, int imax);
+        int uniformInteger(int imin, int imax);
 
         double normal(double mean, double stddev);
 

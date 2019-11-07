@@ -19,6 +19,8 @@ namespace msmrd {
     };
 
 
+    /* Calculates next transition (time and next state), given an initial state using the msmrdMSM.
+     * Note it returns the state in the active set indexing (see activeSet class header)*/
     std::tuple<double, int> msmrdMarkovModel::calculateTransition(int initialState) {
         // Find index of initialState in the transition matrix
         int localState = getMSMindex(initialState);

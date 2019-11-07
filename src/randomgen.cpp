@@ -27,7 +27,7 @@ namespace msmrd {
         return uniform(mt_rand);
     };
 
-    double randomgen::uniformInteger(int imin, int imax) {
+    int randomgen::uniformInteger(int imin, int imax) {
         auto value = uniformRange(1.0*imin, 1.0*imax + 1);
         return (int) std::floor(value);
     };
