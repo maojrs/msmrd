@@ -19,8 +19,19 @@ namespace msmrd {
      * n and m states conformations of each particle.
      */
     class msmrdPatchyProtein : public msmrdIntegrator<ctmsm> {
+    private:
+
+        void setPatchyProteinDiscretization();
+
     public:
-        using msmrdIntegrator<ctmsm>::msmrdIntegrator;
+
+        msmrdPatchyProtein(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
+                        std::array<double,2> radialBound, std::vector<ctmsm> MSMlist,
+                        msmrdMSM markovModel);
+
+        msmrdPatchyProtein(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
+                        std::array<double,2> radialBound, ctmsm MSMlist, msmrdMSM markovModel);
+
 
         // Auxiliary functions
 

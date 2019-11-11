@@ -12,15 +12,20 @@ namespace msmrd {
     /*
      * pyBinders for the c++ discretizations classes
      */
+
     void bindDiscretizations(py::module &m) {
-        py::class_<spherePartition>(m, "spherePartition", "Equal area spherical partition (numSections)")
+        /* On binding of spherePartition, change default holder from unique_ptr to shared_ptr to allow msmrdIntegrator to
+         * set spherePartition as share pointer. This should also be the case for all of its child classes. */
+        py::class_<spherePartition, std::shared_ptr<spherePartition>>(m, "spherePartition", "Equal area spherical "
+                                                                                            "partition (numSections)")
                 .def(py::init<int &>())
                 .def_property_readonly("numSections", &spherePartition::getNumSections)
                 .def("getPartition", &spherePartition::getPartition)
                 .def("getSectionNumber", &spherePartition::getSectionNumberPyBind)
                 .def("getAngles", &spherePartition::getAngles);
 
-        py::class_<halfSpherePartition, spherePartition>(m, "halfSpherePartition", "Equal area partition of the"
+        py::class_<halfSpherePartition, spherePartition, std::shared_ptr<halfSpherePartition>>(m, "halfSpherePartition",
+                                                                                   "Equal area partition of the"
                                                                                    "half sphere (numSections)")
                 .def(py::init<int &>());
 
@@ -33,7 +38,11 @@ namespace msmrd {
             .def("getSectionNumber", &quaternionPartition::getSectionNumberPyBind)
             .def("getSectionIntervals", &quaternionPartition::getSectionIntervals);
 
-        py::class_<positionOrientationPartition>(m, "positionOrientationPartition", "Combines quaternion partion"
+        /* On binding of positionOrientationPartition, change default holder from unique_ptr to shared_ptr
+         * to allow msmrdIntegrator to set positionOrientationPartition as shared pointer. This should also
+         * be done for all of its child classes. */
+        py::class_<positionOrientationPartition, std::shared_ptr<positionOrientationPartition>>(m,
+                                                    "positionOrientationPartition", "Combines quaternion partion"
                                                     "with spherical partition to discretize relative position and "
                                                     "orientation quaternions (elativeDistanceCutOff, "
                                                     "numSphericalSectionsPos,numRadialSectionsQuat, "

@@ -16,6 +16,7 @@ using msm = msmrd::discreteTimeMarkovStateModel;
 using ctmsm = msmrd::continuousTimeMarkovStateModel;
 using msmrdMSM = msmrd::msmrdMarkovModel;
 
+// TODO: rewrite msmrdIntegrator test for latest implementation
 
 //TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
 //    // Create an msmrdMarkovModel for coupling (tested on testMarkovModels)

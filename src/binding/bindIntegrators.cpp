@@ -2,6 +2,8 @@
 #include "integrators/overdampedLangevin.hpp"
 #include "integrators/overdampedLangevinMarkovSwitch.hpp"
 #include "integrators/msmrdIntegrator.hpp"
+#include "discretizations/positionOrientationPartition.hpp"
+
 
 namespace msmrd {
     // Aliases for classes with long names.
@@ -30,6 +32,8 @@ namespace msmrd {
                 .def(py::init<std::vector<ctmsm> &, double &, long &, std::string &>())
                 .def("integrate", &overdampedLangevinMarkovSwitch<ctmsm>::integrate);
 
+        /* Note this binding uses method overloading, and it therefore requires to explicitly state
+         * the input arguments when fcuntions are overloaded. */
         py::class_<msmrdIntegrator<ctmsm>, overdampedLangevinMarkovSwitch<ctmsm>>(m, "msmrdIntegrator",
                                                                                   "Integrator for msmrd algorithm "
                                                                                   "(timestep, seed, particlesbodytype, "
@@ -39,11 +43,17 @@ namespace msmrd {
                                                                                   "positionOrientationPartition)")
                 .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &,
                         ctmsm &, msmrdMSM &>())
-                .def("setDiscretization", &msmrdIntegrator<ctmsm>::setDiscretization)
+                .def("setDiscretization", (void (msmrdIntegrator<ctmsm>::*)
+                        (std::shared_ptr<spherePartition>&)) &msmrdIntegrator<ctmsm>::setDiscretization,
+                        "Sets position only discretization")
+                .def("setDiscretization", (void (msmrdIntegrator<ctmsm>::*)
+                        (std::shared_ptr<positionOrientationPartition>&)) &msmrdIntegrator<ctmsm>::setDiscretization,
+                        "Sets full position orientation discretization")
                 .def("integrate", &msmrdIntegrator<ctmsm>::integrate);
 
         // Created c++ compatible particle list/vector/array of particles in python
         py::bind_vector<std::vector<particle>>(m, "particleList", py::module_local());
+
     }
 
 }

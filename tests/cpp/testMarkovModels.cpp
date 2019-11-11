@@ -12,7 +12,7 @@ using ctmsm = msmrd::continuousTimeMarkovStateModel;
 
 TEST_CASE("Fundamental CTMSM parameters and propagation test", "[ctmsm]") {
     int msmid = 0;
-    std::vector<std::vector<double>> tmatrix ={ {-5, 2, 3,}, {3, -6, 3}, {1, 3, -4} };
+    std::vector<std::vector<double>> tmatrix ={ {-5, 2, 3}, {3, -6, 3}, {1, 3, -4} };
     // sum of outgoing rates for each state (row sum without diagonal negative value)
     std::vector<double> lambda0 = {5, 6, 4};
     // cumulative sum of outgoing rates for each state

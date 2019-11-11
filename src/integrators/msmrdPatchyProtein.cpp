@@ -6,9 +6,37 @@
 
 namespace msmrd {
     /**
-     * Implementation of MSM/RD integrator for patchyProteins.
+     * Implementation of MSM/RD integrator for patchyProteins. Same constructor than msmrdIntegrator; however, it
+     * calls a new discretization.
      */
+    msmrdPatchyProtein::msmrdPatchyProtein(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
+                       std::array<double,2> radialBound, std::vector<ctmsm> MSMlist, msmrdMSM markovModel) :
+            msmrdIntegrator<ctmsm>::msmrdIntegrator(dt, seed, particlesbodytype, numParticleTypes,
+            radialBound, MSMlist, markovModel) {
+        setPatchyProteinDiscretization();
+    }
 
+    msmrdPatchyProtein::msmrdPatchyProtein(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
+                       std::array<double,2> radialBound, ctmsm MSMlist, msmrdMSM markovModel) :
+            msmrdIntegrator<ctmsm>::msmrdIntegrator(dt, seed, particlesbodytype, numParticleTypes,
+                                                    radialBound, MSMlist, markovModel){
+        setPatchyProteinDiscretization();
+    };
+
+    /* Calculates and set a new spherePartition and the positionOrientationParition of the msmrdIntegrator with
+     * local parameters corresponding to the patchyProtein implementation. */
+    void msmrdPatchyProtein::setPatchyProteinDiscretization() {
+        int numSphericalSectionsPos = 6;
+        int numRadialSectionsQuat = 4;
+        int numSphericalSectionsQuat = 6;
+        double relativeDistanceCutOff = radialBounds[1];
+
+        auto tempPositionPart = std::make_shared<spherePartition>(spherePartition(numSphericalSectionsPos));
+        auto tempPositionOrientationPart = std::make_shared<fullPartition> (fullPartition(relativeDistanceCutOff,
+                numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat));
+        setDiscretization(tempPositionPart);
+        setDiscretization(tempPositionOrientationPart);
+    };
 
     /**
      * Auxiliary functions to be overriden

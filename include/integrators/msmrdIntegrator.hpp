@@ -35,8 +35,10 @@ namespace msmrd {
     public:
         eventManager eventMgr = eventManager();
         msmrdMSM markovModel;
-        spherePartition *positionPart;
-        fullPartition *positionOrientationPart;
+        //spherePartition *positionPart;
+        //fullPartition *positionOrientationPart;
+        std::shared_ptr<spherePartition> positionPart;
+        std::shared_ptr<fullPartition> positionOrientationPart;
 
         /**
         * @param radialBounds radial lower bound and upper bound of transition region in MSM/RD scheme. It MUST
@@ -52,10 +54,11 @@ namespace msmrd {
         * @param eventManager class to manage order of events (reactions/transitions).
         * @param markovModel pointer to class msmrdMSMDiscrete, which is the markovModel class specialized for
         * the MSM/RD scheme. It controls the markov Model in the bound state and the msmrd coupling.
-        * @param positionPart pointer to spherical partition of relative distance, only used when rotation
-        * is disabled in the integrator
-        * @param positionOrientationPart pointer to full partition of relative distance and relative orientation,
-        * a.k.a positionOrientationPartition, used when rotation is enabled.
+        * @param positionPart shared pointer to spherical partition of relative distance, only used when rotation
+        * is disabled in the integrator. Needs to be shared so discretization can be set from python interface.
+        * @param positionOrientationPart shared pointer to full partition of relative distance and relative orientation,
+        * a.k.a positionOrientationPartition, used when rotation is enabled. Needs to be shared so discretization
+        * can be set from python interface.
         * @param MSMlist (see overdampedLanegvinMarkovSwitch parent class) can be either a vector of msms
         * (not yet implemented) or of ctmsms. It corresponds to the MSMs of the unbound particles (conformation
         * switching). Its size should match the number of unbound particle types in the simulation, one MSM
@@ -82,7 +85,9 @@ namespace msmrd {
 
         void setDefaultDiscretization();
 
-        void setDiscretization(fullPartition *thisFullPartition);
+        void setDiscretization(std::shared_ptr<spherePartition> &thisSpherePartition);
+
+        void setDiscretization(std::shared_ptr<fullPartition> &thisFullPartition);
 
 
         /* Main MSM/RD function. They are defined as virtual in case we want to override them in derived classes
@@ -152,16 +157,24 @@ namespace msmrd {
         int numRadialSectionsQuat = 5;
         int numSphericalSectionsQuat = 7;
         double relativeDistanceCutOff = radialBounds[1];
-        // TODO: Implement releasing memory of these pointers after use, or convert to smart pointers.
-        positionPart = new spherePartition(numSphericalSectionsPos);
-        positionOrientationPart = new fullPartition(relativeDistanceCutOff, numSphericalSectionsPos,
-                                                    numRadialSectionsQuat, numSphericalSectionsQuat);
+
+        positionPart = std::make_shared<spherePartition>(spherePartition(numSphericalSectionsPos));
+        positionOrientationPart = std::make_shared<fullPartition> (fullPartition(relativeDistanceCutOff,
+                numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat));
     }
 
-    // Sets pointer to discretization chosen (discretization taking into account rotation).
+
+    // Sets pointer to discretization chosen (discretization spherePartition, no rotation).
     template <typename templateMSM>
-    void msmrdIntegrator<templateMSM>::setDiscretization(fullPartition *thisFullPartition) {
-        delete positionOrientationPart;
+    void msmrdIntegrator<templateMSM>::setDiscretization(std::shared_ptr<spherePartition> &thisSpherePartition) {
+        positionPart.reset();
+        positionPart = thisSpherePartition;
+    }
+
+    // Sets pointer to discretization chosen (fullPartition discretization taking into account rotation).
+    template <typename templateMSM>
+    void msmrdIntegrator<templateMSM>::setDiscretization(std::shared_ptr<fullPartition> &thisFullPartition) {
+        positionOrientationPart.reset();
         positionOrientationPart = thisFullPartition;
     }
 
