@@ -22,11 +22,11 @@ namespace msmrd{
             rowsum = 0;
             for (auto &n : row) { rowsum += n; }
             if (std::abs(rowsum - 1) > tolerance) {
-                throw std::range_error("Discrete-time MSM transition matrix rows should sum to 1");
+                throw std::invalid_argument("Discrete-time MSM transition matrix rows should sum to 1");
             }
             for (const auto &element : row) {
                 if (element < 0 || element > 1) {
-                    throw std::range_error("Elements of transition matrix must be probabilities (between 0 and 1)");
+                    throw std::invalid_argument("Elements of transition matrix must be probabilities (between 0 and 1)");
                 }
             }
         }

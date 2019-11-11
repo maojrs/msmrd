@@ -32,8 +32,8 @@ namespace msmrd {
             double C = (r0 * r0) - radius * radius;
             double discriminant = B * B - 4.0 * A * C;
             if (discriminant < 0) {
-                throw std::range_error("Discriminant is zero, error in spherical reflective boundary. "
-                                       "Check all your particles are initially contained in boundary.");
+                throw std::domain_error("Discriminant is zero, error in spherical reflective boundary. "
+                                        "Check all your particles are initially contained in boundary.");
             }
             double al = (-B + std::sqrt(discriminant)) / (2.0 * A); //positive root is the correct one
             vec3<double> intersection = r0 + al * dr;

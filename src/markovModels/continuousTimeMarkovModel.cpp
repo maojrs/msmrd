@@ -25,7 +25,7 @@ namespace msmrd {
             rowsum = 0;
             for (auto &n : row) { rowsum += n; }
                 if (std::abs(rowsum) > tolerance) {
-                    throw std::range_error("Continuous-time MSM transition rate matrix rows should sum to 0");
+                    throw std::invalid_argument("Continuous-time MSM transition rate matrix rows should sum to 0");
                 }
         }
         calculateParameters();

@@ -21,13 +21,13 @@ namespace msmrd {
                          std::string trajtype) {
 
         if (outputTxt && outputChunked){
-            throw std::range_error("Output in chunks is not available with txt output. It is recommended to "
-                                   "change output to H5 in chunks and turn off txt output.");
+            throw std::invalid_argument("Output in chunks is not available with txt output. It is recommended to "
+                                        "change output to H5 in chunks and turn off txt output.");
         }
 
         if (!outputH5 && outputChunked) {
-            throw std::range_error("Output in chunks is only available with H5 output. It is recommended to "
-                                   "change to output with H5 in chunks and turn off txt ouput.");
+            throw std::invalid_argument("Output in chunks is only available with H5 output. It is recommended to "
+                                        "change to output with H5 in chunks and turn off txt ouput.");
         }
 
         // Choose correct child class of trajectory given the current type of particles
@@ -147,9 +147,9 @@ namespace msmrd {
         } else if (numcols == 9) {
             traj->createChunkedH5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
         } else {
-            throw std::range_error("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
-                                   "can be used but needs to be explicitly modified in "
-                                   "simulation.cpp, write2H5file<numcols> ");
+            throw std::invalid_argument("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
+                                        "can be used but needs to be explicitly modified in "
+                                        "simulation.cpp, write2H5file<numcols> ");
         }
     }
 
@@ -168,9 +168,9 @@ namespace msmrd {
             } else if (numcols == 9) {
                 traj->writeChunk2H5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
             } else {
-                throw std::range_error("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
-                                       "can be used but needs to be explicitly modified in "
-                                       "simulation.cpp, write2H5file<numcols> ");
+                throw std::invalid_argument("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
+                                            "can be used but needs to be explicitly modified in "
+                                            "simulation.cpp, write2H5file<numcols> ");
             }
         } else {
             // Write discrete trajectory
@@ -185,9 +185,9 @@ namespace msmrd {
             } else if (numcols == 9) {
                 traj->write2H5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
             } else {
-                throw std::range_error("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
-                                       "can be used but needs to be explicitly modified in "
-                                       "simulation.cpp, write2H5file<numcols> ");
+                throw std::invalid_argument("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
+                                            "can be used but needs to be explicitly modified in "
+                                            "simulation.cpp, write2H5file<numcols> ");
             }
         }
     }

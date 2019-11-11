@@ -130,9 +130,9 @@ namespace msmrd {
         setDefaultDiscretization();
 
         if (MSMlist.size() != numParticleTypes and MSMlist.size() != 1) {
-            std::__throw_range_error("Number of MSMs provided in MSMlist should match number of unbound particle"
-                                     "types in the simulation. If same all particles share same MSM, is enough to "
-                                     "provide one).");
+            throw std::invalid_argument("Number of MSMs provided in MSMlist should match number of unbound particle"
+                                        "types in the simulation. If same all particles share same MSM, is enough to "
+                                        "provide one).");
         }
     };
 

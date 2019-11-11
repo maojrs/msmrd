@@ -38,7 +38,7 @@ namespace msmrd {
         // Verify input 2D vector is a square matrix and fill tmatrix
         for (const auto &row : tmatrix) {
             if (tmatrix.size() != row.size()) {
-                throw std::range_error("MSM matrix must be a square matrix");
+                throw std::invalid_argument("MSM matrix must be a square matrix");
             }
         }
 

@@ -43,7 +43,7 @@ namespace msmrd {
     * to be called to fill in the diffusion coefficients. */
     void msmrdMarkovModel::setDbound(std::vector<double> &D, std::vector<double> &Drot) {
         if ( (D.size() != numBoundStates ) or (Drot.size() != numBoundStates) ) {
-            std::__throw_range_error("Vectors of diffusion coefficients must match number of bound states");
+            throw std::invalid_argument("Vectors of diffusion coefficients must match number of bound states");
         }
         Dlist = D;
         Drotlist = Drot;

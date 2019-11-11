@@ -30,7 +30,7 @@ namespace msmrd {
             rotation = true;
         }
         if (particlesbodytype != "point" && particlesbodytype != "rod" && particlesbodytype != "rigidbody") {
-            throw std::runtime_error("Unknown particles bodytype; it should be either point, rod, rigidbody");
+            throw std::invalid_argument("Unknown particles bodytype; it should be either point, rod, rigidbody");
         }
     };
 

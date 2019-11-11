@@ -32,7 +32,7 @@ namespace msmrd {
         int sectionNumber;
         double r = quatCoordinate.norm();
         if (r > 1.0005) {
-            throw std::range_error("Unit quaternion cannot be larger than one");
+            throw std::domain_error("Unit quaternion cannot be larger than one");
         }
         /* Reduce quaternion coordinate from (s,x,y,z) to (x,y,z), uses the fact
          * that rotation of q = rotation of -q */

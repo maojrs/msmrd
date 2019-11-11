@@ -35,7 +35,7 @@ namespace msmrd{ ;
 
         for (auto &patch : patchesCoordinates) {
             if (patch.norm() != 1) {
-                throw std::range_error("Patches coordinates must have norm one");
+                throw std::invalid_argument("Patches coordinates must have norm one");
             }
         }
     }

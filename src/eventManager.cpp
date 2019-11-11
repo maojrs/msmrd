@@ -15,8 +15,8 @@ namespace msmrd {
                                 int originState, int endState, std::string eventType) {
         if ((eventType != "binding") and (eventType != "unbinding") and
             (eventType != "bound2bound") and (eventType != "transition2transition") and (eventType != "empty")) {
-            std::range_error("Events can only take 'binding', 'unbinding', 'bound2bound', "
-                             "'transition2transition' or 'empty' strings as last argument");
+            throw std::invalid_argument("Events can only take 'binding', 'unbinding', 'bound2bound', "
+                                        "'transition2transition' or 'empty' strings as last argument");
         }
         // Create key and new event
         std::string eventKey = std::to_string(part1Index) + "--" + std::to_string(part2Index);

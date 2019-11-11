@@ -31,12 +31,12 @@ namespace msmrd{
         // Check pacthes coordinates have unit norm
         for (auto &patch : patchesCoordinatesA) {
             if (patch.norm() != 1) {
-                throw std::range_error("Patches coordinates must have norm one");
+                throw std::invalid_argument("Patches coordinates must have norm one");
             }
         }
         for (auto &patch : patchesCoordinatesB) {
             if (patch.norm() != 1) {
-                throw std::range_error("Patches coordinates must have norm one");
+                throw std::invalid_argument("Patches coordinates must have norm one");
             }
         }
 

@@ -34,7 +34,7 @@ namespace msmrdtools {
     template <unsigned long N>
     double stdvecNorm(std::array<double, N> a, std::array<double, N> b) {
         if (a.size() != b.size()) {
-            std::range_error(" Vectors need to be the same size to obtain a valid norm");
+            throw std::invalid_argument(" Vectors need to be the same size to obtain a valid norm");
         }
         int vecsize = a.size();
         double diff = 0;
@@ -44,7 +44,6 @@ namespace msmrdtools {
         diff = std::sqrt(diff);
         return diff;
     };
-
 
     /*
      * Useful quaternion functions definitions.
