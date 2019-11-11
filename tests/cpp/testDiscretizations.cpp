@@ -72,6 +72,19 @@ TEST_CASE("Spherical partition", "[spherePartition]") {
     REQUIRE(thetaInterval2 == std::array<double,2>{1.0471975511965976, 2.0943951023931953} );
     REQUIRE(phiInterval3 == std::array<double,2>{1.5040801783846711, 2.6192778317837444} );
     REQUIRE(thetaInterval3 == std::array<double,2>{2.6927937030769655, 3.5903916041026207} );
+
+    // Test offseting thetas in discretization
+    double offset = 0.55;
+    spherePart.offsetThetas(offset);
+    thetas = spherePart.thetas;
+    for (auto &thetaRef : thetasRef[0]) {
+        thetaRef += offset;
+    }
+    for (auto &thetaRef : thetasRef[1]) {
+        thetaRef += offset;
+    }
+    REQUIRE(msmrdtools::stdvecNorm(thetas[0], thetasRef[0]) <= 0.000001);
+    REQUIRE(msmrdtools::stdvecNorm(thetas[1], thetasRef[1]) <= 0.000001);
 }
 
 

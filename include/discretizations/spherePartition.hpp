@@ -53,7 +53,9 @@ namespace msmrd {
 
         spherePartition() = default;
 
-        explicit spherePartition(int numSections);
+        spherePartition(int numSections);
+
+        void offsetThetas(double offset);
 
         int getSectionNumber(vec3<double> coordinate);
 

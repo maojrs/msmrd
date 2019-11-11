@@ -12,7 +12,7 @@ namespace msmrd {
      */
 
 
-    /* Integrates translational and rotation diffusion for on dt step. (Calls the integrateOne fucntions
+    /* Integrates translational and rotation diffusion for on dt step. (Calls the integrateOne functions
      * of the parent classes) */
     template<>
     void msmrdIntegrator<ctmsm>::integrateDiffusion(std::vector<particle> &parts, double dt) {

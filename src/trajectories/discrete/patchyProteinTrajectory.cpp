@@ -18,12 +18,18 @@ namespace msmrd {
         setRadialBounds(1.25, 2.25);
         setTolerances(0.12, 0.12*2*M_PI);
 
-        int numSphericalSectionsPos = 7; //7; //7;
-        int numRadialSectionsQuat = 5; // 3; //5;
-        int numSphericalSectionsQuat =7; // 6; //7;
+        int numSphericalSectionsPos = 6; //7; //7;
+        int numRadialSectionsQuat = 4; // 3; //5;
+        int numSphericalSectionsQuat = 6; // 6; //7;
         positionOrientationPart = std::make_unique<positionOrientationPartition>(rUpperBound, numSphericalSectionsPos,
                                                                                  numRadialSectionsQuat,
                                                                                  numSphericalSectionsQuat);
+        // Offset thetas in discretization to match patches
+        double offTheta = M_PI/4;
+        positionOrientationPart->sphericalPartition->offsetThetas(offTheta);
+        positionOrientationPart->quatPartition->sphericalPartition->offsetThetas(offTheta);
+
+        // Set bound states defined for the patchy protein example
         setBoundStates();
     };
 
@@ -34,12 +40,18 @@ namespace msmrd {
         setRadialBounds(rLowerBound, rUpperBound);
         setTolerances(0.12, 0.12*2*M_PI);
 
-        int numSphericalSectionsPos = 7; //7; //7;
-        int numRadialSectionsQuat = 5; // 3; //5;
-        int numSphericalSectionsQuat =7; // 6; //7;
+        int numSphericalSectionsPos = 6; //7; //7;
+        int numRadialSectionsQuat = 4; // 3; //5;
+        int numSphericalSectionsQuat = 6; // 6; //7;
         positionOrientationPart = std::make_unique<positionOrientationPartition>(rUpperBound, numSphericalSectionsPos,
                                                                                  numRadialSectionsQuat,
                                                                                  numSphericalSectionsQuat);
+        // Offset thetas in discretization to match patches
+        double offTheta = M_PI/4;
+        positionOrientationPart->sphericalPartition->offsetThetas(offTheta);
+        positionOrientationPart->quatPartition->sphericalPartition->offsetThetas(offTheta);
+
+        // Set bound states defined for the patchy protein example
         setBoundStates();
     };
 
