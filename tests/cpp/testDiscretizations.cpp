@@ -72,20 +72,67 @@ TEST_CASE("Spherical partition", "[spherePartition]") {
     REQUIRE(thetaInterval2 == std::array<double,2>{1.0471975511965976, 2.0943951023931953} );
     REQUIRE(phiInterval3 == std::array<double,2>{1.5040801783846711, 2.6192778317837444} );
     REQUIRE(thetaInterval3 == std::array<double,2>{2.6927937030769655, 3.5903916041026207} );
+}
+
+TEST_CASE("Spherical partition offset", "[spherePartition]") {
+    int numSections = 6;
+    auto spherePart = spherePartition(numSections);
+    auto regionsPerCollar = spherePart.regionsPerCollar;
+    auto phis = spherePart.phis;
+    auto thetas = spherePart.thetas;
+    std::vector<int> regionsPerCollarRef{1, 4, 1};
+    std::vector<double> phisRef{0.0, 0.8410686705679302, 2.300523983021863};
+    std::vector<std::vector<double>> thetasRef;
+    thetasRef.resize(2);
+    thetasRef[0] = std::vector<double> {0.0, 1.5707963267948966, 3.141592653589793, 4.71238898038469};
+
+    // Get section number before offset
+    vec3<double> coordinateUp{0.0, 0.0, 1.0};
+    vec3<double> coordinateDown{0.0, 0.0, -1.0};
+    double th1 = M_PI/4.0;
+    vec3<double> coordinate1{std::cos(th1), std::sin(th1), 0.0};
+    int secNumUp = spherePart.getSectionNumber(coordinateUp);
+    int secNumDown = spherePart.getSectionNumber(coordinateDown);
+    int secNum1 = spherePart.getSectionNumber(coordinate1);
+    REQUIRE(secNumUp == 1);
+    REQUIRE(secNumDown == 6);
+    REQUIRE(secNum1 == 2);
+    // Get angles before offset
+    auto angles = spherePart.getAngles(4);
+    auto angles0 = std::get<0>(angles);
+    auto angles1 = std::get<1>(angles);
+    auto angles0Ref = std::array<double,2> {0.8410686705679302, 2.300523983021863};
+    auto angles1Ref = std::array<double,2> {3.141592653589793, 4.71238898038469};
+    REQUIRE(msmrdtools::stdvecNorm(angles0, angles0Ref) <= 0.000001);
+    REQUIRE(msmrdtools::stdvecNorm(angles1, angles1Ref) <= 0.000001);
 
     // Test offseting thetas in discretization
-    double offset = 0.55;
-    spherePart.offsetThetas(offset);
-    thetas = spherePart.thetas;
+    double offset = M_PI/2.0 + 0.1;
+    spherePart.setThetasOffset(offset);
+    auto thetasNew = spherePart.thetas;
     for (auto &thetaRef : thetasRef[0]) {
         thetaRef += offset;
     }
-    for (auto &thetaRef : thetasRef[1]) {
-        thetaRef += offset;
-    }
-    REQUIRE(msmrdtools::stdvecNorm(thetas[0], thetasRef[0]) <= 0.000001);
-    REQUIRE(msmrdtools::stdvecNorm(thetas[1], thetasRef[1]) <= 0.000001);
+    REQUIRE(msmrdtools::stdvecNorm(thetasNew[0], thetasRef[0]) <= 0.000001);
+
+
+    // Now test getSectionNumber function after offseting
+    secNumUp = spherePart.getSectionNumber(coordinateUp);
+    secNumDown = spherePart.getSectionNumber(coordinateDown);
+    secNum1 = spherePart.getSectionNumber(coordinate1);
+    REQUIRE(secNumUp == 1);
+    REQUIRE(secNumDown == 6);
+    REQUIRE(secNum1 == 5);
+    // Test get angles after offset
+    angles = spherePart.getAngles(4);
+    auto angles0off = std::get<0>(angles);
+    auto angles1off = std::get<1>(angles);
+    angles0Ref = std::array<double,2> {0.8410686705679302, 2.300523983021863};
+    angles1Ref = std::array<double,2> {4.812388980384689, 6.383185307179586};
+    REQUIRE(msmrdtools::stdvecNorm(angles0off, angles0Ref) <= 0.000001);
+    REQUIRE(msmrdtools::stdvecNorm(angles1off, angles1Ref) <= 0.000001);
 }
+
 
 
 TEST_CASE("Half spherical partition", "[halfSpherePartition]") {

@@ -98,12 +98,14 @@ namespace msmrd{
 
 
     // Adds an off set on the thetas, must be a positive value and smaller than dtheta
-    void spherePartition::offsetThetas(double offset) {
+    void spherePartition::setThetasOffset(double offset) {
          double dtheta = std::abs(thetas[0][1] - thetas[0][0]);
-         if ( offset >= dtheta or offset < 0) {
-             throw std::invalid_argument("Offset must be positive and smaller than dtheta in discretization");
+         if ( offset < 0) {
+             throw std::invalid_argument("Offset must be positive and preferably smaller than smaller "
+                                         "dtheta in discretization");
          }
-         for (auto &thetaList : thetas) {
+        thetasOffset = offset;
+        for (auto &thetaList : thetas) {
              for (auto &theta : thetaList) {
                  theta += offset;
              }
@@ -118,7 +120,7 @@ namespace msmrd{
             throw std::invalid_argument("Error: y coordinate must be positive in half sphere discretization");
         }
         // Calculate theta and phi of coordinate
-        double theta = std::atan2(coordinate[1], coordinate[0]);
+        double theta = std::atan2(coordinate[1], coordinate[0]) - thetasOffset;
         if (theta < 0) {
             theta += 2 * M_PI;
         }
@@ -146,8 +148,8 @@ namespace msmrd{
         std::vector<double> collarThetas = thetas[currentCollarIndex - 1];
         int numThetaCuts = collarThetas.size();
         for (int i = 0; i < numThetaCuts; i++){
-            if(theta >= collarThetas[numThetaCuts - 1 - i]){
-                currentThetaIndex = numThetaCuts - i - 1;
+            if(theta >= (collarThetas[numThetaCuts - 1 - i] - thetasOffset)){
+                currentThetaIndex = numThetaCuts - 1 - i;
                 break;
             }
         }
@@ -158,7 +160,8 @@ namespace msmrd{
     }
 
     /* Returns phi-angles (polar) and theta-angles (azimuthal) that correspond to the sectionnumber
-     * in the sphere partition */
+     * in the sphere partition. Note if thetasOffset != 0, then it can return one thetas interval with
+     * value larger than 2pi. However this should not affect execution of dependencies.*/
     std::tuple<std::array<double, 2>, std::array<double, 2>> spherePartition::getAngles(int secNumber) {
         if (secNumber > numSections) {
             throw std::invalid_argument("Error: section number is larger than number of partitions");
@@ -194,7 +197,7 @@ namespace msmrd{
             statesInCollar = secNumber - prevStates;
             theta1 = thetasCollar[statesInCollar - 1];
             if (statesInCollar == thetasCollar.size()) {
-                theta2 = 2 * M_PI /scaling;
+                theta2 = (2 * M_PI + thetasOffset)/scaling;
             } else {
                 theta2 = thetasCollar[statesInCollar];
             }

@@ -26,8 +26,8 @@ namespace msmrd {
                                                                                  numSphericalSectionsQuat);
         // Offset thetas in discretization to match patches
         double offTheta = M_PI/4;
-        positionOrientationPart->sphericalPartition->offsetThetas(offTheta);
-        positionOrientationPart->quatPartition->sphericalPartition->offsetThetas(offTheta);
+        positionOrientationPart->sphericalPartition->setThetasOffset(offTheta);
+        positionOrientationPart->quatPartition->sphericalPartition->setThetasOffset(offTheta);
 
         // Set bound states defined for the patchy protein example
         setBoundStates();
@@ -48,8 +48,8 @@ namespace msmrd {
                                                                                  numSphericalSectionsQuat);
         // Offset thetas in discretization to match patches
         double offTheta = M_PI/4;
-        positionOrientationPart->sphericalPartition->offsetThetas(offTheta);
-        positionOrientationPart->quatPartition->sphericalPartition->offsetThetas(offTheta);
+        positionOrientationPart->sphericalPartition->setThetasOffset(offTheta);
+        positionOrientationPart->quatPartition->sphericalPartition->setThetasOffset(offTheta);
 
         // Set bound states defined for the patchy protein example
         setBoundStates();

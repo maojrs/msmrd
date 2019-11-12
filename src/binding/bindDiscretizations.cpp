@@ -22,7 +22,8 @@ namespace msmrd {
                 .def_property_readonly("numSections", &spherePartition::getNumSections)
                 .def("getPartition", &spherePartition::getPartition)
                 .def("getSectionNumber", &spherePartition::getSectionNumberPyBind)
-                .def("getAngles", &spherePartition::getAngles);
+                .def("getAngles", &spherePartition::getAngles)
+                .def("setThetasOffset", &spherePartition::setThetasOffset);
 
         py::class_<halfSpherePartition, spherePartition, std::shared_ptr<halfSpherePartition>>(m, "halfSpherePartition",
                                                                                    "Equal area partition of the"

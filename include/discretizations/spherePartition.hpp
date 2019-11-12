@@ -33,6 +33,7 @@ namespace msmrd {
     public:
         int numSections;
         double scaling = 1;
+        double thetasOffset = 0.0;
         std::vector<int> regionsPerCollar;
         std::vector<double> phis;
         std::vector<std::vector<double>> thetas;
@@ -40,6 +41,8 @@ namespace msmrd {
         * The partition is fully encoded into three variables within the class:
         * @param scaling can be used to scale the partition to the half sphere (scaling = 2 instead of 1). However
         * its behavior is not trivial so modify with care.
+        * @param thetasOffset is the offset to the collars in theta. This could be useful to adapt the discretization
+        * to a given problem. Default value is zero, but it can be changed with setOffsetThetas function.
         * @param regionsPerCollar, vector which size denotes the number of horizontal collars to
         * split the sphere, and the value of each entry the number of sections in each collar. Summing all these
         * values should result in numPartitions
@@ -55,7 +58,7 @@ namespace msmrd {
 
         spherePartition(int numSections);
 
-        void offsetThetas(double offset);
+        void setThetasOffset(double offset);
 
         int getSectionNumber(vec3<double> coordinate);
 
