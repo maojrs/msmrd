@@ -32,7 +32,7 @@ namespace msmrd {
         int state = 0;
         int nextState;
         double lagtime = 0;
-        double tcount = 0;
+        double timeCounter = 0;
         bool propagateTMSM = true;
         bool activeMSM = true;
         int boundTo = -1;
@@ -60,11 +60,12 @@ namespace msmrd {
          * @param state particle current unbound state (begins in zero). If -1, then particle is in bound state.
          * @param nextState particle next state given and changed by the msm/ctmsm
          * @param lagtime saves the current lagtime from the MSM
-         * @param tcount counts time in between MSM/CTMSM iterations
+         * @param timeCounter counts time in between CTMSM iterations. It keeps track of time elapsed within one
+         * timestep of the accumulated lagtimes from transisins of the CTMSM.
          * @param propagateTMSM determines if MSM/CTMSM should be propagated on a given timestep
          * tcount and propagateTMSM are used to synchronize TMSM with diffusion/rotation timestepping
          * @param activeMSM determines if MSM behavior is active or dormant. This applied only to the MSM for
-         * unbound particles. If in bound state, this activeMSM should be set to false.
+         * unbound particles. If in bound state in MSM/RD, this activeMSM should be set to false.
          * @param boundTo determines if particle is bound and to which particle in the particle list. If -1 the
          * particle is not bound, otherwise the value of boundTo is the index of the other particle in the particle
          * list.
@@ -189,6 +190,8 @@ namespace msmrd {
         void activateMSM() { activeMSM = true; }
 
         void deactivateMSM() { activeMSM = false; }
+
+        void deactivateResetMSM();
 
     };
 

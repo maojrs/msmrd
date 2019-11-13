@@ -41,19 +41,19 @@ namespace msmrd {
         // Do diffusion/rotation propagation taking MSM/CTMSM into account
         double resdt;
         // propagate CTMSM when synchronized and update diffusion coefficients
-        part.tcount = 0;
+        part.timeCounter = 0;
         // Runs one timestep dt, if lagtime < dt, propagates CTMSM as many times as needed
         if (part.lagtime <= timestep) {
             // Run loop until integration for one timestep dt is achieved
-            while (part.tcount < timestep) {
+            while (part.timeCounter < timestep) {
                 // Propagates MSM only when diffusion and rotation are in sync
                 if (part.propagateTMSM) {
                     tmsm.propagateNoUpdate(part, 1); // Diffusion coefficients don't need to be updated until dt reaches lagtime.
                 }
                 // Integrates for one lagtime as long as integration is still under dt
-                if (part.tcount + part.lagtime < timestep) {
+                if (part.timeCounter + part.lagtime < timestep) {
                     integrateOne(partIndex, parts, part.lagtime);
-                    part.tcount += part.lagtime;
+                    part.timeCounter += part.lagtime;
                     part.setLagtime(0);
                     // Ready to propagate MSM, update state and diffusion coefficients
                     part.propagateTMSM = true;
@@ -62,10 +62,10 @@ namespace msmrd {
                     part.setDrot(tmsm.Drotlist[part.state]);
                 // If current lagtime overtakes dt, integrate up to dt (by resdt) and reset lagtime to remaining portion
                 } else {
-                    resdt = timestep - part.tcount;
+                    resdt = timestep - part.timeCounter;
                     integrateOne(partIndex, parts, resdt);
-                    part.setLagtime(part.lagtime + part.tcount - timestep);
-                    part.tcount += resdt; // this means part.tcount = dt, so will exit while loop.
+                    part.setLagtime(part.lagtime - resdt);
+                    part.timeCounter += resdt; // this means part.timeCounter = timestep, so will exit while loop.
                     // If lag time = 0 CTMSM must propagate in next step, otherwise it needs to integrate remaining lagtime.
                     if (part.lagtime == 0) {
                         // Ready to propagate CTMSM, update state and diffusion coefficients
@@ -78,7 +78,7 @@ namespace msmrd {
                     };
                 };
             }
-            part.tcount = 0;
+            part.timeCounter = 0;
         } else {
             // Runs one full time step when lagtime > dt and update remaining lagtime.
             integrateOne(partIndex, parts, timestep);

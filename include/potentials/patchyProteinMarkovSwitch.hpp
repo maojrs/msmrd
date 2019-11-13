@@ -19,9 +19,11 @@ namespace msmrd {
     class patchyProteinMarkovSwitch : public patchyProtein {
     protected:
         double angularStrength = 2.0;
+        double minimumR = 1.25;
     public:
         /**
          * @param angularStrength give the angular strength of angular dependence of torque.
+         * @param minimumR minimum distance that the particles need to be away, so normal MSM behavior is active.
          */
 
         // Inherit parent class contructor
@@ -47,6 +49,8 @@ namespace msmrd {
         // Additional auxiliary functions
 
         void setPotentialParameters() override;
+
+        void enableDisableMSM(vec3<double>relPosition, particle &part1, particle &part2);
 
         std::tuple<vec3<double>, vec3<double>> calculatePlanes(particle &part1, particle &part2,
                                                                const std::vector<vec3<double>> patches1,

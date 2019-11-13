@@ -57,6 +57,20 @@ namespace msmrd{
         rstarAttractive = 0.85*sigma;
         rstarPatches[0] = 0.1*sigma;
         rstarPatches[1] = 0.1*sigma; // Special binding site
+
+        // Sets this specific parameter unique for this potential, see enableDisableMSM function.
+        minimumR = 1.25;
+    }
+
+    /* Checks is MSM must be deactivated in certain particles. In this case, if bounded or close to bounded
+     * disable MSM in particle withs type 1 and state 0. This needs to be hardcoded here for each example. */
+    void patchyProteinMarkovSwitch::enableDisableMSM(vec3<double>relPosition, particle &part1, particle &part2) {
+        if (relPosition.norm() <= minimumR && part2.state == 0) {
+            part2.deactivateResetMSM();
+            part2.activeMSM = false;
+        } else {
+            part2.activateMSM();
+        }
     }
 
 
@@ -116,6 +130,10 @@ namespace msmrd{
         /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
         auto patchesCoords1 = assignPatches(part1.type);
         auto patchesCoords2 = assignPatches(part2.type);
+
+        /* Enables/Disables MSM following potential hardcoded rules. In this case, if bounded or close to bounded
+         * disable and reset the MSM on particle2 when it is on state 0. */
+        enableDisableMSM(rvec, part1, part2);
 
         // Calculate forces and torque due to patches interaction, if close enough and if particle 2 is in state 0
         if (rvec.norm() <= 2*sigma and part2.state == 0) {

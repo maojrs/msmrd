@@ -91,6 +91,16 @@ namespace msmrd {
         activeMSM = false;
     }
 
+    // Deactivates and resets MSM to default value (new transitions need to be calculated.)
+    void particle::deactivateResetMSM() {
+        activeMSM = false;
+        /* When MSM is again activated, this forces integrator to recalculate next transition disregarding
+         * previous computations. This resets the MSM. See overdampedLangevinIntegratorMarkovSwitch for details on
+         * integrator. */
+        propagateTMSM = true;
+        lagtime = 0;
+    }
+
 
 
 }
