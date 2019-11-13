@@ -2,6 +2,7 @@
 #include "integrators/overdampedLangevin.hpp"
 #include "integrators/overdampedLangevinMarkovSwitch.hpp"
 #include "integrators/msmrdIntegrator.hpp"
+#include "integrators/msmrdPatchyProtein.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
 
 
@@ -33,7 +34,7 @@ namespace msmrd {
                 .def("integrate", &overdampedLangevinMarkovSwitch<ctmsm>::integrate);
 
         /* Note this binding uses method overloading, and it therefore requires to explicitly state
-         * the input arguments when fcuntions are overloaded. */
+         * the input arguments when functions are overloaded. */
         py::class_<msmrdIntegrator<ctmsm>, overdampedLangevinMarkovSwitch<ctmsm>>(m, "msmrdIntegrator",
                                                                                   "Integrator for msmrd algorithm "
                                                                                   "(timestep, seed, particlesbodytype, "
@@ -41,8 +42,9 @@ namespace msmrd {
                                                                                   "relativeDistanceCutOff,"
                                                                                   "MSMlist, mainMarkovModel, "
                                                                                   "positionOrientationPartition)")
-                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &,
-                        ctmsm &, msmrdMSM &>())
+                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, ctmsm &, msmrdMSM &>())
+                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, std::vector<ctmsm> &,
+                        msmrdMSM &>())
                 .def("setDiscretization", (void (msmrdIntegrator<ctmsm>::*)
                         (std::shared_ptr<spherePartition>&)) &msmrdIntegrator<ctmsm>::setDiscretization,
                         "Sets position only discretization")
@@ -50,6 +52,19 @@ namespace msmrd {
                         (std::shared_ptr<positionOrientationPartition>&)) &msmrdIntegrator<ctmsm>::setDiscretization,
                         "Sets full position orientation discretization")
                 .def("integrate", &msmrdIntegrator<ctmsm>::integrate);
+
+
+        py::class_<msmrdPatchyProtein, msmrdIntegrator<ctmsm>>(m, "msmrdPatchyProtein",
+                                                                  "Integrator for msmrd algorithm, specialized for"
+                                                                  "patchyProtein implementation (timestep, seed, "
+                                                                  "particlesbodytype, numParticleTypes, "
+                                                                  "relativeDistanceCutOff,"
+                                                                  "MSMlist, mainMarkovModel, "
+                                                                  "positionOrientationPartition)")
+                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, ctmsm &, msmrdMSM &>())
+                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, std::vector<ctmsm> &,
+                        msmrdMSM &>());
+
 
         // Created c++ compatible particle list/vector/array of particles in python
         py::bind_vector<std::vector<particle>>(m, "particleList", py::module_local());

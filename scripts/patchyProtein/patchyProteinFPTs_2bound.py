@@ -96,7 +96,7 @@ def simulationFPT(trajectorynum):
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPatchyProtein)
 
-    # Create particle list
+    # Creates random particle list
     seed = int(trajectorynum)
     partlist = particleTools.randomParticleMSList(numparticles, boxsize, minimumUnboundRadius ,
                                                   particleTypes, unboundMSMlist, seed)
