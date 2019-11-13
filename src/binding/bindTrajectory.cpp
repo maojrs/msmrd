@@ -39,7 +39,8 @@ namespace msmrd {
 
 
         /* Not defined as child class since parent class is a template with virtual fucntions, so need to
-         * add all functions from parent classes manually (all the way to the original trajectory.hpp parent)*/
+         * add all functions from parent classes manually (all the way to the original trajectory.hpp parent).
+         * Also note sampleDiscreteState and getState are the same function. */
         py::class_<patchyDimerTrajectory>(m, "patchyDimer", "discrete trajectory of patchy dimer"
                                                   "example(#particles or #pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
@@ -51,12 +52,14 @@ namespace msmrd {
                 .def("emptyBuffer", &patchyDimerTrajectory::emptyBuffer)
                 .def("sampleDiscreteTrajectory", &patchyDimerTrajectory::sampleDiscreteTrajectory)
                 .def("sampleDiscreteState", &patchyDimerTrajectory::sampleDiscreteState)
+                .def("getState", &patchyDimerTrajectory::sampleDiscreteState)
                 .def("discretizeTrajectory", &patchyDimerTrajectory::discretizeTrajectory)
                 .def("discretizeTrajectoryH5", &patchyDimerTrajectory::discretizeTrajectoryH5)
                 .def("write2H5file", &patchyDimerTrajectory::write2H5file<double, 8>)
                 .def("writeChunk2H5file", &patchyDimerTrajectory::writeChunk2H5file<double, 8>);
 
-        // Not defined as child class since prent class is a virtual template
+        /* Not defined as child class since prent class is a virtual template. Also note sampleDiscreteState and
+         * getState are the same function. */
         py::class_<patchyDimerTrajectory2>(m, "patchyDimer2", "discrete trajectory of patchy dimer 2"
                                                   "example(#particles or #pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
@@ -67,7 +70,8 @@ namespace msmrd {
                 .def("write2file", &patchyDimerTrajectory2::write2file<double>)
                 .def("emptyBuffer", &patchyDimerTrajectory2::emptyBuffer)
                 .def("sampleDiscreteTrajectory", &patchyDimerTrajectory2::sampleDiscreteTrajectory)
-                .def("sampleDiscreteState2", &patchyDimerTrajectory2::sampleDiscreteState)
+                .def("sampleDiscreteState", &patchyDimerTrajectory2::sampleDiscreteState)
+                .def("getState", &patchyDimerTrajectory2::sampleDiscreteState)
                 .def("discretizeTrajectory", &patchyDimerTrajectory2::discretizeTrajectory)
                 .def("discretizeTrajectoryH5", &patchyDimerTrajectory2::discretizeTrajectoryH5)
                 .def("write2H5file", &patchyDimerTrajectory2::write2H5file<double, 8>)
@@ -75,7 +79,8 @@ namespace msmrd {
 
 
         /* Not defined as child class since parent class is a virtual template, so need to add all functions
-         * from parent classes manually (all the way to the original trajectory.hpp parent)*/
+         * from parent classes manually (all the way to the original trajectory.hpp parent).
+         * Also note sampleDiscreteState and getState are the same function. */
         py::class_<patchyProteinTrajectory>(m, "patchyProtein", "discrete trajectory of patchy protein"
                                                   "example(#particles or #pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
@@ -87,6 +92,7 @@ namespace msmrd {
                 .def("emptyBuffer", &patchyProteinTrajectory::emptyBuffer)
                 .def("sampleDiscreteTrajectory", &patchyProteinTrajectory::sampleDiscreteTrajectory)
                 .def("sampleDiscreteState", &patchyProteinTrajectory::sampleDiscreteState)
+                .def("getState", &patchyProteinTrajectory::sampleDiscreteState)
                 .def("discretizeTrajectory", &patchyProteinTrajectory::discretizeTrajectory)
                 .def("discretizeTrajectoryH5", &patchyProteinTrajectory::discretizeTrajectoryH5)
                 .def("write2H5file", &patchyProteinTrajectory::write2H5file<double, 8>)

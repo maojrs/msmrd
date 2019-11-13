@@ -132,8 +132,9 @@ namespace msmrd{
         auto patchesCoords2 = assignPatches(part2.type);
 
         /* Enables/Disables MSM following potential hardcoded rules. In this case, if bounded or close to bounded
-         * disable and reset the MSM on particle2 when it is on state 0. */
-        enableDisableMSM(rvec, part1, part2);
+         * disable and reset the MSM on particle2 when it is on state 0. This is not used for the MSM/RD example, but
+         * it is left for possible future implementations. */
+        //enableDisableMSM(rvec, part1, part2);
 
         // Calculate forces and torque due to patches interaction, if close enough and if particle 2 is in state 0
         if (rvec.norm() <= 2*sigma and part2.state == 0) {
