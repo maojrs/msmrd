@@ -25,7 +25,7 @@ namespace msmrd {
 
 
     // Evaluates potential at given positions and orientations of two particles
-    double patchyParticleAngular::evaluate(const particle &part1, const particle &part2) {
+    double patchyParticleAngular::evaluate(particle &part1, particle &part2) {
 
         // Get part of potential that is the same as for normal patchy particle from parent function.
         double patchyParticlePotential = patchyParticle::evaluate(part1, part2);
@@ -61,7 +61,7 @@ namespace msmrd {
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyParticleAngular::forceTorque(const particle &part1, const particle &part2) {
+    std::array<vec3<double>, 4> patchyParticleAngular::forceTorque(particle &part1, particle &part2) {
 
         // Get part of force and torque that is the same as for normal patchy particle from parent function.
         auto patchyParticleForceTorque = patchyParticle::forceTorque(part1, part2);

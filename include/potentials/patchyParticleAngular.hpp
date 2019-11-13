@@ -30,10 +30,10 @@ namespace msmrd {
         patchyParticleAngular(double sigma, double strength, double angularStrength,
                               std::vector<vec3<double>> patchesCoordinates);
 
-        double evaluate(const particle &part1, const particle &part2) override;
+        double evaluate(particle &part1, particle &part2) override;
 
         std::array<vec3<double>, 4>
-        forceTorque(const particle &part1, const particle &part2) override;
+        forceTorque(particle &part1, particle &part2) override;
 
     };
 

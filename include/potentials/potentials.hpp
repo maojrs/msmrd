@@ -20,11 +20,11 @@ namespace msmrd {
 
         /* Virtual functions to calculate value of potential and force/torque at position "pos".
          * Possible orientation dependence can be added into the aux variables. */
-        virtual double evaluate(const particle &part) = 0;
+        virtual double evaluate(particle &part) = 0;
 
-        virtual std::array<vec3<double>, 2> forceTorque(const particle &part) = 0;
+        virtual std::array<vec3<double>, 2> forceTorque(particle &part) = 0;
 
-        std::vector<std::vector<double>> forceTorquePyBind(const particle &part);
+        std::vector<std::vector<double>> forceTorquePyBind(particle &part);
     };
 
 
@@ -50,13 +50,13 @@ namespace msmrd {
          * return (force1, torque1, force2, torque2), the first two correspond to the force and torque acting on
          * particle 1 due to its interaction with particle 2, and the second two correspond to the force and
          * torque acting on particle 2 due to its interaction with particle 1.*/
-        virtual double evaluate(const particle &part1, const particle &part2) = 0;
+        virtual double evaluate(particle &part1, particle &part2) = 0;
 
-        virtual std::array<vec3<double>, 4> forceTorque(const particle &part1, const particle &part2) = 0;
+        virtual std::array<vec3<double>, 4> forceTorque(particle &part1, particle &part2) = 0;
 
 
         // Function to translate forceTorque function to pyBind
-        std::vector<std::vector<double>> forceTorquePyBind(const particle &part1, const particle &part2);
+        std::vector<std::vector<double>> forceTorquePyBind(particle &part1, particle &part2);
 
 
         // Additional useful functions so potentials can deal with possible periodic boundaries.

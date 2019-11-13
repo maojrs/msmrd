@@ -43,12 +43,12 @@ namespace msmrd{
 
         double derivativeQuadraticPotential(double r, double sig, double eps, double a, double rstar);
 
-        double evaluatePatchesPotential(const particle &part1, const particle &part2,
+        double evaluatePatchesPotential( particle &part1, particle &part2,
                                         vec3<double> &pos1virtual,
                                         std::vector<vec3<double>> &patchesCoords1,
                                         std::vector<vec3<double>> &patchesCoords2);
 
-        std::array<vec3<double>, 4> forceTorquePatches(const particle &part1, const particle &part2,
+        std::array<vec3<double>, 4> forceTorquePatches(particle &part1, particle &part2,
                                                        vec3<double> &pos1virtual,
                                                        std::vector<vec3<double>> &patchesCoords1,
                                                        std::vector<vec3<double>> &patchesCoords2);
@@ -63,9 +63,9 @@ namespace msmrd{
                       std::vector<std::vector<double>> patchesCoordinatesA,
                       std::vector<std::vector<double>> patchesCoordinatesB);
 
-        double evaluate(const particle &part1, const particle &part2) override;
+        double evaluate(particle &part1, particle &part2) override;
 
-        std::array<vec3<double>, 4> forceTorque(const particle &part1, const particle &part2) override;
+        std::array<vec3<double>, 4> forceTorque(particle &part1, particle &part2) override;
 
     };
 

@@ -78,7 +78,7 @@ namespace msmrd {
 
 
     // Evaluates potential at given positions and orientations of two particles
-    double patchyProtein::evaluate(const particle &part1, const particle &part2) {
+    double patchyProtein::evaluate(particle &part1, particle &part2) {
 
         // Calculates relative position
         auto relPos = relativePositionComplete(part1.position, part2.position);
@@ -107,7 +107,7 @@ namespace msmrd {
 
     /* Auxiliary function that calculates patches interaction contribution to potential. Called by main
      * evaluate function. */
-    double patchyProtein::evaluatePatchesPotential(const particle &part1, const particle &part2,
+    double patchyProtein::evaluatePatchesPotential(particle &part1, particle &part2,
                                                    vec3<double> &pos1virtual,
                                                    std::vector<vec3<double>> &patchesCoords1,
                                                    std::vector<vec3<double>> &patchesCoords2){
@@ -146,7 +146,7 @@ namespace msmrd {
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyProtein::forceTorque(const particle &part1, const particle &part2) {
+    std::array<vec3<double>, 4> patchyProtein::forceTorque(particle &part1, particle &part2) {
 
         // Calculate relative position
         std::array<vec3<double>, 2> relPos = relativePositionComplete(part1.position, part2.position);
@@ -181,7 +181,7 @@ namespace msmrd {
     }
 
     /* Auxiliary function that calculates patches interaction forces. Called by main forceTorque function. */
-    std::array<vec3<double>, 4> patchyProtein::forceTorquePatches(const particle &part1, const particle &part2,
+    std::array<vec3<double>, 4> patchyProtein::forceTorquePatches(particle &part1, particle &part2,
                                                                   vec3<double> &pos1virtual,
                                                                   std::vector<vec3<double>> &patchesCoords1,
                                                                   std::vector<vec3<double>> &patchesCoords2){

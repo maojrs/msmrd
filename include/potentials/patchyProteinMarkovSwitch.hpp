@@ -39,18 +39,16 @@ namespace msmrd {
         /* Note evaluate and forceTorque functions do not override the ones of patchyProtein since these
          * ones take particle as arguments instead of particle. Therefore one must be careful the integrator
          * uses particle if we want these functions to be used. */
-        double evaluate(const particle &part1, const particle &part2) override;
+        double evaluate(particle &part1, particle &part2) override;
 
-        std::array<vec3<double>, 4> forceTorque(const particle &part1, const particle &part2) override;
+        std::array<vec3<double>, 4> forceTorque(particle &part1, particle &part2) override;
 
 
         // Additional auxiliary functions
 
         void setPotentialParameters() override;
 
-        std::vector<std::vector<double>> forceTorquePyBind(particle &part1, particle &part2);
-
-        std::tuple<vec3<double>, vec3<double>> calculatePlanes(const particle &part1, const particle &part2,
+        std::tuple<vec3<double>, vec3<double>> calculatePlanes(particle &part1, particle &part2,
                                                                const std::vector<vec3<double>> patches1,
                                                                const std::vector<vec3<double>> patches2);
     };

@@ -70,7 +70,7 @@ namespace msmrd{ ;
     }
 
     // Evaluates potential at given positions and orientations of two particles
-    double patchyParticle::evaluate(const particle &part1, const particle &part2) {
+    double patchyParticle::evaluate(particle &part1, particle &part2) {
         double repulsivePotential;
         double attractivePotential;
         double patchesPotential = 0.0;
@@ -108,7 +108,7 @@ namespace msmrd{ ;
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyParticle::forceTorque(const particle &part1, const particle &part2) {
+    std::array<vec3<double>, 4> patchyParticle::forceTorque(particle &part1, particle &part2) {
         vec3<double> force;
         vec3<double> force1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> force2 = vec3<double> (0.0, 0.0, 0.0);
@@ -142,7 +142,7 @@ namespace msmrd{ ;
      * and torque applied to particle 1 and the second two vectors are the force and torque applied to particle 2.
      * This function is called by main forceTorque function. */
     std::tuple<vec3<double>, vec3<double>, vec3<double>, vec3<double>> patchyParticle::forceTorquePatches(
-            const particle &part1, const particle &part2, const vec3<double> pos1virtual) {
+            particle &part1, particle &part2, const vec3<double> pos1virtual) {
         vec3<double> patch1;
         vec3<double> patch2;
         vec3<double> relpatch;

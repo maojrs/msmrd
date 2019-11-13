@@ -18,10 +18,10 @@ namespace msmrd {
         // Inherit parent class constructor
         using patchyParticleAngular::patchyParticleAngular;
 
-        double evaluate(const particle &part1, const particle &part2) override;
+        double evaluate(particle &part1, particle &part2) override;
 
         std::array<vec3<double>, 4>
-        forceTorque(const particle &part1, const particle &part2) override;
+        forceTorque(particle &part1, particle &part2) override;
 
 
         // Additional auxiliary functions

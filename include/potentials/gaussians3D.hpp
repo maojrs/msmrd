@@ -32,9 +32,9 @@ namespace msmrd {
          */
         gaussians3D(unsigned long nminima, double maxrad, double scalefactor, long seed);
 
-        double evaluate(const particle &part) override;
+        double evaluate(particle &part) override;
 
-        std::array<vec3<double>, 2> forceTorque(const particle &part) override;
+        std::array<vec3<double>, 2> forceTorque(particle &part) override;
     };
 
 }

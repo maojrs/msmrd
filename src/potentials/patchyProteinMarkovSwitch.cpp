@@ -61,7 +61,7 @@ namespace msmrd{
 
 
     // Evaluates potential at given positions and orientations of two particles
-    double patchyProteinMarkovSwitch::evaluate(const particle &part1, const particle &part2) {
+    double patchyProteinMarkovSwitch::evaluate(particle &part1, particle &part2) {
         // Declare variables used in loop
         double patchesPotential = 0.0;
         double angularPotential = 0.0;
@@ -98,7 +98,7 @@ namespace msmrd{
 
     /* Calculate and return (force1, torque1, force2, torque2), which correspond to the force and torque
      * acting on particle1 and the force and torque acting on particle2, respectively. */
-    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(const particle &part1, const particle &part2)  {
+    std::array<vec3<double>, 4> patchyProteinMarkovSwitch::forceTorque(particle &part1, particle &part2)  {
 
         // Calculate relative position
         std::array<vec3<double>, 2> relPos = relativePositionComplete(part1.position, part2.position);
@@ -150,8 +150,8 @@ namespace msmrd{
     /* Given two quaternions/orientations, returns planes(unit vectors) to be aligned by torque. These
      * may vary depending on the physical arrangement of your molecules and how the patches are ordered and
      * selected. Currently set up for particle 1 with 6 binding patches and particle 2 only with one.*/
-    std::tuple<vec3<double>, vec3<double>> patchyProteinMarkovSwitch::calculatePlanes(const particle &part1,
-                                                                 const particle &part2,
+    std::tuple<vec3<double>, vec3<double>> patchyProteinMarkovSwitch::calculatePlanes(particle &part1,
+                                                                 particle &part2,
                                                                  const std::vector<vec3<double>> patches1,
                                                                  const std::vector<vec3<double>> patches2) {
 

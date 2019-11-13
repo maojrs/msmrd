@@ -22,7 +22,7 @@ numSimulations = 600 #500 #1000 #20 #200
 
 
 # Simulation parameters
-timesteps = 30000 #2000000 #5000000 #400000 #20000000
+timesteps = 3000000 #2000000 #5000000 #400000 #20000000
 bufferSize = 1024
 stride = 25
 outTxt = False
