@@ -57,6 +57,15 @@ namespace msmrd {
     };
 
 
+    /* Adds an offset on the thetas of the spherical partition and of the quaternions partition. Must
+     * be a positive value and preferably smaller than all the possible dthetas */
+    void positionOrientationPartition::setThetasOffset(double offset) {
+        sphericalPartition->setThetasOffset(offset);
+        quatPartition->setThetasOffset(offset);
+    };
+
+
+
     /* Gets other two section numbers corresponding to the positionOrientationPartition section number.
      * The function returns a tuple (secNumRelativePos, secNumRelativeQuat): the section number corresponding
      * to the surface spherical partition, and the section number corresponding to the quaternion partition,

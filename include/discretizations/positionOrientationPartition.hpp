@@ -56,6 +56,7 @@ namespace msmrd {
         positionOrientationPartition(double relativeDistanceCutOff, int numSphericalSectionsPos,
                                      int numRadialSectionsQuat, int numSphericalSectionsQuat);
 
+        void setThetasOffset(double offset);
 
         int getSectionNumber(vec3<double> relativePosition, quaternion<double> relativeQuaternion,
                              quaternion<double> quaternionReference = {1,0,0,0});

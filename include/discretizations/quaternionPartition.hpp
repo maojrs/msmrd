@@ -48,6 +48,8 @@ namespace msmrd {
 
         quaternionPartition(int numRadialSections, int numSphericalSections);
 
+        void setThetasOffset(double offset);
+
         int getSectionNumber(quaternion<double> quatCoordinate);
 
         std::tuple<std::array<double, 2>, std::array<double, 2>,

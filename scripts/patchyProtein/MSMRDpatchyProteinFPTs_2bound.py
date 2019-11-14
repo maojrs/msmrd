@@ -24,7 +24,7 @@ bodytype = 'rigidbody'
 particleTypes = [0, 1]
 numBoundStates = 6
 maxNumBoundStates = 10
-radialBounds = [1.25, 2.25] # must match patchyDimer discretization
+radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 minimumUnboundRadius = 2.5
 numTrajectories = 20 #10000
 numParticleTypes = 2 # num. of particle types (not states) in unbound state
@@ -41,8 +41,8 @@ realLagtime = lagtime*dtMDsimulation*stride
 numSphericalSectionsPos = 6
 numRadialSectionsQuat = 4
 numSphericalSectionsQuat = 6
-totalnumSecsQuat = numSphericalSectionsQuat*(numRadialSectionsQuat -1) + 1
-numTransitionsStates = 2 * numSphericalSectionsPos * totalnumSecsQuat
+totalnumSecsQuat = numSphericalSectionsQuat*(numRadialSectionsQuat - 1) + 1
+numTransitionsStates = 2 * numSphericalSectionsPos * totalnumSecsQuat #228
 
 # Set diffusion coefficients for bound states
 # Parameters to define coupling Markov model for bound dynamics: couplingMSM
@@ -77,7 +77,8 @@ def MSMRDsimulationFPT(trajectorynum):
 
     # Define discretization
     discretization = msmrd2.discretizations.positionOrientationPartition(radialBounds[1],
-                                            numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat)
+                    numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat)
+    discretization.setThetasOffset(np.pi/4.0);
 
     # Define boundary
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
@@ -86,7 +87,7 @@ def MSMRDsimulationFPT(trajectorynum):
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/MSM_patchyProtein_t3.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/pickled_data/MSM_patchyProtein_t6.00E+06_s50_lagt" + str(lagtime)
                      +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']
@@ -121,7 +122,7 @@ def MSMRDsimulationFPT(trajectorynum):
     integrator.setBoundary(boxBoundary)
     integrator.setDiscretization(discretization)
 
-    # Creates random particle list
+# Creates random particle list
     seed = int(trajectorynum)
     partlist = particleTools.randomParticleMSList(numparticles, boxsize, minimumUnboundRadius ,
                                                   particleTypes, unboundMSMlist, seed)
@@ -134,7 +135,7 @@ def MSMRDsimulationFPT(trajectorynum):
         currentState = partlist[0].boundState
         if currentState in boundStates:
             unbound = False
-            return 0, integrator.clock
+            return currentState, integrator.clock
         elif integrator.clock >= 15000.0:
             unbound = False
             return 'Failed at:', integrator.clock

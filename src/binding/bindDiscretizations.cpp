@@ -37,7 +37,8 @@ namespace msmrd {
             .def_property_readonly("numSections", &quaternionPartition::getNumSections)
             .def("getPartition", &quaternionPartition::getPartition)
             .def("getSectionNumber", &quaternionPartition::getSectionNumberPyBind)
-            .def("getSectionIntervals", &quaternionPartition::getSectionIntervals);
+            .def("getSectionIntervals", &quaternionPartition::getSectionIntervals)
+            .def("setThetasOffset", &quaternionPartition::setThetasOffset);
 
         /* On binding of positionOrientationPartition, change default holder from unique_ptr to shared_ptr
          * to allow msmrdIntegrator to set positionOrientationPartition as shared pointer. This should also
@@ -51,7 +52,8 @@ namespace msmrd {
                 .def(py::init<double &, int &, int &, int &>())
                 .def_property_readonly("numSections", &positionOrientationPartition::getNumSections)
                 .def("getSectionNumber", &positionOrientationPartition::getSectionNumberPyBind)
-                .def("getSectionNumbers", &positionOrientationPartition::getSectionNumbers);
+                .def("getSectionNumbers", &positionOrientationPartition::getSectionNumbers)
+                .def("setThetasOffset", &positionOrientationPartition::setThetasOffset);
 
     };
 }

@@ -17,6 +17,12 @@ namespace msmrd {
         makeRadialPartition();
     };
 
+    /* Adds an offset on the thetas of the spherical partition within the quaternion partition. Must
+     * be a positive value and preferably smaller than all the possible dthetas */
+    void quaternionPartition::setThetasOffset(double offset) {
+        sphericalPartition->setThetasOffset(offset);
+    };
+
     // Defines the location of the radial cuts between the origin and r=1.
     void quaternionPartition::makeRadialPartition() {
         double dr = 1.0/numRadialSections;

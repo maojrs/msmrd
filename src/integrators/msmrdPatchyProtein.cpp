@@ -24,7 +24,7 @@ namespace msmrd {
     };
 
     /* Calculates and set a new spherePartition and the positionOrientationParition of the msmrdIntegrator with
-     * local parameters corresponding to the patchyProtein implementation. */
+     * local parameters corresponding to the patchyProtein implementation default values. */
     void msmrdPatchyProtein::setPatchyProteinDiscretization() {
         int numSphericalSectionsPos = 6;
         int numRadialSectionsQuat = 4;
@@ -91,7 +91,7 @@ namespace msmrd {
 
         /* If endState larger than sections in partition, take the module. Since transition states
          * with higher value correspond to same place in partition, but different state for particle2. Also
-         * uses this tocalculate unboundState of particle2. */
+         * uses this to calculate unboundState of particle2. */
         if (endState > positionOrientationPart->numTotalSections) {
             unboundState = static_cast<int>(std::floor((endState - 1)/positionOrientationPart->numTotalSections));
             endState = (endState - 1) % positionOrientationPart->numTotalSections + 1;
