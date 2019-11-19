@@ -1,17 +1,20 @@
 import numpy as np
-import msmrd2
-import random
-from msmrd2.potentials import patchyProteinMarkovSwitch
-from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
-from msmrd2.integrators import overdampedLangevinMarkovSwitch as odLangevinMS
-import msmrd2.tools.quaternions as quaternions
+import pickle
 import multiprocessing
 from multiprocessing import Pool
+import msmrd2
+from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
+from msmrd2.markovModels import msmrdMarkovModel as msmrdMSM
+from msmrd2.integrators import msmrdPatchyProtein
+import msmrd2.tools.particleTools as particleTools
+import msmrd2.tools.quaternions as quaternions
 import os
 
 '''
-Creates an MD simulation of two particle and calculates their first passage times (FPTs) from a given 
-bound state to any unbound state. The data is written to '../data/patchyProtein/first_passage_times/filename_here.
+Creates an MSM/RD simulation of two particle that calculates first passage times (FPTs) from a 
+given bound state to any unbound configuration. This requires to input the MSM for the MSM/RD algorithm 
+calculated from an MD simulation (the MSM is loaded using pickle). The data is 
+written to '../data/patchyProtein/first_passage_times/MSMRDfilename_here.
 '''
 
 # Main parameters for particle and integrator
@@ -19,27 +22,37 @@ numparticles = 2
 dt = 0.0001 #0.00001 #0.000005
 bodytype = 'rigidbody'
 particleTypes = [0, 1]
-minimumUnboundRadius = 2.5
-numTrajectories = 20 #10000
 numBoundStates = 6
+maxNumBoundStates = 10
 initialState = 1 # 1 to 6 possible values
 
-# Define Patchy Protein potential parameters (This values are fixed and should match
-# those used to determine metastable states in potential and trajectory.)
-sigma = 1.0
-strength = 65
-patchesCoordinates1 = [np.array([1.,0.,0.]), np.array([0.,1.,0.]), np.array([0.,0.,1.]),
-                       np.array([-1.,0.,0.]), np.array([0.,-1.,0.]), np.array([0.,0.,-1.])]
-patchesCoordinates2 = [np.array([1.,0.,0.])]
+radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
+minimumUnboundRadius = 2.5
+numParticleTypes = 2 # num. of particle types (not states) in unbound state
+numTrajectories = 20 #10000
 
-# Define simulation boundaries parameters (choose either spherical or box)
-boxsize = 6
-boundaryType = 'periodic'
+# Other important parameters
+lagtime = 50 #75 #300
+boxsize = 6 #8 #6
+dtMDsimulation = 0.00001
+stride = 50
+realLagtime = lagtime*dtMDsimulation*stride
 
+# Discretization parameters (need to be consistent with the on used to generate the rate dictionary
+numSphericalSectionsPos = 6
+numRadialSectionsQuat = 4
+numSphericalSectionsQuat = 6
+totalnumSecsQuat = numSphericalSectionsQuat*(numRadialSectionsQuat - 1) + 1
+numTransitionsStates = 2 * numSphericalSectionsPos * totalnumSecsQuat #228
+
+# Set diffusion coefficients for bound states
+# Parameters to define coupling Markov model for bound dynamics: couplingMSM
+Dbound = 0.5*np.ones(numBoundStates)
+DboundRot = np.ones(numBoundStates)
 
 # Chooses parent directory
 parentDirectory = "../../data/patchyProtein/first_passage_times/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/first_passage_times/"
+# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/first_passage_times/"
 
 # Creates parent directory if it doesn't exist already
 try:
@@ -47,12 +60,12 @@ try:
 except OSError as error:
     print("First passage times directory already exists. Simulation continues.")
 
-# Create empty files to save the data in parallel algorithm
-filename = parentDirectory + 'patchyProteinFPTs_' + str(initialState) + '_2unbound_trajs' \
-           + str(numTrajectories) +'_boxsize' + str(boxsize) + '.xyz'
+# Chooses filename for output file with the results of the parallel simulation
+filename = parentDirectory + 'MSMRDpatchyProteinFPTs_2unbound_trajs' + str(numTrajectories) + \
+           '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
 
-def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
+def generateParticleList(state, boxsize, types, couplingMSM, randomSeed = -1):
     '''
     Generate a random particle list of two particles corresponding to an initial unbound state. As each
     state has several different configurations, this functions picks one randomly. The definition of the
@@ -60,7 +73,7 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
     :param state: bound state in which the two particle list should begin in (can be a list of states)
     :param boxsize: size of simulation box, if scalar it assumes the three box edges are the same in all dimensions
     :param types: array containing the particle types. The index should correspond to that of of the particle list.
-    :param unboundMSMs: list of unboundMSM, needed to extract diffusion coefficients of particles.
+    :param couplingMSM: MSM for MSM/RD, needed to extract diffusion coefficients of particles.
     :param randomSeed: seed for python random generator. Important to specify in parallel runs. Default value of -1
     will use the default seed.
     :return: random particle list corresponding to one of the initialBoundstates.
@@ -102,35 +115,55 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
     substate = np.random.choice(state) # if states was originally a scalar, always picks that value.
     position2 = relPos[substate - 1]
     orientation2 = quatRotations[substate - 1]
-    p1State = 0
-    p2State = 0
     # Obtain diffusion coefficients from unboundMSM
-    D1 = unboundMSMs[types[0]].D[p1State]
-    Drot1 = unboundMSMs[types[0]].Drot[p1State]
-    D2 = unboundMSMs[types[1]].D[p2State]
-    Drot2 = unboundMSMs[types[1]].Drot[p2State]
+    Dbound = couplingMSM.D[substate - 1]
+    DrotBound = couplingMSM.Drot[substate - 1]
     # Define particles
-    part1 = msmrd2.particle(0, p1State, D1, Drot1, position1, orientation1)
-    part2 = msmrd2.particle(1, p2State, D2, Drot2, position2, orientation2)
+    part1 = msmrd2.particle(0, -1, Dbound, DrotBound, position1, orientation1)
+    part2 = msmrd2.particle(1, -1, 0.0, 0.0, position2, orientation2)
+    # Define properties of bound particles
+    part1.setBoundState(substate)
+    part2.setBoundState(substate)
+    part1.setBoundTo(1)
+    part2.setBoundTo(0)
+    part1.deactivateMSM()
+    part2.deactivateMSM()
+    part2.deactivate()
+    part2.setPosition([10000000.0, 10000000.0, 10000000.0])
+    # Define and return particle list
     partlist = msmrd2.integrators.particleList([part1, part2])
     return partlist
 
 
 
-
-def simulationFPT(trajectorynum):
+def MSMRDsimulationFPT(trajectorynum):
     '''
     Calculates first passage time of a trajectory with random initial
     conditions and final state a bound state
-    :param trajectorynum: number of trajectories on which to calculate the FPT
+    :param trajectorynum: trajectory number (index on parallel computation) on which to calculate the FPT
     :return: state, first passage time
     '''
 
     # Define dummy trajectory to extract bound states from python (needed to use getState function)
-    dummyTraj = msmrd2.trajectories.patchyProtein(numparticles,1024)
+    dummyTraj = msmrd2.trajectories.patchyProtein(numparticles, 1, radialBounds[0], minimumUnboundRadius)
+
+    # Define discretization
+    discretization = msmrd2.discretizations.positionOrientationPartition(radialBounds[1],
+                    numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat)
+    discretization.setThetasOffset(np.pi/4.0);
+
+    # Define boundary
+    boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Define base seed
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
+
+    # Load rate dicitionary
+    pickle_in = open("../../data/pickled_data/MSM_patchyProtein_t6.00E+06_s50_lagt" + str(lagtime)
+                     +  ".pickle","rb")
+    mainMSM = pickle.load(pickle_in)
+    tmatrix = mainMSM['transition_matrix']
+    activeSet = mainMSM['active_set']
 
     # Create unbound MSMlist (CTMSMs)
     # MSM for particle type0
@@ -150,28 +183,28 @@ def simulationFPT(trajectorynum):
     markovModel1.setDrot(Drot1list)
     unboundMSMlist = [markovModel0, markovModel1]
 
-    # Define simulation boundaries (choose either spherical or box)
-    boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
+    # Set coupling MSM for MSM/RD
+    seed = int(-3*trajectorynum) # Negative seed, uses random device as seed
+    couplingMSM = msmrdMSM(numBoundStates, maxNumBoundStates,  tmatrix, activeSet, realLagtime, seed)
+    couplingMSM.setDbound(Dbound, DboundRot)
 
-    # Define potential
-    potentialPatchyProtein = patchyProteinMarkovSwitch(sigma, strength, patchesCoordinates1, patchesCoordinates2)
-
-    # Define integrator and boundary (over-damped Langevin)
-    integrator = odLangevinMS(unboundMSMlist, dt, seed, bodytype)
+    # Define integrator, boundary and discretization
+    seed = -int(1*trajectorynum) # Negative seed, uses random device as seed
+    integrator = msmrdPatchyProtein(dt, seed, bodytype, numParticleTypes, radialBounds, unboundMSMlist, couplingMSM)
     integrator.setBoundary(boxBoundary)
-    integrator.setPairPotential(potentialPatchyProtein)
+    integrator.setDiscretization(discretization)
 
-    # Generate random position and orientation particle list with two particles
+# Creates random particle list
     seed = int(trajectorynum)
-    partlist = generateParticleList(initialState, boxsize, particleTypes, unboundMSMlist, randomSeed = -1)
+    partlist = generateParticleList(initialState, boxsize, particleTypes, couplingMSM, seed)
 
     # Calculates the first passage times for a given bound state. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.
     bound = True
     while(bound):
         integrator.integrate(partlist)
-        boundState = dummyTraj.getState(partlist[0], partlist[1])
-        if boundState == 0:
+        currentState = dummyTraj.getState(partlist[0], partlist[1])
+        if (partlist[0].boundTo == -1) and (currentState == 0):
             bound = False
             return initialState, integrator.clock
         elif integrator.clock >= 15000.0:
@@ -188,7 +221,7 @@ def multiprocessingHandler():
     pool = Pool(processes=num_cores)
     trajNumList = list(range(numTrajectories))
     with open(filename, 'w') as file:
-        for index, result in enumerate(pool.imap(simulationFPT, trajNumList)):
+        for index, result in enumerate(pool.imap(MSMRDsimulationFPT, trajNumList)):
             state, time = result
             if state != 'failed':
                 file.write(str(state) + ' ' + str(time) + '\n')
@@ -200,6 +233,12 @@ def multiprocessingHandler():
 # Run parallel code
 multiprocessingHandler()
 
-
-
-
+# # Serial code for testing with gdb
+# with open(filename, 'w') as file:
+#     for index in range(numTrajectories):
+#         state, time = MSMRDsimulationFPT(index)
+#         if state in boundStates:
+#             file.write(str(state) + ' ' + str(time) + '\n')
+#             print("Simulation " + str(index) + ", done. Success!")
+#         else:
+#             print("Simulation " + str(index) + ", done. Failed :(")

@@ -57,6 +57,8 @@ def relativeOrientation(q1,q2):
 def angle2quat(phi):
     ''' Transform from angle-axis representation (w*dt) to quaternion representation. '''
     phinorm = np.linalg.norm(phi)
+    if phinorm == 0:
+        return np.array([1., 0., 0., 0.])
     phiunit = phi/phinorm
     s = np.cos(0.5*phinorm)
     p = np.sin(0.5*phinorm)*phiunit

@@ -45,13 +45,10 @@ def loadDiscreteTrajectory(fnamebase, fnumber, fnamesuffix = '_discrete', filety
 
         # Get the data
         a_group_key = list(f.keys())[0]
-        data = np.array(f[a_group_key])
+        array = f.get(a_group_key)
+        nparray = np.array(array).transpose()[0]
 
-        # Transform data into simple 1D array
-        array = np.zeros(len(data), dtype = int)
-        for i in range(len(data)):
-            array[i] = data[i][0]
-        return array
+        return nparray
 
     if filetype == 'xyz':
         filename = fnamebase + str(fnumber).zfill(4) + fnamesuffix + '.xyz'

@@ -11,9 +11,9 @@ import os
 
 '''
 Creates an MSM/RD simulation of two particle that calculates first passage times (FPTs) from a random 
-unbound configuration to either of the two bound states (A or B). This requires as input a rate dictionary 
-calculated from an MSM of an MD simulation (the rate dictionary is loaded using pickle). The data is 
-written to '../data/dimer/first_passage_times/MSMRDfilename_here.
+unbound configuration to a given bound state. This requires to input the MSM for the MSM/RD algorithm 
+calculated from an MD simulation (the MSM is loaded using pickle). The data is 
+written to '../data/patchyProtein/first_passage_times/MSMRDfilename_here.
 '''
 
 # Main parameters for particle and integrator
@@ -26,7 +26,6 @@ numBoundStates = 6
 maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 minimumUnboundRadius = 2.5
-numTrajectories = 20 #10000
 numParticleTypes = 2 # num. of particle types (not states) in unbound state
 numTrajectories = 20 #10000
 
@@ -64,7 +63,7 @@ except OSError as error:
     print("First passage times directory already exists. Simulation continues.")
 
 # Chooses filename for output file with the results of the parallel simulation
-filename = parentDirectory + 'MSMRDpatchyDimerFPTs_2bound_trajs' + str(numTrajectories) + \
+filename = parentDirectory + 'MSMRDpatchyProteinFPTs_2bound_trajs' + str(numTrajectories) + \
            '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
 def MSMRDsimulationFPT(trajectorynum):
@@ -124,7 +123,7 @@ def MSMRDsimulationFPT(trajectorynum):
 
 # Creates random particle list
     seed = int(trajectorynum)
-    partlist = particleTools.randomParticleMSList(numparticles, boxsize, minimumUnboundRadius ,
+    partlist = particleTools.randomParticleMSList(numparticles, boxsize, minimumUnboundRadius,
                                                   particleTypes, unboundMSMlist, seed)
 
     # Calculates the first passage times for a given bound state. Each trajectory is integrated until

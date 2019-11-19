@@ -72,14 +72,15 @@ except OSError as error:
 filename = parentDirectory + 'MSMRDpatchyDimerFPTs_' + initialState + '2unbound_trajs' \
            + str(numTrajectories) + '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
-def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
+def generateParticleList(state, boxsize, types, couplingMSM, randomSeed = -1):
     '''
     Generate a random particle list of two particles corresponding to either state A or state B. As each
     state has several different configurations, this functions picks one randomly. The definition of the
     states is taken form patchyDimer.cpp
     :param state: bound state in which the two particle list should be in, A or B
     :param boxsize: size of simulation box, if scalar it assumes the three box edges are the same in all dimensions
-    :param unboundMSMs: list of unboundMSM, needed to extract diffusion coefficients of particles.
+    :param types: array containing the particle types. The index should correspond to that of of the particle list.
+    :param couplingMSM: MSM for MSM/RD, needed to extract diffusion coefficients of particles.
     :param randomSeed: seed for python random generator. Important to specify in parallel runs. Default value of -1
     will use the default seed.
     :return: random particle list corresponding to either state A or state B.
@@ -93,13 +94,6 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
     if np.isscalar(types):
         newtypes = np.ones(2, dtype = 'int')
         types = (types*newtypes).astype(int)
-
-    # Obtain diffusion coefficients from unboundMSM
-    D1 = unboundMSMs[types[0]].D[0]
-    Drot1 = unboundMSMs[types[0]].Drot[0]
-    D2 = unboundMSMs[types[1]].D[0]
-    Drot2 = unboundMSMs[types[1]].Drot[0]
-
 
     position1 = np.array([0.0, 0.0, 0.0])
     #position1 = np.array([boxsize[0]*random.random()-0.5*boxsize[0],
@@ -141,8 +135,12 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
         substate = random.choice([3,4,7,8])
         position2 = pos2[substate - 1]
         orientation2 = quatRotations[substate - 1]
-    part1 = msmrd2.particle(types[0], -1, D1, Drot1, position1, orientation1)
-    part2 = msmrd2.particle(types[1], -1, D2, Drot2, position2, orientation2)
+    # Obtain diffusion coefficients from unboundMSM
+    Dbound = couplingMSM.D[substate - 1]
+    DrotBound = couplingMSM.Drot[substate - 1]
+    # Define particles
+    part1 = msmrd2.particle(types[0], -1, Dbound, DrotBound, position1, orientation1)
+    part2 = msmrd2.particle(types[1], -1, 0., 0., position2, orientation2)
     # Set up bound particles as if done by the code (deactivate one of them)
     part1.setBoundState(substate)
     part2.setBoundState(substate)
@@ -199,7 +197,7 @@ def MSMRDsimulationFPT(trajectorynum):
 
     # Generate random position and orientation particle list with two particles
     seed = int(trajectorynum)
-    partlist = generateParticleList(initialState, boxsize, partTypes, [unboundMSM], seed)
+    partlist = generateParticleList(initialState, boxsize, partTypes, couplingMSM, seed)
 
     # Calculates the first passage times for a given bound state. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.
