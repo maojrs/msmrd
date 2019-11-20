@@ -32,7 +32,7 @@ namespace msmrd {
         std::array<double,2> radialBounds;
         int numParticleTypes;
         bool firstrun = true;
-        bool outputEventLog = true;
+        bool recordEventLog = false;
     public:
         eventManager eventMgr = eventManager();
         msmrdMSM markovModel;
@@ -53,7 +53,7 @@ namespace msmrd {
         * @param numParticleTypes define the number of particle types in the unbound states in the
         * simulation (usually 1 or 2).
         * @param firstrun boolean variable to check if the integrator is ran for the first time in a simulation.
-        * @param outputEventLog boolean to dump or not dump event list for every time step
+        * @param recordEventLog boolean to dump or not dump event list for every time step
         * into eventMgr.eventLog. Useful for debugging, but need to watch out memory if log not dumped fast enough.
         * @param eventManager class to manage order of events (reactions/transitions).
         * @param markovModel pointer to class msmrdMSMDiscrete, which is the markovModel class specialized for
@@ -93,6 +93,12 @@ namespace msmrd {
 
         void setDiscretization(std::shared_ptr<fullPartition> &thisFullPartition);
 
+
+        /* Other useful functions to output log files (setRecordEventLog sets recordEventLog variable. This
+         * needs to be set to true in order to printEventLog function to print anything meaningful) */
+
+        void setRecordEventLog(bool value) { recordEventLog = value; }
+
         void printEventLog(std::string filename);
 
 
@@ -116,6 +122,8 @@ namespace msmrd {
         virtual void removeUnrealizedEvents(std::vector<particle> &parts);
 
         virtual void applyEvents(std::vector<particle> &parts);
+
+
 
 
     };
@@ -187,6 +195,10 @@ namespace msmrd {
     // Prints eventlog by invoking method from eventMgr into file filename.dat
     template <typename templateMSM>
     void msmrdIntegrator<templateMSM>::printEventLog(std::string filename) {
+        if (not recordEventLog) {
+            throw std::runtime_error("Need to use setRecordEventLog to set recordEventLog true in order to "
+                                     "print the event log.");
+        }
         eventMgr.printEventLog(filename);
     }
 

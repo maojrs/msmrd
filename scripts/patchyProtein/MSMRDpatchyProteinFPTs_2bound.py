@@ -27,10 +27,10 @@ maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 minimumUnboundRadius = 2.5
 numParticleTypes = 2 # num. of particle types (not states) in unbound state
-numTrajectories = 20 #10000
+numTrajectories = 1000 #10000
 
 # Other important parameters
-lagtime = 150 #75 #300
+lagtime = 50 #75 #150 #75 #300
 boxsize = 6 #8 #6
 dtMDsimulation = 0.00001
 stride = 50
@@ -63,7 +63,7 @@ except OSError as error:
     print("First passage times directory already exists. Simulation continues.")
 
 # Chooses filename for output file with the results of the parallel simulation
-filename = parentDirectory + 'MSMRDpatchyProteinFPTs_2bound_trajs' + str(numTrajectories) + \
+filename = parentDirectory + 'testMSMRDpatchyProteinFPTs_2bound_trajs' + str(numTrajectories) + \
            '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
 def MSMRDsimulationFPT(trajectorynum):
@@ -134,6 +134,9 @@ def MSMRDsimulationFPT(trajectorynum):
         currentState = partlist[0].boundState
         if currentState in boundStates:
             unbound = False
+            #filenameLog = filename = "/home/maojrs/Dokumente/Postdoc/projects/MSMRD2/" \
+            #                         "msmrd2/data/patchyProtein/debug/eventLog_" + str(trajectorynum)
+            #integrator.printEventLog(filenameLog)
             return currentState, integrator.clock
         elif integrator.clock >= 15000.0:
             unbound = False
@@ -154,6 +157,7 @@ def multiprocessingHandler():
             if state in boundStates:
                 file.write(str(state) + ' ' + str(time) + '\n')
                 print("Simulation " + str(index) + ", done. Success!")
+                print(str(time))
             else:
                 print("Simulation " + str(index) + ", done. Failed :(")
 

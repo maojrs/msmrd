@@ -20,7 +20,7 @@ dt = 0.0001 #0.00001 #0.000005
 bodytype = 'rigidbody'
 particleTypes = [0, 1]
 minimumUnboundRadius = 2.5
-numTrajectories = 20 #10000
+numTrajectories = 5000 #10000
 numBoundStates = 6
 initialState = 1 # 1 to 6 possible values
 
@@ -48,7 +48,7 @@ except OSError as error:
     print("First passage times directory already exists. Simulation continues.")
 
 # Create empty files to save the data in parallel algorithm
-filename = parentDirectory + 'patchyProteinFPTs_' + str(initialState) + '_2unbound_trajs' \
+filename = parentDirectory + 'patchyProteinFPTs_2unbound_trajs' \
            + str(numTrajectories) +'_boxsize' + str(boxsize) + '.xyz'
 
 

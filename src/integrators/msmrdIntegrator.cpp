@@ -415,8 +415,8 @@ namespace msmrd {
         updatePositionOrientation(parts);
 
 
-        // Output eventlog for debugging
-        if (outputEventLog) {
+        // Output eventlog (useful for debugging)
+        if (recordEventLog) {
             auto timeIteration = static_cast<int>(clock / dt);
             eventMgr.write2EventLog(timeIteration);
         }

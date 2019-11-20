@@ -29,10 +29,10 @@ initialState = 1 # 1 to 6 possible values
 radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 minimumUnboundRadius = 2.5
 numParticleTypes = 2 # num. of particle types (not states) in unbound state
-numTrajectories = 20 #10000
+numTrajectories = 5000 #10000
 
 # Other important parameters
-lagtime = 50 #75 #300
+lagtime = 75 #50 #75 #300
 boxsize = 6 #8 #6
 dtMDsimulation = 0.00001
 stride = 50
@@ -61,7 +61,7 @@ except OSError as error:
     print("First passage times directory already exists. Simulation continues.")
 
 # Chooses filename for output file with the results of the parallel simulation
-filename = parentDirectory + 'MSMRDpatchyProteinFPTs_2unbound_trajs' + str(numTrajectories) + \
+filename = parentDirectory + 'testMSMRDpatchyProteinFPTs_2unbound_trajs' + str(numTrajectories) + \
            '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
 
