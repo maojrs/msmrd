@@ -82,16 +82,33 @@ namespace msmrd {
         }
     }
 
-    // Outputs event log into file
-    void eventManager::outputEventLog(int timeIteration, std::string baseFilename) {
-        std::ofstream outputfile;
-        outputfile.open (baseFilename + "_t" + std::to_string(timeIteration)+ ".txt");
-        for (auto &thisEvent : eventDictionary) {
-            auto value = thisEvent.second;
-            outputfile << value.waitTime << " " << value.endState << " " << value.part1Index <<
-                       " " << value.part2Index << " " << value.originState << " " << value.eventType << " \n";
+
+    // Writes current events to event logfile
+    void eventManager::write2EventLog(int timeIteration) {
+        eventLog.push_back(std::to_string(timeIteration));
+        if (eventDictionary.size() > 0) {
+            for (auto &thisEvent : eventDictionary) {
+                auto value = thisEvent.second;
+                auto event = std::to_string(value.waitTime) + " " + std::to_string(value.part1Index) +
+                         " " + std::to_string(value.part2Index) + " " + std::to_string(value.originState) +
+                         " " + std::to_string(value.endState) + " " + value.eventType + " \n";
+                eventLog.push_back(event);
+            }
+        } else{
+            eventLog.push_back("No events \n");
         }
-        outputfile.close();
     }
+
+    // Prints log into file
+    void eventManager::printEventLog(std::string baseFilename) {
+            std::ofstream outputfile;
+            outputfile.open (baseFilename + ".dat");
+            for (auto &thisLine : eventLog) {
+                outputfile << thisLine << " \n";
+            }
+            outputfile.close();
+            eventLog.clear();
+    }
+
 
 }

@@ -34,6 +34,11 @@ namespace msmrd {
         auto tempPositionPart = std::make_shared<spherePartition>(spherePartition(numSphericalSectionsPos));
         auto tempPositionOrientationPart = std::make_shared<fullPartition> (fullPartition(relativeDistanceCutOff,
                 numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat));
+        // Apply default theta offset used for this implementation of patchy proteins
+        double offTheta = M_PI/4;
+        tempPositionPart->setThetasOffset(offTheta);
+        tempPositionOrientationPart->setThetasOffset(offTheta);
+        // Set discretization into integrator
         setDiscretization(tempPositionPart);
         setDiscretization(tempPositionOrientationPart);
     };

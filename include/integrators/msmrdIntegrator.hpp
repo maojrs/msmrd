@@ -32,6 +32,7 @@ namespace msmrd {
         std::array<double,2> radialBounds;
         int numParticleTypes;
         bool firstrun = true;
+        bool outputEventLog = true;
     public:
         eventManager eventMgr = eventManager();
         msmrdMSM markovModel;
@@ -51,6 +52,9 @@ namespace msmrd {
         * the discretization used coreMSM
         * @param numParticleTypes define the number of particle types in the unbound states in the
         * simulation (usually 1 or 2).
+        * @param firstrun boolean variable to check if the integrator is ran for the first time in a simulation.
+        * @param outputEventLog boolean to dump or not dump event list for every time step
+        * into eventMgr.eventLog. Useful for debugging, but need to watch out memory if log not dumped fast enough.
         * @param eventManager class to manage order of events (reactions/transitions).
         * @param markovModel pointer to class msmrdMSMDiscrete, which is the markovModel class specialized for
         * the MSM/RD scheme. It controls the markov Model in the bound state and the msmrd coupling.
@@ -88,6 +92,8 @@ namespace msmrd {
         void setDiscretization(std::shared_ptr<spherePartition> &thisSpherePartition);
 
         void setDiscretization(std::shared_ptr<fullPartition> &thisFullPartition);
+
+        void printEventLog(std::string filename);
 
 
         /* Main MSM/RD function. They are defined as virtual in case we want to override them in derived classes
@@ -178,5 +184,10 @@ namespace msmrd {
         positionOrientationPart = thisFullPartition;
     }
 
+    // Prints eventlog by invoking method from eventMgr into file filename.dat
+    template <typename templateMSM>
+    void msmrdIntegrator<templateMSM>::printEventLog(std::string filename) {
+        eventMgr.printEventLog(filename);
+    }
 
 }

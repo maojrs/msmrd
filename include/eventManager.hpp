@@ -24,6 +24,7 @@ namespace msmrd {
         struct event emptyEvent = {.waitTime = std::numeric_limits<double>::infinity(),
                 .part1Index = -1, .part2Index = -1, .originState = -1,  .endState = -1, .eventType = "empty"};
         std::map<std::string, event> eventDictionary;
+        std::vector<std::string> eventLog;
 
         /*
          * @struct event, each event consists of 5 variables, time until event happens, the state to which it will
@@ -34,6 +35,7 @@ namespace msmrd {
          * @param emptyEvent defines default emptyEvent, returns event with waitTime = infinity.
          * @param eventDictionary, list of events/reaction/transitions, associated with a key corresponding to the
          * two indexes of the particles involved, e.g. "part1Index--part2Index", or more specifically "1--2".
+         * @param eventLog can be programmed to keep a log of the events for all or some timesteps.
          */
 
         eventManager() {};
@@ -53,7 +55,9 @@ namespace msmrd {
 
         int getNumEvents() { return eventDictionary.size(); }
 
-        void outputEventLog(int timeIteration, std::string baseFilename);
+        void write2EventLog(int timeIteration);
+
+        void printEventLog(std::string baseFilename);
 
     };
 }

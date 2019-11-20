@@ -155,13 +155,14 @@ namespace msmrd {
                     /* Computes new transition if particles drifted into transition region for
                      * the first time, i.e. empty event and relativeDistance < radialBounds[1], or if
                      * particles transitioned between transition states. */
+                    currentTransitionState = -1;
                     auto previousEvent = eventMgr.getEvent(i, j);
                     if (previousEvent.eventType == "empty") {
                         // returns -1 if |relativePosition| > radialBounds[1]
                         currentTransitionState = computeCurrentTransitionState(parts[i], parts[j]);
                     } else if (previousEvent.eventType == "inTransition") {
                         //previous endState is current starting state
-                        currentTransitionState = previousEvent.endState;
+                        currentTransitionState = 1 * previousEvent.endState;
                         eventMgr.removeEvent(i, j);
                     }
                     // If valid currentTransitionState (see computeCurrentTransitionState), calculate next transition.
@@ -413,6 +414,12 @@ namespace msmrd {
          * are modified directly and don't need to be updated. */
         updatePositionOrientation(parts);
 
+
+        // Output eventlog for debugging
+        if (outputEventLog) {
+            auto timeIteration = static_cast<int>(clock / dt);
+            eventMgr.write2EventLog(timeIteration);
+        }
 
     }
 

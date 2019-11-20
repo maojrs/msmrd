@@ -40,7 +40,7 @@ namespace msmrd {
          * @param numSphericalSections number of spherical sections in surface of sphere. Each radial shell in
          * the partition has numSphericalShells section in it.
          * @param numTotalSections total number of sections in partition
-         * @param sphericalPartition pointer to pherical partition on the surface. Along with the
+         * @param sphericalPartition pointer to spherical partition on the surface. Along with the
          * radial sections it is used to define the volumetric sections.
          * @param radialSections vector with radial values to define cuts of radial sections. Along with the
          * halfSphericalPartition it is used to define the volumetric sections.

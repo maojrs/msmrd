@@ -51,6 +51,7 @@ namespace msmrd {
                 .def("setDiscretization", (void (msmrdIntegrator<ctmsm>::*)
                         (std::shared_ptr<positionOrientationPartition>&)) &msmrdIntegrator<ctmsm>::setDiscretization,
                         "Sets full position orientation discretization")
+                .def("printEventLog", &msmrdIntegrator<ctmsm>::printEventLog)
                 .def("integrate", &msmrdIntegrator<ctmsm>::integrate);
 
 

@@ -33,8 +33,8 @@ namespace msmrd {
         double transitionTime = std::get<0>(transition);
         int nextState = std::get<1>(transition);
         // Recover correct indexing for MSM/RD (same as discrete trajectories)
-        nextState = activeSet[nextState];
-        return std::make_tuple(transitionTime, nextState);
+        auto nState = activeSet[nextState];
+        return std::make_tuple(transitionTime, nState);
     };
 
 
