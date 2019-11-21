@@ -50,13 +50,14 @@ namespace msmrd {
     }
 
 
-    int msmrdMarkovModel::getMSMRDindex(int MSMindex){
+    //  Get MSMRD state from index
+    int msmrdMarkovModel::getActiveSetIndex(int MSMindex){
         return activeSet[MSMindex];
     };
 
-    int msmrdMarkovModel::getMSMindex(int MSMRDindex){
+    int msmrdMarkovModel::getMSMindex(int activeSetIndex){
         // Find index (MSMindex) of initialState (MSMRDindex) in the transition matrix
-        std::vector<int>::iterator itr = std::find(activeSet.begin(), activeSet.end(), MSMRDindex);
+        std::vector<int>::iterator itr = std::find(activeSet.begin(), activeSet.end(), activeSetIndex);
         if (itr != activeSet.cend()) {
             // Element found, return corresponding MSM index
             return std::distance(activeSet.begin(), itr);

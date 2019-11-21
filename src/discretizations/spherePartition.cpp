@@ -99,7 +99,6 @@ namespace msmrd{
 
     // Adds an offset on the thetas, must be a positive value and preferably smaller than all the possible dthetas
     void spherePartition::setThetasOffset(double offset) {
-         double dtheta = std::abs(thetas[0][1] - thetas[0][0]);
          if ( offset < 0) {
              throw std::invalid_argument("Offset must be positive and preferably smaller than smaller "
                                          "dtheta in discretization");

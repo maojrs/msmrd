@@ -4,6 +4,7 @@
 #include <catch2/catch.hpp>
 #include "markovModels/discreteTimeMarkovModel.hpp"
 #include "markovModels/continuousTimeMarkovModel.hpp"
+#include "markovModels/msmrdMarkovModel.hpp"
 
 
 using namespace msmrd;
@@ -43,37 +44,30 @@ TEST_CASE("Fundamental CTMSM parameters and propagation test", "[ctmsm]") {
     }
 }
 
-//TEST_CASE("Initialization of dictionary in msmrdMarkovModel class", "[msmrdMarkovModel]") {
-//    int nBoundStates = 2;
-//    int nTransitionStates = 2;
-//    std::map<std::string, float> rateDictionary = { {"11->b1", 5.0}, {"11->b2", 3.0},
-//                                                    {"12->b1", 4.0}, {"12->b2", 12.0},
-//                                                    {"b1->11", 1.0}, {"b1->12", 0.5},
-//                                                    {"b2->11", 2.0}, {"b2->12", 1.5},
-//                                                    {"b1->b2", 0.7}, {"b2->b1", 1.2}};
-//    // Create an msmMarkovModel
-//    auto myMSM = msmrdMarkovModel(nBoundStates, nTransitionStates, -1, rateDictionary);
-//    // Check if the initialization of ctmsms in msmrdMarkovmodel is done correctly.
-//    auto rate1b1 = myMSM.getRate("11->b1");
-//    auto rate2b1 = myMSM.getRate("12->b1");
-//    auto rate1b2 = myMSM.getRate("11->b2");
-//    auto rate2b2 = myMSM.getRate("12->b2");
-//    REQUIRE(rate1b1 == 5.0);
-//    REQUIRE(rate2b1 == 4.0);
-//    REQUIRE(rate1b2 == 3.0);
-//    REQUIRE(rate2b2 == 12.0);
-//    // Check transitions to bound state
-//    auto transition = myMSM.computeTransition2BoundState(1);
-//    auto time = std::get<0>(transition);
-//    auto endState = std::get<1>(transition);
-//    REQUIRE(time > 0);
-//    bool correctEndState = endState == 1 || endState == 2;
-//    REQUIRE(correctEndState);
-//    // Check transitions from bound states
-//    auto transition2 = myMSM.computeTransitionFromBoundState(1);
-//    auto time2 = std::get<0>(transition2);
-//    auto endState2 = std::get<1>(transition2);
-//    REQUIRE(time2 > 0);
-//    bool correctEndState2 = endState2 == 11 || endState2 == 12 || endState2 == 2;
-//    REQUIRE(correctEndState2);
-//}
+TEST_CASE("Initialization of msmrdMarkovModel class", "[msmrdMarkovModel]") {
+    double lagtime = 1;
+    long seed = -1;
+    int numBoundStates = 2; // states 1 and 2
+    int maxNumBoundStates = 10;
+    int numTransitionStates = 2; // states 10 or 11
+    std::vector<std::vector<double>> tmatrix = {{0.0, 0.3, 0.2, 0.5},
+                                                {0.4, 0.3, 0.1, 0.2},
+                                                {0.1, 0.1, 0.6, 0.2},
+                                                {0.4, 0.2, 0.3, 0.1}};
+    std::vector<int> activeSet = {1, 2, 11, 12}; // MSMindexing is 0, 1, 2, 3, respectively.
+
+    auto msmrdMSM = msmrdMarkovModel(numBoundStates, maxNumBoundStates, tmatrix, activeSet, lagtime, seed);
+
+    // Check transition works normally
+    auto transition = msmrdMSM.calculateTransition(1); // uses activeSetIndex
+    auto time = std::get<0>(transition);
+    auto endState = std::get<1>(transition); // gets state in activeSetIndex
+    REQUIRE(time > 0);
+    bool correctEndState = endState == 2 || endState == 11 || endState == 12; // uses activeSetIndex
+    REQUIRE(correctEndState);
+    // Check functions to recover MSM and activeSet indexes are working
+    for (int i = 0; i < activeSet.size(); i++) {
+        REQUIRE(msmrdMSM.getActiveSetIndex(i) == activeSet[i]);
+        REQUIRE(msmrdMSM.getMSMindex(activeSet[i]) == i);
+    }
+}

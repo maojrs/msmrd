@@ -79,7 +79,7 @@ TEST_CASE("Sampling from randomgen", "[randomgen]") {
     for (int i=0; i<1000; i++) {
         rand1 += randg.normal(0,1)/1000;
     }
-    REQUIRE(std::abs(rand1) <= 0.1);
+    REQUIRE(std::abs(rand1) <= 0.3);
     // Uniform Sphere
     vec3<double> trial1;
     vec3<double> trial2;
