@@ -25,7 +25,7 @@ namespace msmrd {
                                                                                  numRadialSectionsQuat,
                                                                                  numSphericalSectionsQuat);
         // Offset thetas in discretization to match patches
-        double offTheta = M_PI/4;
+        double offTheta = M_PI/4.0;
         positionOrientationPart->setThetasOffset(offTheta);
 
         // Set bound states defined for the patchy protein example
@@ -36,7 +36,6 @@ namespace msmrd {
                                                      double rLowerBound, double rUpperBound) :
             discreteTrajectory(Nparticles, bufferSize, rLowerBound, rUpperBound) {
 
-        setRadialBounds(rLowerBound, rUpperBound);
         setTolerances(0.12, 0.12*2*M_PI);
 
         int numSphericalSectionsPos = 6; //7; //7;
@@ -46,7 +45,7 @@ namespace msmrd {
                                                                                  numRadialSectionsQuat,
                                                                                  numSphericalSectionsQuat);
         // Offset thetas in discretization to match patches
-        double offTheta = M_PI/4;
+        double offTheta = M_PI/4.0;
         positionOrientationPart->setThetasOffset(offTheta);
 
         // Set bound states defined for the patchy protein example
@@ -93,10 +92,15 @@ namespace msmrd {
     }
 
 
+    /*
+     * Alternative implementation of patchyProteinTrajectory
+     */
+
     /* Based on parent class discreteTrajectory function. It differs with the original since it takes
      * the particle 2 state to choose a discrete state. It assumes particle can only bind, while particle 2
-     * is in state 0.*/
-    int patchyProteinTrajectory::sampleDiscreteState(particle part1, particle part2) {
+     * is in state 0. The previous implementation assumes the behavior of particle's 2 state is averaged by
+     * the MSM. */
+    int patchyProteinTrajectory2::sampleDiscreteState(particle part1, particle part2) {
         // Initialize sample with value zero (unbound state)
         int discreteState = 0;
 
@@ -133,6 +137,6 @@ namespace msmrd {
             discreteState  = maxNumberBoundStates + secNum;
         }
         return discreteState;
-    };
+    }
 
 }

@@ -27,9 +27,18 @@ namespace msmrd {
 
         patchyProteinTrajectory(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
 
-        int sampleDiscreteState(particle part1, particle part2) override;
-
         void setBoundStates();
+
+    };
+
+
+    /* Alternative implementation of patchyProteinTrajectory */
+    class patchyProteinTrajectory2 : public patchyProteinTrajectory {
+    public:
+
+        using patchyProteinTrajectory::patchyProteinTrajectory;
+
+        int sampleDiscreteState(particle part1, particle part2) override;
 
     };
 

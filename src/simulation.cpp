@@ -39,9 +39,13 @@ namespace msmrd {
             outputDiscreteTraj = true;
             traj = std::make_unique<patchyDimerTrajectory2>(particleList.size(), bufferSize);
             numcols = 9; //(time, positionx3, orientationx4, state)
-        } else if (trajtype == "patchyProtein"){
+        } else if (trajtype == "patchyProtein") {
             outputDiscreteTraj = true;
             traj = std::make_unique<patchyProteinTrajectory>(particleList.size(), bufferSize);
+            numcols = 9; //(time, positionx3, orientationx4, state)
+        } else if (trajtype == "patchyProtein2"){
+            outputDiscreteTraj = true;
+            traj = std::make_unique<patchyProteinTrajectory2>(particleList.size(), bufferSize);
             numcols = 9; //(time, positionx3, orientationx4, state)
         } else if (trajtype == "position"){
             traj = std::make_unique<trajectoryPosition>(particleList.size(), bufferSize);
