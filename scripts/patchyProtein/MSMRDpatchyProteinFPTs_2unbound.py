@@ -61,7 +61,7 @@ except OSError as error:
     print("First passage times directory already exists. Simulation continues.")
 
 # Chooses filename for output file with the results of the parallel simulation
-filename = parentDirectory + 'testMSMRDpatchyProteinFPTs_2unbound_trajs' + str(numTrajectories) + \
+filename = parentDirectory + 'MSMRDpatchyProteinFPTs_2unbound_trajs' + str(numTrajectories) + \
            '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
 

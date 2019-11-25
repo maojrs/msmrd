@@ -20,6 +20,7 @@ dt = 0.0001 #0.00001 #0.000005
 bodytype = 'rigidbody'
 particleTypes = [0, 1]
 minimumUnboundRadius = 2.5
+radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 numTrajectories = 5000 #10000
 numBoundStates = 6
 initialState = 1 # 1 to 6 possible values
@@ -127,7 +128,7 @@ def simulationFPT(trajectorynum):
     '''
 
     # Define dummy trajectory to extract bound states from python (needed to use getState function)
-    dummyTraj = msmrd2.trajectories.patchyProtein(numparticles,1024)
+    dummyTraj = msmrd2.trajectories.patchyProtein(numparticles, 1024, radialBounds[0], minimumUnboundRadius)
 
     # Define base seed
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed

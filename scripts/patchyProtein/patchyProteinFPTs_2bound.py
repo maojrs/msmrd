@@ -20,7 +20,7 @@ dt = 0.0001 #0.00001 #0.000005
 bodytype = 'rigidbody'
 particleTypes = [0, 1]
 minimumUnboundRadius = 2.5
-numTrajectories = 20 #10000
+numTrajectories = 5000 #10000
 
 # Define Patchy Protein potential parameters (This values are fixed and should match
 # those used to determine metastable states in potential and trajectory.)
@@ -98,7 +98,7 @@ def simulationFPT(trajectorynum):
 
     # Creates random particle list
     seed = int(trajectorynum)
-    partlist = particleTools.randomParticleMSList(numparticles, boxsize, minimumUnboundRadius ,
+    partlist = particleTools.randomParticleMSList(numparticles, boxsize, minimumUnboundRadius,
                                                   particleTypes, unboundMSMlist, seed)
 
     # Calculates the first passage times for a given bound state. Each trajectory is integrated until
@@ -129,6 +129,7 @@ def multiprocessingHandler():
             if state in boundStates:
                 file.write(str(state) + ' ' + str(time) + '\n')
                 print("Simulation " + str(index) + ", done. Success!")
+                print(str(time))
             else:
                 print("Simulation " + str(index) + ", done. Failed :(")
 

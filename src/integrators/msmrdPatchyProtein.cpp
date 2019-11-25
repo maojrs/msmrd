@@ -5,10 +5,12 @@
 #include "integrators/msmrdPatchyProtein.hpp"
 
 namespace msmrd {
+
     /**
-     * Implementation of MSM/RD integrator for patchyProteins. Same constructor than msmrdIntegrator; however, it
+     * Implementation of MSM/RD integrator for patchyProteins2. Same constructor than msmrdIntegrator; however, it
      * calls a new discretization.
      */
+
     msmrdPatchyProtein::msmrdPatchyProtein(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
                        std::array<double,2> radialBound, std::vector<ctmsm> MSMlist, msmrdMSM markovModel) :
             msmrdIntegrator<ctmsm>::msmrdIntegrator(dt, seed, particlesbodytype, numParticleTypes,
@@ -35,18 +37,24 @@ namespace msmrd {
         auto tempPositionOrientationPart = std::make_shared<fullPartition> (fullPartition(relativeDistanceCutOff,
                 numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat));
         // Apply default theta offset used for this implementation of patchy proteins
-        double offTheta = M_PI/4;
+        double offTheta = M_PI/4.0;
         tempPositionPart->setThetasOffset(offTheta);
         tempPositionOrientationPart->setThetasOffset(offTheta);
+        //tempPositionOrientationPart->sphericalPartition->setThetasOffset(offTheta);
+        //tempPositionOrientationPart->quatPartition->sphericalPartition->setThetasOffset(offTheta);
         // Set discretization into integrator
         setDiscretization(tempPositionPart);
         setDiscretization(tempPositionOrientationPart);
     };
 
+
     /**
-     * Auxiliary functions to be overriden
+     * Implementations of specializations of msmrdPatchyProtein, i.e. msmrdPatchyProtein2, which is used
+     * with trajectories derived from patchyProteinTrajectory2.
      */
-    int msmrdPatchyProtein::setNewUnboundState(int unboundState, std::vector<particle> &parts, int partIndex) {
+
+    // Sets chosen new unbound state (if allowed by (unbound)MSMlist)
+    int msmrdPatchyProtein2::setNewUnboundState(int unboundState, std::vector<particle> &parts, int partIndex) {
         int newState = 0;
         auto partType = parts[partIndex].type;
         if (MSMlist[partType].tmatrix.size() > 1) {
@@ -65,28 +73,25 @@ namespace msmrd {
     }
 
 
-    /**
-     * Main MSM/RD patchy protein integrator overridden functions
-     */
-
+     // Main MSM/RD integrator overridden functions
 
     // Same as msmrdIntegrator<ctmsm>::computeCurrentTransitionState but adjusts output if part2.state == 1
-    int msmrdPatchyProtein::computeCurrentTransitionState(particle &part1, particle &part2) {
+    int msmrdPatchyProtein2::computeCurrentTransitionState(particle &part1, particle &part2) {
         int currentTransitionState = msmrdIntegrator<ctmsm>::computeCurrentTransitionState(part1, part2);
-        if (part2.state == 1 and currentTransitionState > markovModel.getMaxNumberBoundStates()) {
-            if (rotation) {
-                currentTransitionState += positionOrientationPart->numTotalSections;
-            } else {
-                currentTransitionState += positionPart->numSections;
-            }
-        }
+//        if (part2.state == 1 and currentTransitionState > markovModel.getMaxNumberBoundStates()) {
+//            if (rotation) {
+//                currentTransitionState += positionOrientationPart->numTotalSections;
+//            } else {
+//                currentTransitionState += positionPart->numSections;
+//            }
+//        }
         return currentTransitionState;
     }
 
 
     /* Same as msmrdIntegrator<ctmsm>::transition2UnboundState, with minor adjustments to deal with additional
      * transition states corresponding to part2.state=1. */
-    void msmrdPatchyProtein::transition2UnboundState(std::vector<particle> &parts, int iIndex,
+    void msmrdPatchyProtein2::transition2UnboundState(std::vector<particle> &parts, int iIndex,
                                                      int jIndex, int endStateAlt) {
         int unboundState = 0;
 

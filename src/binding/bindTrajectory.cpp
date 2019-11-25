@@ -98,6 +98,15 @@ namespace msmrd {
                 .def("write2H5file", &patchyProteinTrajectory::write2H5file<double, 8>)
                 .def("writeChunk2H5file", &patchyProteinTrajectory::writeChunk2H5file<double, 8>);
 
+        // Alternative version of patchyProteinTrajectory
+        py::class_<patchyProteinTrajectory2, patchyProteinTrajectory>(m, "patchyProtein2", "alternative discrete "
+                                                                "trajectory of patchy protein example(#particles "
+                                                                "or #pairs of particles, approx size)")
+                .def(py::init<int &, int &>())
+                .def(py::init<int &, int &, double &, double &>())
+                .def("sampleDiscreteState", &patchyProteinTrajectory::sampleDiscreteState)
+                .def("getState", &patchyProteinTrajectory::sampleDiscreteState);
+
 
 
     }

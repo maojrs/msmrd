@@ -68,6 +68,18 @@ namespace msmrd {
                         msmrdMSM &>());
 
 
+        py::class_<msmrdPatchyProtein2, msmrdPatchyProtein>(m, "msmrdPatchyProtein2",
+                                                               "Integrator for msmrd algorithm, specialized for"
+                                                               "patchyProtein2 implementation (timestep, seed, "
+                                                               "particlesbodytype, numParticleTypes, "
+                                                               "relativeDistanceCutOff,"
+                                                               "MSMlist, mainMarkovModel, "
+                                                               "positionOrientationPartition)")
+                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, ctmsm &, msmrdMSM &>())
+                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, std::vector<ctmsm> &,
+                        msmrdMSM &>());
+
+
         // Created c++ compatible particle list/vector/array of particles in python
         py::bind_vector<std::vector<particle>>(m, "particleList", py::module_local());
 
