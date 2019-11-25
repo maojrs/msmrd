@@ -19,7 +19,7 @@ using msm = msmrd::discreteTimeMarkovStateModel;
 using ctmsm = msmrd::continuousTimeMarkovStateModel;
 using msmrdMSM = msmrd::msmrdMarkovModel;
 
-TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
+TEST_CASE("Initialization of MSMRD integrator class", "[msmrdIntegrator]") {
     int numBoundStates = 2;
     int numTransitionStates = 2;
     int maxNumBoundStates = 10;
@@ -63,7 +63,8 @@ TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
     // Define and set up integrators
     double dt = 0.002;
     std::string bodytype = "rigidbody";
-    auto myIntegrator = msmrdIntegrator<ctmsm>(dt, seed, bodytype, numParticleTypes, radialBounds, unboundMSM, msmrdMSM);
+    auto myIntegrator = msmrdIntegrator<ctmsm>(dt, seed, bodytype, numParticleTypes,
+                                               radialBounds, unboundMSM, msmrdMSM);
     myIntegrator.setBoundary(&boundary);
 
     // Check  msmrdMSM is loaded correctly
@@ -87,7 +88,13 @@ TEST_CASE("Main MSMRD integrator class", "[msmrdIntegrator]") {
     auto discretization = std::make_shared<positionOrientationPartition> (
             positionOrientationPartition(relativeDistanceCutOff, numSphericalSectionsPos,
                                          numRadialSectionsQuat, numSphericalSectionsQuat));
-    discretization->setThetasOffset(M_PI/4.0);
+    double offset = M_PI/4.0;
+    discretization->setThetasOffset(offset);
     myIntegrator.setDiscretization(discretization);
     REQUIRE(myIntegrator.positionOrientationPart->numTotalSections == 114);
+    auto partition = myIntegrator.positionOrientationPart->sphericalPartition->getPartition();
+    auto thetas = std::get<2>(partition);
+    auto thetasRef = std::vector<double> {0.0 + offset, 1.5707963267948966 + offset,
+                                          3.141592653589793 + offset, 4.71238898038469 + offset};
+    REQUIRE(thetas[0] == thetasRef);
 }
