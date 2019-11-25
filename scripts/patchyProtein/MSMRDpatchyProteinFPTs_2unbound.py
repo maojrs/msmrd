@@ -43,7 +43,7 @@ numSphericalSectionsPos = 6
 numRadialSectionsQuat = 4
 numSphericalSectionsQuat = 6
 totalnumSecsQuat = numSphericalSectionsQuat*(numRadialSectionsQuat - 1) + 1
-numTransitionsStates = 2 * numSphericalSectionsPos * totalnumSecsQuat #228
+numTransitionsStates = numSphericalSectionsPos * totalnumSecsQuat #228
 
 # Set diffusion coefficients for bound states
 # Parameters to define coupling Markov model for bound dynamics: couplingMSM

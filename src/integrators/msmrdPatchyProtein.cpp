@@ -14,7 +14,7 @@ namespace msmrd {
     msmrdPatchyProtein::msmrdPatchyProtein(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
                        std::array<double,2> radialBound, std::vector<ctmsm> MSMlist, msmrdMSM markovModel) :
             msmrdIntegrator<ctmsm>::msmrdIntegrator(dt, seed, particlesbodytype, numParticleTypes,
-            radialBound, MSMlist, markovModel) {
+                                                    radialBound, MSMlist, markovModel) {
         setPatchyProteinDiscretization();
     }
 
@@ -40,8 +40,6 @@ namespace msmrd {
         double offTheta = M_PI/4.0;
         tempPositionPart->setThetasOffset(offTheta);
         tempPositionOrientationPart->setThetasOffset(offTheta);
-        //tempPositionOrientationPart->sphericalPartition->setThetasOffset(offTheta);
-        //tempPositionOrientationPart->quatPartition->sphericalPartition->setThetasOffset(offTheta);
         // Set discretization into integrator
         setDiscretization(tempPositionPart);
         setDiscretization(tempPositionOrientationPart);

@@ -87,7 +87,7 @@ namespace msmrd {
         auto partType = parts[partIndex].type;
         if (MSMlist[partType].tmatrix.size() > 1) {
             parts[partIndex].activeMSM = true;
-            newState = randg.uniformInteger(0, static_cast<int>(MSMlist[partType].tmatrix.size()));
+            newState = randg.uniformInteger(0, static_cast<int>(MSMlist[partType].tmatrix.size() - 1));
         }
         /* Set new unbound states (which also eliminates pair connections by resetting boundTo and
          * boundState to -1) and activate particles. */

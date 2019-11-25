@@ -33,7 +33,7 @@ numTrajectories = 5000 #1000 #10000
 lagtime = 75 #50 #75 #150 #75 #300
 boxsize = 6 #8 #6
 dtMDsimulation = 0.00001
-stride = 25# 50
+stride = 50
 realLagtime = lagtime*dtMDsimulation*stride
 
 # Discretization parameters (need to be consistent with the on used to generate the rate dictionary
@@ -41,7 +41,7 @@ numSphericalSectionsPos = 6
 numRadialSectionsQuat = 4
 numSphericalSectionsQuat = 6
 totalnumSecsQuat = numSphericalSectionsQuat*(numRadialSectionsQuat - 1) + 1
-numTransitionsStates = 2 * numSphericalSectionsPos * totalnumSecsQuat #228
+numTransitionsStates = numSphericalSectionsPos * totalnumSecsQuat #228
 
 # Set diffusion coefficients for bound states
 # Parameters to define coupling Markov model for bound dynamics: couplingMSM
