@@ -69,11 +69,11 @@ namespace msmrd {
         * per particle type. Size 1 is also acceptable, which assumes all aprticles share the same MSM.
         */
         msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                        std::array<double,2> radialBound, std::vector<templateMSM> MSMlist,
+                        std::array<double,2> radialBounds, std::vector<templateMSM> MSMlist,
                                 msmrdMSM markovModel);
 
         msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                        std::array<double,2> radialBound, templateMSM MSMlist, msmrdMSM markovModel);
+                        std::array<double,2> radialBounds, templateMSM MSMlist, msmrdMSM markovModel);
 
 
         // Redefine integrate function

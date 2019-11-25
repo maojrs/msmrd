@@ -24,6 +24,7 @@ namespace msmrd {
         /**
          * @param angularStrength give the angular strength of angular dependence of torque.
          * @param minimumR minimum distance that the particles need to be away, so normal MSM behavior is active.
+         * Currently inactive, see enableDisableMSM function.
          */
 
         // Inherit parent class contructor

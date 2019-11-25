@@ -39,9 +39,9 @@ namespace msmrd {
 
         std::tuple<double, int> calculateTransition(int initialState);
 
-        int getMSMRDindex(int MSMindex);
+        int getActiveSetIndex(int MSMindex);
 
-        int getMSMindex(int MSMRDindex);
+        int getMSMindex(int activeSetIndex);
 
         void setMaxNumberBoundStates(unsigned int newIndex) {
             maxNumberBoundStates = newIndex;
