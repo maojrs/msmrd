@@ -103,7 +103,7 @@ namespace msmrd{
              throw std::invalid_argument("Offset must be positive and preferably smaller than smaller "
                                          "dtheta in discretization");
          }
-        thetasOffset = offset;
+        thetasOffset = 1.0 * offset;
         for (auto &thetaList : thetas) {
              for (auto &theta : thetaList) {
                  theta += offset;
