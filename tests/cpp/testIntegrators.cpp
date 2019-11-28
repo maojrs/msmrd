@@ -17,7 +17,6 @@
 using namespace msmrd;
 using msm = msmrd::discreteTimeMarkovStateModel;
 using ctmsm = msmrd::continuousTimeMarkovStateModel;
-using msmrdMSM = msmrd::msmrdMarkovModel;
 
 TEST_CASE("Initialization of MSMRD integrator class", "[msmrdIntegrator]") {
     int numBoundStates = 2;
@@ -68,9 +67,9 @@ TEST_CASE("Initialization of MSMRD integrator class", "[msmrdIntegrator]") {
     myIntegrator.setBoundary(&boundary);
 
     // Check  msmrdMSM is loaded correctly
-    REQUIRE(myIntegrator.markovModel.getTmatrix() == msmrdTmatrix);
-    REQUIRE(myIntegrator.markovModel.getNumberBoundStates() == numBoundStates);
-    REQUIRE(myIntegrator.markovModel.activeSet == activeSet);
+    REQUIRE(myIntegrator.msmrdMSM.getTmatrix() == msmrdTmatrix);
+    REQUIRE(myIntegrator.msmrdMSM.getNumberBoundStates() == numBoundStates);
+    REQUIRE(myIntegrator.msmrdMSM.activeSet == activeSet);
 
     // Check unboundMSM is loaded correctly
     REQUIRE(myIntegrator.MSMlist[0].getTmatrix() == tmatrix);

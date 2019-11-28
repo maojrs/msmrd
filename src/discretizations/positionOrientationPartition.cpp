@@ -61,7 +61,7 @@ namespace msmrd {
      * be a positive value and preferably smaller than all the possible dthetas */
     void positionOrientationPartition::setThetasOffset(double offset) {
         sphericalPartition->setThetasOffset(offset);
-        quatPartition->setThetasOffset(offset);
+        //quatPartition->setThetasOffset(offset);
     };
 
 

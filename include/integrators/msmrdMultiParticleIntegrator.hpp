@@ -11,7 +11,6 @@ namespace msmrd {
 
     using msm = msmrd::discreteTimeMarkovStateModel;
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
-    using msmrdMSM = msmrd::msmrdMarkovModel;
     using fullPartition = msmrd::positionOrientationPartition;
 
     /**

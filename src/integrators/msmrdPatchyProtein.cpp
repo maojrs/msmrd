@@ -12,14 +12,14 @@ namespace msmrd {
      */
 
     msmrdPatchyProtein::msmrdPatchyProtein(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                       std::array<double,2> radialBound, std::vector<ctmsm> MSMlist, msmrdMSM markovModel) :
+                       std::array<double,2> radialBound, std::vector<ctmsm> MSMlist, msmrdMarkovModel msmrdMSM) :
             msmrdIntegrator<ctmsm>::msmrdIntegrator(dt, seed, particlesbodytype, numParticleTypes,
-                                                    radialBound, MSMlist, markovModel) {
+                                                    radialBound, MSMlist, msmrdMSM) {
         setPatchyProteinDiscretization();
     }
 
     msmrdPatchyProtein::msmrdPatchyProtein(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                       std::array<double,2> radialBound, ctmsm MSMlist, msmrdMSM markovModel) :
+                       std::array<double,2> radialBound, ctmsm MSMlist, msmrdMarkovModel markovModel) :
             msmrdIntegrator<ctmsm>::msmrdIntegrator(dt, seed, particlesbodytype, numParticleTypes,
                                                     radialBound, MSMlist, markovModel){
         setPatchyProteinDiscretization();
@@ -76,13 +76,13 @@ namespace msmrd {
     // Same as msmrdIntegrator<ctmsm>::computeCurrentTransitionState but adjusts output if part2.state == 1
     int msmrdPatchyProtein2::computeCurrentTransitionState(particle &part1, particle &part2) {
         int currentTransitionState = msmrdIntegrator<ctmsm>::computeCurrentTransitionState(part1, part2);
-//        if (part2.state == 1 and currentTransitionState > markovModel.getMaxNumberBoundStates()) {
-//            if (rotation) {
-//                currentTransitionState += positionOrientationPart->numTotalSections;
-//            } else {
-//                currentTransitionState += positionPart->numSections;
-//            }
-//        }
+        if (part2.state == 1 and currentTransitionState > msmrdMSM.getMaxNumberBoundStates()) {
+            if (rotation) {
+                currentTransitionState += positionOrientationPart->numTotalSections;
+            } else {
+                currentTransitionState += positionPart->numSections;
+            }
+        }
         return currentTransitionState;
     }
 
@@ -94,7 +94,7 @@ namespace msmrd {
         int unboundState = 0;
 
         // Redefine endstate indexing, so it is understood by the partition/discretization.
-        int index0 = markovModel.getMaxNumberBoundStates();
+        int index0 = msmrdMSM.getMaxNumberBoundStates();
         int endState = endStateAlt - index0;
 
         /* If endState larger than sections in partition, take the module. Since transition states

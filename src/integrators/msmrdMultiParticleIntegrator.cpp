@@ -21,7 +21,7 @@ namespace msmrd {
         int currentTransitionState;
         double transitionTime;
         int nextState;
-        int index0 = markovModel.getMaxNumberBoundStates();
+        int index0 = msmrdMSM.getMaxNumberBoundStates();
         // Loop over all pairs of particles without repetition with i < j
         for (int i = 0; i < parts.size(); i++) {
             for (int j = i + 1; j < parts.size(); j++) {
@@ -42,7 +42,7 @@ namespace msmrd {
                     }
                     // If valid currentTransitionState (see computeCurrentTransitionState), calculate next transition.
                     if (currentTransitionState != -1) {
-                        auto transition = markovModel.calculateTransition(currentTransitionState);
+                        auto transition = msmrdMSM.calculateTransition(currentTransitionState);
                         transitionTime = std::get<0>(transition);
                         nextState = std::get<1>(transition);
                         if (nextState <= index0) {
@@ -64,7 +64,7 @@ namespace msmrd {
         double transitionTime;
         int nextState;
         std::tuple<double, int> transition;
-        int index0 = markovModel.getMaxNumberBoundStates();
+        int index0 = msmrdMSM.getMaxNumberBoundStates();
         for (int i = 0; i < parts.size(); i++) {
             // Only compute transition if particle is bound to another particle.
             // If particle[i] is bound, then parts[i].boundList is not empty.
@@ -75,7 +75,7 @@ namespace msmrd {
                      * the first time, i.e. empty event */
                     auto previousEvent = eventMgr.getEvent(i, parts[i].boundList[boundParticleIndex]);
                     if (previousEvent.eventType == "empty") {
-                        transition = markovModel.calculateTransition(parts[i].boundStates[boundParticleIndex]);
+                        transition = msmrdMSM.calculateTransition(parts[i].boundStates[boundParticleIndex]);
                         transitionTime = std::get<0>(transition);
                         nextState = std::get<1>(transition);
                         // Distinguish between events bound to bound transition and unbinding events
@@ -117,10 +117,10 @@ namespace msmrd {
 
         /* Set diffusion coefficients of bound particle compound (note states start counting from 1, not zero).
          * In general this should be a more complicated when binding larger complexes. */
-        int MSMindex = markovModel.getMSMindex(endState);
+        int MSMindex = msmrdMSM.getMSMindex(endState);
         if (particleCompounds[parts[iIndex].compoundIndex].compoundSize == 2) {
-            particleCompounds[parts[iIndex].compoundIndex].setDs(markovModel.Dlist[MSMindex],
-                                                                 markovModel.Drotlist[MSMindex]);
+            particleCompounds[parts[iIndex].compoundIndex].setDs(msmrdMSM.Dlist[MSMindex],
+                                                                 msmrdMSM.Drotlist[MSMindex]);
         }
         /* TODO: implement diffusion coeffcients assignments for larger complexes (> 2 particles).
          * Not too relevant in first implementation since all diffusion coefficients are constats,
@@ -139,7 +139,7 @@ namespace msmrd {
         parts[iIndex].compoundIndex;
 
         // Redefine endstate indexing, so it is understood by the partition/discretization.
-        int index0 = markovModel.getMaxNumberBoundStates();
+        int index0 = msmrdMSM.getMaxNumberBoundStates();
         int endState = endStateAlt - index0;
 
         // Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.

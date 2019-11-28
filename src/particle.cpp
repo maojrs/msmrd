@@ -80,6 +80,7 @@ namespace msmrd {
     // Sets unbound state of particle (the state corresponding to its independent conformation)
     void particle::setState(int newstate) {
         state = newstate;
+        nextState = newstate;
         boundState = -1;
         boundTo = -1;
     }
@@ -87,6 +88,7 @@ namespace msmrd {
     // Sets bound state of particle
     void particle::setBoundState(int newBoundState) {
         state = -1;
+        nextState = -1;
         boundState = newBoundState;
         activeMSM = false;
     }

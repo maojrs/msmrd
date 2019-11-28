@@ -84,15 +84,16 @@ namespace msmrd {
     template<>
     int msmrdIntegrator<ctmsm>::setRandomUnboundState(std::vector<particle> &parts, int partIndex) {
         int newState = 0;
+        // Sets random unbound state from MSMlist[partType] if applicable.
         auto partType = parts[partIndex].type;
         if (MSMlist[partType].tmatrix.size() > 1) {
             parts[partIndex].activeMSM = true;
             newState = randg.uniformInteger(0, static_cast<int>(MSMlist[partType].tmatrix.size() - 1));
         }
-        /* Set new unbound states (which also eliminates pair connections by resetting boundTo and
-         * boundState to -1) and activate particles. */
-        parts[partIndex].setState(newState);
+        /* Activate particle and set new unbound states (which also eliminates pair connections by
+         * resetting boundTo and boundState to -1). */
         parts[partIndex].activate();
+        parts[partIndex].setState(newState);
         // Sets diffusion coefficients of new unbound state
         auto diff = MSMlist[partType].Dlist[newState];
         auto diffRot = MSMlist[partType].Drotlist[newState];
@@ -117,7 +118,7 @@ namespace msmrd {
         vec3<double> relativePosition;
         quaternion<double> relativeOrientation;
         quaternion<double> refQuaternion;
-        int index0 = markovModel.getMaxNumberBoundStates();
+        int index0 = msmrdMSM.getMaxNumberBoundStates();
         // Need special function to calculate relative position, in case we have a periodic boundary.
         relativePosition = calculateRelativePosition(part1.nextPosition, part2.nextPosition);
         if (relativePosition.norm() < radialBounds[1]) {
@@ -146,7 +147,7 @@ namespace msmrd {
         int currentTransitionState;
         double transitionTime;
         int nextState;
-        int index0 = markovModel.getMaxNumberBoundStates();
+        int index0 = msmrdMSM.getMaxNumberBoundStates();
         // Loop over all pairs of particles without repetition with i < j
         for (int i = 0; i < parts.size(); i++) {
             for (int j = i + 1; j < parts.size(); j++) {
@@ -167,7 +168,7 @@ namespace msmrd {
                     }
                     // If valid currentTransitionState (see computeCurrentTransitionState), calculate next transition.
                     if (currentTransitionState != -1) {
-                        auto transition = markovModel.calculateTransition(currentTransitionState);
+                        auto transition = msmrdMSM.calculateTransition(currentTransitionState);
                         transitionTime = std::get<0>(transition);
                         nextState = std::get<1>(transition);
                         if (nextState <= index0) {
@@ -190,7 +191,7 @@ namespace msmrd {
         double transitionTime;
         int nextState;
         std::tuple<double, int> transition;
-        int index0 = markovModel.getMaxNumberBoundStates();
+        int index0 = msmrdMSM.getMaxNumberBoundStates();
         for (int i = 0; i < parts.size(); i++) {
             // Only compute transition if particle is bound to another particle.
             // If particle[i] is bound, boundTo > 0; if bound pairs are only to be counted once, then boundTo > i
@@ -199,16 +200,16 @@ namespace msmrd {
                  * the first time, i.e. empty event */
                 auto previousEvent = eventMgr.getEvent(i, parts[i].boundTo);
                 if (previousEvent.eventType == "empty") {
-                    transition = markovModel.calculateTransition(parts[i].boundState);
+                    transition = msmrdMSM.calculateTransition(parts[i].boundState);
                     transitionTime = std::get<0>(transition);
                     nextState = std::get<1>(transition);
                     // Distinguish between events bound to bound transition and unbinding events
                     if (nextState <= index0) {
                         eventMgr.addEvent(transitionTime, i, parts[i].boundTo,
-                                          parts[i].state, nextState, "bound2bound");
+                                          parts[i].boundState, nextState, "bound2bound");
                     } else {
                         eventMgr.addEvent(transitionTime, i, parts[i].boundTo,
-                                          parts[i].state, nextState, "unbinding");
+                                          parts[i].boundState, nextState, "unbinding");
                     }
                 }
             }
@@ -227,12 +228,12 @@ namespace msmrd {
         parts[iIndex].boundTo = jIndex;
         parts[jIndex].boundTo = iIndex;
         parts[jIndex].deactivate();
-        // Set bound state for particle
+        // Set bound state for particle (also sets (unbound) state and nextState to -1 and deactivates the unboundMSM)
         parts[iIndex].setBoundState(endState);
         parts[jIndex].setBoundState(endState);
         // Set diffusion coefficients in bound state (note states start counting from 1, not zero)
-        int MSMindex = markovModel.getMSMindex(endState);
-        parts[iIndex].setDs(markovModel.Dlist[MSMindex], markovModel.Drotlist[MSMindex]);
+        int MSMindex = msmrdMSM.getMSMindex(endState);
+        parts[iIndex].setDs(msmrdMSM.Dlist[MSMindex], msmrdMSM.Drotlist[MSMindex]);
         // Average bound particle position and orientation (save on particle with smaller index).
         if (rotation) {
             parts[iIndex].nextOrientation = 1.0 * parts[iIndex].orientation;
@@ -256,7 +257,7 @@ namespace msmrd {
         setRandomUnboundState(parts, jIndex);
 
         // Redefine endstate indexing, so it is understood by the partition/discretization.
-        int index0 = markovModel.getMaxNumberBoundStates();
+        int index0 = msmrdMSM.getMaxNumberBoundStates();
         int endState = endStateAlt - index0;
 
         // Extract relative position and orientation from partition and endstate
@@ -286,8 +287,8 @@ namespace msmrd {
         parts[jIndex].setBoundState(endState);
         /* Set diffusion coefficients in bound state (although not always neccesary for bound states,
          * we convert to the proper indexing.) */
-        int MSMindex = markovModel.getMSMindex(endState);
-        parts[iIndex].setDs(markovModel.Dlist[MSMindex], markovModel.Drotlist[MSMindex]);
+        int MSMindex = msmrdMSM.getMSMindex(endState);
+        parts[iIndex].setDs(msmrdMSM.Dlist[MSMindex], msmrdMSM.Drotlist[MSMindex]);
     }
 
 

@@ -10,7 +10,6 @@ namespace msmrd {
 
     using msm = msmrd::discreteTimeMarkovStateModel;
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
-    using msmrdMSM = msmrd::msmrdMarkovModel;
     using fullPartition = msmrd::positionOrientationPartition;
 
     /**
@@ -27,10 +26,10 @@ namespace msmrd {
 
         msmrdPatchyProtein(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
                         std::array<double,2> radialBound, std::vector<ctmsm> MSMlist,
-                        msmrdMSM markovModel);
+                        msmrdMarkovModel markovModel);
 
         msmrdPatchyProtein(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                        std::array<double,2> radialBound, ctmsm MSMlist, msmrdMSM markovModel);
+                        std::array<double,2> radialBound, ctmsm MSMlist, msmrdMarkovModel markovModel);
     };
 
 

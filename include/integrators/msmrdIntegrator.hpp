@@ -16,7 +16,6 @@ namespace msmrd {
 
     using msm = msmrd::discreteTimeMarkovStateModel;
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
-    using msmrdMSM = msmrd::msmrdMarkovModel;
     using fullPartition = msmrd::positionOrientationPartition;
 
     /**
@@ -35,7 +34,7 @@ namespace msmrd {
         bool recordEventLog = false;
     public:
         eventManager eventMgr = eventManager();
-        msmrdMSM markovModel;
+        msmrdMarkovModel msmrdMSM;
         //spherePartition *positionPart;
         //fullPartition *positionOrientationPart;
         std::shared_ptr<spherePartition> positionPart;
@@ -70,10 +69,10 @@ namespace msmrd {
         */
         msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
                         std::array<double,2> radialBounds, std::vector<templateMSM> MSMlist,
-                                msmrdMSM markovModel);
+                        msmrdMarkovModel msmrdMSM);
 
         msmrdIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                        std::array<double,2> radialBounds, templateMSM MSMlist, msmrdMSM markovModel);
+                        std::array<double,2> radialBounds, templateMSM MSMlist, msmrdMarkovModel msmrdMSM);
 
 
         // Redefine integrate function
@@ -136,9 +135,9 @@ namespace msmrd {
     template <typename templateMSM>
     msmrdIntegrator<templateMSM>::msmrdIntegrator(double dt, long seed,
                                std::string particlesbodytype, int numParticleTypes, std::array<double,2> radialBounds,
-                               std::vector<templateMSM> MSMlist, msmrdMSM markovModel) :
+                               std::vector<templateMSM> MSMlist, msmrdMarkovModel msmrdMSM) :
             overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype),
-                    markovModel(std::move(markovModel)),
+                    msmrdMSM(std::move(msmrdMSM)),
             numParticleTypes(numParticleTypes), radialBounds(radialBounds) {
 
         setDefaultDiscretization();
@@ -153,10 +152,9 @@ namespace msmrd {
     template <typename templateMSM>
     msmrdIntegrator<templateMSM>::msmrdIntegrator(double dt, long seed,
                                std::string particlesbodytype, int numParticleTypes, std::array<double,2> radialBounds,
-                               templateMSM MSMlist, msmrdMSM markovModel) :
+                               templateMSM MSMlist, msmrdMarkovModel msmrdMSM) :
             overdampedLangevinMarkovSwitch<templateMSM>(MSMlist, dt, seed, particlesbodytype),
-                    markovModel(std::move(markovModel)),
-            numParticleTypes(numParticleTypes), radialBounds(radialBounds) {
+                    msmrdMSM(std::move(msmrdMSM)), numParticleTypes(numParticleTypes), radialBounds(radialBounds) {
 
         setDefaultDiscretization();
 
