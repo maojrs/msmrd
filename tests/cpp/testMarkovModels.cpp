@@ -42,6 +42,8 @@ TEST_CASE("Fundamental CTMSM parameters and propagation test", "[ctmsm]") {
         partMS2.updateState();
         REQUIRE(partMS.getState() == partMS2.getState());
     }
+    // Check type id naming is correct
+    REQUIRE(typeid(ctmsmTest2).name() == typeid(ctmsm).name());
 }
 
 TEST_CASE("Initialization of msmrdMarkovModel class", "[msmrdMarkovModel]") {

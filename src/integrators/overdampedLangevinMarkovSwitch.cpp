@@ -15,23 +15,6 @@ namespace msmrd {
     using ctmsm = msmrd::continuousTimeMarkovStateModel;
 
 
-    /* Integrates diffusion and rotation of one particle, called by the integrateOneMS (visible only
-     * inside the class). Note it cannot be inherited from overdampedLangevin::integrateOne since it
-     * uses a particle list instead of a particle list. Using list of pointers possible but not ideal
-     * due to dependencies. */
-    template<>
-    void overdampedLangevinMarkovSwitch<ctmsm>::integrateOne(int partIndex, std::vector<particle> &parts, double timestep) {
-        vec3<double> force;
-        vec3<double> torque;
-        force = forceField[partIndex];
-        torque = torqueField[partIndex];
-        translate(parts[partIndex], force, timestep);
-        if (rotation) {
-            rotate(parts[partIndex], torque, timestep);
-        }
-    };
-
-
     /* Integrates rotation/translation and Markovian switch of one particle, with pair interactions
      * (visible only inside the class) */
     template<>
@@ -58,8 +41,7 @@ namespace msmrd {
                     // Ready to propagate MSM, update state and diffusion coefficients
                     part.propagateTMSM = true;
                     part.updateState(); // Sets calculated next state as current state
-                    part.setD(tmsm.Dlist[part.state]);
-                    part.setDrot(tmsm.Drotlist[part.state]);
+                    part.setDs(tmsm.Dlist[part.state], tmsm.Drotlist[part.state]);
                 // If current lagtime overtakes dt, integrate up to dt (by resdt) and reset lagtime to remaining portion
                 } else {
                     resdt = timestep - part.timeCounter;
@@ -71,8 +53,7 @@ namespace msmrd {
                         // Ready to propagate CTMSM, update state and diffusion coefficients
                         part.propagateTMSM = true;
                         part.updateState(); // Sets calculated next state as current state
-                        part.setD(tmsm.Dlist[part.state]);
-                        part.setDrot(tmsm.Drotlist[part.state]);
+                        part.setDs(tmsm.Dlist[part.state], tmsm.Drotlist[part.state]);
                     } else {
                         part.propagateTMSM = false;
                     };
@@ -88,8 +69,7 @@ namespace msmrd {
                 // Ready to propagate CTMSM, update state and diffusion coefficients
                 part.propagateTMSM = true;
                 part.updateState(); // Sets calculated next state as current state
-                part.setD(tmsm.Dlist[part.state]);
-                part.setDrot(tmsm.Drotlist[part.state]);
+                part.setDs(tmsm.Dlist[part.state], tmsm.Drotlist[part.state]);
             } else {
                 part.propagateTMSM = false;
             };
