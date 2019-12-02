@@ -62,7 +62,7 @@ namespace msmrd {
         vec3<double> relPos2 = {std::cos(angleDiff / 2.0), std::sin(-angleDiff / 2.0), 0};
         vec3<double> relPos1orthogonal = {-1.0 * std::sin(angleDiff / 2.0), std::cos(angleDiff / 2.0), 0.0};
         vec3<double> relPos2orthogonal = {std::sin(angleDiff / 2.0), std::cos(angleDiff / 2.0), 0.0};
-        /* Relative rotations (from particle 1) of particle 2 that yield the 8 bound states
+        /* Relative rotations (assuming particle 1 fixed) of particle 2 that yield the 8 bound states
          * in the axis-angle representation. (One needs to make drawing to understand)*/
         std::array<vec3<double>, 8> rotations;
         rotations[0] = M_PI * relPos1orthogonal; //ok
@@ -79,15 +79,17 @@ namespace msmrd {
         for (int i = 0; i < 8; i++) {
             quatRotations[i] = msmrdtools::axisangle2quaternion(rotations[i]);
         }
-        // Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
-        boundStates[0] = std::make_tuple(relPos1, quatRotations[0]);
-        boundStates[1] = std::make_tuple(relPos1, quatRotations[1]);
-        boundStates[2] = std::make_tuple(relPos1, quatRotations[2]);
-        boundStates[3] = std::make_tuple(relPos1, quatRotations[3]);
-        boundStates[4] = std::make_tuple(relPos2, quatRotations[4]);
-        boundStates[5] = std::make_tuple(relPos2, quatRotations[5]);
-        boundStates[6] = std::make_tuple(relPos2, quatRotations[6]);
-        boundStates[7] = std::make_tuple(relPos2, quatRotations[7]);
+        /* Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
+         * Note we need to take the conj, so it matches the relative orientation from particle 1, as used to define
+         * the states in trajectories/discrete/discreteTrajectory.hpp */
+        boundStates[0] = std::make_tuple(relPos1, quatRotations[0].conj());
+        boundStates[1] = std::make_tuple(relPos1, quatRotations[1].conj());
+        boundStates[2] = std::make_tuple(relPos1, quatRotations[2].conj());
+        boundStates[3] = std::make_tuple(relPos1, quatRotations[3].conj());
+        boundStates[4] = std::make_tuple(relPos2, quatRotations[4].conj());
+        boundStates[5] = std::make_tuple(relPos2, quatRotations[5].conj());
+        boundStates[6] = std::make_tuple(relPos2, quatRotations[6].conj());
+        boundStates[7] = std::make_tuple(relPos2, quatRotations[7].conj());
     }
 
 
@@ -143,7 +145,7 @@ namespace msmrd {
         vec3<double> relPos2 = {std::cos(angleDiff / 2.0), std::sin(-angleDiff / 2.0), 0};
         vec3<double> relPos1orthogonal = {-1.0 * std::sin(angleDiff / 2.0), std::cos(angleDiff / 2.0), 0.0};
         vec3<double> relPos2orthogonal = {std::sin(angleDiff / 2.0), std::cos(angleDiff / 2.0), 0.0};
-        /* Relative rotations (from particle 1) of particle 2 that yield the 4 bound states
+        /* Relative rotations (assuming particle 1 fixed) of particle 2 that yield the 4 bound states
          * in the axis-angle representation. (One needs to make drawing to understand)*/
         std::array<vec3<double>, 4> rotations;
         rotations[0] = M_PI * relPos1orthogonal; // part1Patch1 with part2patch1
@@ -156,11 +158,13 @@ namespace msmrd {
         for (int i = 0; i < 4; i++) {
             quatRotations[i] = msmrdtools::axisangle2quaternion(rotations[i]);
         }
-        // Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
-        boundStates[0] = std::make_tuple(relPos1, quatRotations[0]);
-        boundStates[1] = std::make_tuple(relPos1, quatRotations[1]);
-        boundStates[2] = std::make_tuple(relPos2, quatRotations[2]);
-        boundStates[3] = std::make_tuple(relPos2, quatRotations[3]);
+        /* Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
+         * Note we need to take the conj, so it matches the relative orientation from particle 1, as used to define
+         * the states in trajectories/discrete/discreteTrajectory.hpp */
+        boundStates[0] = std::make_tuple(relPos1, quatRotations[0].conj());
+        boundStates[1] = std::make_tuple(relPos1, quatRotations[1].conj());
+        boundStates[2] = std::make_tuple(relPos2, quatRotations[2].conj());
+        boundStates[3] = std::make_tuple(relPos2, quatRotations[3].conj());
     }
 
 }

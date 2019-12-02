@@ -165,9 +165,8 @@ namespace msmrd {
         relativePosition = msmrdtools::rotateVec(relativePosition, part1.orientation.conj());
         quaternion<double> quatReference = {1,0,0,0}; // we can then define reference quaternion as identity.
 
-        // Calculate relative orientation (w/respect to particle 1)
+        // Calculate relative orientation (rotation particle 1 needs to make to reach the orientation of particle 2)
         quaternion<double> relativeOrientation;
-        //relativeOrientation = part1.orientation.conj() * part2.orientation;
         relativeOrientation =  part2.orientation * part1.orientation.conj();
 
 
@@ -221,9 +220,10 @@ namespace msmrd {
      * Mostly only used when interacting using python and/or interacting with pybind.
      */
 
-    /* From a given trajectory of the from (timestep, position, orientation), where repeated timesteps mean
-     * differente particles at same tieme step, obtain a discrete trajectory using a discretization given by
-     * sampleDiscreteState. This is useful to load trajectories directly from python and discretize them.*/
+    /* From a given trajectory of the from (timestep, position, orientation) or (timestep, position, orientation,
+     * state), where repeated timesteps mean differente particles at same tieme step, obtain a discrete trajectory
+     * using a discretization given by sampleDiscreteState. This is useful to load trajectories directly from
+     * python and discretize them.*/
     template<int numBoundStates>
     std::vector<double> discreteTrajectory<numBoundStates>::discretizeTrajectory(
             std::vector<std::vector<double>> trajectory) {
@@ -251,7 +251,7 @@ namespace msmrd {
             orientation1 = {part1Data[4], part1Data[5], part1Data[6], part1Data[7]};
             orientation2 = {part2Data[4], part2Data[5], part2Data[6], part2Data[7]};
             // If state of particle is included in trajectory, load it as well. (for backward compatibility)
-            if (trajectory.size() > 8) {
+            if (trajectory[numParticles*i].size() > 8) {
                 state1 = static_cast<int>(part1Data[8]);
                 state2 = static_cast<int>(part2Data[8]);
             }
@@ -271,9 +271,10 @@ namespace msmrd {
 
 
 
-    /* From a given trajectory H5 file of the from (timestep, position, orientation), where repeated timesteps mean
-     * different particles at same tieme step, obtain a discrete trajectory using the discreteTrajectory discretization.
-     * This is the same as discretizeTrajectory, but loads the H5 file directly in c++ and later discretizes them.*/
+    /* From a given trajectory H5 file of the from (timestep, position, orientation) or (timestep, position,
+     * orientation, state), where repeated timesteps mean different particles at same tieme step, obtain a
+     * discrete trajectory using the discreteTrajectory discretization. This is the same as discretizeTrajectory,
+     * but loads the H5 file directly in c++ and later discretizes them.*/
     template<int numBoundStates>
     std::vector<double> discreteTrajectory<numBoundStates>::discretizeTrajectoryH5(std::string filename) {
         int numParticles = 2; // Must be two to discretize trajectory (also it is a dimer)
@@ -324,7 +325,7 @@ namespace msmrd {
             orientation1 = {trajectory[jj+4], trajectory[jj+5], trajectory[jj+6], trajectory[jj+7]};
             orientation2 = {trajectory[kk+4], trajectory[kk+5], trajectory[kk+6], trajectory[kk+7]};
             // If state of particle is included in trajectory, load it as well (for backward compatibility).
-            if (NX > 8) {
+            if (NY > 8) {
                 state1 = static_cast<int>(trajectory[jj+8]);
                 state2 = static_cast<int>(trajectory[kk+8]);
             }
