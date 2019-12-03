@@ -159,19 +159,17 @@ namespace msmrd {
 
         /* Calculate relative position taking into account periodic boundary measured
          * from i to j (gets you from i to j). */
-        vec3<double> relativePosition = calculateRelativePosition(part1.position, part2.position);
+        auto relativePosition = calculateRelativePosition(part1.position, part2.position);
 
         // Rotate relative position to match the reference orientation of particle 1. (VERY IMPORTANT)
         relativePosition = msmrdtools::rotateVec(relativePosition, part1.orientation.conj());
         quaternion<double> quatReference = {1,0,0,0}; // we can then define reference quaternion as identity.
 
         // Calculate relative orientation (rotation particle 1 needs to make to reach the orientation of particle 2)
-        quaternion<double> relativeOrientation;
-        relativeOrientation =  part2.orientation * part1.orientation.conj();
+        auto relativeOrientation =  part2.orientation * part1.orientation.conj();
 
 
         // Extract current state, save into sample and return sample
-        int secNum;
         if (relativePosition.norm() < rLowerBound) {
             // Returns discrete state or -1 if it is no in any bound state
             discreteState = getBoundState(relativePosition, relativeOrientation);
@@ -179,7 +177,7 @@ namespace msmrd {
         // Returns a transitions state if it is in the transition region
         else if (relativePosition.norm() < positionOrientationPart->relativeDistanceCutOff) {
             // Get corresponding section numbers from spherical partition to classify its state
-            secNum = positionOrientationPart->getSectionNumber(relativePosition, relativeOrientation, quatReference);
+            auto secNum = positionOrientationPart->getSectionNumber(relativePosition,relativeOrientation,quatReference);
             discreteState  = maxNumberBoundStates + secNum;
         }
         // If none of the statements before modified discreteState, it returns the unbound state (0)
@@ -195,19 +193,17 @@ namespace msmrd {
     template<int numBoundStates>
     int discreteTrajectory<numBoundStates>::getBoundState(vec3<double> relativePosition,
                                                           quaternion<double> relativeOrientation) {
-
-        /* Check if it matches a bound states, if so return the corresponding state. Otherwise
-         * return -1. */
+        // Check if it matches a bound states, if so return the corresponding state, otherwise return -1.
         vec3<double> relPosCenter;
         quaternion<double> relQuatCenter;
         double angleDistance;
-        for (int i = 0; i < boundStates.size(); i++) {
+        for (int i = 0; i < numBoundStates; i++) {
             relPosCenter = std::get<0>(boundStates[i]);
             relQuatCenter = std::get<1>(boundStates[i]);
 
             if ( (relPosCenter - relativePosition).norm() <= tolerancePosition) {
                 angleDistance = msmrdtools::quaternionAngleDistance(relQuatCenter, relativeOrientation);
-                if  ( angleDistance < toleranceOrientation) {
+                if  (angleDistance < toleranceOrientation) {
                     return i + 1;
                 }
             }

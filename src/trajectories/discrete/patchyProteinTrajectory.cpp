@@ -58,7 +58,6 @@ namespace msmrd {
     * metastable regions are given by a tuple of relative position and relative orientation. The size of the
     * regions are determined by tolerancePosition and toleranceOrientation*/
     void patchyProteinTrajectory::setBoundStates() {
-        double angleDiff = 3 * M_PI / 5; // angle difference to form a pentamer
         /* Define relative position vectors from particle 1 at the origin. These two patches
          * point in the same direction as the two patches in the dimer. */
         std::array<vec3<double>, 6> relPos;
