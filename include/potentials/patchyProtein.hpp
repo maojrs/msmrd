@@ -15,6 +15,10 @@ namespace msmrd{
      * their orientation (quaternion<double>, quaternion<double), and their types (int, int).
      */
     class patchyProtein : public pairPotential {
+    private:
+        // Need to call this function from constructor to define parameters
+        void setPotentialParameters();
+
     protected:
         std::vector<vec3<double>> patchesCoordinatesA;
         std::vector<vec3<double>> patchesCoordinatesB;
@@ -34,8 +38,6 @@ namespace msmrd{
         double rstarRepulsive;
         double rstarAttractive;
         std::array<double, 2> rstarPatches;
-
-        virtual void setPotentialParameters();
 
         std::vector<vec3<double>> assignPatches(int type);
 

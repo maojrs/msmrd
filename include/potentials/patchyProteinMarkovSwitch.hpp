@@ -17,6 +17,10 @@ namespace msmrd {
      * in this file using the classes here as reference (see setPotentialParameters() and calculatePlanes()).
      */
     class patchyProteinMarkovSwitch : public patchyProtein {
+    private:
+        // Need to call this function from constructor to define parameters
+        void setPotentialParameters();
+
     protected:
         double angularStrength = 2.0;
         double minimumR = 1.25;
@@ -26,9 +30,6 @@ namespace msmrd {
          * @param minimumR minimum distance that the particles need to be away, so normal MSM behavior is active.
          * Currently inactive, see enableDisableMSM function.
          */
-
-        // Inherit parent class contructor
-        using patchyProtein::patchyProtein;
 
         // Additional constructors (in case angular strength is determined)
         patchyProteinMarkovSwitch(double sigma, double strength, double angularStrength,
@@ -48,8 +49,6 @@ namespace msmrd {
 
 
         // Additional auxiliary functions
-
-        void setPotentialParameters() override;
 
         void enableDisableMSM(vec3<double>relPosition, particle &part1, particle &part2);
 

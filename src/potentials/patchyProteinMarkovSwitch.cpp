@@ -14,13 +14,17 @@ namespace msmrd{
                                  std::vector<vec3<double>> patchesCoordinatesA,
                                  std::vector<vec3<double>> patchesCoordinatesB)
             :  patchyProtein(sigma, strength, std::move(patchesCoordinatesA), std::move(patchesCoordinatesB)),
-               angularStrength(angularStrength) {};
+               angularStrength(angularStrength) {
+        setPotentialParameters();
+    };
 
     patchyProteinMarkovSwitch::patchyProteinMarkovSwitch(double sigma, double strength, double angularStrength,
                                  std::vector<std::vector<double>> patchesCoordinatesA,
                                  std::vector<std::vector<double>> patchesCoordinatesB)
             :  patchyProtein(sigma, strength, patchesCoordinatesA, patchesCoordinatesB),
-               angularStrength(angularStrength) {};
+               angularStrength(angularStrength) {
+        setPotentialParameters();
+    };
 
 
 
@@ -42,7 +46,7 @@ namespace msmrd{
 
         // Set strengths of potential parts
         epsRepulsive = 1.0*strength;
-        epsAttractive = -0.05*strength;
+        epsAttractive = -0.0*strength; //-0.05*strength;
         epsPatches[0] = -0.15*strength;
         epsPatches[1] = -0.20*strength; // Special binding site
 
