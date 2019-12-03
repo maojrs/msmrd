@@ -63,7 +63,7 @@ except OSError as error:
     print("First passage times directory already exists. Simulation continues.")
 
 # Chooses filename for output file with the results of the parallel simulation
-filename = parentDirectory + 'testMSMRDpatchyProteinFPTs_2bound_trajs' + str(numTrajectories) + \
+filename = parentDirectory + 'MSMRDpatchyProteinFPTs_2bound_trajs' + str(numTrajectories) + \
            '_lagt' + str(lagtime) + '_boxsize' + str(boxsize) + '.xyz'
 
 def MSMRDsimulationFPT(trajectorynum):
@@ -148,7 +148,7 @@ def multiprocessingHandler():
     '''
     Handles parallel processing of simulationFPT and writes to same file in parallel
     '''
-    num_cores = 2 #multiprocessing.cpu_count()
+    num_cores = multiprocessing.cpu_count()
     pool = Pool(processes=num_cores)
     trajNumList = list(range(numTrajectories))
     with open(filename, 'w') as file:

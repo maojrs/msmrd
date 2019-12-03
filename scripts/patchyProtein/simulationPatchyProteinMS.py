@@ -22,18 +22,20 @@ numSimulations = 600 #500 #1000 #20 #200
 
 
 # Simulation parameters
-timesteps = 3000000 #2000000 #5000000 #400000 #20000000
+timesteps = 6000000 #2000000 #5000000 #400000 #20000000
 bufferSize = 1024
-stride = 25
+stride = 50
 outTxt = False
 outH5 = True
 outChunked = True
-trajtype = "patchyProtein"
+trajtype = "patchyProtein" #"positionOrienatationState"
+
 
 # Define Patchy Protein potential parameters (This values are fixed and should match
 # those used to determine metastable states in potential and trajectory.)
 sigma = 1.0
 strength = 65
+angularStrength = 2
 patchesCoordinates1 = [np.array([1.,0.,0.]), np.array([0.,1.,0.]), np.array([0.,0.,1.]),
                        np.array([-1.,0.,0.]), np.array([0.,-1.,0.]), np.array([0.,0.,-1.])]
 patchesCoordinates2 = [np.array([1.,0.,0.])]
@@ -65,8 +67,9 @@ basefilename = os.path.join(filedirectory, "simPatchyProtein")
 # Create parameter dictionary and writes parameters to reference file
 parameterfilename = os.path.join(filedirectory, "parameters")
 parameterDictionary = {'numFiles' : numSimulations, 'numParticles' : Nparticles, 'dt' : dt, 'bodytype' : bodytype,
-                       'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype,
-                       'boxsize' : boxsize, 'boundaryType' : boundaryType, 'potentialStrength' : strength}
+                       'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype, 'boxsize' : boxsize,
+                       'boundaryType' : boundaryType, 'potentialStrength' : strength,
+                       'potentialAngularStrength' : angularStrength}
 analysisTools.writeParameters(parameterfilename, parameterDictionary)
 
 
@@ -104,7 +107,8 @@ def runParallelSims(simnumber):
                                                  unboundMSMlist, seed)
 
     # Defines patchy protein potential
-    potentialPatchyProteinMS = patchyProteinMarkovSwitch(sigma, strength, patchesCoordinates1, patchesCoordinates2)
+    potentialPatchyProteinMS = patchyProteinMarkovSwitch(sigma, strength, angularStrength,
+                                                         patchesCoordinates1, patchesCoordinates2)
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)

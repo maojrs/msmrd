@@ -26,6 +26,7 @@ numTrajectories = 5000 #10000
 # those used to determine metastable states in potential and trajectory.)
 sigma = 1.0
 strength = 65
+angularStrength = 2
 patchesCoordinates1 = [np.array([1.,0.,0.]), np.array([0.,1.,0.]), np.array([0.,0.,1.]),
                        np.array([-1.,0.,0.]), np.array([0.,-1.,0.]), np.array([0.,0.,-1.])]
 patchesCoordinates2 = [np.array([1.,0.,0.])]
@@ -89,7 +90,8 @@ def simulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
 
     # Define potential
-    potentialPatchyProtein = patchyProteinMarkovSwitch(sigma, strength, patchesCoordinates1, patchesCoordinates2)
+    potentialPatchyProtein = patchyProteinMarkovSwitch(sigma, strength, angularStrength,
+                                                       patchesCoordinates1, patchesCoordinates2)
 
     # Define integrator and boundary (over-damped Langevin)
     integrator = odLangevinMS(unboundMSMlist, dt, seed, bodytype)

@@ -8,7 +8,7 @@ import msmrd2.tools.analysis as analysisTools
 # implied time scales use notebook version of this script.
 
 # Load parameters from parameters file (from original MD simulation)
-parentDirectory = '../../data/patchyProtein/benchmark_t6E6_s50/'
+parentDirectory = '../../data/patchyProtein/benchmark/'
 parameterDictionary = analysisTools.readParameters(parentDirectory + "parameters")
 nfiles = parameterDictionary['numFiles']
 dt = parameterDictionary['dt']
