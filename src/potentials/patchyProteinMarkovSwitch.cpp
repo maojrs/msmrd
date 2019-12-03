@@ -17,8 +17,8 @@ namespace msmrd{
                angularStrength(angularStrength) {};
 
     patchyProteinMarkovSwitch::patchyProteinMarkovSwitch(double sigma, double strength, double angularStrength,
-                                 std::vector<std::vector<double>> patchesCoordsA,
-                                 std::vector<std::vector<double>> patchesCoordsB)
+                                 std::vector<std::vector<double>> patchesCoordinatesA,
+                                 std::vector<std::vector<double>> patchesCoordinatesB)
             :  patchyProtein(sigma, strength, patchesCoordinatesA, patchesCoordinatesB),
                angularStrength(angularStrength) {};
 
