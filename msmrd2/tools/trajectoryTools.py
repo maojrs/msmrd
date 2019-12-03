@@ -107,7 +107,7 @@ def splitDiscreteTrajs(discreteTrajs, unboundStateIndex = 0):
             if array.size > 1:
                 slicedDtrajs.append(array)
         trajnum += 1
-        print("Trajectory ", trajnum, " of ", len(discreteTrajs), " done.", end="\r")
+        print("Slicing trajectory ", trajnum, " of ", len(discreteTrajs), " done.", end="\r")
     return slicedDtrajs
 
 
