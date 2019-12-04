@@ -15,7 +15,10 @@ namespace msmrd{
                                  std::vector<vec3<double>> patchesCoordinatesB)
             :  patchyProtein(sigma, strength, std::move(patchesCoordinatesA), std::move(patchesCoordinatesB)),
                angularStrength(angularStrength) {
+
         setPotentialParameters();
+
+        setBoundStates();
     };
 
     patchyProteinMarkovSwitch::patchyProteinMarkovSwitch(double sigma, double strength, double angularStrength,
@@ -23,7 +26,10 @@ namespace msmrd{
                                  std::vector<std::vector<double>> patchesCoordinatesB)
             :  patchyProtein(sigma, strength, patchesCoordinatesA, patchesCoordinatesB),
                angularStrength(angularStrength) {
+
         setPotentialParameters();
+
+        setBoundStates();
     };
 
 
@@ -123,6 +129,9 @@ namespace msmrd{
         vec3<double> pos1virtual = relPos[0]; // virtual part1.position if periodic boundary; otherwise part1.position.
         vec3<double> rvec = relPos[1]; //part2.position - part1.position;
 
+        // Calculate relative orientation
+        auto relOrientation = part2.orientation * part1.orientation.conj();
+
         /* Calculate and add forces due to repulsive and attractive isotropic potentials.
          *  Note correct sign/direction of force given by rvec/rvec.norm*() */
         auto repulsiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsRepulsive,
@@ -140,8 +149,18 @@ namespace msmrd{
          * it is left for possible future implementations. */
         //enableDisableMSM(rvec, part1, part2);
 
+        // Check if particle is in any of the bound states,
+        auto particlesBound = isBound(rvec, relOrientation);
+
+        // If bound, deactivate the unboundMSM, otherwise, keep it active (assumes unbound MSM only of particle 2.).
+        if (particlesBound) {
+            part2.deactivateMSM();
+        } else {
+            part2.activateMSM();
+        }
+
         // Calculate forces and torque due to patches interaction, if close enough and if particle 2 is in state 0
-        if (rvec.norm() <= 2*sigma and part2.state == 0) {
+        if ( (rvec.norm() <= 2*sigma and part2.state == 0)) {
             // Calculate forces and torque due to patches interaction using auxiliary function
             auto forcTorqPatches = forceTorquePatches(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
             auto force1 = forcTorqPatches[0];
@@ -236,6 +255,67 @@ namespace msmrd{
         //plane2 = plane2/plane2.norm();
 
         return std::make_tuple(plane1, plane2);
+    }
+
+
+    /* Copied from discreteTrajectory to identify bound states. Checks if particle is in any of the patchyProtein
+     * trajectory bound states. */
+    bool patchyProteinMarkovSwitch::isBound(vec3<double> relativePosition, quaternion<double> relativeOrientation) {
+        // Check if it matches a bound states, if so return true otherwise return false.
+        vec3<double> relPosCenter;
+        quaternion<double> relQuatCenter;
+        for (int i = 0; i < 6; i++) {
+            relPosCenter = std::get<0>(boundStates[i]);
+            relQuatCenter = std::get<1>(boundStates[i]);
+
+            if ( (relPosCenter - relativePosition).norm() <= 0.12) {
+                auto angleDistance = msmrdtools::quaternionAngleDistance(relQuatCenter, relativeOrientation);
+                if  (angleDistance < 0.12*2*M_PI) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /* Copied from patchyProteinTrajectory. Sets bound states (metastable regions) of the patchy protein
+     * implementation. Should match those of the patchyProtein trajectory. The centers of the
+     * metastable regions are given by a tuple of relative position and relative orientation. The size of the
+     * regions are determined by tolerancePosition and toleranceOrientation*/
+    void patchyProteinMarkovSwitch::setBoundStates() {
+        /* Define relative position vectors from particle 1 at the origin. These two patches
+         * point in the same direction as the two patches in the dimer. */
+        std::array<vec3<double>, 6> relPos;
+        relPos[0] = {1., 0., 0.};
+        relPos[1] = {0., 1., 0.};
+        relPos[2] = {0., 0., 1.};
+        relPos[3] = {-1., 0., 0.};
+        relPos[4] = {0., -1., 0.};
+        relPos[5] = {0., 0., -1.};
+        /* Relative rotations (assuming particle 1 fixed) of particle 2 that yield the 6 bound states
+         * in the axis-angle representation. (One needs to make drawing to understand)*/
+        std::array<vec3<double>, 6> rotations;
+        rotations[0] = {0.0, 0.0, M_PI}; //ok
+        rotations[1] = {0.0, 0.0, -M_PI / 2.0}; //ok
+        rotations[2] = {0.0, M_PI / 2.0, 0.0}; //ok
+        rotations[3] = {0.0, 0.0, 0.0}; //ok
+        rotations[4] = {0.0, 0.0, M_PI / 2.0}; //ok
+        rotations[5] = {0.0, -M_PI / 2.0, 0.0}; //ok
+        /*Convert rotations in the axis angle representation to quaternions */
+        std::array<quaternion<double>, 6> quatRotations;
+        for (int i = 0; i < 6; i++) {
+            quatRotations[i] = msmrdtools::axisangle2quaternion(rotations[i]);
+        }
+        /* Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
+         * Note we need to take the conj, so it matches the relative orientation from particle 1, as used to define
+         * the states in trajectories/discrete/discreteTrajectory.hpp */
+        boundStates[0] = std::make_tuple(relPos[0], quatRotations[0].conj());
+        boundStates[1] = std::make_tuple(relPos[1], quatRotations[1].conj());
+        boundStates[2] = std::make_tuple(relPos[2], quatRotations[2].conj());
+        boundStates[3] = std::make_tuple(relPos[3], quatRotations[3].conj());
+        boundStates[4] = std::make_tuple(relPos[4], quatRotations[4].conj());
+        boundStates[5] = std::make_tuple(relPos[5], quatRotations[5].conj());
     }
 
 

@@ -18,8 +18,13 @@ namespace msmrd {
      */
     class patchyProteinMarkovSwitch : public patchyProtein {
     private:
-        // Need to call this function from constructor to define parameters
+        std::array< std::tuple<vec3<double>, quaternion<double>>, 6> boundStates{};
+
         void setPotentialParameters();
+
+        void setBoundStates();
+
+        bool isBound(vec3<double> relPosition, quaternion<double> relOrientation);
 
     protected:
         double angularStrength = 2.0;

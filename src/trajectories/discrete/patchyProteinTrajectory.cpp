@@ -53,8 +53,7 @@ namespace msmrd {
     };
 
 
-    /* Sets bound states (metastable regions) of this patchy dimer implementation (two equal patcy particles,
-    * each with two patches an angle angleDiff away with two stable relative orientations). The centers of the
+    /* Sets bound states (metastable regions) of this patchy protein implementation. The centers of the
     * metastable regions are given by a tuple of relative position and relative orientation. The size of the
     * regions are determined by tolerancePosition and toleranceOrientation*/
     void patchyProteinTrajectory::setBoundStates() {

@@ -196,13 +196,12 @@ namespace msmrd {
         // Check if it matches a bound states, if so return the corresponding state, otherwise return -1.
         vec3<double> relPosCenter;
         quaternion<double> relQuatCenter;
-        double angleDistance;
         for (int i = 0; i < numBoundStates; i++) {
             relPosCenter = std::get<0>(boundStates[i]);
             relQuatCenter = std::get<1>(boundStates[i]);
 
             if ( (relPosCenter - relativePosition).norm() <= tolerancePosition) {
-                angleDistance = msmrdtools::quaternionAngleDistance(relQuatCenter, relativeOrientation);
+                auto angleDistance = msmrdtools::quaternionAngleDistance(relQuatCenter, relativeOrientation);
                 if  (angleDistance < toleranceOrientation) {
                     return i + 1;
                 }

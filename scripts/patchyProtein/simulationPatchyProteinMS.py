@@ -22,13 +22,13 @@ numSimulations = 600 #500 #1000 #20 #200
 
 
 # Simulation parameters
-timesteps = 6000000 #2000000 #5000000 #400000 #20000000
+timesteps = 12000000 #6000000 #2000000 #5000000 #400000 #20000000
 bufferSize = 1024
-stride = 50
+stride = 100 #50
 outTxt = False
 outH5 = True
 outChunked = True
-trajtype = "patchyProtein" #"positionOrienatationState"
+trajtype = "patchyProtein2" #"positionOrienatationState"
 
 
 # Define Patchy Protein potential parameters (This values are fixed and should match
@@ -62,7 +62,7 @@ except OSError as error:
         sys.exit()
 
 # Provides base filename (folder must exist (and preferably empty), otherwise H5 might fail)
-basefilename = os.path.join(filedirectory, "simPatchyProtein")
+basefilename = os.path.join(filedirectory, "simPatchyProtein2")
 
 # Create parameter dictionary and writes parameters to reference file
 parameterfilename = os.path.join(filedirectory, "parameters")
