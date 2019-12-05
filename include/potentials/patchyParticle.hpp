@@ -13,6 +13,8 @@ namespace msmrd {
     class patchyParticle : public pairPotential {
     protected:
         std::vector<vec3<double>> patchesCoordinates;
+        bool patchesActive = true;
+
         double sigma = 1.0;
         double strength = 100.0;
         double patchPotentialScaling = 1.0;
@@ -39,6 +41,7 @@ namespace msmrd {
     public:
         /**
          * @param patchesCoordintates list of patches coordinates in a sphere of unit radius
+         * @param patchesActive if true means there are interacting patches, otherwise it is false.
          * @param sigma diameter of sphere at which patches are placed. Corresponds to the diameter of the particle.
          * @param strength overall strength of potential, eps values scaled in terms of this value.
          * @param eps*** strength paramaters for isotropic attractive, isotropic repulsive and

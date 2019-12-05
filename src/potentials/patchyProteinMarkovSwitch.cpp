@@ -18,7 +18,7 @@ namespace msmrd{
 
         setPotentialParameters();
 
-        setBoundStates();
+        //setBoundStates();
     };
 
     patchyProteinMarkovSwitch::patchyProteinMarkovSwitch(double sigma, double strength, double angularStrength,
@@ -29,7 +29,7 @@ namespace msmrd{
 
         setPotentialParameters();
 
-        setBoundStates();
+        //setBoundStates();
     };
 
 
@@ -52,7 +52,7 @@ namespace msmrd{
 
         // Set strengths of potential parts
         epsRepulsive = 1.0*strength;
-        epsAttractive = -0.0*strength; //-0.05*strength;
+        epsAttractive = -0.15*strength; //-0.05*strength;
         epsPatches[0] = -0.15*strength;
         epsPatches[1] = -0.20*strength; // Special binding site
 
@@ -73,7 +73,8 @@ namespace msmrd{
     }
 
     /* Checks is MSM must be deactivated in certain particles. In this case, if bounded or close to bounded
-     * disable MSM in particle withs type 1 and state 0. This needs to be hardcoded here for each example. */
+     * disable MSM in particle withs type 1 and state 0. This needs to be hardcoded here for each example.
+     * Not used at the moment. */
     void patchyProteinMarkovSwitch::enableDisableMSM(vec3<double>relPosition, particle &part1, particle &part2) {
         if (relPosition.norm() <= minimumR && part2.state == 0) {
             part2.deactivateResetMSM();
@@ -104,7 +105,7 @@ namespace msmrd{
         auto patchesCoords2 = assignPatches(part2.type);
 
         // Evaluate patches potential if close enough and if particle 2 is in state 0
-        if (rvec.norm() <= 2*sigma and part2.state == 0) {
+        if (rvec.norm() <= 2*sigma and part2.state == 0 and patchesActive) {
             // Use default patches auxiliary parent function without angular dependence
             patchesPotential = evaluatePatchesPotential(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
             /* Get planes needed to be aligned by torque, based on use potential of -[(cos(theta) + 1)/2]^8
@@ -149,18 +150,17 @@ namespace msmrd{
          * it is left for possible future implementations. */
         //enableDisableMSM(rvec, part1, part2);
 
-        // Check if particle is in any of the bound states,
-        auto particlesBound = isBound(rvec, relOrientation);
-
+        // Check if particle is in any of the bound states. Not in use, left here for possible future implementations
+        //auto particlesBound = isBound(rvec, relOrientation);
         // If bound, deactivate the unboundMSM, otherwise, keep it active (assumes unbound MSM only of particle 2.).
-        if (particlesBound) {
-            part2.deactivateMSM();
-        } else {
-            part2.activateMSM();
-        }
+        //if (particlesBound) {
+        //    part2.deactivateMSM();
+        //} else {
+        //    part2.activateMSM();
+        //}
 
         // Calculate forces and torque due to patches interaction, if close enough and if particle 2 is in state 0
-        if ( (rvec.norm() <= 2*sigma and part2.state == 0)) {
+        if ( rvec.norm() <= 2*sigma and part2.state == 0 and patchesActive) {
             // Calculate forces and torque due to patches interaction using auxiliary function
             auto forcTorqPatches = forceTorquePatches(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
             auto force1 = forcTorqPatches[0];
@@ -259,7 +259,7 @@ namespace msmrd{
 
 
     /* Copied from discreteTrajectory to identify bound states. Checks if particle is in any of the patchyProtein
-     * trajectory bound states. */
+     * trajectory bound states. Not in use at the moment */
     bool patchyProteinMarkovSwitch::isBound(vec3<double> relativePosition, quaternion<double> relativeOrientation) {
         // Check if it matches a bound states, if so return true otherwise return false.
         vec3<double> relPosCenter;
@@ -282,7 +282,7 @@ namespace msmrd{
     /* Copied from patchyProteinTrajectory. Sets bound states (metastable regions) of the patchy protein
      * implementation. Should match those of the patchyProtein trajectory. The centers of the
      * metastable regions are given by a tuple of relative position and relative orientation. The size of the
-     * regions are determined by tolerancePosition and toleranceOrientation*/
+     * regions are determined by tolerancePosition and toleranceOrientation. Not required at the moment. */
     void patchyProteinMarkovSwitch::setBoundStates() {
         /* Define relative position vectors from particle 1 at the origin. These two patches
          * point in the same direction as the two patches in the dimer. */

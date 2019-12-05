@@ -33,6 +33,11 @@ namespace msmrd{ ;
         rstarAttractive = 0.85*sigma;
         rstarPatches = 0.1*sigma;
 
+        // Check there are patches, if not, turn patchy interaction off
+        if (patchesCoordinates.size() == 0) {
+            patchesActive = false;
+        }
+
         for (auto &patch : patchesCoordinates) {
             if (patch.norm() != 1) {
                 throw std::invalid_argument("Patches coordinates must have norm one");
@@ -62,6 +67,11 @@ namespace msmrd{ ;
         rstarAttractive = 0.85*sigma;
         rstarPatches = 0.1*sigma;
 
+        // Check there are patches, if not, turn patchy interaction off
+        if (patchesCoordinates.size() == 0) {
+            patchesActive = false;
+        }
+
         for (auto &patch : patchesCoordinates) {
             if (patch.norm() != 1) {
                 throw std::range_error("Patches coordinates must have norm one");
@@ -88,7 +98,7 @@ namespace msmrd{ ;
         repulsivePotential = quadraticPotential(rvec.norm(), sigma, epsRepulsive, aRepulsive, rstarRepulsive);
         attractivePotential = quadraticPotential(rvec.norm(), sigma, epsAttractive, aAttractive, rstarAttractive);
 
-        if (rvec.norm() <= 2*sigma) {
+        if (rvec.norm() <= 2*sigma and patchesActive) {
             // Loop over all patches
             for (int i = 0; i < patchesCoordinates.size(); i++) {
                 patchNormal1 = msmrdtools::rotateVec(patchesCoordinates[i], part1.orientation);
@@ -130,7 +140,7 @@ namespace msmrd{ ;
         force = (repulsiveForceNorm + attractiveForceNorm)*rvec/rvec.norm();
 
         // Calculate forces and torque due to patches interaction
-        if (rvec.norm() <= 2*sigma) {
+        if (rvec.norm() <= 2*sigma and patchesActive) {
             std::tie(force1, torque1, force2, torque2) = forceTorquePatches(part1, part2, pos1virtual);
         }
 

@@ -6,7 +6,6 @@
 #include "potentials/gayBerne.hpp"
 #include "potentials/patchyParticle.hpp"
 #include "potentials/patchyParticleAngular.hpp"
-#include "potentials/patchyParticleAngular2.hpp"
 #include "potentials/patchyProtein.hpp"
 #include "potentials/patchyProteinMarkovSwitch.hpp"
 

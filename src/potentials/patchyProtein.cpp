@@ -74,6 +74,11 @@ namespace msmrd {
         rstarAttractive = 0.85*sigma;
         rstarPatches[0] = 0.1*sigma;
         rstarPatches[1] = 0.1*sigma; // Special binding site
+
+        // Check there are patches, if not, turn patchy interaction off
+        if (patchesCoordinatesA.size() == 0 or patchesCoordinatesB.size() == 0) {
+            patchesActive = false;
+        }
     }
 
 
@@ -95,7 +100,7 @@ namespace msmrd {
 
         // Evaluate patches potential if particles are close enough
         double patchesPotential = 0.0;
-        if (rvec.norm() <= 2*sigma) {
+        if (rvec.norm() <= 2*sigma and patchesActive) {
             // Evaluate patches potential, using auxiliary function
             patchesPotential = evaluatePatchesPotential(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
         }
@@ -166,7 +171,7 @@ namespace msmrd {
         auto patchesCoords2 = assignPatches(part2.type);
 
         // Calculate forces and torque due to patches interaction if particles are close enough
-        if (rvec.norm() <= 2*sigma) {
+        if (rvec.norm() <= 2*sigma and patchesActive) {
             auto forcTorqPatches = forceTorquePatches(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
             auto force1 = forcTorqPatches[0];
             auto torque1 = forcTorqPatches[1];

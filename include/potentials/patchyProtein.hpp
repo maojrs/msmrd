@@ -22,6 +22,8 @@ namespace msmrd{
     protected:
         std::vector<vec3<double>> patchesCoordinatesA;
         std::vector<vec3<double>> patchesCoordinatesB;
+        bool patchesActive = true;
+
         double sigma = 1.0;
         double strength = 100.0;
 
