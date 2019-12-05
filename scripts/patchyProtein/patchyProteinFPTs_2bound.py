@@ -63,7 +63,7 @@ def simulationFPT(trajectorynum):
     '''
 
     # Define dummy trajectory to extract bound states from python (needed to use getState function)
-    dummyTraj = msmrd2.trajectories.patchyProtein(numparticles,1024)
+    dummyTraj = msmrd2.trajectories.patchyProtein2(numparticles,1024)
 
     # Define base seed
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed

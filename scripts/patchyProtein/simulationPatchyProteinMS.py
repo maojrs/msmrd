@@ -28,7 +28,7 @@ stride = 100 #50
 outTxt = False
 outH5 = True
 outChunked = True
-trajtype = "patchyProtein2" #"positionOrienatationState"
+trajtype = "patchyProtein" #"positionOrienatationState"
 
 
 # Define Patchy Protein potential parameters (This values are fixed and should match
@@ -62,7 +62,7 @@ except OSError as error:
         sys.exit()
 
 # Provides base filename (folder must exist (and preferably empty), otherwise H5 might fail)
-basefilename = os.path.join(filedirectory, "simPatchyProtein2")
+basefilename = os.path.join(filedirectory, "simPatchyProtein")
 
 # Create parameter dictionary and writes parameters to reference file
 parameterfilename = os.path.join(filedirectory, "parameters")

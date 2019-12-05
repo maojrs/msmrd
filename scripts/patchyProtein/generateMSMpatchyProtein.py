@@ -22,7 +22,7 @@ fnamebase = parentDirectory + 'simPatchyProtein_'
 
 # Parameters for MSM generation
 numBoundStates = 6
-lagtimes = [50, 75, 100, 150] # [75]
+lagtimes = [100, 150, 175, 200, 250] #[50, 75, 100, 150] # [75]
 reversible = True #False
 stitching = True
 

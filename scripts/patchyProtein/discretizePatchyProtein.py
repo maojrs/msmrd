@@ -37,6 +37,7 @@ for i in range(nfiles):
     dtraj = discretizator.discretizeTrajectoryH5(filename)
     dtrajs.append(dtraj)
     print("Loading file ", i+1, " of ", nfiles, " done.", end="\r")
+print()
 print("Done loading files")
 
 # Write discrete trajectory to xyz files
@@ -46,4 +47,5 @@ for i, dtraj in enumerate(dtrajs):
         datafile.write(str(dtraj[j]) + '\n')
     datafile.close()
     print("Writing discrete trajectory ", i+1, " of ", nfiles, " done.", end="\r")
+print()
 print("Done writing discrete trajectories")
