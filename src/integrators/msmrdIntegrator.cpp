@@ -377,8 +377,8 @@ namespace msmrd {
     void msmrdIntegrator<ctmsm>::integrate(std::vector<particle> &parts) {
 
         /* Calculate forces and torques and save them into forceField and torqueField. For the MSM/RD this will
-         * in general be zero, so only needs to be run once. */
-        if (firstrun) {
+         * in general be zero, so only needs to be run once. However, in some case they might be activated */
+        if (firstrun or pairPotentialActive or externalPotentialActive) {
             calculateForceTorqueFields<particle>(parts);
             firstrun = false;
         }
