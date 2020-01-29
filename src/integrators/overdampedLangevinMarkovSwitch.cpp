@@ -47,7 +47,7 @@ namespace msmrd {
                     resdt = timestep - part.timeCounter;
                     integrateOne(partIndex, parts, resdt);
                     part.setLagtime(part.lagtime - resdt);
-                    part.timeCounter += resdt; // this means part.timeCounter = timestep, so will exit while loop.
+                    part.timeCounter = 1.0*timestep; // since we sum resdt to part.timeCounter, so while loop exits.
                     // If lag time = 0 CTMSM must propagate in next step, otherwise it needs to integrate remaining lagtime.
                     if (part.lagtime == 0) {
                         // Ready to propagate CTMSM, update state and diffusion coefficients

@@ -58,6 +58,9 @@ namespace msmrd {
         if (MSMlist[partType].tmatrix.size() > 1) {
             parts[partIndex].activeMSM = true;
             newState = unboundState;
+            // Allow for propagation of unboundMSM and reset lagrime.
+            parts[partIndex].propagateTMSM = true;
+            parts[partIndex].setLagtime(0);
         }
         /* Set new unbound states (which also eliminates pair connections by resetting boundTo and
          * boundState to -1) and activate particles. */

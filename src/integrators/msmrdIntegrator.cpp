@@ -89,8 +89,11 @@ namespace msmrd {
         if (MSMlist[partType].tmatrix.size() > 1) {
             parts[partIndex].activeMSM = true;
             newState = randg.uniformInteger(0, static_cast<int>(MSMlist[partType].tmatrix.size() - 1));
+            // Allow for propagation of unboundMSM and reset lagrime.
+            parts[partIndex].propagateTMSM = true;
+            parts[partIndex].setLagtime(0);
         }
-        /* Activate particle and set new unbound states (which also eliminates pair connections by
+        /* Activate particle, set new unbound states (which also eliminates pair connections by
          * resetting boundTo and boundState to -1). */
         parts[partIndex].activate();
         parts[partIndex].setState(newState);
@@ -378,12 +381,12 @@ namespace msmrd {
 
         /* Calculate forces and torques and save them into forceField and torqueField. For the MSM/RD this will
          * in general be zero, so only needs to be run once. However, in some case they might be activated */
-        if (firstrun or pairPotentialActive or externalPotentialActive) {
-            calculateForceTorqueFields<particle>(parts);
-            firstrun = false;
-        }
+        //if (firstrun or pairPotentialActive or externalPotentialActive) {
+        calculateForceTorqueFields<particle>(parts);
+        //    firstrun = false;
+        //}
 
-        /* NOTE: the ordering of the following routines is veryy important, draw a timeline if necessary.*/
+        /* NOTE: the ordering of the following routines is very important, draw a timeline if necessary.*/
 
         // Compute future transitions to bound states (from unbound states) and add them to the event manager.
         computeTransitionsFromTransitionStates(parts);

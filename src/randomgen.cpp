@@ -21,7 +21,7 @@ namespace msmrd {
         }
     };
 
-    // Returns random number between rmin and rmax sampled uniformly
+    // Returns random number between rmin and rmax sampled uniformly [rmin,rmax)
     double randomgen::uniformRange(double rmin, double rmax) {
         std::uniform_real_distribution<double> uniform(rmin, rmax);
         return uniform(mt_rand);

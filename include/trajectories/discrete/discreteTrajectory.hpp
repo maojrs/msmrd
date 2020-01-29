@@ -8,7 +8,6 @@
 #include "trajectories/trajectoryPositionOrientation.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
 #include "tools.hpp"
-#include "H5Cpp.h"
 
 namespace msmrd {
     /**

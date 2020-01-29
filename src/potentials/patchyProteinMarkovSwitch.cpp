@@ -52,7 +52,7 @@ namespace msmrd{
 
         // Set strengths of potential parts
         epsRepulsive = 1.0*strength;
-        epsAttractive = -0.15*strength; //-0.05*strength;
+        epsAttractive = -0.00*strength; //-0.05*strength
         epsPatches[0] = -0.15*strength;
         epsPatches[1] = -0.20*strength; // Special binding site
 
@@ -130,8 +130,8 @@ namespace msmrd{
         vec3<double> pos1virtual = relPos[0]; // virtual part1.position if periodic boundary; otherwise part1.position.
         vec3<double> rvec = relPos[1]; //part2.position - part1.position;
 
-        // Calculate relative orientation
-        auto relOrientation = part2.orientation * part1.orientation.conj();
+        // // Calculate relative orientation
+        // auto relOrientation = part2.orientation * part1.orientation.conj();
 
         /* Calculate and add forces due to repulsive and attractive isotropic potentials.
          *  Note correct sign/direction of force given by rvec/rvec.norm*() */
