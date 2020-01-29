@@ -381,10 +381,10 @@ namespace msmrd {
 
         /* Calculate forces and torques and save them into forceField and torqueField. For the MSM/RD this will
          * in general be zero, so only needs to be run once. However, in some case they might be activated */
-        //if (firstrun or pairPotentialActive or externalPotentialActive) {
-        calculateForceTorqueFields<particle>(parts);
-        //    firstrun = false;
-        //}
+        if (firstrun or pairPotentialActive or externalPotentialActive) {
+            calculateForceTorqueFields<particle>(parts);
+            firstrun = false;
+        }
 
         /* NOTE: the ordering of the following routines is very important, draw a timeline if necessary.*/
 
