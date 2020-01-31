@@ -1,12 +1,12 @@
 import numpy as np
 import pickle
-import multiprocessing
 from multiprocessing import Pool
 import msmrd2
 from msmrd2.potentials import patchyProteinMarkovSwitch
 from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
 from msmrd2.markovModels import msmrdMarkovModel as msmrdMSM
 from msmrd2.integrators import msmrdPatchyProtein
+#from msmrd2.integrators import msmrdPatchyProtein2
 import msmrd2.tools.particleTools as particleTools
 import os
 
@@ -18,9 +18,8 @@ written to '../data/patchyProtein/first_passage_times/MSMRDfilename_here.
 '''
 
 # Main parameters for particle and integrator
-# Main parameters for particle and integrator
 numparticles = 2
-dt = 0.0001 #0.00001 #0.000005
+dt = 0.0001 #0.0001 #0.00001 #0.000005
 bodytype = 'rigidbody'
 particleTypes = [0, 1]
 numBoundStates = 6
@@ -28,13 +27,13 @@ maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 minimumUnboundRadius = 2.5
 numParticleTypes = 2 # num. of particle types (not states) in unbound state
-numTrajectories = 5000 #1000 #10000
+numTrajectories = 600 #1000 #10000
 
 # Other important parameters
-lagtime = 150 #50 #75 #150 #75 #300
+lagtime = 150 #75 #75 #50 #75 #150 #75 #300
 boxsize = 6 #8 #6
 dtMDsimulation = 0.00001
-stride = 100 #50
+stride = 25
 realLagtime = lagtime*dtMDsimulation*stride
 
 # Discretization parameters (need to be consistent with the on used to generate the rate dictionary
@@ -55,7 +54,7 @@ patchesCoordinates2 = []
 
 # Set diffusion coefficients for bound states
 # Parameters to define coupling Markov model for bound dynamics: couplingMSM
-Dbound = 0.5*np.ones(numBoundStates)
+Dbound = np.ones(numBoundStates)
 DboundRot = np.ones(numBoundStates)
 
 # Bound states definition, needed to calculate boundstate
@@ -86,7 +85,7 @@ def MSMRDsimulationFPT(trajectorynum):
 
     # Define discretization
     discretization = msmrd2.discretizations.positionOrientationPartition(radialBounds[1],
-                    numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat)
+                                                                         numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat)
     discretization.setThetasOffset(np.pi/4.0)
 
     # Define boundary
@@ -96,11 +95,13 @@ def MSMRDsimulationFPT(trajectorynum):
     potentialPatchyProtein = patchyProteinMarkovSwitch(sigma, strength, angularStrength,
                                                        patchesCoordinates1, patchesCoordinates2)
 
+
     # Define base seed
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/MSM_patchyProtein_t1.20E+07_s100_lagt" + str(lagtime)
+    pickle_in = open("../../data/atchyProtein/benchmark/"
+                     "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']
@@ -135,6 +136,7 @@ def MSMRDsimulationFPT(trajectorynum):
     integrator.setBoundary(boxBoundary)
     integrator.setDiscretization(discretization)
     integrator.setPairPotential(potentialPatchyProtein)
+
 
     # Creates random particle list
     seed = int(trajectorynum)
@@ -189,3 +191,4 @@ multiprocessingHandler()
 #             print("Simulation " + str(index) + ", done. Success!")
 #         else:
 #             print("Simulation " + str(index) + ", done. Failed :(")
+

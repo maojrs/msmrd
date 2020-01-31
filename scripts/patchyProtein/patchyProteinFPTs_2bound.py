@@ -4,7 +4,6 @@ from msmrd2.potentials import patchyProteinMarkovSwitch
 from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
 from msmrd2.integrators import overdampedLangevinMarkovSwitch as odLangevinMS
 import msmrd2.tools.particleTools as particleTools
-import multiprocessing
 from multiprocessing import Pool
 import os
 
@@ -16,11 +15,11 @@ unbound configuration to any given bound state(s). The data is written to
 
 # Main parameters for particle and integrator
 numparticles = 2
-dt = 0.0001 #0.00001 #0.000005
+dt = 0.0001 #0.0001 #0.00001 #0.000005
 bodytype = 'rigidbody'
 particleTypes = [0, 1]
 minimumUnboundRadius = 2.5
-numTrajectories = 5000 #10000
+numTrajectories = 600 #10000
 
 # Define Patchy Protein potential parameters (This values are fixed and should match
 # those used to determine metastable states in potential and trajectory.)
@@ -38,7 +37,6 @@ boundaryType = 'periodic'
 # Define bound states
 #boundStates = [1,2,3,4,5,6]
 boundStates = [1] # Main bound state
-
 
 # Chooses parent directory
 parentDirectory = "../../data/patchyProtein/first_passage_times/"
@@ -62,8 +60,15 @@ def simulationFPT(trajectorynum):
     :return: state, first passage time
     '''
 
+    # Define simulation boundaries (choose either spherical or box)
+    boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
+
+
     # Define dummy trajectory to extract bound states from python (needed to use getState function)
-    dummyTraj = msmrd2.trajectories.patchyProtein2(numparticles,1024)
+    radialLowerBound = 1.25
+    radialUpperBound = 2.25
+    dummyTraj = msmrd2.trajectories.patchyProtein(numparticles,1024, radialLowerBound, radialUpperBound)
+    dummyTraj.setBoundary(boxBoundary)
 
     # Define base seed
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
@@ -86,14 +91,13 @@ def simulationFPT(trajectorynum):
     markovModel1.setDrot(Drot1list)
     unboundMSMlist = [markovModel0, markovModel1]
 
-    # Define simulation boundaries (choose either spherical or box)
-    boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, 'periodic')
 
     # Define potential
     potentialPatchyProtein = patchyProteinMarkovSwitch(sigma, strength, angularStrength,
                                                        patchesCoordinates1, patchesCoordinates2)
 
     # Define integrator and boundary (over-damped Langevin)
+    #integrator = odLangevin(dt, seed, bodytype)
     integrator = odLangevinMS(unboundMSMlist, dt, seed, bodytype)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPatchyProtein)

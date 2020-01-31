@@ -22,13 +22,14 @@ numSimulations = 600 #500 #1000 #20 #200
 
 
 # Simulation parameters
-timesteps = 12000000 #6000000 #2000000 #5000000 #400000 #20000000
+timesteps = 6000000 #2000000 #5000000 #400000 #20000000
 bufferSize = 1024
-stride = 100 #50
+stride = 25 #50
 outTxt = False
 outH5 = True
 outChunked = True
-trajtype = "patchyProtein" #"positionOrienatationState"
+#trajtype = "positionOrientationState"
+trajtype = "patchyProtein"
 
 
 # Define Patchy Protein potential parameters (This values are fixed and should match
@@ -67,9 +68,8 @@ basefilename = os.path.join(filedirectory, "simPatchyProtein")
 # Create parameter dictionary and writes parameters to reference file
 parameterfilename = os.path.join(filedirectory, "parameters")
 parameterDictionary = {'numFiles' : numSimulations, 'numParticles' : Nparticles, 'dt' : dt, 'bodytype' : bodytype,
-                       'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype, 'boxsize' : boxsize,
-                       'boundaryType' : boundaryType, 'potentialStrength' : strength,
-                       'potentialAngularStrength' : angularStrength}
+                       'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype,
+                       'boxsize' : boxsize, 'boundaryType' : boundaryType, 'potentialStrength' : strength}
 analysisTools.writeParameters(parameterfilename, parameterDictionary)
 
 
@@ -104,7 +104,7 @@ def runParallelSims(simnumber):
 
     # Define particle list
     particleList = particleTools.randomParticleMSList(Nparticles, boxsize, separationDistance, particleTypes,
-                                                 unboundMSMlist, seed)
+                                                      unboundMSMlist, seed)
 
     # Defines patchy protein potential
     potentialPatchyProteinMS = patchyProteinMarkovSwitch(sigma, strength, angularStrength,
@@ -131,3 +131,6 @@ num_cores = multiprocessing.cpu_count()
 pool = Pool(processes=num_cores)
 iterator = [i for i in range(numSimulations)]
 pool.map(partial(runParallelSims), iterator)
+
+#for i in range(10):
+#    runParallelSims(i)
