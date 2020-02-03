@@ -70,6 +70,11 @@ namespace msmrd{
 
         // Sets this specific parameter unique for this potential, see enableDisableMSM function.
         minimumR = 1.25;
+
+        // Check there are patches, if not, turn patchy interaction off
+        if (patchesCoordinatesA.size() == 0 or patchesCoordinatesB.size() == 0) {
+            patchesActive = false;
+        }
     }
 
     /* Checks is MSM must be deactivated in certain particles. In this case, if bounded or close to bounded

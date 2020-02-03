@@ -4,6 +4,7 @@ from msmrd2.potentials import patchyProteinMarkovSwitch
 from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
 from msmrd2.integrators import overdampedLangevinMarkovSwitch as odLangevinMS
 import msmrd2.tools.particleTools as particleTools
+# import multiprocessing
 from multiprocessing import Pool
 import os
 
@@ -97,7 +98,6 @@ def simulationFPT(trajectorynum):
                                                        patchesCoordinates1, patchesCoordinates2)
 
     # Define integrator and boundary (over-damped Langevin)
-    #integrator = odLangevin(dt, seed, bodytype)
     integrator = odLangevinMS(unboundMSMlist, dt, seed, bodytype)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPatchyProtein)

@@ -9,6 +9,7 @@ import msmrd2.tools.analysis as analysisTools
 
 # Load parameters from parameters file (from original MD simulation)
 parentDirectory = '../../data/patchyProtein/benchmark/'
+#parentDirectory = '/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/benchmark/'
 parameterDictionary = analysisTools.readParameters(parentDirectory + "parameters")
 nfiles = parameterDictionary['numFiles']
 dt = parameterDictionary['dt']
@@ -22,7 +23,7 @@ fnamebase = parentDirectory + 'simPatchyProtein_'
 
 # Parameters for MSM generation
 numBoundStates = 6
-lagtimes = [100, 150, 175, 200, 250] #[50, 75, 100, 150] # [75]
+lagtimes = [100, 150, 175, 200, 250, 300] #[50, 75, 100, 150] # [75]
 reversible = True #False
 stitching = True
 

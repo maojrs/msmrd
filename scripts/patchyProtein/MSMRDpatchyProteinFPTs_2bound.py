@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+# import multiprocessing
 from multiprocessing import Pool
 import msmrd2
 from msmrd2.potentials import patchyProteinMarkovSwitch
@@ -63,7 +64,7 @@ boundStates = [1]
 
 # Chooses parent directory
 parentDirectory = "../../data/patchyProtein/first_passage_times/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/first_passage_times/"
+# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/first_passage_times/"
 
 # Creates parent directory if it doesn't exist already
 try:
@@ -100,9 +101,12 @@ def MSMRDsimulationFPT(trajectorynum):
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
 
     # Load rate dicitionary
-    pickle_in = open("../../data/atchyProtein/benchmark/"
+    pickle_in = open("../../data/patchyProtein/benchmark/"
                      "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
+    #pickle_in = open("/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/benchmark/"
+    #                 "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
+    #                 +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']
     activeSet = mainMSM['active_set']
