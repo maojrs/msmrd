@@ -107,7 +107,7 @@ def splitDiscreteTrajs(discreteTrajs, unboundStateIndex = 0):
             if array.size > 1:
                 slicedDtrajs.append(array)
         trajnum += 1
-        print("Slicing trajectory ", trajnum, " of ", len(discreteTrajs), " done.", end="\r")
+        print("Slicing trajectory ", trajnum, " of ", len(discreteTrajs), " done.", end="\r")  
     return slicedDtrajs
 
 
@@ -126,17 +126,23 @@ def stitchTrajs(slicedDtrajs, minlength = 1000):
     while len(myslicedDtrajs) > 0:
         traj = myslicedDtrajs[0]
         del myslicedDtrajs[0]
-        # Keep trajectories under a certain length min length
+        percentageDone = int(100.0*(1-len(myslicedDtrajs)/len(slicedDtrajs.copy())))
+        print("Stitching trajectories: ", percentageDone, "% done   ", end="\r")
+        # Try to keep all resulting trajectories over a certain length min length
         while traj.size <= minlength:
             foundTrajs = False
             for i in reversed(range(len(myslicedDtrajs))):
                 # If end point and start point match, join trajectories
                 if traj[-1] == myslicedDtrajs[i][0]:
+                    if traj[-1] < 0:
+                    	print("WTF?????            ")
+                    if myslicedDtrajs[i][0] < 0:
+                    	print("WTF again???????????    ")
                     foundTrajs = True
                     traj = np.concatenate([traj, myslicedDtrajs[i]])
                     del myslicedDtrajs[i]
             # If no possible trajectory to join is found, save trajectory and continue.
             if foundTrajs == False:
                 break;
-        stitchedTrajs.append(traj)
+        stitchedTrajs.append(traj)   
     return stitchedTrajs

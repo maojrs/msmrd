@@ -36,20 +36,20 @@ for i in range(nfiles):
     dtraj = trajectoryTools.loadDiscreteTrajectory(fnamebase, i, fnamesuffix, filetype)
     dtrajs.append(dtraj)
     print("Loading discrete trajectory ", i+1, " of ", nfiles, " done.", end="\r")
-print("Loaded all trajectories!                      ")
+print("\nLoaded all trajectories!")
 
 
 # Slice trajectories getting rid of the unbound state 0
 unboundStateIndex = 0
 slicedDtrajs = trajectoryTools.splitDiscreteTrajs(dtrajs, unboundStateIndex)
 # Stitch trajectories if wanted
-print("All trajectories sliced, now stitching trajectories ...")
+print("\nSliced all trajectories!")
 if stitching:
     minLength = 5000
     finalTrajs = trajectoryTools.stitchTrajs(slicedDtrajs, minLength)
 else:
     finalTrajs = slicedDtrajs
-print("Stitched all trajectories!")
+print("\nStitched all trajectories!")
 
 
 # Loop over all desired lagtime to obatin MSMs
@@ -67,4 +67,4 @@ for i, lagtime in enumerate(lagtimes):
                       "_s" + "{:d}".format(stride) + "_lagt" + "{:d}".format(lagtime) + ".pickle","wb")
     pickle.dump(MSM, pickle_out)
     pickle_out.close()
-print("Generated all MSMs.")
+print("\nGenerated all MSMs.")
