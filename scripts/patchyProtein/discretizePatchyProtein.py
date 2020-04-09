@@ -31,15 +31,14 @@ discretizator = msmrd2.trajectories.patchyProtein(numParticles, bufferSize, radi
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
 discretizator.setBoundary(boxBoundary)
 
-# Load H5 files and generates discrete trajectories at once directly on c++.
+# Loads H5 files and generates discrete trajectories at once directly on c++.
 dtrajs = []
 for i in range(nfiles):
     filename = fnamebase + str(i).zfill(4) + '.h5'
     dtraj = discretizator.discretizeTrajectoryH5(filename)
     dtrajs.append(dtraj)
     print("Loading file ", i+1, " of ", nfiles, " done.", end="\r")
-print()
-print("Done loading files")
+print("\nDone loading files")
 
 # Write discrete trajectory to xyz files
 for i, dtraj in enumerate(dtrajs):
@@ -48,5 +47,4 @@ for i, dtraj in enumerate(dtrajs):
         datafile.write(str(dtraj[j]) + '\n')
     datafile.close()
     print("Writing discrete trajectory ", i+1, " of ", nfiles, " done.", end="\r")
-print()
-print("Done writing discrete trajectories")
+print("\nDone writing discrete trajectories")

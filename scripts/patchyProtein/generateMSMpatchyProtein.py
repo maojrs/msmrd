@@ -7,6 +7,10 @@ import msmrd2.tools.analysis as analysisTools
 # Given discrete data, creates MSMs for a list of lagtimes. To see
 # implied time scales use notebook version of this script.
 
+# Plot implied time scales
+plotImpliedTimescalesDraft = False
+plotImpliedTimescalesPaperVersion = True
+
 # Load parameters from parameters file (from original MD simulation)
 parentDirectory = '../../data/patchyProtein/benchmark/'
 #parentDirectory = '/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/benchmark/'
@@ -68,3 +72,43 @@ for i, lagtime in enumerate(lagtimes):
     pickle.dump(MSM, pickle_out)
     pickle_out.close()
 print("\nGenerated all MSMs.")
+
+# Generate implied timescales plots (draft verision)
+if plotImpliedTimescalesDraft:
+	maxlagtime = 300 #100 #200 #300
+	its = pyemma.msm.its(finalTrajs, maxlagtime, reversible=reversible)
+	nits = 20
+	mplt.plot_implied_timescales(its, nits = nits, ylog=True, units='steps', linewidth=1, dt=1)
+	plt.ylabel(r"log(timescale/steps)", fontsize = 18)
+	plt.xlabel(r"lag time/steps", fontsize = 18)
+	plt.savefig('its_draft_patchyProtein.pdf')
+	# No log version
+	mplt.plot_implied_timescales(its, nits = nits, ylog=False, units='steps', linewidth=2, dt=1)
+	plt.ylabel(r"timescale/steps", fontsize = 24)
+	plt.xlabel(r"lag time/steps", fontsize = 24)
+	plt.savefig('its_draft_nolog_patchyProtein.pdf')
+
+# Generate implied timescales plots (paper verision w/error bars)	
+if plotImpliedTimescalesPaperVersion:
+	maxlagtime = 300
+	its = pyemma.msm.its(finalTrajs, maxlagtime, reversible=reversible, errors='bayes')
+	nits = 20
+	fig, ax = plt.subplots(figsize=(10, 7))
+	mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=True, units='steps', linewidth=2, dt=1, 
+		                         show_mean=False, markersize=0, confidence=0.95)
+	plt.ylabel(r"log(timescale/steps)", fontsize = 24)
+	plt.xlabel(r"lag time/steps", fontsize = 24)
+	plt.xticks(fontsize = 28)
+	plt.yticks(fontsize = 28)
+	#plt.ylim([10.0,100000])
+	plt.savefig('its_paper_patchyProtein.pdf')
+	# No log version
+	fig, ax = plt.subplots(figsize=(10, 7))
+	mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=False, units='steps', linewidth=2, dt=1, 
+		                         show_mean=False, markersize=0, confidence=0.95)
+	plt.ylabel(r"timescale/steps", fontsize = 24)
+	plt.xlabel(r"lag time/steps", fontsize = 24)
+	plt.xticks(fontsize = 28)
+	plt.yticks(fontsize = 28)
+	#plt.ylim([10.0,4500])
+	plt.savefig('its_paper_nolog_patchyProtein.pdf')
