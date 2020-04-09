@@ -104,8 +104,8 @@ namespace msmrd {
                                                                 "or #pairs of particles, approx size)")
                 .def(py::init<int &, int &>())
                 .def(py::init<int &, int &, double &, double &>())
-                .def("sampleDiscreteState", &patchyProteinTrajectory::sampleDiscreteState)
-                .def("getState", &patchyProteinTrajectory::sampleDiscreteState);
+                .def("sampleDiscreteState", &patchyProteinTrajectory2::sampleDiscreteState)
+                .def("getState", &patchyProteinTrajectory2::sampleDiscreteState);
 
 
 

@@ -30,6 +30,7 @@ namespace msmrd {
         for (int i=1; i<=numRadialSections; i++){
             radialSections[i] = radialSections[i-1] + dr;
         }
+        radialSections[numRadialSections] = 1.0;
     };
 
     /* Gets the section number in the volumetric partition of the half sphere given a coordinate
@@ -49,19 +50,32 @@ namespace msmrd {
             reducedCoordinate = {-1.0*quatCoordinate[1], -1.0*quatCoordinate[2], -1.0*quatCoordinate[3]};
         }
         double rReduced = reducedCoordinate.norm();
-
+        // Check for errors
+        if (rReduced > 1.0005) {
+            throw std::domain_error("Unit quaternion cannot be larger than one");
+        }
+        // Renormalize in case of computational epsilon error above 1.
+        if (rReduced > 1) {
+        	rReduced = 1.0;
+        }
+		bool foundSectionNumber = false;
         for (int i = 0; i < numRadialSections; i++){
             if (rReduced <= radialSections[i+1]){
                 if (i == 0) {
                     sectionNumber = 1;
+                    foundSectionNumber = true;
                     break;
                 } else {
                     sectionNumber = numSphericalSections*(i-1) + 1;
                     sectionNumber += sphericalPartition->getSectionNumber(reducedCoordinate);
+                    foundSectionNumber = true;
                     break;
                 }
             }
         }
+        if (not foundSectionNumber) {
+			throw std::invalid_argument("Couldn't get section number. See getSectionNumber function of quaternionPartition");
+		}
         return sectionNumber;
     };
 

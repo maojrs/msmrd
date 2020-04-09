@@ -146,11 +146,22 @@ namespace msmrd{
         }
         std::vector<double> collarThetas = thetas[currentCollarIndex - 1];
         int numThetaCuts = collarThetas.size();
+        double newTheta;
+        bool foundThetaIndex = false;
         for (int i = 0; i < numThetaCuts; i++){
-            if(theta >= (collarThetas[numThetaCuts - 1 - i] - thetasOffset)){
+            // Compensate for the offset and ensure non-negative values
+            newTheta = collarThetas[numThetaCuts - 1 - i] - thetasOffset;
+            if (newTheta < 0) {
+            	newTheta += 2*M_PI;
+            } 
+            if(theta >= newTheta){
                 currentThetaIndex = numThetaCuts - 1 - i;
+                foundThetaIndex = true;
                 break;
             }
+        }
+        if (not foundThetaIndex) {
+        	throw std::invalid_argument("Error w/sphere discretization. Cant get section number (see getSectionNumber function)");
         }
         sectionNum = std::accumulate(std::begin(regionsPerCollar), std::next(std::begin(regionsPerCollar),
                                      currentCollarIndex), 0) + currentThetaIndex + 1;
