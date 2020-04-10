@@ -10,8 +10,8 @@ import msmrd2.tools.analysis as analysisTools
 # implied time scales use notebook version of this script.
 
 # Plot implied time scales
-plotImpliedTimescalesDraft = False
-plotImpliedTimescalesPaperVersion = True
+plotImpliedTimescalesDraft = True
+plotImpliedTimescalesPaperVersion = False
 
 # Load parameters from parameters file (from original MD simulation)
 #parentDirectory = '../../data/patchyProtein/benchmark/'
@@ -81,12 +81,14 @@ if plotImpliedTimescalesDraft:
     maxlagtime = 300 #100 #200 #300
     its = pyemma.msm.its(finalTrajs, maxlagtime, reversible=reversible)
     nits = 20
-    mplt.plot_implied_timescales(its, nits = nits, ylog=True, units='steps', linewidth=1, dt=1)
+    fig, ax = plt.subplots(figsize=(10, 7))
+    mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=True, units='steps', linewidth=2, dt=1)
     plt.ylabel(r"log(timescale/steps)", fontsize = 18)
     plt.xlabel(r"lag time/steps", fontsize = 18)
     plt.savefig(parentDirectory + 'its_draft_patchyProtein' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     # No log version
-    mplt.plot_implied_timescales(its, nits = nits, ylog=False, units='steps', linewidth=2, dt=1)
+    fig, ax = plt.subplots(figsize=(10, 7))
+    mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=False, units='steps', linewidth=2, dt=1)
     plt.ylabel(r"timescale/steps", fontsize = 24)
     plt.xlabel(r"lag time/steps", fontsize = 24)
     plt.savefig(parentDirectory + 'its_draft_nolog_patchyProtein' + "{:.2E}".format(totalTimeSteps) + '.pdf')
