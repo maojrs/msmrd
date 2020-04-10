@@ -60,7 +60,7 @@ print("\nStitched all trajectories!")
 
 # Loop over all desired lagtime to obatin MSMs
 for i, lagtime in enumerate(lagtimes):
-    print("Generating MSM ", i, "of ", len(lagtimes),  " at lagtime ", lagtime, end="\r")
+    print("Generating MSM ", i+1, "of ", len(lagtimes),  " at lagtime ", lagtime, end="\r")
 
     # Create MSM between transision states and bound states without stitching
     mainmsm = pyemma.msm.estimate_markov_model(finalTrajs, lagtime, reversible=reversible)
@@ -84,12 +84,12 @@ if plotImpliedTimescalesDraft:
     mplt.plot_implied_timescales(its, nits = nits, ylog=True, units='steps', linewidth=1, dt=1)
     plt.ylabel(r"log(timescale/steps)", fontsize = 18)
     plt.xlabel(r"lag time/steps", fontsize = 18)
-    plt.savefig('its_draft_patchyProtein.pdf')
+    plt.savefig(parentDirectory + 'its_draft_patchyProtein' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     # No log version
     mplt.plot_implied_timescales(its, nits = nits, ylog=False, units='steps', linewidth=2, dt=1)
     plt.ylabel(r"timescale/steps", fontsize = 24)
     plt.xlabel(r"lag time/steps", fontsize = 24)
-    plt.savefig('its_draft_nolog_patchyProtein.pdf')
+    plt.savefig(parentDirectory + 'its_draft_nolog_patchyProtein' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     print("Finished draft plots.")
 
 # Generate implied timescales plots (paper verision w/error bars)	
@@ -106,7 +106,7 @@ if plotImpliedTimescalesPaperVersion:
     plt.xticks(fontsize = 28)
     plt.yticks(fontsize = 28)
     #plt.ylim([10.0,100000])
-    plt.savefig('its_paper_patchyProtein.pdf')
+    plt.savefig(parentDirectory + 'its_paper_patchyProtein' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     # No log version
     fig, ax = plt.subplots(figsize=(10, 7))
     mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=False, units='steps', linewidth=2, dt=1, 
@@ -116,5 +116,5 @@ if plotImpliedTimescalesPaperVersion:
     plt.xticks(fontsize = 28)
     plt.yticks(fontsize = 28)
     #plt.ylim([10.0,4500])
-    plt.savefig('its_paper_nolog_patchyProtein.pdf')
+    plt.savefig(parentDirectory + 'its_paper_nolog_patchyProtein' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     print("Finished paper plots.")
