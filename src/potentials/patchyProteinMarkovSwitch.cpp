@@ -51,11 +51,11 @@ namespace msmrd{
         }
 
         // Set patch potentical scaling
-        patchPotentialScaling = 0.7;
+        patchPotentialScaling = 0.5; //0.7; //1.0;
 
         // Set strengths of potential parts
         epsRepulsive = 1.0*strength;
-        epsAttractive = -0.10*strength; //0.00before //-0.05*strength
+        epsAttractive = -0.15*strength; //-0.10*strength; //0.00before //-0.05*strength
         epsPatches[0] = -0.15*strength;
         epsPatches[1] = -0.20*strength; // Special binding site
 
@@ -72,7 +72,7 @@ namespace msmrd{
         rstarPatches[1] = 0.1*sigma; // Special binding site
 
         // Sets this specific parameter unique for this potential, see enableDisableMSM function.
-        minimumR = 1.25;
+        minimumR = 1.25*sigma;
 
         // Check there are patches, if not, turn patchy interaction off
         if (patchesCoordinatesA.size() == 0 or patchesCoordinatesB.size() == 0) {
@@ -113,7 +113,7 @@ namespace msmrd{
         auto patchesCoords2 = assignPatches(part2.type);
 
         // Evaluate patches potential if close enough and if particle 2 is in state 0
-        if (rvec.norm() <= minimumR*sigma and part2.state == 0 and patchesActive) {
+        if (rvec.norm() <= minimumR and part2.state == 0 and patchesActive) {
             // Use default patches auxiliary parent function without angular dependence
             patchesPotential = evaluatePatchesPotential(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
             /* Get planes needed to be aligned by torque, based on use potential of -[(cos(theta) + 1)/2]^8
@@ -169,7 +169,7 @@ namespace msmrd{
         //}
 
         // Calculate forces and torque due to patches interaction, if close enough and if particle 2 is in state 0
-        if ( rvec.norm() <= minimumR*sigma and part2.state == 0 and patchesActive) {
+        if ( rvec.norm() <= minimumR and part2.state == 0 and patchesActive) {
             // Calculate forces and torque due to patches interaction using auxiliary function
             auto forcTorqPatches = forceTorquePatches(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
             auto force1 = forcTorqPatches[0];

@@ -1,6 +1,6 @@
 import numpy as np
 import pickle
-# import multiprocessing
+import multiprocessing
 from multiprocessing import Pool
 import msmrd2
 from msmrd2.potentials import patchyProteinMarkovSwitch
