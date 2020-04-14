@@ -120,3 +120,19 @@ TEST_CASE("patchyProteinMS potential: test calculatePlanes function", "[potentia
     }
 }
 
+TEST_CASE("patchyProteinMS potential: test patchesActive", "[potentials]") {
+    // Define patchy protein potential
+    std::vector<vec3<double>> patchesCoordinatesA(6);
+    std::vector<vec3<double>> patchesCoordinatesB(0);
+    patchesCoordinatesA[0] = vec3<double> (1.,0.,0.);
+    patchesCoordinatesA[1] = vec3<double> (0.,1.,0.);
+    patchesCoordinatesA[2] = vec3<double> (0.,0.,1.);
+    patchesCoordinatesA[3] = vec3<double> (-1.,0.,0.);
+    patchesCoordinatesA[4] = vec3<double> (0.,-1.,0.);
+    patchesCoordinatesA[5] = vec3<double> (0.,0.,-1.);
+    double sigma = 1.0;
+    double strength = 1.0;
+    auto potentialPPMS = patchyProteinMarkovSwitch(sigma, strength, strength, patchesCoordinatesA, patchesCoordinatesB);
+    REQUIRE(potentialPPMS.arePatchesActive() == false);
+}
+

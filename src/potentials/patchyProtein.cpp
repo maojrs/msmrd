@@ -145,7 +145,7 @@ namespace msmrd {
             }
         }
 
-        return patchesPotential;
+        return patchPotentialScaling * patchesPotential;
     };
 
 
@@ -233,12 +233,12 @@ namespace msmrd {
                     patchForce = patchesForceNorm * rpatch / rpatch.norm();
                 }
                 // Calculate force and torque acting on particle 1 and add values to previous forces and torques
-                force1 += patchForce;
-                torque1 += 0.5 * sigma * patchNormal1.cross(patchForce);
+                force1 += patchPotentialScaling * patchForce;
+                torque1 += 0.5 * sigma * patchPotentialScaling * patchNormal1.cross(patchForce);
 
                 // Calculate force and torque acting on particle 2 and add values to previous forces and torques
-                force2 += -1.0 * patchForce;
-                torque2 += 0.5 * sigma * patchNormal2.cross(-1.0 * patchForce);
+                force2 += -1.0 * patchPotentialScaling * patchForce;
+                torque2 += 0.5 * sigma * patchPotentialScaling * patchNormal2.cross(-1.0 * patchForce);
             }
         }
 

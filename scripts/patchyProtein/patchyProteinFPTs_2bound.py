@@ -4,7 +4,7 @@ from msmrd2.potentials import patchyProteinMarkovSwitch
 from msmrd2.markovModels import continuousTimeMarkovStateModel as ctmsm
 from msmrd2.integrators import overdampedLangevinMarkovSwitch as odLangevinMS
 import msmrd2.tools.particleTools as particleTools
-# import multiprocessing
+import multiprocessing
 from multiprocessing import Pool
 import os
 

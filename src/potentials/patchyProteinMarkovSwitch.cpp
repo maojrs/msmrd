@@ -50,6 +50,9 @@ namespace msmrd{
             }
         }
 
+        // Set patch potentical scaling
+        patchPotentialScaling = 0.7;
+
         // Set strengths of potential parts
         epsRepulsive = 1.0*strength;
         epsAttractive = -0.10*strength; //0.00before //-0.05*strength
@@ -110,7 +113,7 @@ namespace msmrd{
         auto patchesCoords2 = assignPatches(part2.type);
 
         // Evaluate patches potential if close enough and if particle 2 is in state 0
-        if (rvec.norm() <= 1.25*sigma and part2.state == 0 and patchesActive) {
+        if (rvec.norm() <= minimumR*sigma and part2.state == 0 and patchesActive) {
             // Use default patches auxiliary parent function without angular dependence
             patchesPotential = evaluatePatchesPotential(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
             /* Get planes needed to be aligned by torque, based on use potential of -[(cos(theta) + 1)/2]^8
@@ -144,6 +147,7 @@ namespace msmrd{
                                                                aRepulsive, rstarRepulsive);
         auto attractiveForceNorm = derivativeQuadraticPotential(rvec.norm(), sigma, epsAttractive,
                                                                 aAttractive, rstarAttractive);
+
         auto force = (repulsiveForceNorm + attractiveForceNorm)*rvec/rvec.norm();
 
         /* Assign patch pattern depending on particle type (note only two types of particles are supported here) */
@@ -165,7 +169,7 @@ namespace msmrd{
         //}
 
         // Calculate forces and torque due to patches interaction, if close enough and if particle 2 is in state 0
-        if ( rvec.norm() <= 1.25*sigma and part2.state == 0 and patchesActive) {
+        if ( rvec.norm() <= minimumR*sigma and part2.state == 0 and patchesActive) {
             // Calculate forces and torque due to patches interaction using auxiliary function
             auto forcTorqPatches = forceTorquePatches(part1, part2, pos1virtual, patchesCoords1, patchesCoords2);
             auto force1 = forcTorqPatches[0];

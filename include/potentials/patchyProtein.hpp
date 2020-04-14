@@ -26,6 +26,7 @@ namespace msmrd{
 
         double sigma = 1.0;
         double strength = 100.0;
+        double patchPotentialScaling = 1.0;
 
         // Parameters for first and second type of interactions
         // Strength of potentials
@@ -70,6 +71,8 @@ namespace msmrd{
         double evaluate(particle &part1, particle &part2) override;
 
         std::array<vec3<double>, 4> forceTorque(particle &part1, particle &part2) override;
+
+        bool arePatchesActive() { return patchesActive; }
 
     };
 
