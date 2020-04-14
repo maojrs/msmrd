@@ -48,8 +48,8 @@ boundaryType = 'periodic'
 
 
 # Parent directory location
-parentDirectory = "../../data/patchyProtein/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/"
+#parentDirectory = "../../data/patchyProtein/"
+parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/"
 
 # Create folder for data
 foldername = "benchmark"

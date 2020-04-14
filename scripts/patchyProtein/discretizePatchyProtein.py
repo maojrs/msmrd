@@ -5,8 +5,8 @@ import msmrd2.tools.analysis as analysisTools
 
 
 # Load parameters from parameters file (from original MD simulation)
-parentDirectory = '../../data/patchyProtein/benchmark/'
-#parentDirectory = '/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/benchmark/'
+#parentDirectory = '../../data/patchyProtein/benchmark/'
+parentDirectory = '/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/benchmark/'
 parameterDictionary = analysisTools.readParameters(parentDirectory + "parameters")
 nfiles = parameterDictionary['numFiles']
 numParticles = parameterDictionary['numParticles']
