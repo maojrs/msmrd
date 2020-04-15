@@ -48,8 +48,8 @@ numTransitionsStates = numSphericalSectionsPos * totalnumSecsQuat #228
 # those used to determine metastable states in potential and trajectory.) Note here, we use
 # no patches since we only want the isotropic attractive part.
 sigma = 1.0
-strength = 65
-angularStrength = 2
+strength = 60 #65
+angularStrength = 10 #2
 patchesCoordinates1 = []
 patchesCoordinates2 = []
 
@@ -63,8 +63,8 @@ DboundRot = np.ones(numBoundStates)
 boundStates = [1]
 
 # Chooses parent directory
-parentDirectory = "../../data/patchyProtein/first_passage_times/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/first_passage_times/"
+#parentDirectory = "../../data/patchyProtein/first_passage_times/"
+parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/first_passage_times/"
 
 # Creates parent directory if it doesn't exist already
 try:

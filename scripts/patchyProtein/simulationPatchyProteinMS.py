@@ -35,8 +35,8 @@ trajtype = "patchyProtein"
 # Define Patchy Protein potential parameters (This values are fixed and should match
 # those used to determine metastable states in potential and trajectory.)
 sigma = 1.0
-strength = 65
-angularStrength = 2
+strength = 60 #65
+angularStrength = 10 #2
 patchesCoordinates1 = [np.array([1.,0.,0.]), np.array([0.,1.,0.]), np.array([0.,0.,1.]),
                        np.array([-1.,0.,0.]), np.array([0.,-1.,0.]), np.array([0.,0.,-1.])]
 patchesCoordinates2 = [np.array([1.,0.,0.])]
