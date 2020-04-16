@@ -28,8 +28,8 @@ initialState = 1 # 1 to 6 possible values
 # Define Patchy Protein potential parameters (This values are fixed and should match
 # those used to determine metastable states in potential and trajectory.)
 sigma = 1.0
-strength = 65
-angularStrength = 2
+strength = 60 #65
+angularStrength = 10 #2
 patchesCoordinates1 = [np.array([1.,0.,0.]), np.array([0.,1.,0.]), np.array([0.,0.,1.]),
                        np.array([-1.,0.,0.]), np.array([0.,-1.,0.]), np.array([0.,0.,-1.])]
 patchesCoordinates2 = [np.array([1.,0.,0.])]
@@ -40,8 +40,8 @@ boundaryType = 'periodic'
 
 
 # Chooses parent directory
-parentDirectory = "../../data/patchyProtein/first_passage_times/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/first_passage_times/"
+#parentDirectory = "../../data/patchyProtein/first_passage_times/"
+parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/first_passage_times/"
 
 # Creates parent directory if it doesn't exist already
 try:

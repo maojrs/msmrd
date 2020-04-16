@@ -20,7 +20,7 @@ dt = 0.0001 #0.0001 #0.00001 #0.000005
 bodytype = 'rigidbody'
 particleTypes = [0, 1]
 minimumUnboundRadius = 2.5
-numTrajectories = 600 #10000
+numTrajectories = 5000 #600 #10000
 
 # Define Patchy Protein potential parameters (This values are fixed and should match
 # those used to determine metastable states in potential and trajectory.)
@@ -36,8 +36,8 @@ boxsize = 6
 boundaryType = 'periodic'
 
 # Define bound states
-#boundStates = [1,2,3,4,5,6]
-boundStates = [1] # Main bound state
+boundStates = [1,2,3,4,5,6]
+#boundStates = [1] # Main bound state
 
 # Chooses parent directory
 #parentDirectory = "../../data/patchyProtein/first_passage_times/"

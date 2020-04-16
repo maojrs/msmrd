@@ -8,4 +8,6 @@ if proceed != 'y':
 
 os.system('python simulationPatchyProteinMS.py')
 os.system('python discretizePatchyProtein.py')
+os.system('source activate base')
+#os.system('source activate pyemma')
 os.system('python generateMSMpatchyProtein.py')

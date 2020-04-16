@@ -28,7 +28,7 @@ maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 minimumUnboundRadius = 2.5
 numParticleTypes = 2 # num. of particle types (not states) in unbound state
-numTrajectories = 600 #1000 #10000
+numTrajectories = 5000 #600 #1000 #10000
 
 # Other important parameters
 lagtime = 150 #75 #75 #50 #75 #150 #75 #300
@@ -59,8 +59,8 @@ Dbound = np.ones(numBoundStates)
 DboundRot = np.ones(numBoundStates)
 
 # Bound states definition, needed to calculate boundstate
-#boundStates = [1, 2, 3, 4, 5, 6]
-boundStates = [1]
+boundStates = [1, 2, 3, 4, 5, 6]
+#boundStates = [1]
 
 # Chooses parent directory
 #parentDirectory = "../../data/patchyProtein/first_passage_times/"
@@ -101,12 +101,12 @@ def MSMRDsimulationFPT(trajectorynum):
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
 
     # Load rate dicitionary
-    pickle_in = open("../../data/patchyProtein/benchmark/"
-                     "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
-                     +  ".pickle","rb")
-    #pickle_in = open("/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/benchmark/"
+    #pickle_in = open("../../data/patchyProtein/benchmark/"
     #                 "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
     #                 +  ".pickle","rb")
+    pickle_in = open("/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/benchmark/"
+                     "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
+                     +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']
     activeSet = mainMSM['active_set']

@@ -36,7 +36,7 @@ numTrajectories = 5000 #10000
 lagtime = 150 #50 #75 #300
 boxsize = 6 #8 #6
 dtMDsimulation = 0.00001
-stride = 100
+stride = 25 #100
 realLagtime = lagtime*dtMDsimulation*stride
 
 # Discretization parameters (need to be consistent with the on used to generate the rate dictionary
@@ -50,8 +50,8 @@ numTransitionsStates = numSphericalSectionsPos * totalnumSecsQuat #228
 # those used to determine metastable states in potential and trajectory.) Note here, we use
 # no patches since we only want the isotropic attractive part.
 sigma = 1.0
-strength = 65
-angularStrength = 2
+strength = 60 #65
+angularStrength = 10 #2
 patchesCoordinates1 = []
 patchesCoordinates2 = []
 
@@ -61,8 +61,8 @@ Dbound = 0.5*np.ones(numBoundStates)
 DboundRot = np.ones(numBoundStates)
 
 # Chooses parent directory
-parentDirectory = "../../data/patchyProtein/first_passage_times/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/first_passage_times/"
+#parentDirectory = "../../data/patchyProtein/first_passage_times/"
+parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/first_passage_times/"
 
 # Creates parent directory if it doesn't exist already
 try:
@@ -173,7 +173,11 @@ def MSMRDsimulationFPT(trajectorynum):
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/MSM_patchyProtein_t1.20E+07_s100_lagt" + str(lagtime)
+    pickle_in = open("../../data/patchyProtein/benchmark/"
+                     "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
+                     +  ".pickle","rb")
+    pickle_in = open("/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/benchmark/"
+                     "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']
