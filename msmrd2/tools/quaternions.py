@@ -69,6 +69,8 @@ def quat2angle(q):
     ''' Transform from quaternion representation to angle-axis representation. '''
     phi = q[1:]
     qnorm = np.linalg.norm(phi)
+    if qnorm == 0:
+        return np.array([0., 0., 0.])
     phi = phi/qnorm
     theta = 2*np.arctan2(qnorm,q[0])
     phi = phi*theta
@@ -89,5 +91,7 @@ def quaternionDistance(q1, q2):
 def quaternionAngleDistance(q1, q2):
     ''' Calculate quaternion angle distance between two quaternions '''
     relquat = multiply(q2, conjugate(q1))
+    relquat2 = multiply(q2, conjugate(-1*q1))
     relangle = quat2angle(relquat)
-    return np.linalg.norm(relangle)
+    relangle2 = quat2angle(relquat2)
+    return np.min([np.linalg.norm(relangle),np.linalg.norm(relangle2)])

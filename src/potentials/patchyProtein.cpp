@@ -132,7 +132,7 @@ namespace msmrd {
                 patchNormal2 = msmrdtools::rotateVec(patchesCoords2[j], part2.orientation);
                 patch2 = part2.position + 0.5 * sigma * patchNormal2;
                 rpatch = patch2 - patch1; // Scale unit distance of patches by sigma
-                // Assumes the first patch from type1 has a different type of interaction,
+                // Assumes the first patch from type "0" has a different type of interaction,
                 if ((i == 0 && part1.type == 0) || (j == 0 && part2.type == 0)) {
                     patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[1],
                                                            aPatches[1], rstarPatches[1]);

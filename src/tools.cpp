@@ -28,15 +28,15 @@ namespace msmrdtools {
      * to angle of rotation to its quaternion representation. */
     quaternion<double> axisangle2quaternion(const vec3<double> &phi) {
         double phinorm = phi.norm();
+        quaternion<double> result = quaternion<double>{1, 0, 0, 0};
         if (phinorm != 0) {
-            vec3<double> phiunit = phi / phinorm;
-            double s = cos(0.5 * phinorm);
-            double p = sin(0.5 * phinorm);
-            return {s, p * phiunit[0], p * phiunit[1], p * phiunit[2]};
-        } else {
-            //returns unit quaternion (no rotation)
-            return {1, 0, 0, 0};
+            vec3<double> phiunit;
+            phiunit = phi / phinorm;
+            double s = std::cos(0.5 * phinorm);
+            double p = std::sin(0.5 * phinorm);
+            result = quaternion<double>{s, p * phiunit};
         }
+        return result;
     }
 
     /* Converts quaternion to angle-axis representation, where
@@ -44,9 +44,11 @@ namespace msmrdtools {
     vec3<double> quaternion2axisangle(const quaternion<double> q) {
         vec3<double> phi = {q[1], q[2], q[3]};
         double qnorm = phi.norm();
-        phi = phi / qnorm;
-        double theta = 2 * std::atan2(qnorm, q[0]);
-        phi = phi * theta;
+        if (qnorm != 0) {
+            phi = phi / qnorm;
+            double theta = 2 * std::atan2(qnorm, q[0]);
+            phi = phi * theta;
+        }
         return phi;
     }
 
@@ -71,9 +73,12 @@ namespace msmrdtools {
     /* Calculate minimum rotation angle along some axis to reach q2 from q1.
      * Output between 0 and 2pi. */
     double quaternionAngleDistance(quaternion<double> q1, quaternion<double> q2) {
+        // Take into account q and -q represent the same rotation
         quaternion<double> relquat = q2 * q1.conj();
+        quaternion<double> relquat2 = q2 * (-1.0*q1).conj();
         vec3<double> relangle = quaternion2axisangle(relquat);
-        return relangle.norm();
+        vec3<double> relangle2 = quaternion2axisangle(relquat2);
+        return std::min(relangle.norm(), relangle2.norm());
     }
 
     // Calculates relative distance (p2-p1) of two vectors (p1, p2) in a periodic box, returns relative distance.

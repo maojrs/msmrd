@@ -25,7 +25,7 @@ bodytype = 'rigidbody'
 particleTypes = [0, 1]
 numBoundStates = 6
 maxNumBoundStates = 10
-initialState = 1 # 1 to 6 possible values
+initialState = [1,2,3,4,5,6] #1 # 1 to 6 possible values
 
 radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 minimumUnboundRadius = 2.5
@@ -173,9 +173,9 @@ def MSMRDsimulationFPT(trajectorynum):
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
 
     # Load rate dicitionary
-    pickle_in = open("../../data/patchyProtein/benchmark/"
-                     "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
-                     +  ".pickle","rb")
+    #pickle_in = open("../../data/patchyProtein/benchmark/"
+    #                 "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
+    #                 +  ".pickle","rb")
     pickle_in = open("/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/benchmark/"
                      "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
@@ -213,7 +213,7 @@ def MSMRDsimulationFPT(trajectorynum):
     integrator.setDiscretization(discretization)
     integrator.setPairPotential(potentialPatchyProtein)
 
-# Creates random particle list
+    # Creates random particle list
     seed = int(trajectorynum)
     partlist = generateParticleList(initialState, boxsize, particleTypes, couplingMSM, seed)
 

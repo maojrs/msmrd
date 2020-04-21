@@ -80,16 +80,16 @@ namespace msmrd {
             quatRotations[i] = msmrdtools::axisangle2quaternion(rotations[i]);
         }
         /* Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
-         * Note we need to take the conj, so it matches the relative orientation from particle 1, as used to define
-         * the states in trajectories/discrete/discreteTrajectory.hpp */
-        boundStates[0] = std::make_tuple(relPos1, quatRotations[0].conj());
-        boundStates[1] = std::make_tuple(relPos1, quatRotations[1].conj());
-        boundStates[2] = std::make_tuple(relPos1, quatRotations[2].conj());
-        boundStates[3] = std::make_tuple(relPos1, quatRotations[3].conj());
-        boundStates[4] = std::make_tuple(relPos2, quatRotations[4].conj());
-        boundStates[5] = std::make_tuple(relPos2, quatRotations[5].conj());
-        boundStates[6] = std::make_tuple(relPos2, quatRotations[6].conj());
-        boundStates[7] = std::make_tuple(relPos2, quatRotations[7].conj());
+         * Note we define relativeOrientation as q2 * q1.conj(), so it matches the relative orientation from
+         * particle 1 as used in trajectories/discrete/discreteTrajectory.hpp */
+        boundStates[0] = std::make_tuple(relPos1, quatRotations[0]);
+        boundStates[1] = std::make_tuple(relPos1, quatRotations[1]);
+        boundStates[2] = std::make_tuple(relPos1, quatRotations[2]);
+        boundStates[3] = std::make_tuple(relPos1, quatRotations[3]);
+        boundStates[4] = std::make_tuple(relPos2, quatRotations[4]);
+        boundStates[5] = std::make_tuple(relPos2, quatRotations[5]);
+        boundStates[6] = std::make_tuple(relPos2, quatRotations[6]);
+        boundStates[7] = std::make_tuple(relPos2, quatRotations[7]);
     }
 
 
@@ -159,12 +159,12 @@ namespace msmrd {
             quatRotations[i] = msmrdtools::axisangle2quaternion(rotations[i]);
         }
         /* Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
-         * Note we need to take the conj, so it matches the relative orientation from particle 1, as used to define
-         * the states in trajectories/discrete/discreteTrajectory.hpp */
-        boundStates[0] = std::make_tuple(relPos1, quatRotations[0].conj());
-        boundStates[1] = std::make_tuple(relPos1, quatRotations[1].conj());
-        boundStates[2] = std::make_tuple(relPos2, quatRotations[2].conj());
-        boundStates[3] = std::make_tuple(relPos2, quatRotations[3].conj());
+         * Note we define relativeOrientation as q2 * q1.conj(), so it matches the relative orientation from
+         * particle 1 as used in trajectories/discrete/discreteTrajectory.hpp */
+        boundStates[0] = std::make_tuple(relPos1, quatRotations[0]);
+        boundStates[1] = std::make_tuple(relPos1, quatRotations[1]);
+        boundStates[2] = std::make_tuple(relPos2, quatRotations[2]);
+        boundStates[3] = std::make_tuple(relPos2, quatRotations[3]);
     }
 
 }

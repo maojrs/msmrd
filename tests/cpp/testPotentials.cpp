@@ -109,7 +109,8 @@ TEST_CASE("patchyProteinMS potential: test calculatePlanes function", "[potentia
             pos1 = vec3<double>(0., 0., 0.) + randg.normal3D(0, 0.01);
             pos2 = relativePositions[i];
             th1 = quaternion<double>(1., 0., 0., 0.);
-            th2 = msmrdtools::axisangle2quaternion(relativeOrientations[i] + randg.normal3D(0, 0.01));
+            auto relOrientations = relativeOrientations[i] + randg.normal3D(0, 0.01);
+            th2 = msmrdtools::axisangle2quaternion(relOrientations);
             auto part1 = particle(0, 0, 1.0, 1.0, pos1, th1);
             auto part2 = particle(0, 0, 1.0, 1.0, pos2, th2);
             auto planes = potentialPPMS.calculatePlanes(part1, part2, patchesCoordinatesA, patchesCoordinatesB);

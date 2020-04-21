@@ -31,7 +31,7 @@ boundStates = [1,2,3,4,5,6] #1 # 1 to 6 possible values
 radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 minimumUnboundRadius = 2.5
 numParticleTypes = 2 # num. of particle types (not states) in unbound state
-numTrajectories = 5000 #10000
+numTrajectories = 1000 #10000
 
 # Other important parameters
 lagtime = 150 #50 #75 #300
@@ -238,7 +238,7 @@ def multiprocessingHandler(initialState, finalState):
     num_cores = multiprocessing.cpu_count()
     pool = Pool(processes=num_cores)
     trajNumList = list(range(numTrajectories))
-    MSMRDsimulationFPTpartial = partial(simulationFPT, initialState, finalState)
+    MSMRDsimulationFPTpartial = partial(MSMRDsimulationFPT, initialState, finalState)
     with open(filename, 'w') as file:
         for index, result in enumerate(pool.imap(MSMRDsimulationFPTpartial, trajNumList)):
             initState, endState, time = result

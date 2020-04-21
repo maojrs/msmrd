@@ -23,7 +23,7 @@ minimumUnboundRadius = 2.5
 radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 numTrajectories = 5000 #10000
 numBoundStates = 6
-initialState = 1 # 1 to 6 possible values
+initialState = [1,2,3,4,5,6] #1 # 1 to 6 possible values
 
 # Define Patchy Protein potential parameters (This values are fixed and should match
 # those used to determine metastable states in potential and trajectory.)
