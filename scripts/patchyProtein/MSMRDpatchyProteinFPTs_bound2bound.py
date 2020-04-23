@@ -27,6 +27,8 @@ particleTypes = [0, 1]
 numBoundStates = 6
 maxNumBoundStates = 10
 boundStates = [1,2,3,4,5,6] #1 # 1 to 6 possible values
+initialStates = 1 * boundStates
+finalStates = 1 * boundStates
 
 radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 minimumUnboundRadius = 2.5
@@ -153,9 +155,6 @@ def MSMRDsimulationFPT(initialState, finalState, trajectorynum):
     :return: initial bound state, final bound state  and first passage time
     '''
 
-    # Define dummy trajectory to extract bound states from python (needed to use getState function)
-    dummyTraj = msmrd2.trajectories.patchyProtein(numparticles, 1, radialBounds[0], minimumUnboundRadius)
-
     # Define discretization
     discretization = msmrd2.discretizations.positionOrientationPartition(radialBounds[1],
                     numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat)
@@ -221,7 +220,7 @@ def MSMRDsimulationFPT(initialState, finalState, trajectorynum):
     searchingEndState = True
     while(searchingEndState):
         integrator.integrate(partlist)
-        currentState = dummyTraj.getState(partlist[0], partlist[1])
+        currentState = partlist[0].boundState
         if currentState == finalState:
             searchingEndState = False
             return initialState, finalState, integrator.clock
@@ -250,8 +249,8 @@ def multiprocessingHandler(initialState, finalState):
 
 
 # Run code for all the possible transitions
-for initialState in boundStates:
-    for finalState in boundStates:
+for initialState in initialStates:
+    for finalState in finalStates:
         if (initialState != finalState):
             # Chooses filename for output file with the results of the parallel simulation
             filename = parentDirectory + 'MSMRDpatchyProteinFPTs_' + str(initialState) + 'to' + str(finalState) \

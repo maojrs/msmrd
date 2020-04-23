@@ -25,6 +25,8 @@ radialBounds = [1.25, 2.25] # must match patchyProtein discretization trajectory
 numTrajectories = 1000 #10000
 numBoundStates = 6
 boundStates = [1,2,3,4,5,6]
+initialStates = 1 * boundStates
+finalStates = 1 * boundStates
 
 # Define Patchy Protein potential parameters (This values are fixed and should match
 # those used to determine metastable states in potential and trajectory.)
@@ -201,8 +203,8 @@ def multiprocessingHandler(initialState, finalState):
 
 
 # Run code for all the possible transitions
-for initialState in boundStates:
-	for finalState in boundStates:
+for initialState in initialStates:
+	for finalState in finalStates:
 		if (initialState != finalState):
 			# Create empty files to save the data in parallel algorithm
 			filename = parentDirectory + 'patchyProteinFPTs_' + str(initialState) + 'to' + str(finalState) + '_trajs' \
