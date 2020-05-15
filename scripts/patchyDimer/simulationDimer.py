@@ -4,6 +4,7 @@ from msmrd2.integrators import overdampedLangevin as odLangevin
 from msmrd2.potentials import patchyParticleAngular
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
+import msmrd2.tools.quaternions as quaternions
 import multiprocessing
 from multiprocessing import Pool
 from functools import partial
