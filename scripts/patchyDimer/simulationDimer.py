@@ -51,7 +51,7 @@ parentDirectory = "../../data/dimer/"
 # parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/"
 
 # Create folder for data
-foldername = "60strength"
+foldername = "benchmark"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
