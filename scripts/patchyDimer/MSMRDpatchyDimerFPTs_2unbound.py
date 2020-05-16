@@ -27,7 +27,7 @@ maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyDimer discretization
 minimumUnboundRadius = 2.5
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
-numTrajectories = 10000
+numTrajectories = 5000
 
 # Other important parameters
 lagtime = 150 #150 #300
@@ -172,7 +172,7 @@ def MSMRDsimulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/MSM_dimer_t3.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/pickled_data/MSM_patchyDimer_t3.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']
