@@ -23,7 +23,7 @@ initialState = 'B'
 targetState = 'A'
 radialBounds = [1.25, 2.25] # must match patchyDimer discretization
 minimumUnboundRadius = 2.5
-numTrajectories = 10000
+numTrajectories = 5000
 # Other important parameters
 boxsize = 6
 

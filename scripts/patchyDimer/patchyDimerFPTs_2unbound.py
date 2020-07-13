@@ -146,7 +146,7 @@ def simulationFPT(trajectorynum):
     partlist = generateParticleList(initialState, boxsize, D, Drot, seed)
 
     # Calculates the first passage times for a given bound state. Each trajectory is integrated until
-    # a bound state is reached. The output in the files is the elapsed time.
+    # an unbound state is reached. The output in the files is the elapsed time.
     bound = True
     while(bound):
         integrator.integrate(partlist)

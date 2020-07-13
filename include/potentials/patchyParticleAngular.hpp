@@ -44,7 +44,7 @@ namespace msmrd {
      * dependence in terms of quaternions. Used for more precise control of angular potential over
      * orientation dynamics. (Uses the three degress of freedom of rotations to calculate torque from
      * potential, unlike its parent class uses a unit vector to describe orientation.) Used as base model
-     * for pentamer formation.
+     * for pentamer formation (implemented with only one stable angular configuration).
      */
     class patchyParticleAngular2 : public patchyParticleAngular {
     public:
