@@ -15,7 +15,7 @@ namespace msmrd {
 
     /**
      * Class for multi-particle msmrd integration based on patchy particles. Uses base functionality from
-     * msmrdIntegratorDiscrete, but extends its methods for multiparticle MSM/RD integration.
+     * msmrdIntegrator, but extends its methods for multiparticle MSM/RD integration.
      */
     class msmrdMultiParticleIntegrator : public msmrdIntegrator<ctmsm> {
     public:
@@ -26,6 +26,8 @@ namespace msmrd {
          */
 
         using msmrdIntegrator<ctmsm>::msmrdIntegrator;
+
+        void integrate(std::vector<particle> &parts) override;
 
         void computeTransitionsFromTransitionStates(std::vector<particle> &parts) override;
 
@@ -43,6 +45,8 @@ namespace msmrd {
     protected:
 
         /* Functions exclusive to multiparticle MSM/RD*/
+
+        void integrateDiffusionCompounds(double dt0, std::vector<particle> &parts);
 
         int addCompound(std::vector<particle> &parts, int iIndex, int jIndex, int endState);
 

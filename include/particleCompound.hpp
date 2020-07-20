@@ -30,7 +30,7 @@ namespace msmrd {
          * @param D diffusion constant
          * @param Drot rotational diffusion constant
          * @param position position of particle compound
-         * @param positonReference position of reference particle within compund. The other
+         * @param positonReference position of reference particle within compound. The other
          * particles postion can be built from this value, the compound position and the bound states.
          * @param orientation orientation of particle compound. It will always be created with identity
          * orientation. Since the particle orientations can be reconstructed from reference particle.

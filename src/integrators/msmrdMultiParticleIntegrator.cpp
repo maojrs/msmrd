@@ -6,8 +6,8 @@
 
 namespace msmrd {
     /**
-     * Implementation of multiparticle MSM/RD integrator. Based mainly on msmrdintegratorDiscrete.
-     * Uses same constructor as msmrdIntegratorDiscrete, with the followin parameters
+     * Implementation of multiparticle MSM/RD integrator. Based mainly on msmrdintegrator.
+     * Uses same constructor as msmrdIntegrator, with the following parameters
      * @param dt time step
      * @param seed random generator seed (Note seed = -1 corresponds to random device)
      * @param rotation boolean to indicate if rotational degrees of freedom should be integrated
@@ -58,7 +58,8 @@ namespace msmrd {
     }
 
 
-    /* Computes possible transitions from bound states to other bound states or unbound states (transition states)
+    /* NOT USED IN FIRST IMPLEMENTTION .
+     * Computes possible transitions from bound states to other bound states or unbound states (transition states)
      * and saves them in the event manager. Used by integrate function. */
     void msmrdMultiParticleIntegrator::computeTransitionsFromBoundStates(std::vector<particle> &parts) {
         double transitionTime;
@@ -99,8 +100,7 @@ namespace msmrd {
      * tracked with a particle compound. */
     void msmrdMultiParticleIntegrator::transition2BoundState(std::vector<particle> &parts, int iIndex,
                                                              int jIndex, int endState) {
-        /* Establish pair connection in particle class and deactivate particle with larger index ( only
-         * particle with smaller index remains active to represent the movement of the bound particle) */
+        /* Establish pair connection in particle class and deactivate both particles */
         parts[iIndex].boundList.push_back(jIndex);
         parts[jIndex].boundList.push_back(iIndex);
         parts[iIndex].deactivate();
@@ -128,7 +128,8 @@ namespace msmrd {
     }
 
 
-    /* CURRENTLY WORKING HERE BELOW, ENCOUNTERED ISSUE IN HOW PARTICLECOMPOUND SAVES TOPOLOGIES, NEED TO
+    /* NOT ALLOWING FOR UNBINDING EVENTS IN FIRST IMPLEMENTATION.
+     * CURRENTLY WORKING ON FUNCTION BELOW, ENCOUNTERED ISSUE IN HOW PARTICLECOMPOUND SAVES TOPOLOGIES, NEED TO
      * ADDRESS THAT FIRST, SEE particle.hpp */
 
     void msmrdMultiParticleIntegrator::transition2UnboundState(std::vector<particle> &parts, int iIndex,
@@ -163,9 +164,58 @@ namespace msmrd {
     }
 
 
+    /* Main integrate function */
+    void msmrdMultiParticleIntegrator::integrate(std::vector<particle> &parts) {
+
+        /* Calculate forces and torques and save them into forceField and torqueField. For the MSM/RD this will
+         * in general be zero, so only needs to be run once. However, in some case they might be activated */
+        if (firstrun or pairPotentialActive or externalPotentialActive) {
+            calculateForceTorqueFields<particle>(parts);
+            firstrun = false;
+        }
+
+        /* NOTE: the ordering of the following routines is very important, draw a timeline if necessary.*/
+
+        // Compute future transitions to bound states (from unbound states) and add them to the event manager.
+        computeTransitionsFromTransitionStates(parts);
+
+        // Integrates diffusion for one time step.
+        integrateDiffusion(parts, dt);
+
+        // Remove unrealized previous events (see function for detailed description).
+        removeUnrealizedEvents(parts);
+
+        /* Advance global time and in event manager (to make events happen). Useful to draw a timeline to
+         * understand order of events. */
+        clock += dt;
+        eventMgr.advanceTime(dt);
+
+        /* Check for events in event manager that should happen during this time step [t,t+dt) and
+         * make them happen. Note if the lag-time is a multiple of dt (n*dt), which is likely the case,
+         * events will happen at end of the timestep exactly */
+        applyEvents(parts);
+
+        // Enforce boundary and set new positions into parts[i].nextPosition (only if particle is active).
+        enforceBoundary(parts);
+
+        /* Update positions and orientations (sets calculated next position/orientation
+         * calculated by integrator and boundary as current position/orientation). Note states
+         * are modified directly and don't need to be updated. */
+        updatePositionOrientation(parts);
+
+
+        // Output eventlog (useful for debugging)
+        if (recordEventLog) {
+            auto timeIteration = static_cast<int>(clock / dt);
+            eventMgr.write2EventLog(timeIteration);
+        }
+
+    }
+
+
 
     /**
-     * Functions exclusive to multi-particle MSM/RD below
+     * Additional functions exclusive to multi-particle MSM/RD below
      */
 
 
@@ -191,7 +241,7 @@ namespace msmrd {
         // If one of the two doesn't belong to a complex, join the solo particle into the complex.
         else if (iPart.compoundIndex * jPart.compoundIndex < 0) {
             // Generate new binding description
-            int compoundIndex = std::min(iPart.compoundIndex, jPart.compoundIndex);
+            int compoundIndex = std::max(iPart.compoundIndex, jPart.compoundIndex);
             std::tuple<int,int> pairIndices = std::make_tuple(iIndex, jIndex);
             //Insert new binding decription into complex
             particleCompounds[compoundIndex].boundPairsDictionary.insert (
@@ -211,7 +261,7 @@ namespace msmrd {
             std::tuple<int,int> pairIndices = std::make_tuple(iIndex, jIndex);
             particleCompounds[iCompoundIndex].boundPairsDictionary.insert (
                     std::pair<std::tuple<int,int>, int>(pairIndices, endState) );
-            // Join complexes and flag complex with alrger index to be deleted.
+            // Join complexes and flag complex with larger index to be deleted.
             particleCompounds[iCompoundIndex].joinParticleCompound(particleCompounds[jCompoundIndex]);
             particleCompounds[jCompoundIndex].active = false;
             // Extract main compound size, increase complex size by one and make zero the empty one
@@ -235,12 +285,15 @@ namespace msmrd {
         if (compoundSize == 2) {
             // Set average position
             particleCompounds[compoundIndex].position = 0.5*(parts[iIndex].position + parts[jIndex].position);
-            vec3<double> diffVec = parts[jIndex].position - parts[iIndex].position;
-            particleCompounds[compoundIndex].positionReference = parts[iIndex].position - 0.5*diffVec/diffVec.norm();
+            //vec3<double> diffVec = parts[jIndex].position - parts[iIndex].position;
+            particleCompounds[compoundIndex].positionReference = parts[iIndex].position; // - 0.5*diffVec/diffVec.norm();
             particleCompounds[compoundIndex].orientationReference = 1.0*parts[iIndex].orientation;
         } else {
             particleCompounds[compoundIndex].position = (mainCompoundSize * particleCompounds[compoundIndex].position +
-                                                         (compoundSize - mainCompoundSize) * parts[jIndex].position)/compoundSize;
+                                                         (compoundSize - mainCompoundSize) *
+                                                         parts[jIndex].position)/compoundSize;
+            particleCompounds[compoundIndex].positionReference = parts[iIndex].position; // - 0.5*diffVec/diffVec.norm();
+            particleCompounds[compoundIndex].orientationReference = 1.0*parts[iIndex].orientation;
         }
     };
 
@@ -261,6 +314,62 @@ namespace msmrd {
 
 
     // @TODO WRITE TEST ROUTINE FOR THE FUNCTION BELOW: THIS FUNCTION WILL NEED TO BE ADDED IN THE INTEGRATOR FUNCTION
+
+    void msmrdMultiParticleIntegrator::integrateDiffusionCompounds(double dt0, std::vector<particle> &parts){
+        for (auto particleCompound : particleCompounds) {
+            // Calculte change in poisition
+            vec3<double> dr;
+            dr =  std::sqrt(2 * dt0 * particleCompound.D) * randg.normal3D(0, 1);
+            particleCompound.position += dr;
+            // Calculate change in orientation
+            vec3<double> dphi;
+            quaternion<double> dquat;
+            dphi = std::sqrt(2 * dt0 * particleCompound.Drot) * randg.normal3D(0, 1);
+            dquat = msmrdtools::axisangle2quaternion(dphi);
+            particleCompound.orientation = dquat * particleCompound.orientation;
+            // Make a copy of the boundsPair dictionary
+            std::map<std::tuple<int,int>, int> boundPairsDictionaryCopy(particleCompound.boundPairsDictionary);
+            // Update position and orientation of reference particle
+            // MAKE THIS BELOW INTO A FUNCTION AND USE IT HERE AND BELOW
+            auto vec0 = parts[particleCompound.referenceIndex].position;
+            auto offAxisPoint = particleCompound.position;
+            auto rotatedVec0 = dr + msmrdtools::rotateVecOffAxis(vec0, dquat, offAxisPoint);
+            parts[particleCompound.referenceIndex].position = rotatedVec0;
+            auto vec1 = vec3<double>(1,1,0); //reference vector 1 to control orientation
+            auto vec2 = vec3<double>(1,-1,0); //reference vector 2 to control orientation
+            vec1 = msmrdtools::rotateVec(vec1, parts[particleCompound.referenceIndex].orientation);
+            vec2 = msmrdtools::rotateVec(vec2, parts[particleCompound.referenceIndex].orientation);
+            auto rotatedVec1 = dr + msmrdtools::rotateVecOffAxis(vec1, dquat, offAxisPoint);
+            auto rotatedVec2 = dr + msmrdtools::rotateVecOffAxis(vec2, dquat, offAxisPoint);
+            quaternion<double> newOrientation = msmrdtools::recoverRotationFromVectors(vec0,vec1,vec2,
+                    rotatedVec0,rotatedVec1,rotatedVec2);
+            parts[particleCompound.referenceIndex].orientation = newOrientation;
+            /* Update position and orientation of all other particles in compound (depends on
+             * specific implementation, here based on the dimer example with one angular binding). Loops many times
+             * over copy of boundsPairsDictionary, starting by the reference particle and building all the bindings
+             * until there is no binding left to incorporate. */
+            int tempIndex1 = 1 * particleCompound.referenceIndex;
+            int tempIndex2 = 1 * particleCompound.referenceIndex;
+            while (boundPairsDictionaryCopy.size() > 0) {
+                for (auto it = boundPairsDictionaryCopy.cbegin(); it != boundPairsDictionaryCopy.cend(); it++) {
+                    auto index1 = std::get<0>(it->first);
+                    auto index2 = std::get<1>(it->first);
+                    auto state = it->second;
+                    if (index1 == tempIndex1) {
+                        // Assign positions and orientations to particles invovled
+                        tempIndex1 = index2;
+                    }
+                    if (index2 == tempIndex2) {
+                        // Assign positions and orientations to particles invovled
+                        tempIndex2 = index1;
+                    }
+                    // Remove element from dictionary and break loop
+                    boundPairsDictionaryCopy.erase(it);
+                    break;
+                }
+            }
+        }
+    }
 
     /* Deletes inactive complexes in particle complex vector, and updates indexes in particle list. Doesn't
      * need to do at every time step, but every now and then to free up memory. */
