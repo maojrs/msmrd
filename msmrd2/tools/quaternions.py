@@ -95,3 +95,56 @@ def quaternionAngleDistance(q1, q2):
     relangle = quat2angle(relquat)
     relangle2 = quat2angle(relquat2)
     return np.min([np.linalg.norm(relangle),np.linalg.norm(relangle2)])
+
+def rotateVecOffAxis(vect, rotQuat, offAxisPoint):
+    '''
+    Rotate vector (np array) or list of vectors (list of np arrays) using a quaternion (4d-nparray) around an axis
+    off the origin that passes through point 'offAxisPoint'.
+    '''
+    newVec = vect - offAxisPoint
+    newVec = rotateVec(newVec, rotQuat)
+    newVec = newVec + offAxisPoint
+    return newVec
+
+def recoverRotationFromVectors(origin, vec1, vec2, newOrigin, rotatedVec1, rotatedVec2):
+    '''
+    Recovers rotation from vectors involved in a rotation. Take vectors vec1 and vec2 defined on origin
+    frame of reference before rotation and their rotated vectors, rotatedVec1 and rotatedVec2 defined on newOrigin
+    to calculate the corresponding rotation. Returns the rotation in the form of a quaternion. It is important to
+    include newOrigin in case the frame of reference was translated.
+    '''
+    # Define relative vector a and b, and ap and bp in new and rotated frame of reference
+    a = vec1 - origin
+    b = vec2 - origin
+    ap = rotatedVec1 - newOrigin
+    bp = rotatedVec2 - newOrigin
+    # Find first quaternion (align a with ap)
+    a_cross = np.cross(a,ap)
+    if np.linalg.norm(a_cross) != 0:
+        axisRot1 = a_cross/np.linalg.norm(a_cross)
+    else:
+        dummyVec = a + np.array([1.0, 0, 0])
+        perpendicularVec = np.cross(dummyVec,a)
+        axisRot1 = perpendicularVec/np.linalg.norm(perpendicularVec)
+    cosTheta1 = np.dot(a,ap)
+    sinTheta1 = np.linalg.norm(a_cross)
+    theta1 = np.arctan2(sinTheta1,cosTheta1)
+    axisAngleRot1 = axisRot1*theta1
+    quat1 = angle2quat(axisAngleRot1)
+    # Find second quaternion rotation (align b and bp after rotating q1)
+    bRotated = rotateVec(b,quat1)
+    b_cross = np.cross(bRotated,bp)
+    if np.linalg.norm(b_cross) != 0:
+        axisRot2 = b_cross/np.linalg.norm(b_cross)
+    else:
+        dummyVec = bRotated + np.array([1,0,0])
+        perpendicularVec = np.cross(dummyVec,bRotated)
+        axisRot2 = perpendicularVec/np.linalg.norm(perpendicularVec)
+    cosTheta2 = np.dot(bRotated,bp)
+    sinTheta2 = np.linalg.norm(b_cross)
+    theta2 = np.arctan2(sinTheta2,cosTheta2)
+    axisAngleRot2 = axisRot2*theta2
+    quat2 = angle2quat(axisAngleRot2)
+    # Calculate final rotation
+    finalQuat = multiply(quat2,quat1)
+    return finalQuat

@@ -32,3 +32,44 @@ TEST_CASE("Switching between quaternion and axis angle representations", "[quate
     vec3<double> recoveredAxisAngleRep = msmrdtools::quaternion2axisangle(quatRep);
     REQUIRE((axisAngleRep - recoveredAxisAngleRep).norm() < 0.000001);
 }
+
+TEST_CASE("Rotate vector through an axis off the origin", "[rotateVecOffAxis]") {
+    vec3<double> vec1 = vec3<double>(1,1,0);
+    vec3<double> offAxisPoint = vec3<double>(2,0,0);
+    vec3<double> rotation = vec3<double>(0,0,M_PI);
+    auto quatRotation = msmrdtools::axisangle2quaternion(rotation);
+    auto resultVec = msmrdtools::rotateVecOffAxis(vec1, quatRotation,offAxisPoint);
+    auto referenceResult = vec3<double>(3,-1,0);
+    REQUIRE((resultVec - referenceResult).norm() < 0.000001);
+}
+
+TEST_CASE("Recover rotation quaternion from vectors", "[recoverRotationFromVectors]") {
+    // Simple but tricky rotation (rotation by pi yields zero cross product)
+    vec3<double> origin = vec3<double>(0,0,0);
+    vec3<double> vec1 = vec3<double>(1,1,0);
+    vec3<double> vec2 = vec3<double>(1,-1,0);
+    vec3<double> offAxisPoint = vec3<double>(2,0,0);
+    vec3<double> rotation = vec3<double>(0,0,M_PI);
+    auto quatRotation = msmrdtools::axisangle2quaternion(rotation);
+    auto newOrigin = msmrdtools::rotateVecOffAxis(origin, quatRotation, offAxisPoint);
+    auto rotatedVec1 = msmrdtools::rotateVecOffAxis(vec1, quatRotation, offAxisPoint);
+    auto rotatedVec2 = msmrdtools::rotateVecOffAxis(vec2, quatRotation, offAxisPoint);
+    auto recoveredQuaternion = msmrdtools::recoverRotationFromVectors(origin,vec1,vec2,
+            newOrigin,rotatedVec1,rotatedVec2);
+    auto recoveredAxisAngle = msmrdtools::quaternion2axisangle(recoveredQuaternion);
+    REQUIRE((rotation - recoveredAxisAngle).norm() < 0.000001);
+    REQUIRE((quatRotation - recoveredQuaternion).norm() < 0.000001);
+    // Very arbitrary rotation
+    rotation = vec3<double>(0.4,0.7*M_PI,0.2*M_PI);
+    quatRotation = msmrdtools::axisangle2quaternion(rotation);
+    newOrigin = msmrdtools::rotateVecOffAxis(origin, quatRotation, offAxisPoint);
+    rotatedVec1 = msmrdtools::rotateVecOffAxis(vec1, quatRotation, offAxisPoint);
+    rotatedVec2 = msmrdtools::rotateVecOffAxis(vec2, quatRotation, offAxisPoint);
+    recoveredQuaternion = msmrdtools::recoverRotationFromVectors(origin,vec1,vec2,
+            newOrigin,rotatedVec1,rotatedVec2);
+    recoveredAxisAngle = msmrdtools::quaternion2axisangle(recoveredQuaternion);
+    REQUIRE((rotation - recoveredAxisAngle).norm() < 0.000001);
+    REQUIRE((quatRotation - recoveredQuaternion).norm() < 0.000001);
+
+
+}

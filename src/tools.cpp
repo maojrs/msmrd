@@ -63,6 +63,16 @@ namespace msmrdtools {
         return result;
     }
 
+    // Rotates vector p by rotation represented by quaternion q around an axis
+    // off the origin that passes through point 'offAxisPoint'..
+    vec3<double> rotateVecOffAxis(vec3<double> p, quaternion<double> q,vec3<double> offAxisPoint) {
+        vec3<double> result;
+        result = p - offAxisPoint;
+        result = rotateVec(result, q);
+        result = result + offAxisPoint;
+        return result;
+    }
+
     /* Calculate distance between quaternions/rotations. Gives 0 when rotations are the same
      * and 1 when represent rotations 180 degress apart. */
     double quaternionDistance(const quaternion<double> q1, const quaternion<double> q2) {
@@ -167,4 +177,53 @@ namespace msmrdtools {
 
         return (s0 * q0) + (s1 * q1);
     }
+
+    /* Recovers quaternion rotation from original and rotated vectors. Take vectors vec1 and vec2 defined on origin
+    frame of reference before rotation and their rotated vectors, rotatedVec1 and rotatedVec2 defined on newOrigin
+    to calculate the corresponding rotation. Returns the rotation in the form of a quaternion. It is important to
+    include newOrigin in case the frame of reference was translated. */
+    quaternion<double> recoverRotationFromVectors(vec3<double> origin, vec3<double> vec1, vec3<double> vec2,
+                                                  vec3<double>newOrigin, vec3<double>rotatedVec1,
+                                                  vec3<double>rotatedVec2) {
+        // Define relative vector a and b, and ap and bp in new and rotated frame of reference
+        auto a = vec1 - origin;
+        auto b = vec2 - origin;
+        auto ap = rotatedVec1 - newOrigin;
+        auto bp = rotatedVec2 - newOrigin;
+        // Find first quaternion (align a with ap)
+        auto a_cross = a.cross(ap);
+        vec3<double> axisRot1;
+        if (a_cross.norm() != 0) {
+            axisRot1 = a_cross / a_cross.norm();
+        } else {
+            auto dummyVec = a + vec3<double>(1.0, 0, 0);
+            auto perpendicularVec = dummyVec.cross(a);
+            axisRot1 = perpendicularVec/perpendicularVec.norm();
+        }
+        auto cosTheta1 = a * ap;
+        auto sinTheta1 = a_cross.norm();
+        auto theta1 = std::atan2(sinTheta1,cosTheta1);
+        auto axisAngleRot1 = axisRot1 * theta1;
+        auto quat1 = axisangle2quaternion(axisAngleRot1);
+        // Find second quaternion rotation (align b and bp after rotating q1)
+        auto bRotated = rotateVec(b,quat1);
+        auto b_cross = bRotated.cross(bp);
+        vec3<double> axisRot2;
+        if (b_cross.norm() != 0) {
+            axisRot2 = b_cross / b_cross.norm();
+        } else {
+            auto dummyVec = bRotated + vec3<double>(1.0, 0, 0);
+            auto perpendicularVec = dummyVec.cross(bRotated);
+            axisRot2 = perpendicularVec/perpendicularVec.norm();
+        }
+        auto cosTheta2 = bRotated * bp;
+        auto sinTheta2 = b_cross.norm();
+        auto theta2 = std::atan2(sinTheta2,cosTheta2);
+        auto axisAngleRot2 = axisRot2 * theta2;
+        auto quat2 = axisangle2quaternion(axisAngleRot2);
+        // Calculate final rotation
+        auto finalQuat = quat2 * quat1;
+        return finalQuat;
+    }
+
 }

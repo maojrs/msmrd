@@ -59,6 +59,9 @@ namespace msmrdtools {
     // Rotates vector p by rotation represented by quaternion q.
     vec3<double> rotateVec(vec3<double> p, quaternion<double> q);
 
+    // Rotates vector p by rotation represented by quaternion q.
+    vec3<double> rotateVecOffAxis(vec3<double> p, quaternion<double> q, vec3<double> offAxisPoint);
+
     // Calculate distance between quaternions/rotations
     double quaternionDistance(const quaternion<double> q1, const quaternion<double> q2);
 
@@ -82,6 +85,11 @@ namespace msmrdtools {
 
     // Calculates slerp (spherical linear interpolation) between quaternions, t between (0,1).
     quaternion<double> quaternionSlerp(quaternion<double> q0, quaternion<double> q1, double t);
+
+    // Recovers quaternion rotation from original and rotated vectors
+    quaternion<double> recoverRotationFromVectors(vec3<double> origin, vec3<double> vec1, vec3<double> vec2,
+                                                  vec3<double>newOrigin, vec3<double>rotatedVec1,
+                                                  vec3<double>rotatedVec2);
 
 }
 
