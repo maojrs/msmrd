@@ -12,7 +12,7 @@ def rotateVec(vect, rotQuat):
     v1 = np.insert(vect,0,0)
     v1 = multiply(v1,r0m)
     v1 = multiply(r0,v1)
-    rotVect = v1[1:]/np.linalg.norm(v1[1:])
+    rotVect = v1[1:]
     return rotVect
 
 
