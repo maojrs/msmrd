@@ -112,10 +112,10 @@ namespace msmrd {
         parts[jIndex].boundStates.push_back(endState);
 
         // Add particle complex to particleComplexes vector.
-        int mainCompoundSize = addCompound(parts, iIndex, jIndex, endState);
+        addCompound(parts, iIndex, jIndex, endState);
 
         // Set average position and orientation of particle compound
-        setCompoundPositionOrientation(parts, iIndex, jIndex, mainCompoundSize);
+        //setCompoundPositionOrientation(parts, iIndex, jIndex, mainCompoundSize);
 
         /* Set diffusion coefficients of bound particle compound (note states start counting from 1, not zero).
          * In general this should be a more complicated when binding larger complexes. */
@@ -130,40 +130,40 @@ namespace msmrd {
     }
 
 
-    /* NOT ALLOWING FOR UNBINDING EVENTS IN FIRST IMPLEMENTATION.
-     * CURRENTLY WORKING ON FUNCTION BELOW, ENCOUNTERED ISSUE IN HOW PARTICLECOMPOUND SAVES TOPOLOGIES, NEED TO
-     * ADDRESS THAT FIRST, SEE particle.hpp */
-    template<>
-    void msmrdMultiParticleIntegrator<ctmsm>::transition2UnboundState(std::vector<particle> &parts, int iIndex,
-                                                               int jIndex, int endStateAlt) {
-
-        // Check if particles unbinding belong to particleCompounds
-        parts[iIndex].compoundIndex;
-        parts[iIndex].compoundIndex;
-
-        // Redefine endstate indexing, so it is understood by the partition/discretization.
-        int index0 = msmrdMSM.getMaxNumberBoundStates();
-        int endState = endStateAlt - index0;
-
-        // Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.
-        setRandomUnboundState(parts, iIndex);
-        setRandomUnboundState(parts, jIndex);
-
-        // Extract relative position and orientation from partition and endstate
-        auto relativePositionOrientation = getRelativePositionOrientation(endState);
-        auto relPosition = std::get<0>(relativePositionOrientation);
-
-        // Set next orientations based on the relative ones (parts[iIndex] keeps track of bound particle orientation)
-        if (rotation) {
-            auto relOrientation = std::get<1>(relativePositionOrientation);
-            parts[iIndex].nextOrientation = 1.0 * parts[iIndex].orientation;
-            parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
-        }
-
-        // Set next positions based on the relative ones (parts[iIndex] keeps track of bound particle position)
-        parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
-        parts[jIndex].nextPosition = parts[iIndex].nextPosition + relPosition;
-    }
+//    /* NOT ALLOWING FOR UNBINDING EVENTS IN FIRST IMPLEMENTATION.
+//     * CURRENTLY WORKING ON FUNCTION BELOW, ENCOUNTERED ISSUE IN HOW PARTICLECOMPOUND SAVES TOPOLOGIES, NEED TO
+//     * ADDRESS THAT FIRST, SEE particle.hpp */
+//    template<>
+//    void msmrdMultiParticleIntegrator<ctmsm>::transition2UnboundState(std::vector<particle> &parts, int iIndex,
+//                                                               int jIndex, int endStateAlt) {
+//
+//        // Check if particles unbinding belong to particleCompounds
+//        parts[iIndex].compoundIndex;
+//        parts[iIndex].compoundIndex;
+//
+//        // Redefine endstate indexing, so it is understood by the partition/discretization.
+//        int index0 = msmrdMSM.getMaxNumberBoundStates();
+//        int endState = endStateAlt - index0;
+//
+//        // Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.
+//        setRandomUnboundState(parts, iIndex);
+//        setRandomUnboundState(parts, jIndex);
+//
+//        // Extract relative position and orientation from partition and endstate
+//        auto relativePositionOrientation = getRelativePositionOrientation(endState);
+//        auto relPosition = std::get<0>(relativePositionOrientation);
+//
+//        // Set next orientations based on the relative ones (parts[iIndex] keeps track of bound particle orientation)
+//        if (rotation) {
+//            auto relOrientation = std::get<1>(relativePositionOrientation);
+//            parts[iIndex].nextOrientation = 1.0 * parts[iIndex].orientation;
+//            parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
+//        }
+//
+//        // Set next positions based on the relative ones (parts[iIndex] keeps track of bound particle position)
+//        parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
+//        parts[jIndex].nextPosition = parts[iIndex].nextPosition + relPosition;
+//    }
 
 
     /* Main integrate function */
@@ -185,6 +185,9 @@ namespace msmrd {
         // Integrates diffusion for one time step.
         integrateDiffusion(parts, dt);
 
+        // Integrates diffusion of compounds for one time step.
+        integrateDiffusionCompounds(parts, dt);
+
         // Remove unrealized previous events (see function for detailed description).
         removeUnrealizedEvents(parts);
 
@@ -200,6 +203,9 @@ namespace msmrd {
 
         // Enforce boundary and set new positions into parts[i].nextPosition (only if particle is active).
         enforceBoundary(parts);
+
+        // Enforce boundary and updates positions of particleCompounds.
+        enforceBoundary(particleCompounds);
 
         /* Update positions and orientations (sets calculated next position/orientation
          * calculated by integrator and boundary as current position/orientation). Note states
@@ -220,53 +226,6 @@ namespace msmrd {
     /**
      * Additional functions exclusive to multi-particle MSM/RD below
      */
-
-    // @TODO WRITE TEST ROUTINE FOR THE FUNCTION BELOW: THIS FUNCTION WILL NEED TO BE ADDED IN THE INTEGRATOR FUNCTION
-    template<>
-    void msmrdMultiParticleIntegrator<ctmsm>::integrateDiffusionCompounds(double dt0,
-                                                                                std::vector<particle> &parts){
-        for (auto particleCompound : particleCompounds) {
-            // Calculte change in poisition
-            vec3<double> dr;
-            dr =  std::sqrt(2 * dt0 * particleCompound.D) * randg.normal3D(0, 1);
-            particleCompound.position += dr;
-            // Calculate change in orientation
-            vec3<double> dphi;
-            quaternion<double> dquat;
-            dphi = std::sqrt(2 * dt0 * particleCompound.Drot) * randg.normal3D(0, 1);
-            dquat = msmrdtools::axisangle2quaternion(dphi);
-            particleCompound.orientation = dquat * particleCompound.orientation;
-            // Make a copy of the boundsPair dictionary
-            std::map<std::tuple<int,int>, int> boundPairsDictionaryCopy(particleCompound.boundPairsDictionary);
-            // Update position and orientation of reference particle
-            setParticlePositionOrientation(parts, particleCompound, dr,  dquat, particleCompound.referenceIndex);
-            /* Update position and orientation of all other particles in compound (depends on
-             * specific implementation, here based on the dimer example with one angular binding). Loops many times
-             * over copy of boundsPairsDictionary, starting by the reference particle and building all the bindings
-             * until there is no binding left to incorporate. */
-            int tempIndex1 = 1 * particleCompound.referenceIndex;
-            int tempIndex2 = 1 * particleCompound.referenceIndex;
-            while (boundPairsDictionaryCopy.size() > 0) {
-                for (auto it = boundPairsDictionaryCopy.cbegin(); it != boundPairsDictionaryCopy.cend(); it++) {
-                    auto index1 = std::get<0>(it->first);
-                    auto index2 = std::get<1>(it->first);
-                    auto state = it->second;
-                    if (index1 == tempIndex1) {
-                        // Assign positions and orientations to particles involved
-                        tempIndex1 = index2;
-                    }
-                    if (index2 == tempIndex2) {
-                        // Assign positions and orientations to particles involved
-                        tempIndex2 = index1;
-                    }
-                    // Remove element from dictionary and break loop
-                    boundPairsDictionaryCopy.erase(it);
-                    break;
-                }
-            }
-        }
-    }
-
 
 
 

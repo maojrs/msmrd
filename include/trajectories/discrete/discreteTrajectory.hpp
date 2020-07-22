@@ -84,6 +84,12 @@ namespace msmrd {
 
         int getBoundState(vec3<double> relativePosition, quaternion<double> relativeOrientation);
 
+        vec3<double> getRelativePosition(int boundStateIndex);
+
+        quaternion<double> getRelativeOrientation(int boundStateIndex);
+
+
+
 
 
         // Functions are mostly only used when interacting with python or by pybind.
@@ -208,6 +214,18 @@ namespace msmrd {
         }
         return -1;
     };
+
+    /* Returns relative position corresponding to a given bound state, indexed by boundStateIndex. */
+    template<int numBoundStates>
+    vec3<double> discreteTrajectory<numBoundStates>::getRelativePosition(int boundStateIndex) {
+        return std::get<0>(boundStates[boundStateIndex]);
+    }
+
+    /* Returns relative orientation corresponding to a given bound state, indexed by boundStateIndex. */
+    template<int numBoundStates>
+    quaternion<double> discreteTrajectory<numBoundStates>::getRelativeOrientation(int boundStateIndex) {
+        return std::get<1>(boundStates[boundStateIndex]);
+    }
 
 
     /*
