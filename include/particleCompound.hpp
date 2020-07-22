@@ -19,10 +19,12 @@ namespace msmrd {
         double D;
         double Drot;
         vec3<double> position = vec3<double>();
-        vec3<double> positionReference = vec3<double>();
+        //vec3<double> positionReference = vec3<double>();
         quaternion<double> orientation = quaternion<double>(1.0, 0.0, 0.0, 0.0);
-        quaternion<double> orientationReference = quaternion<double>();
+        //quaternion<double> orientationReference = quaternion<double>();
         std::map<std::tuple<int,int>, int> boundPairsDictionary = {};
+        std::map<int, vec3<double>> relativePositions = {};
+        std::map<int, quaternion<double>> relativeOrientations = {};
         int referenceIndex = -1;
         int compoundSize = 2;
         bool active = true;
@@ -39,6 +41,10 @@ namespace msmrd {
          * @param boundPairsDictionary dictionary, whose key corresponds to the tuple of pairs of indexes of the
          * particles bound with each other within the compound. The value is the state in which
          * the corresponding pair of particles is bound in.
+         * @param relativePositions dictionary with the particle index as key and its relative position
+         * with respect the reference particle in the compound.
+         * @param relativeOrientations dictionary with the particle index as key and its relative orientation
+         * with respect the reference particle in the compound.
          * @param referenceIndex index of reference particle in particleList. The reference particle will be chosen
          * as the one with smallest index when the compund is created. Once the compound is created it will not
          * change reference particle, unless the reference particle unbounds from complex.
@@ -67,6 +73,8 @@ namespace msmrd {
         void joinParticleCompound(particleCompound partComplex);
 
         std::vector<particleCompound> splitCompound(std::tuple<int,int> pairToBeRemoved);
+
+        bool isActive() { return active; }
 
         // Setters
 

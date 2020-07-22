@@ -52,4 +52,21 @@ namespace msmrd {
         }
     }
 
+    // Enforces periodic box boundary condition
+    void sphere::enforcePeriodicBoundary(particleCompound &part) {
+        throw std::runtime_error("Periodic boundary condition not available for spherical boundary.");
+    };
+
+    // Enforces reflective box boundary condition
+    void sphere::enforceReflectiveBoundary(particleCompound &part) {
+        throw std::invalid_argument("Reflective boundary not implemented for particle Compounds, see box.cpp");
+    };
+
+    // Enforces open boundary condition
+    void sphere::enforceOpenBoundary(particleCompound &part) {
+        if (part.position.norm() > radius)  {
+            part.active = false;
+        }
+    }
+
 }

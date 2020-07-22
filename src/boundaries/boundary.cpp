@@ -12,20 +12,6 @@ namespace msmrd {
     boundary::boundary(std::string boundarytype) : boundarytype(boundarytype) {};
 
 
-    /* Main function to enforce boundary, note enforce boundary acts on "nextPositions" of the particles, so
-     * it can keep better track of the previous position when the boundary requires so. */
-    void boundary::enforceBoundary(particle &part) {
-        if (boundarytype == "periodic") {
-            enforcePeriodicBoundary(part);
-        } else if (boundarytype == "reflective") {
-            enforceReflectiveBoundary(part);
-        } else if (boundarytype == "open") {
-            enforceOpenBoundary(part);
-        } else if (boundarytype != "none") {
-            throw std::runtime_error("Unknown boundary type; it should be either periodic, reflective or open.");
-        }
-    };
-
     /** Function to reflect vector
      * @param dr vector pointing from previous position to current position
      * @param r0 vector of previous position

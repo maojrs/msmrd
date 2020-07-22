@@ -4,6 +4,7 @@
 #pragma once
 #include <iostream>
 #include "particle.hpp"
+#include "particleCompound.hpp"
 #include "vec3.hpp"
 
 
@@ -26,6 +27,12 @@ namespace msmrd {
 
         virtual void enforceOpenBoundary(particle &part) = 0;
 
+        virtual void enforcePeriodicBoundary(particleCompound &part) = 0;
+
+        virtual void enforceReflectiveBoundary(particleCompound &part) = 0;
+
+        virtual void enforceOpenBoundary(particleCompound &part) = 0;
+
     public:
 
         double radius = 0;
@@ -34,7 +41,8 @@ namespace msmrd {
 
         boundary(std::string boundarytype);
 
-        void enforceBoundary(particle &part);
+        template< typename PARTICLE >
+        void enforceBoundary(PARTICLE &particle);
 
         std::string getBoundaryType() const { return boundarytype; }
 
@@ -49,6 +57,22 @@ namespace msmrd {
          * returns corresponding portion of vector dr that was reflected in boundary
          */
          vec3<double> reflectVector(vec3<double> r0, vec3<double> dr, vec3<double> intersection, vec3<double> normal);
+    };
+
+
+    /* Main template function to enforce boundary, note enforce boundary acts on "nextPositions" of the particles, so
+     * it can keep better track of the previous position when the boundary requires so. */
+    template <typename PARTICLE>
+    void boundary::enforceBoundary(PARTICLE &part) {
+        if (boundarytype == "periodic") {
+            enforcePeriodicBoundary(part);
+        } else if (boundarytype == "reflective") {
+            enforceReflectiveBoundary(part);
+        } else if (boundarytype == "open") {
+            enforceOpenBoundary(part);
+        } else if (boundarytype != "none") {
+            throw std::runtime_error("Unknown boundary type; it should be either periodic, reflective or open.");
+        }
     };
 
 }

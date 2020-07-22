@@ -77,4 +77,26 @@ namespace msmrd {
         }
     }
 
-}
+    // Enforces periodic box boundary condition for particle compounds (acts directly on position)
+    void box::enforcePeriodicBoundary(particleCompound &part) {
+        for (int i = 0; i < 3; i++) {
+            if (part.position[i] >= boxsize[i] / 2) { part.position[i] -= boxsize[i]; }
+            if (part.position[i] <= -boxsize[i] / 2) { part.position[i] += boxsize[i]; }
+        }
+    };
+
+    void box::enforceReflectiveBoundary(particleCompound &part) {
+        throw std::invalid_argument("Reflective boundary not implemented for particle Compounds, see box.cpp");
+    }
+
+    // Enforces open boundary condition for particle compounds (acts directly on position)
+    void box::enforceOpenBoundary(particleCompound &part) {
+        if (std::abs(part.position[0]) > xx ||
+            std::abs(part.position[1]) > yy ||
+            std::abs(part.position[2]) > zz) {
+            part.active = false;
+        }
+    }
+
+
+    }

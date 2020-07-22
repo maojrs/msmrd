@@ -21,6 +21,12 @@ namespace msmrd {
 
         void enforceOpenBoundary(particle &part) override {};
 
+        void enforcePeriodicBoundary(particleCompound &part) override {};
+
+        void enforceReflectiveBoundary(particleCompound &part) override {};
+
+        void enforceOpenBoundary(particleCompound &part) override {};
+
     public:
 
         noBoundary() : boundary("none") {};
