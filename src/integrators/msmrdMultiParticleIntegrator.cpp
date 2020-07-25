@@ -58,43 +58,6 @@ namespace msmrd {
     }
 
 
-    /* NOT USED IN FIRST IMPLEMENTTION .
-     * Computes possible transitions from bound states to other bound states or unbound states (transition states)
-     * and saves them in the event manager. Used by integrate function. */
-    template<>
-    void msmrdMultiParticleIntegrator<ctmsm>::computeTransitionsFromBoundStates(std::vector<particle> &parts) {
-        double transitionTime;
-        int nextState;
-        std::tuple<double, int> transition;
-        int index0 = msmrdMSM.getMaxNumberBoundStates();
-        for (int i = 0; i < parts.size(); i++) {
-            // Only compute transition if particle is bound to another particle.
-            // If particle[i] is bound, then parts[i].boundList is not empty.
-            for (auto boundParticleIndex : parts[i].boundList) {
-                // Bound pairs are only to be counted once, then:
-                if (parts[i].boundList[boundParticleIndex] > i) {
-                    /* Only compute transition if particles switched into a given bound state for
-                     * the first time, i.e. empty event */
-                    auto previousEvent = eventMgr.getEvent(i, parts[i].boundList[boundParticleIndex]);
-                    if (previousEvent.eventType == "empty") {
-                        transition = msmrdMSM.calculateTransition(parts[i].boundStates[boundParticleIndex]);
-                        transitionTime = std::get<0>(transition);
-                        nextState = std::get<1>(transition);
-                        // Distinguish between events bound to bound transition and unbinding events
-                        if (nextState <= index0) {
-                            eventMgr.addEvent(transitionTime, i, parts[i].boundList[boundParticleIndex],
-                                              parts[i].boundStates[boundParticleIndex], nextState, "bound2bound");
-                        } else {
-                            eventMgr.addEvent(transitionTime, i, parts[i].boundList[boundParticleIndex],
-                                              parts[i].boundStates[boundParticleIndex], nextState, "unbinding");
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
     /* Applies transition to bound state if binding pocket is not taken by another binding.
      * Makes particles with indexes iIndex and jIndex in the particle list transition to a bound state. Note
      * always iIndex < jIndex should hold. Also both particles are desactivated since their position will be
@@ -128,42 +91,6 @@ namespace msmrd {
          * Not too relevant in first implementation since all diffusion coefficients are constats,
          * so left for future implemenation. */
     }
-
-
-//    /* NOT ALLOWING FOR UNBINDING EVENTS IN FIRST IMPLEMENTATION.
-//     * CURRENTLY WORKING ON FUNCTION BELOW, ENCOUNTERED ISSUE IN HOW PARTICLECOMPOUND SAVES TOPOLOGIES, NEED TO
-//     * ADDRESS THAT FIRST, SEE particle.hpp */
-//    template<>
-//    void msmrdMultiParticleIntegrator<ctmsm>::transition2UnboundState(std::vector<particle> &parts, int iIndex,
-//                                                               int jIndex, int endStateAlt) {
-//
-//        // Check if particles unbinding belong to particleCompounds
-//        parts[iIndex].compoundIndex;
-//        parts[iIndex].compoundIndex;
-//
-//        // Redefine endstate indexing, so it is understood by the partition/discretization.
-//        int index0 = msmrdMSM.getMaxNumberBoundStates();
-//        int endState = endStateAlt - index0;
-//
-//        // Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.
-//        setRandomUnboundState(parts, iIndex);
-//        setRandomUnboundState(parts, jIndex);
-//
-//        // Extract relative position and orientation from partition and endstate
-//        auto relativePositionOrientation = getRelativePositionOrientation(endState);
-//        auto relPosition = std::get<0>(relativePositionOrientation);
-//
-//        // Set next orientations based on the relative ones (parts[iIndex] keeps track of bound particle orientation)
-//        if (rotation) {
-//            auto relOrientation = std::get<1>(relativePositionOrientation);
-//            parts[iIndex].nextOrientation = 1.0 * parts[iIndex].orientation;
-//            parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
-//        }
-//
-//        // Set next positions based on the relative ones (parts[iIndex] keeps track of bound particle position)
-//        parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
-//        parts[jIndex].nextPosition = parts[iIndex].nextPosition + relPosition;
-//    }
 
 
     /* Main integrate function */
@@ -222,14 +149,78 @@ namespace msmrd {
     }
 
 
-
-    /**
-     * Additional functions exclusive to multi-particle MSM/RD below
+    /*
+     *  Incomplete commented functions below, maybe for more complex implementations of the multi-particle
+     *  MSM/RD algorithm.
      */
 
+//    /* Computes possible transitions from bound states to other bound states or unbound states (transition states)
+//     * and saves them in the event manager. Used by integrate function. */
+//    template<>
+//    void msmrdMultiParticleIntegrator<ctmsm>::computeTransitionsFromBoundStates(std::vector<particle> &parts) {
+//        double transitionTime;
+//        int nextState;
+//        std::tuple<double, int> transition;
+//        int index0 = msmrdMSM.getMaxNumberBoundStates();
+//        for (int i = 0; i < parts.size(); i++) {
+//            // Only compute transition if particle is bound to another particle.
+//            // If particle[i] is bound, then parts[i].boundList is not empty.
+//            for (auto boundParticleIndex : parts[i].boundList) {
+//                // Bound pairs are only to be counted once, then:
+//                if (parts[i].boundList[boundParticleIndex] > i) {
+//                    /* Only compute transition if particles switched into a given bound state for
+//                     * the first time, i.e. empty event */
+//                    auto previousEvent = eventMgr.getEvent(i, parts[i].boundList[boundParticleIndex]);
+//                    if (previousEvent.eventType == "empty") {
+//                        transition = msmrdMSM.calculateTransition(parts[i].boundStates[boundParticleIndex]);
+//                        transitionTime = std::get<0>(transition);
+//                        nextState = std::get<1>(transition);
+//                        // Distinguish between events bound to bound transition and unbinding events
+//                        if (nextState <= index0) {
+//                            eventMgr.addEvent(transitionTime, i, parts[i].boundList[boundParticleIndex],
+//                                              parts[i].boundStates[boundParticleIndex], nextState, "bound2bound");
+//                        } else {
+//                            eventMgr.addEvent(transitionTime, i, parts[i].boundList[boundParticleIndex],
+//                                              parts[i].boundStates[boundParticleIndex], nextState, "unbinding");
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 
-
+//    template<>
+//    void msmrdMultiParticleIntegrator<ctmsm>::transition2UnboundState(std::vector<particle> &parts, int iIndex,
+//                                                               int jIndex, int endStateAlt) {
+//
+//        // Check if particles unbinding belong to particleCompounds
+//        parts[iIndex].compoundIndex;
+//        parts[iIndex].compoundIndex;
+//
+//        // Redefine endstate indexing, so it is understood by the partition/discretization.
+//        int index0 = msmrdMSM.getMaxNumberBoundStates();
+//        int endState = endStateAlt - index0;
+//
+//        // Calculates and sets next unbound states (of the unbound MSM). If no MSM, defaults to zero.
+//        setRandomUnboundState(parts, iIndex);
+//        setRandomUnboundState(parts, jIndex);
+//
+//        // Extract relative position and orientation from partition and endstate
+//        auto relativePositionOrientation = getRelativePositionOrientation(endState);
+//        auto relPosition = std::get<0>(relativePositionOrientation);
+//
+//        // Set next orientations based on the relative ones (parts[iIndex] keeps track of bound particle orientation)
+//        if (rotation) {
+//            auto relOrientation = std::get<1>(relativePositionOrientation);
+//            parts[iIndex].nextOrientation = 1.0 * parts[iIndex].orientation;
+//            parts[jIndex].nextOrientation = relOrientation * parts[iIndex].nextOrientation;
+//        }
+//
+//        // Set next positions based on the relative ones (parts[iIndex] keeps track of bound particle position)
+//        parts[iIndex].nextPosition = parts[iIndex].position - 0.5*relPosition;
+//        parts[jIndex].nextPosition = parts[iIndex].nextPosition + relPosition;
+//    }
 
 
 }

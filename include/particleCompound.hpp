@@ -18,10 +18,10 @@ namespace msmrd {
     public:
         double D;
         double Drot;
-        vec3<double> position = vec3<double>();
-        //vec3<double> positionReference = vec3<double>();
+        vec3<double> position;
+//        vec3<double> positionReference = vec3<double>();
         quaternion<double> orientation = quaternion<double>(1.0, 0.0, 0.0, 0.0);
-        //quaternion<double> orientationReference = quaternion<double>();
+//        quaternion<double> orientationReference = quaternion<double>();
         std::map<std::tuple<int,int>, int> boundPairsDictionary = {};
         std::map<int, vec3<double>> relativePositions = {};
         std::map<int, quaternion<double>> relativeOrientations = {};
@@ -42,9 +42,9 @@ namespace msmrd {
          * particles bound with each other within the compound. The value is the state in which
          * the corresponding pair of particles is bound in.
          * @param relativePositions dictionary with the particle index as key and its relative position
-         * with respect the reference particle in the compound.
+         * with respect to the center of the particle compound.
          * @param relativeOrientations dictionary with the particle index as key and its relative orientation
-         * with respect the reference particle in the compound.
+         * with respect to the orientation of the main particle in the particle compound.
          * @param referenceIndex index of reference particle in particleList. The reference particle will be chosen
          * as the one with smallest index when the compund is created. Once the compound is created it will not
          * change reference particle, unless the reference particle unbounds from complex.
