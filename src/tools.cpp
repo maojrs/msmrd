@@ -205,7 +205,7 @@ namespace msmrdtools {
         auto theta1 = std::atan2(sinTheta1,cosTheta1);
         auto axisAngleRot1 = axisRot1 * theta1;
         auto quat1 = axisangle2quaternion(axisAngleRot1);
-        // Find second quaternion rotation (align b and bp after rotating q1)
+        // Find second quaternion rotation (align b and bp after rotating  b by q1)
         auto bRotated = rotateVec(b,quat1);
         auto b_cross = bRotated.cross(bp);
         vec3<double> axisRot2;

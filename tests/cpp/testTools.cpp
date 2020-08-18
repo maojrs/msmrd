@@ -46,8 +46,8 @@ TEST_CASE("Rotate vector through an axis off the origin", "[rotateVecOffAxis]") 
 TEST_CASE("Recover rotation quaternion from vectors", "[recoverRotationFromVectors]") {
     // Simple but tricky rotation (rotation by pi yields zero cross product)
     vec3<double> origin = vec3<double>(0,0,0);
-    vec3<double> vec1 = vec3<double>(1,1,0);
-    vec3<double> vec2 = vec3<double>(1,-1,0);
+    vec3<double> vec1 = origin + vec3<double>(1,1,0);
+    vec3<double> vec2 = origin + vec3<double>(1,-1,0);
     vec3<double> offAxisPoint = vec3<double>(2,0,0);
     vec3<double> rotation = vec3<double>(0,0,M_PI);
     auto quatRotation = msmrdtools::axisangle2quaternion(rotation);
@@ -60,6 +60,11 @@ TEST_CASE("Recover rotation quaternion from vectors", "[recoverRotationFromVecto
     REQUIRE((rotation - recoveredAxisAngle).norm() < 0.000001);
     REQUIRE((quatRotation - recoveredQuaternion).norm() < 0.000001);
     // Very arbitrary rotation
+    origin = vec3<double>(0.2,0.5,1.5);
+    /* TODO: if the z-components of vec1 and vec2 are different than zero, recoverRotationFromVectors seems to fail.
+     * Check bug later since rcovering the rotation with z's=0 works fine. */
+    vec1 = origin + vec3<double>(1,1,0.0);
+    vec2 = origin + vec3<double>(1,-1,0.0);
     rotation = vec3<double>(0.4,0.7*M_PI,0.2*M_PI);
     quatRotation = msmrdtools::axisangle2quaternion(rotation);
     newOrigin = msmrdtools::rotateVecOffAxis(origin, quatRotation, offAxisPoint);
@@ -68,6 +73,7 @@ TEST_CASE("Recover rotation quaternion from vectors", "[recoverRotationFromVecto
     recoveredQuaternion = msmrdtools::recoverRotationFromVectors(origin,vec1,vec2,
             newOrigin,rotatedVec1,rotatedVec2);
     recoveredAxisAngle = msmrdtools::quaternion2axisangle(recoveredQuaternion);
+    //REQUIRE(rotation == recoveredAxisAngle);
     REQUIRE((rotation - recoveredAxisAngle).norm() < 0.000001);
     REQUIRE((quatRotation - recoveredQuaternion).norm() < 0.000001);
 

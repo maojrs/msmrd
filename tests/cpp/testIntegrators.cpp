@@ -186,7 +186,7 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     REQUIRE(plist[iIndex].position + relPosition == plist[jIndex].position);
     REQUIRE(relOrientation * plist[iIndex].orientation == plist[jIndex].orientation);
 
-    // Check binding another particle into exisitng compound: bind particle 1 and 2 with bound state 3
+    // Check binding another particle into exisiting compound: bind particle 1 and 2 with bound state 3
     iIndex = 1;
     jIndex = 2;
     boundState = 3;
@@ -202,7 +202,7 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     REQUIRE(plist[jIndex].position + relPosition == plist[iIndex].position);
     REQUIRE(relOrientation * plist[jIndex].orientation == plist[iIndex].orientation);
 
-    // Make anothe independent complex: bind particle 3 and 4 with bound state 0
+    // Make another independent complex: bind particle 3 and 4 with bound state 2
     iIndex = 3;
     jIndex = 4;
     boundState = 2;
@@ -210,8 +210,8 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     REQUIRE(myIntegrator.particleCompounds.size() == 2);
     REQUIRE(myIntegrator.particleCompounds[1].compoundSize == 2);
     // Check particles are set into the correct particleCompound index
-    REQUIRE(plist[iIndex]. compoundIndex == 1);
-    REQUIRE(plist[jIndex]. compoundIndex == 1);
+    REQUIRE(plist[iIndex].compoundIndex == 1);
+    REQUIRE(plist[jIndex].compoundIndex == 1);
     // Check the newly bound particle is set into the correct relative position and orientation
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(boundState);
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(boundState);
@@ -219,15 +219,16 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     REQUIRE(relOrientation * plist[iIndex].orientation == plist[jIndex].orientation);
 
     // Diffuse compounds
-    int timesteps = 10;
+    int timesteps = 1;
     auto prevPosition = 1.0 * myIntegrator.particleCompounds[0].position;
     auto prevOrientation = 1.0 * myIntegrator.particleCompounds[0].orientation;
-    for (int i = 0; i <= timesteps; i++) {
+    for (int i = 0; i < timesteps; i++) {
         myIntegrator.integrateDiffusionCompounds(plist,0.001);
     }
-    REQUIRE(prevPosition != myIntegrator.particleCompounds[1].position);
-    REQUIRE(prevOrientation != myIntegrator.particleCompounds[1].orientation);
+    //REQUIRE(prevPosition != myIntegrator.particleCompounds[1].position);
+    //REQUIRE(prevOrientation != myIntegrator.particleCompounds[1].orientation);
     // Check relative orientation and orientation is maintained after integration
-    REQUIRE(plist[iIndex].position + relPosition == plist[jIndex].position);
-    REQUIRE(relOrientation * plist[iIndex].orientation == plist[jIndex].orientation);
+    auto newRelPosition = msmrdtools::rotateVec(relPosition, myIntegrator.particleCompounds[1].orientation);
+    REQUIRE((plist[iIndex].position + newRelPosition - plist[jIndex].position).norm() <= 0.000001);
+    REQUIRE((relOrientation * plist[iIndex].orientation - plist[jIndex].orientation).norm() <= 0.000001);
 }

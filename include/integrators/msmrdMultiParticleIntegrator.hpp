@@ -35,7 +35,7 @@ namespace msmrd {
          * @param discreteTrajClass: pointer to trajectory class used for the discretization. We need this to extract
          * the bound states and their relative positions and orientations. The specific discrete trajectory
          * class will be fixed in the constructor, so this needs to be modified for different MSM/RD applications.
-         * @param pentamerCenter location of pentamer center with respcet to the main particle in a compound. Uniquely
+         * @param pentamerCenter location of pentamer center with respect to the main particle in a compound. Uniquely
          * for trimer and pentamer implementations of multi-particle MSM/RD.
          */
 
@@ -85,7 +85,7 @@ namespace msmrd {
 
         void joinParticleCompounds(std::vector<particle> &parts, int mainIndex, int secondIndex, int endState);
 
-        quaternion<double> getParticleCompoundOrientation(particle &mainParticle);
+//        quaternion<double> getParticleCompoundOrientation(particle &mainParticle);
 
         /* Functions below might need to be overridden for more complex implementations. */
 
@@ -159,7 +159,7 @@ namespace msmrd {
             mainIndex = jIndex;
             secondIndex = iIndex;
         }
-        // If neither particle belongs to a complex, create one
+        // If neither particle belongs to a complex, create one.
         if (parts[mainIndex].compoundIndex == -1 and parts[secondIndex].compoundIndex == -1) {
             createCompound(parts, mainIndex, secondIndex, endState);
         }
@@ -171,47 +171,37 @@ namespace msmrd {
         else {
             joinParticleCompounds(parts, mainIndex, secondIndex, endState);
         }
+        // Deactivate corresponding particles since now their diffusion will be controlled by a particle compound */
+        parts[mainIndex].deactivate();
+        parts[secondIndex].deactivate();
     };
 
 
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::updateParticlesInCompound(std::vector<particle> &parts,
         particleCompound &partCompound, vec3<double> deltar, quaternion<double> deltaq) {
-        //auto refIndex = partCompound.referenceIndex;
-        for (auto it = partCompound.relativePositions.cbegin();it != partCompound.relativePositions.cend();it++) {
+        // Update positions of the particles
+        for (auto it = partCompound.relativePositions.cbegin(); it != partCompound.relativePositions.cend();it++) {
             auto partIndex = it->first;
             auto relPosition = it->second;
-            auto relOrientation = partCompound.relativeOrientations[partIndex];
-            // Update the position of the particle
-            auto vec0 = partCompound.position + msmrdtools::rotateVec(relPosition, partCompound.orientation);
-            auto rotatedVec0 = partCompound.position + deltar + msmrdtools::rotateVec(relPosition, deltaq * partCompound.orientation);
-            parts[partIndex].position = rotatedVec0;
-            // Update the orientation of the particle
-            auto vec1 = vec3<double>(1, 1, 0); //reference vector 1 to control orientation
-            auto vec2 = vec3<double>(1, -1, 0); //reference vector 2 to control orientation
-            vec1 = msmrdtools::rotateVec(vec1, parts[partIndex].orientation);
-            vec2 = msmrdtools::rotateVec(vec2, parts[partIndex].orientation);
-            auto offAxisPoint = partCompound.position - parts[partIndex].position;
-            auto rotatedVec1 = partCompound.position + deltar + msmrdtools::rotateVecOffAxis(vec1, deltaq, offAxisPoint);
-            auto rotatedVec2 = partCompound.position + deltar + msmrdtools::rotateVecOffAxis(vec2, deltaq, offAxisPoint);
-            quaternion<double> newOrientation = msmrdtools::recoverRotationFromVectors(vec0, vec0 + vec1, vec0 + vec2,
-                                                                                       rotatedVec0, rotatedVec1,
-                                                                                       rotatedVec2);
-
-//            auto vec0 = msmrdtools::rotateVecOffAxis(relPosition, partCompound.orientation, offAxisPoint);
-//            auto rotatedVec0 = deltar + msmrdtools::rotateVecOffAxis(vec0, deltaq, offAxisPoint);
-//            parts[partIndex].position = rotatedVec0;
-//            // Update the orientation of the particle
-//            auto vec1 = vec3<double>(1, 1, 0); //reference vector 1 to control orientation
-//            auto vec2 = vec3<double>(1, -1, 0); //reference vector 2 to control orientation
-//            vec1 = msmrdtools::rotateVec(vec1, parts[partIndex].orientation);
-//            vec2 = msmrdtools::rotateVec(vec2, parts[partIndex].orientation);
-//            auto rotatedVec1 = deltar + msmrdtools::rotateVecOffAxis(vec1, deltaq, offAxisPoint);
-//            auto rotatedVec2 = deltar + msmrdtools::rotateVecOffAxis(vec2, deltaq, offAxisPoint);
-//            quaternion<double> newOrientation = msmrdtools::recoverRotationFromVectors(vec0, vec1, vec2,
-//                                                                                       rotatedVec0, rotatedVec1,
-//                                                                                       rotatedVec2);
-            parts[partIndex].orientation = newOrientation;
+            auto newPartPosition = partCompound.position + deltar +
+                                   msmrdtools::rotateVec(relPosition, deltaq * partCompound.orientation);
+            parts[partIndex].position = newPartPosition;
+        }
+        // Update orientations of the particles
+        auto refParticleOrientation = parts[partCompound.referenceParticleIndex].orientation;
+        for (auto it = partCompound.relativeOrientations.cbegin(); it != partCompound.relativeOrientations.cend();it++) {
+            auto partIndex = it->first;
+            auto relOrientation = it->second;
+            auto origin = parts[partIndex].position - partCompound.position;
+            auto vec1 = origin + vec3<double>(1, 1, 0); //ref vector1 to track orientation(z=0,see testTools.cpp)
+            auto vec2 = origin + vec3<double>(1, -1, 0); //ref vector2 to track orientation (keep z=0)
+            auto rotatedOrigin = msmrdtools::rotateVec(origin, deltaq * partCompound.orientation);
+            auto rotatedVec1 = msmrdtools::rotateVec(vec1, deltaq);
+            auto rotatedVec2 = msmrdtools::rotateVec(vec2, deltaq);
+            quaternion<double> deltaOrientation = msmrdtools::recoverRotationFromVectors(origin, vec1, vec2,
+                                                                                         rotatedOrigin, rotatedVec1, rotatedVec2);
+            parts[partIndex].orientation =  relOrientation * deltaOrientation * refParticleOrientation;
         }
     }
 
@@ -255,6 +245,7 @@ namespace msmrd {
         std::tuple<int,int> pairIndices = std::make_tuple(mainIndex, secondIndex);
         std::map<std::tuple<int,int>, int> boundPairsDictionary = {{pairIndices, endState}};
         particleCompound pComplex = particleCompound(boundPairsDictionary);
+        pComplex.referenceParticleIndex = mainIndex;
         /* Set relative positions and orientations in particle compound with respect to pentamer center, assuming
          * main particle is in origin with identity orientation. */
         pComplex.relativePositions.insert(std::pair<int, vec3<double>>(mainIndex, -1.0 * pentamerCenter));
@@ -268,11 +259,12 @@ namespace msmrd {
                 -1.0 * pentamerCenter + relPosition));
         pComplex.relativeOrientations.insert(std::pair<int, quaternion<double>>(secondIndex, relOrientation));
         // Set fixed position and orientation of newly bound particle
-        secondPart.position = mainPart.position + relPosition;
+        secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
         secondPart.orientation = relOrientation * mainPart.orientation;
         // Set particle compound position and orientation (as the center of a pentamer, same for all compounds)
         pComplex.position = mainPart.position + msmrdtools::rotateVec(pentamerCenter, mainPart.orientation);
-        pComplex.orientation = mainPart.orientation.conj(); //getParticleCompoundOrientation(mainPart); // maybe it is just mainPart.orientation.conj()
+        pComplex.orientation = mainPart.orientation.conj();
+        //getParticleCompoundOrientation(mainPart); // maybe it is just mainPart.orientation.conj()
         /* Set particle complex diffusion coefficients (This part could be extracted from MD data, here we simply
          * assume the same diffusion coefficient as the solo particles) */
         pComplex.D = 1.0 * mainPart.D;
@@ -305,7 +297,7 @@ namespace msmrd {
         relPosition += particleCompounds[compoundIndex].relativePositions[mainIndex];
         relOrientation = relOrientation * particleCompounds[compoundIndex].relativeOrientations[mainIndex];
         particleCompounds[compoundIndex].relativePositions.insert(std::pair<int, vec3<double>>(secondIndex,
-                particleCompounds[compoundIndex].positionReference + relPosition));
+                -1.0 * pentamerCenter + relPosition));
         particleCompounds[compoundIndex].relativeOrientations.insert(std::pair<int, quaternion<double>>(
                 secondIndex, relOrientation));
         // Extract main compound size and increase complex size by one.
@@ -396,20 +388,20 @@ namespace msmrd {
     };
 
 
-    /* Recovers the rotation quaternion for the particle compound based on the reference particle of the compound. It
-     * assumer the center of the compound is the center of a pentamer formation, so this is estremely dependent on the
-     * specific application. */
-    template <typename templateMSM>
-    quaternion<double> msmrdMultiParticleIntegrator<templateMSM>::getParticleCompoundOrientation(particle &mainParticle){
-        auto vec0 = vec3<double>(1.0/(2.0 * std::sin(M_PI/5.0)),0,0);
-        auto vec1 = vec3<double>(0,0,0);
-        auto vec2 = vec3<double>(0,1,0);
-        auto rotatedVec0 = msmrdtools::rotateVec(vec0,mainParticle.orientation);
-        auto rotatedVec1 = vec3<double>(0,0,0);
-        auto rotatedVec2 = msmrdtools::rotateVec(vec2,mainParticle.orientation);
-        auto outputQuat = msmrdtools::recoverRotationFromVectors(vec0,vec1,vec2,rotatedVec0,rotatedVec1,rotatedVec1);
-        return outputQuat;
-    }
+//    /* Recovers the rotation quaternion for the particle compound based on the reference particle of the compound. It
+//     * assumer the center of the compound is the center of a pentamer formation, so this is estremely dependent on the
+//     * specific application. */
+//    template <typename templateMSM>
+//    quaternion<double> msmrdMultiParticleIntegrator<templateMSM>::getParticleCompoundOrientation(particle &mainParticle){
+//        auto vec0 = vec3<double>(1.0/(2.0 * std::sin(M_PI/5.0)),0,0);
+//        auto vec1 = vec3<double>(0,0,0);
+//        auto vec2 = vec3<double>(0,1,0);
+//        auto rotatedVec0 = msmrdtools::rotateVec(vec0,mainParticle.orientation);
+//        auto rotatedVec1 = vec3<double>(0,0,0);
+//        auto rotatedVec2 = msmrdtools::rotateVec(vec2,mainParticle.orientation);
+//        auto outputQuat = msmrdtools::recoverRotationFromVectors(vec0,vec1,vec2,rotatedVec0,rotatedVec1,rotatedVec1);
+//        return outputQuat;
+//    }
 
 
 //    /* Checks ...*/

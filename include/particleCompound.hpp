@@ -18,6 +18,7 @@ namespace msmrd {
     public:
         double D;
         double Drot;
+        int referenceParticleIndex = -1;
         vec3<double> position;
 //        vec3<double> positionReference = vec3<double>();
         quaternion<double> orientation = quaternion<double>(1.0, 0.0, 0.0, 0.0);
@@ -31,7 +32,8 @@ namespace msmrd {
         /**
          * @param D diffusion constant
          * @param Drot rotational diffusion constant
-         * @param position position of particle compound
+         * @param referenceParticleIndex index in the particle list of reference particle of the compound.
+         * @param position position of particle compound (on chosen center, e.g. a center of mass or a geometric center)
          * @param positonReference position of reference particle within compound. The other
          * particles postion can be built from this value, the compound position and the bound states.
          * @param orientation orientation of particle compound. It will always be created with identity
