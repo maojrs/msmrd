@@ -20,9 +20,7 @@ namespace msmrd {
         double Drot;
         int referenceParticleIndex = -1;
         vec3<double> position;
-//        vec3<double> positionReference = vec3<double>();
         quaternion<double> orientation = quaternion<double>(1.0, 0.0, 0.0, 0.0);
-//        quaternion<double> orientationReference = quaternion<double>();
         std::map<std::tuple<int,int>, int> boundPairsDictionary = {};
         std::map<int, vec3<double>> relativePositions = {};
         std::map<int, quaternion<double>> relativeOrientations = {};

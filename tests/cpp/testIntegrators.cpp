@@ -219,14 +219,14 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     REQUIRE(relOrientation * plist[iIndex].orientation == plist[jIndex].orientation);
 
     // Diffuse compounds
-    int timesteps = 1;
+    int timesteps = 20;
     auto prevPosition = 1.0 * myIntegrator.particleCompounds[0].position;
     auto prevOrientation = 1.0 * myIntegrator.particleCompounds[0].orientation;
     for (int i = 0; i < timesteps; i++) {
         myIntegrator.integrateDiffusionCompounds(plist,0.001);
     }
-    //REQUIRE(prevPosition != myIntegrator.particleCompounds[1].position);
-    //REQUIRE(prevOrientation != myIntegrator.particleCompounds[1].orientation);
+    REQUIRE(prevPosition != myIntegrator.particleCompounds[1].position);
+    REQUIRE(prevOrientation != myIntegrator.particleCompounds[1].orientation);
     // Check relative orientation and orientation is maintained after integration
     auto newRelPosition = msmrdtools::rotateVec(relPosition, myIntegrator.particleCompounds[1].orientation);
     REQUIRE((plist[iIndex].position + newRelPosition - plist[jIndex].position).norm() <= 0.000001);

@@ -180,31 +180,31 @@ namespace msmrd {
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::updateParticlesInCompound(std::vector<particle> &parts,
         particleCompound &partCompound, vec3<double> deltar, quaternion<double> deltaq) {
-        // Update positions of the particles
-        for (auto it = partCompound.relativePositions.cbegin(); it != partCompound.relativePositions.cend();it++) {
-            auto partIndex = it->first;
-            auto relPosition = it->second;
-            auto newPartPosition = partCompound.position + deltar +
-                                   msmrdtools::rotateVec(relPosition, deltaq * partCompound.orientation);
-            parts[partIndex].position = newPartPosition;
-        }
         // Update orientations of the particles
         auto refParticleOrientation = parts[partCompound.referenceParticleIndex].orientation;
-        for (auto it = partCompound.relativeOrientations.cbegin(); it != partCompound.relativeOrientations.cend();it++) {
+        for (auto it = partCompound.relativeOrientations.cbegin();
+             it != partCompound.relativeOrientations.cend(); it++) {
             auto partIndex = it->first;
             auto relOrientation = it->second;
             auto origin = parts[partIndex].position - partCompound.position;
             auto vec1 = origin + vec3<double>(1, 1, 0); //ref vector1 to track orientation(z=0,see testTools.cpp)
             auto vec2 = origin + vec3<double>(1, -1, 0); //ref vector2 to track orientation (keep z=0)
             auto rotatedOrigin = msmrdtools::rotateVec(origin, deltaq * partCompound.orientation);
-            auto rotatedVec1 = msmrdtools::rotateVec(vec1, deltaq);
-            auto rotatedVec2 = msmrdtools::rotateVec(vec2, deltaq);
-            quaternion<double> deltaOrientation = msmrdtools::recoverRotationFromVectors(origin, vec1, vec2,
-                                                                                         rotatedOrigin, rotatedVec1, rotatedVec2);
-            parts[partIndex].orientation =  relOrientation * deltaOrientation * refParticleOrientation;
+            auto rotatedVec1 = msmrdtools::rotateVec(vec1, deltaq * partCompound.orientation);
+            auto rotatedVec2 = msmrdtools::rotateVec(vec2, deltaq * partCompound.orientation);
+            auto deltaOrientation = msmrdtools::recoverRotationFromVectors(origin, vec1, vec2,
+                                                                           rotatedOrigin, rotatedVec1, rotatedVec2);
+            parts[partIndex].orientation = relOrientation * deltaOrientation * refParticleOrientation;
+        }
+        // Update positions of the particles
+        for (auto it = partCompound.relativePositions.cbegin(); it != partCompound.relativePositions.cend(); it++) {
+            auto partIndex = it->first;
+            auto relPosition = it->second;
+            auto newPartPosition = partCompound.position + deltar +
+                                   msmrdtools::rotateVec(relPosition, deltaq * partCompound.orientation);
+            parts[partIndex].position = newPartPosition;
         }
     }
-
 
     /* Deletes inactive complexes in particle complex vector, and updates indexes in particle list. Doesn't
      * need to do at every time step, but every now and then to free up memory. */

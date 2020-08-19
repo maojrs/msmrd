@@ -136,7 +136,8 @@ namespace msmrd {
 
         /* Update positions and orientations (sets calculated next position/orientation
          * calculated by integrator and boundary as current position/orientation). Note states
-         * are modified directly and don't need to be updated. */
+         * are modified directly and don't need to be updated. Also note the positions and orientations
+         * of particles in compounds are updated directly in the integrateDiffusionCompounds function. */
         updatePositionOrientation(parts);
 
 
