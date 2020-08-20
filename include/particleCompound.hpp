@@ -18,19 +18,17 @@ namespace msmrd {
     public:
         double D;
         double Drot;
-        int referenceParticleIndex = -1;
         vec3<double> position;
         quaternion<double> orientation = quaternion<double>(1.0, 0.0, 0.0, 0.0);
         std::map<std::tuple<int,int>, int> boundPairsDictionary = {};
         std::map<int, vec3<double>> relativePositions = {};
         std::map<int, quaternion<double>> relativeOrientations = {};
-        int referenceIndex = -1;
+        int referenceParticleIndex = -1;
         int compoundSize = 2;
         bool active = true;
         /**
          * @param D diffusion constant
          * @param Drot rotational diffusion constant
-         * @param referenceParticleIndex index in the particle list of reference particle of the compound.
          * @param position position of particle compound (on chosen center, e.g. a center of mass or a geometric center)
          * @param positonReference position of reference particle within compound. The other
          * particles postion can be built from this value, the compound position and the bound states.
@@ -45,9 +43,10 @@ namespace msmrd {
          * with respect to the center of the particle compound.
          * @param relativeOrientations dictionary with the particle index as key and its relative orientation
          * with respect to the orientation of the main particle in the particle compound.
-         * @param referenceIndex index of reference particle in particleList. The reference particle will be chosen
+         * @param referenceParticleIndex index of reference particle in particleList. The reference particle will be chosen
          * as the one with smallest index when the compund is created. Once the compound is created it will not
-         * change reference particle, unless the reference particle unbounds from complex.
+         * change reference particle, unless the reference particle unbounds from complex. If two compounds join
+         * the reference particle will remain the one with the smallest index.
          * @param compoundSize number of particles contained in complex. Defaults to 2 for newly created
          * compounds. If 0, it means compound is inactive.
          * @param active if true the compound is active, if false it is no longer active and can be deleted

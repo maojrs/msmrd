@@ -189,7 +189,7 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     // Check binding another particle into exisiting compound: bind particle 1 and 2 with bound state 3
     iIndex = 1;
     jIndex = 2;
-    boundState = 3;
+    boundState = 2;
     myIntegrator.addCompound(plist, iIndex, jIndex, boundState);
     REQUIRE(myIntegrator.particleCompounds.size() == 1);
     REQUIRE(myIntegrator.particleCompounds[0].compoundSize == 3);
@@ -201,6 +201,14 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(boundState);
     REQUIRE(plist[jIndex].position + relPosition == plist[iIndex].position);
     REQUIRE(relOrientation * plist[jIndex].orientation == plist[iIndex].orientation);
+    // Check relative position and orientation of previous binding is conserved
+    boundState = 0;
+    iIndex = 0;
+    jIndex = 2;
+    relPosition = myIntegrator.discreteTrajClass->getRelativePosition(boundState);
+    relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(boundState);
+    REQUIRE(plist[iIndex].position + relPosition == plist[jIndex].position);
+    REQUIRE(relOrientation * plist[iIndex].orientation == plist[jIndex].orientation);
 
     // Make another independent complex: bind particle 3 and 4 with bound state 2
     iIndex = 3;
@@ -231,4 +239,24 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     auto newRelPosition = msmrdtools::rotateVec(relPosition, myIntegrator.particleCompounds[1].orientation);
     REQUIRE((plist[iIndex].position + newRelPosition - plist[jIndex].position).norm() <= 0.000001);
     REQUIRE((relOrientation * plist[iIndex].orientation - plist[jIndex].orientation).norm() <= 0.000001);
+
+    // Bind two existing compounds together (compound 0-2-1 with compound 3-4)
+    iIndex = 0;
+    jIndex = 3;
+    boundState = 3;
+    myIntegrator.addCompound(plist, iIndex, jIndex, boundState);
+    REQUIRE(myIntegrator.particleCompounds.size() == 2);
+    myIntegrator.cleanParticleCompoundsVector(plist);
+    REQUIRE(myIntegrator.particleCompounds.size() == 1);
+    REQUIRE(myIntegrator.particleCompounds[0].compoundSize == 5);
+    // Check relative positions/orientations match pentamer ring.
+    relPosition = myIntegrator.discreteTrajClass->getRelativePosition(boundState);
+    relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(boundState);
+    REQUIRE(plist[iIndex].position + relPosition == plist[jIndex].position);
+    REQUIRE(relOrientation * plist[iIndex].orientation == plist[jIndex].orientation);
+    // TODO: Something happens when joining two compounds that messes up the positions of the mainCompound, check alignParticlesInCompound
+    relPosition = myIntegrator.discreteTrajClass->getRelativePosition(0);
+    relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(0);
+    //REQUIRE(plist[0].position + relPosition == plist[2].position);
+    //REQUIRE(relOrientation * plist[0].orientation == plist[2].orientation);
 }

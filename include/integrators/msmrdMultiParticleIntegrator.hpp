@@ -73,7 +73,7 @@ namespace msmrd {
         void updateParticlesInCompound(std::vector<particle> &parts, particleCompound &partCompound,
                 vec3<double> deltar, quaternion<double> deltaq);
 
-        void updateParticleCompoundsVector(std::vector<particle> &parts);
+        void cleanParticleCompoundsVector(std::vector<particle> &parts);
 
     protected:
 
@@ -84,6 +84,8 @@ namespace msmrd {
         void addParticleToCompound(std::vector<particle> &parts, int mainIndex, int secondIndex, int endState);
 
         void joinParticleCompounds(std::vector<particle> &parts, int mainIndex, int secondIndex, int endState);
+
+        void alignParticlesInCompound(std::vector<particle> &parts, int mainIndex, int secondIndex);
 
 //        quaternion<double> getParticleCompoundOrientation(particle &mainParticle);
 
@@ -146,37 +148,37 @@ namespace msmrd {
     void msmrdMultiParticleIntegrator<templateMSM>::addCompound(std::vector<particle> &parts, int iIndex,
                                                          int jIndex, int endState) {
         /* Assign indexes of particles depending if they belong to the main compound or the secondary compound. The
-         * convention is the main compound is that with the smallest (positive) index in particleCompounds. */
-        int mainIndex;
-        int secondIndex;
-        if (parts[iIndex].compoundIndex >= 0 and parts[jIndex].compoundIndex >= 0) {
-            mainIndex = std::min(iIndex,jIndex);
-            secondIndex = std::max(iIndex,jIndex);
-        } else if (parts[iIndex].compoundIndex >= parts[jIndex].compoundIndex) {
-            mainIndex = iIndex;
-            secondIndex = jIndex;
-        } else {
-            mainIndex = jIndex;
-            secondIndex = iIndex;
-        }
+         * convention is the main compound is that with the smallest particle index between the binding partners. If no
+         * compound exists, the mainIndex corresponds to the particle with the smallest index. If only one compound
+         * exists the mainIndex is the one corresponding to the particle in the compound. */
+        int mainIndex = 1 * iIndex;
+        int secondIndex = 1 * jIndex;
         // If neither particle belongs to a complex, create one.
-        if (parts[mainIndex].compoundIndex == -1 and parts[secondIndex].compoundIndex == -1) {
+        if (parts[iIndex].compoundIndex == -1 and parts[jIndex].compoundIndex == -1) {
             createCompound(parts, mainIndex, secondIndex, endState);
         }
         // If one of the two doesn't belong to a complex, join the solo particle into the complex.
-        else if (parts[mainIndex].compoundIndex < 0 or parts[secondIndex].compoundIndex < 0) {
+        else if (parts[iIndex].compoundIndex < 0 or parts[jIndex].compoundIndex < 0) {
+            // Switch main and second index if neccesary (main particle must be in compound)
+            if (parts[iIndex].compoundIndex < 0){
+                mainIndex = 1 * jIndex;
+                secondIndex = 1 * iIndex;
+            }
             addParticleToCompound(parts, mainIndex, secondIndex, endState);
         }
         // If both belong to a complex, join the complexes together (keep the one with lower index)
         else {
             joinParticleCompounds(parts, mainIndex, secondIndex, endState);
         }
+
+        /* TODO: Add the case where two particles from the same complex bind. Likely not necessary for simple cases,
+         * like the pentamer, where the binding of 5 particles together, essentially implies the pentamer formation. */
         // Deactivate corresponding particles since now their diffusion will be controlled by a particle compound */
         parts[mainIndex].deactivate();
         parts[secondIndex].deactivate();
     };
 
-
+    /* Updates particles positions and orientations in a compound that diffused by deltar and rotated by deltaq */
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::updateParticlesInCompound(std::vector<particle> &parts,
         particleCompound &partCompound, vec3<double> deltar, quaternion<double> deltaq) {
@@ -207,11 +209,10 @@ namespace msmrd {
     }
 
     /* Deletes inactive complexes in particle complex vector, and updates indexes in particle list. Doesn't
-     * need to do at every time step, but every now and then to free up memory. */
-    /* @TODO Dont use this function at start, maye use it later since it is just an optimization routine to
-     * avoid memory overflow. */
+     * need to do at every time step, but every now and then to free up memory. Not necessary but avoids possible
+     * memory overflow in large systems. */
     template <typename templateMSM>
-    void msmrdMultiParticleIntegrator<templateMSM>::updateParticleCompoundsVector(std::vector<particle> &parts) {
+    void msmrdMultiParticleIntegrator<templateMSM>::cleanParticleCompoundsVector(std::vector<particle> &parts) {
         for (size_t i = particleCompounds.size(); i--;) {
             if (particleCompounds[i].active == false) {
                 // Erase particle complex
@@ -297,7 +298,7 @@ namespace msmrd {
         relPosition += particleCompounds[compoundIndex].relativePositions[mainIndex];
         relOrientation = relOrientation * particleCompounds[compoundIndex].relativeOrientations[mainIndex];
         particleCompounds[compoundIndex].relativePositions.insert(std::pair<int, vec3<double>>(secondIndex,
-                -1.0 * pentamerCenter + relPosition));
+                relPosition));
         particleCompounds[compoundIndex].relativeOrientations.insert(std::pair<int, quaternion<double>>(
                 secondIndex, relOrientation));
         // Extract main compound size and increase complex size by one.
@@ -319,7 +320,7 @@ namespace msmrd {
         particle &secondPart = parts[secondIndex];
         int mainCompoundIndex = mainPart.compoundIndex;
         int secondCompoundIndex = secondPart.compoundIndex;
-        // Indert new binding into boundsPairs dicitionary
+        // Insert new binding into boundsPairs dicitionary
         std::tuple<int,int> pairIndices = std::make_tuple(mainIndex, secondIndex);
         particleCompounds[mainCompoundIndex].boundPairsDictionary.insert (
                 std::pair<std::tuple<int,int>, int>(pairIndices, endState) );
@@ -329,15 +330,42 @@ namespace msmrd {
         // Set relative positions and orientations in particle compound, first the particle where there was a binding.
         auto relPosition = discreteTrajClass->getRelativePosition(endState);
         auto relOrientation = discreteTrajClass->getRelativeOrientation(endState);
+        // Set fixed position and orientation of newly bound particle
+        secondPart.position = mainPart.position + relPosition;
+        secondPart.orientation = relOrientation * mainPart.orientation;
+        // Set relative position and orientation with respect to reference particle
         relPosition += particleCompounds[mainCompoundIndex].relativePositions[mainIndex];
         relOrientation = relOrientation * particleCompounds[mainCompoundIndex].relativeOrientations[mainIndex];
         particleCompounds[mainCompoundIndex].relativePositions.insert(std::pair<int, vec3<double>>(secondIndex,
                                                                                                relPosition));
         particleCompounds[mainCompoundIndex].relativeOrientations.insert(std::pair<int, quaternion<double>>(
                 secondIndex, relOrientation));
-        secondPart.position = mainPart.position + relPosition;
-        secondPart.orientation = relOrientation * mainPart.orientation;
-        // ... then assign them to all the other particles in newly bound complex
+        /* ... then assign them to all the other particles in newly bound complex (aligns particles positions and
+         * orientations of binding complex) */
+        alignParticlesInCompound(parts, mainIndex, secondIndex);
+        // Set particle compound position (keep previous orientation)
+        int mainCompoundSize = particleCompounds[mainCompoundIndex].compoundSize;
+        int secondaryCompoundSize = particleCompounds[secondCompoundIndex].compoundSize;
+        particleCompounds[mainCompoundIndex].position = (mainCompoundSize *
+                particleCompounds[mainCompoundIndex].position + secondaryCompoundSize *
+                particleCompounds[secondCompoundIndex].position)/(mainCompoundSize + secondaryCompoundSize);
+        // Extract main compound size, increase complex size by one and make zero the empty one
+        particleCompounds[mainCompoundIndex].compoundSize += particleCompounds[secondCompoundIndex].compoundSize;
+        particleCompounds[secondCompoundIndex].compoundSize = 0;
+        // Set new particle complex indices to the one of the lower index (main one).
+        mainPart.compoundIndex = mainCompoundIndex;
+        secondPart.compoundIndex = mainCompoundIndex;
+    };
+
+    /* Aligns remaining particles in compound that just binded with another compound. This means rewriting positions
+     * and orientations as well as relativePositions and Orientations in particleCompound. */
+    template <typename templateMSM>
+    void msmrdMultiParticleIntegrator<templateMSM>::alignParticlesInCompound(std::vector<particle> &parts,
+                                                                             int mainIndex, int secondIndex) {
+        particle &mainPart = parts[mainIndex];
+        particle &secondPart = parts[secondIndex];
+        int mainCompoundIndex = mainPart.compoundIndex;
+        int secondCompoundIndex = secondPart.compoundIndex;
         std::map<std::tuple<int,int>, int> boundPairsDictionaryCopy(
                 particleCompounds[secondCompoundIndex].boundPairsDictionary);
         int refParticleIndex = secondIndex;
@@ -352,39 +380,30 @@ namespace msmrd {
                 relOrient = relOrient * particleCompounds[mainCompoundIndex].relativeOrientations[refParticleIndex];
                 if (index1 == refParticleIndex) {
                     particleCompounds[mainCompoundIndex].relativePositions.insert(std::pair<int, vec3<double>>(
-                            index2,relPosition));
+                            index2, relPos));
                     particleCompounds[mainCompoundIndex].relativeOrientations.insert(std::pair<int,
-                            quaternion<double>>(index2, relOrientation));
-                    parts[index2].position = parts[refParticleIndex].position + relPosition;
-                    parts[index2].orientation = relOrientation * parts[refParticleIndex].orientation;
+                            quaternion<double>>(index2, relOrient));
+                    parts[index2].position = parts[refParticleIndex].position + relPos;
+                    parts[index2].orientation = relOrient * parts[refParticleIndex].orientation;
                     refParticleIndex = index2;
+                    // Remove element from reference map and break loop
+                    boundPairsDictionaryCopy.erase(it);
+                    break;
                 }
                 else if (index2 == refParticleIndex){
                     particleCompounds[mainCompoundIndex].relativePositions.insert(std::pair<int, vec3<double>>(
-                            index1,relPosition));
+                            index1,relPos));
                     particleCompounds[mainCompoundIndex].relativeOrientations.insert(std::pair<int,
-                            quaternion<double>>(index1, relOrientation));
+                            quaternion<double>>(index1, relOrient));
                     refParticleIndex = index1;
-                    parts[index1].position = parts[refParticleIndex].position + relPosition;
-                    parts[index1].orientation = relOrientation * parts[refParticleIndex].orientation;
+                    parts[index1].position = parts[refParticleIndex].position + relPos;
+                    parts[index1].orientation = relOrient * parts[refParticleIndex].orientation;
+                    // Remove element from reference map and break loop
+                    boundPairsDictionaryCopy.erase(it);
+                    break;
                 }
-                // Remove element from dictionary and break loop
-                boundPairsDictionaryCopy.erase(it);
-                break;
             }
         }
-        // Set particle compound position (keep previous orientation)
-        int mainCompoundSize = particleCompounds[mainCompoundIndex].compoundSize;
-        int secondaryCompoundSize = particleCompounds[secondCompoundIndex].compoundSize;
-        particleCompounds[mainCompoundIndex].position = (mainCompoundSize *
-                particleCompounds[mainCompoundIndex].position + secondaryCompoundSize *
-                particleCompounds[secondCompoundIndex].position)/(mainCompoundSize + secondaryCompoundSize);
-        // Extract main compound size, increase complex size by one and make zero the empty one
-        particleCompounds[mainCompoundIndex].compoundSize += particleCompounds[secondCompoundIndex].compoundSize;
-        particleCompounds[secondCompoundIndex].compoundSize = 0;
-        // Set new particle complex indices to the one of the lower index (main one).
-        mainPart.compoundIndex = mainCompoundIndex;
-        secondPart.compoundIndex = mainCompoundIndex;
     };
 
 

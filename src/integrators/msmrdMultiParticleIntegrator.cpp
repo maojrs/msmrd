@@ -140,6 +140,10 @@ namespace msmrd {
          * of particles in compounds are updated directly in the integrateDiffusionCompounds function. */
         updatePositionOrientation(parts);
 
+        /* Cleans the vector of particle compounds in case any compound needs to be deleted. Can be run just
+         * every several timesteps or avoided completely for small systems. */
+        cleanParticleCompoundsVector(parts);
+
 
         // Output eventlog (useful for debugging)
         if (recordEventLog) {
