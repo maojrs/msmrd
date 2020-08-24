@@ -180,34 +180,41 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     // Check particles are set into the correct particleCompound index
     REQUIRE(plist[iIndex]. compoundIndex == 0);
     REQUIRE(plist[jIndex]. compoundIndex == 0);
-    // Check the newly bound particle is set into the correct relative position and orientation
+    /* Check the newly bound particle is set into the correct relative position and orientation.
+     * Note this relative positions/orientations are w/respect to other particle and not the center
+     * of the particle compound.*/
     auto relPosition = myIntegrator.discreteTrajClass->getRelativePosition(boundState);
     auto relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(boundState);
-    REQUIRE(plist[iIndex].position + relPosition == plist[jIndex].position);
+    auto newRelPosition = msmrdtools::rotateVec(relPosition, plist[iIndex].orientation);
+    REQUIRE(plist[iIndex].position + newRelPosition == plist[jIndex].position);
     REQUIRE(relOrientation * plist[iIndex].orientation == plist[jIndex].orientation);
 
-    // Check binding another particle into exisiting compound: bind particle 1 and 2 with bound state 3
+    // Check binding another particle into existing compound: bind particle 1 and 2 with bound state 2
     iIndex = 1;
     jIndex = 2;
     boundState = 2;
     myIntegrator.addCompound(plist, iIndex, jIndex, boundState);
     REQUIRE(myIntegrator.particleCompounds.size() == 1);
     REQUIRE(myIntegrator.particleCompounds[0].compoundSize == 3);
+    REQUIRE(myIntegrator.particleCompounds[0].relativePositions.size() == 3);
+    REQUIRE(myIntegrator.particleCompounds[0].relativeOrientations.size() == 3);
     // Check particles are set into the correct particleCompound index
     REQUIRE(plist[0].compoundIndex == 0);
     REQUIRE(plist[1].compoundIndex == 0);
     REQUIRE(plist[2].compoundIndex == 0);
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(boundState);
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(boundState);
-    REQUIRE(plist[jIndex].position + relPosition == plist[iIndex].position);
+    newRelPosition = msmrdtools::rotateVec(relPosition, plist[jIndex].orientation);
+    REQUIRE(plist[jIndex].position + newRelPosition == plist[iIndex].position);
     REQUIRE(relOrientation * plist[jIndex].orientation == plist[iIndex].orientation);
     // Check relative position and orientation of previous binding is conserved
-    boundState = 0;
     iIndex = 0;
     jIndex = 2;
+    boundState = 0;
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(boundState);
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(boundState);
-    REQUIRE(plist[iIndex].position + relPosition == plist[jIndex].position);
+    newRelPosition = msmrdtools::rotateVec(relPosition, plist[iIndex].orientation);
+    REQUIRE(plist[iIndex].position + newRelPosition == plist[jIndex].position);
     REQUIRE(relOrientation * plist[iIndex].orientation == plist[jIndex].orientation);
 
     // Make another independent complex: bind particle 3 and 4 with bound state 2
@@ -223,6 +230,7 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     // Check the newly bound particle is set into the correct relative position and orientation
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(boundState);
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(boundState);
+    newRelPosition = msmrdtools::rotateVec(relPosition, plist[iIndex].orientation);
     REQUIRE(plist[iIndex].position + relPosition == plist[jIndex].position);
     REQUIRE(relOrientation * plist[iIndex].orientation == plist[jIndex].orientation);
 
@@ -231,14 +239,27 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     auto prevPosition = 1.0 * myIntegrator.particleCompounds[0].position;
     auto prevOrientation = 1.0 * myIntegrator.particleCompounds[0].orientation;
     for (int i = 0; i < timesteps; i++) {
-        myIntegrator.integrateDiffusionCompounds(plist,0.001);
+        myIntegrator.integrateDiffusionCompounds(plist,0.0001);
     }
     REQUIRE(prevPosition != myIntegrator.particleCompounds[1].position);
     REQUIRE(prevOrientation != myIntegrator.particleCompounds[1].orientation);
-    // Check relative orientation and orientation is maintained after integration
-    auto newRelPosition = msmrdtools::rotateVec(relPosition, myIntegrator.particleCompounds[1].orientation);
+
+    // Check relative position and orientation is maintained after integration
+    newRelPosition = msmrdtools::rotateVec(relPosition, plist[iIndex].orientation);
     REQUIRE((plist[iIndex].position + newRelPosition - plist[jIndex].position).norm() <= 0.000001);
     REQUIRE((relOrientation * plist[iIndex].orientation - plist[jIndex].orientation).norm() <= 0.000001);
+    // Also check for other compound with two bonds (0-2 and 2-1)
+    relPosition = myIntegrator.discreteTrajClass->getRelativePosition(0);
+    relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(0);
+    newRelPosition = msmrdtools::rotateVec(relPosition, plist[0].orientation);
+    REQUIRE((plist[0].position + newRelPosition - plist[2].position).norm() <= 0.000001);
+    REQUIRE((relOrientation * plist[0].orientation - plist[2].orientation).norm() <= 0.000001);
+    relPosition = myIntegrator.discreteTrajClass->getRelativePosition(2);
+    relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(2);
+    newRelPosition = msmrdtools::rotateVec(relPosition, plist[2].orientation);
+    REQUIRE(plist[2].position + newRelPosition == plist[1].position);
+    REQUIRE((plist[2].position + newRelPosition - plist[1].position).norm() <= 0.000001);
+    REQUIRE((relOrientation * plist[2].orientation - plist[1].orientation).norm() <= 0.000001);
 
     // Bind two existing compounds together (compound 0-2-1 with compound 3-4)
     iIndex = 0;
@@ -250,13 +271,26 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     REQUIRE(myIntegrator.particleCompounds.size() == 1);
     REQUIRE(myIntegrator.particleCompounds[0].compoundSize == 5);
     // Check relative positions/orientations match pentamer ring.
+    // New binding 0-3 with bound state 3
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(boundState);
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(boundState);
-    REQUIRE(plist[iIndex].position + relPosition == plist[jIndex].position);
+    newRelPosition = msmrdtools::rotateVec(relPosition, plist[iIndex].orientation);
+    REQUIRE(plist[iIndex].position + newRelPosition == plist[jIndex].position);
     REQUIRE(relOrientation * plist[iIndex].orientation == plist[jIndex].orientation);
-    // TODO: Something happens when joining two compounds that messes up the positions of the mainCompound, check alignParticlesInCompound
+    // Binding 0-2 with bound state 0
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(0);
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(0);
-    //REQUIRE(plist[0].position + relPosition == plist[2].position);
-    //REQUIRE(relOrientation * plist[0].orientation == plist[2].orientation);
+    newRelPosition = msmrdtools::rotateVec(relPosition, plist[0].orientation);
+    REQUIRE((plist[0].position + newRelPosition - plist[2].position).norm() <= 0.000001);
+    REQUIRE((relOrientation * plist[0].orientation - plist[2].orientation).norm() <= 0.000001);
+    // Binding 2-1 with bound state 2
+    relPosition = myIntegrator.discreteTrajClass->getRelativePosition(2);
+    relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(2);
+    newRelPosition = msmrdtools::rotateVec(relPosition, plist[2].orientation);
+    REQUIRE((plist[2].position + newRelPosition - plist[1].position).norm() <= 0.000001);
+    REQUIRE((relOrientation * plist[2].orientation - plist[1].orientation).norm() <= 0.000001);
+    // Binding 3-4 with bound state 2
+    newRelPosition = msmrdtools::rotateVec(relPosition, plist[3].orientation);
+    REQUIRE((plist[3].position + newRelPosition - plist[4].position).norm() <= 0.000001);
+    REQUIRE((relOrientation * plist[3].orientation - plist[4].orientation).norm() <= 0.000001);
 }
