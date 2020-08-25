@@ -148,8 +148,8 @@ namespace msmrd {
         /* Relative rotations (assuming particle 1 fixed) of particle 2 that yield the 4 bound states
          * in the axis-angle representation. (One needs to make drawing to understand)*/
         std::array<vec3<double>, 4> rotations;
-        rotations[0] = M_PI * relPos1orthogonal; // part1Patch1 with part2patch1
-        rotations[1] = {0.0, 0.0, -2 * M_PI / 5.0}; // part1Patch1 with part2patch2
+        rotations[0] = {0.0, 0.0, -2 * M_PI / 5.0}; // part1Patch1 with part2patch1
+        rotations[1] = M_PI * relPos1orthogonal; // part1Patch1 with part2patch2
         // --first 2 rotations correspond to binding on top patch (1) of part1, next 2 rotations to bottom patch (2).
         rotations[2] = {0.0, 0.0, 2 * M_PI / 5.0}; // part1Patch2 with part2patch1
         rotations[3] = M_PI * relPos2orthogonal; // part1Patch2 with part2patch2
