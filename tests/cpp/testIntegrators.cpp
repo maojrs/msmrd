@@ -287,9 +287,8 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(1);
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(1);
     newRelPosition = msmrdtools::rotateVec(relPosition, plist[2].orientation); // THIS IS WRONG BUT WHY??;
-    //newRelPosition = msmrdtools::rotateVecOffAxis(relPosition, myIntegrator.particleCompounds[0].orientation,
-    //        plist[2].position - myIntegrator.particleCompounds[0].position);
 
+    // AS SHOWN HERE EVERYTHING SEEMS TO WORK FINE HERE< SO WHERE IS THE DAMN PROBLEMMM?????
     auto vecA = plist[1].position - myIntegrator.particleCompounds[0].position;
     auto vecB = plist[2].position - myIntegrator.particleCompounds[0].position;
     vecA = msmrdtools::rotateVec(vecA, myIntegrator.particleCompounds[0].orientation.conj());
@@ -297,9 +296,9 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     auto vecC = vecA - vecB;
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(1);
     relPosition = msmrdtools::rotateVec(relPosition, quatRotations[0]);
-    //REQUIRE(quatRotations[0] == plist[2].orientation * plist[0].orientation.conj());
+    /REQUIRE(quatRotations[0] == plist[2].orientation * plist[0].orientation.conj());
     //REQUIRE(quatRotations[1] == plist[1].orientation * plist[2].orientation.conj());
-    //REQUIRE(vecC == relPosition);
+    REQUIRE(vecC == relPosition);
 
 
     REQUIRE(plist[2].position + newRelPosition == plist[1].position);
