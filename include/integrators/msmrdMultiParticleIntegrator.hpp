@@ -125,7 +125,9 @@ namespace msmrd {
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::integrateDiffusionCompounds(std::vector<particle> &parts, double dt0){
         for (auto &particleCompound : particleCompounds) {
-            // Calculate change in position
+            // Calculate change teVecOffAxis(relVec,
+    ////        myIntegrator.particleCompounds[0].orientation.conj(),
+    ////        myIntegrator.particleCompounds[0].position - plist[2].position);in position
             vec3<double> dr =  std::sqrt(2 * dt0 * particleCompound.D) * integrator::randg.normal3D(0, 1);
             // Calculate change in orientation
             vec3<double> dphi = std::sqrt(2 * dt0 * particleCompound.Drot) *
@@ -182,23 +184,39 @@ namespace msmrd {
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::updateParticlesInCompound(std::vector<particle> &parts,
         particleCompound &partCompound, vec3<double> deltar, quaternion<double> deltaq) {
-        // Calculate change of orientation of reference particle
-        auto refParticlePosition = parts[partCompound.referenceParticleIndex].position;
-        auto refParticleOrientation = parts[partCompound.referenceParticleIndex].orientation;
-        auto origin = refParticlePosition - partCompound.position;
-        auto vec1 = origin + vec3<double>(1, 1, 0); //ref vector1 to track orientation(z=0,see testTools.cpp)
-        auto vec2 = origin + vec3<double>(1, -1, 0); //ref vector2 to track orientation (keep z=0)
-        auto rotatedOrigin = msmrdtools::rotateVec(origin, deltaq);
-        auto rotatedVec1 = msmrdtools::rotateVec(vec1, deltaq);
-        auto rotatedVec2 = msmrdtools::rotateVec(vec2, deltaq);
-        auto deltaOrientation = msmrdtools::recoverRotationFromVectors(origin, vec1, vec2,
-                                                                       rotatedOrigin, rotatedVec1, rotatedVec2);
         // Update orientations of the particles
+//        auto refParticlePosition = parts[partCompound.referenceParticleIndex].position;
+//        auto origin = partCompound.relativePositions[partCompound.referenceParticleIndex];
+//        auto vec1 = origin + vec3<double>(1, 1, 0); //ref vector1 to track orientation(z=0,see testTools.cpp)
+//        auto vec2 = origin + vec3<double>(1, -1, 0); //ref vector2 to track orientation (keep z=0)
+//        auto rotatedOrigin = msmrdtools::rotateVec(origin, deltaq * partCompound.orientation);
+//        auto rotatedVec1 = msmrdtools::rotateVec(vec1, deltaq * partCompound.orientation);
+//        auto rotatedVec2 = msmrdtools::rotateVec(vec2, deltaq * partCompound.orientation);
+//        auto deltaOrientation = msmrdtools::recoverRotationFromVectors(origin, vec1, vec2,
+//                                                                       rotatedOrigin, rotatedVec1, rotatedVec2);
+        auto refOrientation = deltaq * partCompound.orientation; // NOTE refParticle and compound always have same orientation
         for (auto element : partCompound.relativeOrientations) {
             auto partIndex = element.first;
             auto relOrientation = element.second;
-            parts[partIndex].orientation = relOrientation * deltaOrientation * refParticleOrientation;
+            parts[partIndex].orientation = refOrientation * relOrientation; //deltaOrientation;
         }
+//        // Calculate change of orientation of reference particle
+//        auto refParticlePosition = parts[partCompound.referenceParticleIndex].position;
+//        auto refParticleOrientation = parts[partCompound.referenceParticleIndex].orientation;
+//        auto origin = refParticlePosition - partCompound.position;
+//        auto vec1 = origin + vec3<double>(1, 1, 0); //ref vector1 to track orientation(z=0,see testTools.cpp)
+//        auto vec2 = origin + vec3<double>(1, -1, 0); //ref vector2 to track orientation (keep z=0)
+//        auto rotatedOrigin = msmrdtools::rotateVec(origin, deltaq);
+//        auto rotatedVec1 = msmrdtools::rotateVec(vec1, deltaq);
+//        auto rotatedVec2 = msmrdtools::rotateVec(vec2, deltaq);
+//        auto deltaOrientation = msmrdtools::recoverRotationFromVectors(origin, vec1, vec2,
+//                                                                       rotatedOrigin, rotatedVec1, rotatedVec2);
+//        // Update orientations of the particles
+//        for (auto element : partCompound.relativeOrientations) {
+//            auto partIndex = element.first;
+//            auto relOrientation = element.second;
+//            parts[partIndex].orientation = relOrientation * deltaOrientation * refParticleOrientation;
+//        }
         // Update positions of the particles
         for (auto element : partCompound.relativePositions) {
             auto partIndex = element.first;
@@ -271,7 +289,7 @@ namespace msmrd {
         auto relOrientation = discreteTrajClass->getRelativeOrientation(endState);
         // Set fixed position and orientation of newly bound particle
         secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
-        secondPart.orientation = relOrientation * mainPart.orientation;
+        secondPart.orientation = mainPart.orientation * relOrientation;
         // Set particle compound position and orientation (as the center of a pentamer, same for all compounds)
         pComplex.position = mainPart.position + msmrdtools::rotateVec(pentamerCenter, mainPart.orientation);
         pComplex.orientation = mainPart.orientation; // make a drawing to understand why
@@ -306,11 +324,11 @@ namespace msmrd {
         auto relOrientation = discreteTrajClass->getRelativeOrientation(endState);
         // Set fixed position and orientation of newly bound particle
         secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
-        secondPart.orientation = relOrientation * mainPart.orientation;
+        secondPart.orientation = mainPart.orientation * relOrientation;
         // Set relative position w/respect to compound center and orientation w/respect to reference particle
         relPosition = particleCompounds[compoundIndex].relativePositions[mainIndex]
                 + msmrdtools::rotateVec(relPosition, particleCompounds[compoundIndex].relativeOrientations[mainIndex]);
-        relOrientation = relOrientation * particleCompounds[compoundIndex].relativeOrientations[mainIndex];
+        relOrientation = particleCompounds[compoundIndex].relativeOrientations[mainIndex] * relOrientation;
         particleCompounds[compoundIndex].relativePositions.insert(std::pair<int, vec3<double>>(secondIndex,
                 relPosition));
         particleCompounds[compoundIndex].relativeOrientations.insert(std::pair<int, quaternion<double>>(
@@ -342,7 +360,7 @@ namespace msmrd {
         auto relOrientation = discreteTrajClass->getRelativeOrientation(endState);
         // Set fixed position and orientation of newly bound particle
         secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
-        secondPart.orientation = relOrientation * mainPart.orientation;
+        secondPart.orientation = mainPart.orientation * relOrientation;
         // Set relative position w/respect to compound center and orientation w/respect reference particle
         relPosition = particleCompounds[mainCompoundIndex].relativePositions[mainIndex]
                       + msmrdtools::rotateVec(relPosition,
