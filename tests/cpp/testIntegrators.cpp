@@ -265,14 +265,14 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     REQUIRE(plist[iIndex].orientation * relOrientation == plist[jIndex].orientation);
 
     // Diffuse compounds
-    int timesteps = 2;
+    int timesteps = 20;
     auto prevPosition = 1.0 * myIntegrator.particleCompounds[0].position;
     auto prevOrientation = 1.0 * myIntegrator.particleCompounds[0].orientation;
     for (int i = 0; i < timesteps; i++) {
         myIntegrator.integrateDiffusionCompounds(plist,0.0001);
     }
-    REQUIRE(prevPosition != myIntegrator.particleCompounds[1].position);
-    REQUIRE(prevOrientation != myIntegrator.particleCompounds[1].orientation);
+    REQUIRE(prevPosition != myIntegrator.particleCompounds[0].position);
+    REQUIRE(prevOrientation != myIntegrator.particleCompounds[0].orientation);
 
     // Check relative position and orientation is maintained after integration
     newRelPosition = msmrdtools::rotateVec(relPosition, plist[iIndex].orientation);
@@ -306,99 +306,22 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     newRelPosition = msmrdtools::rotateVec(relPosition, plist[iIndex].orientation);
     REQUIRE(plist[iIndex].position + newRelPosition == plist[jIndex].position);
     REQUIRE(plist[iIndex].orientation * relOrientation == plist[jIndex].orientation);
-    // Binding 0-2 with bound state 0
+    // Check binding 0-2 with bound state 0
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(0);
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(0);
     newRelPosition = msmrdtools::rotateVec(relPosition, plist[0].orientation);
     REQUIRE((plist[0].position + newRelPosition - plist[2].position).norm() <= 0.000001);
     REQUIRE((plist[0].orientation * relOrientation- plist[2].orientation).norm() <= 0.000001);
-    // Binding 2-1 with bound state 1
+    // Check binding 2-1 with bound state 1
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(1);
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(1);
     newRelPosition = msmrdtools::rotateVec(relPosition, plist[2].orientation);
     REQUIRE((plist[2].position + newRelPosition - plist[1].position).norm() <= 0.000001);
     REQUIRE((plist[2].orientation * relOrientation - plist[1].orientation).norm() <= 0.000001);
-    // Binding 3-4 with bound state 2
+    // Check binding 3-4 with bound state 2
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(2);
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(2);
     newRelPosition = msmrdtools::rotateVec(relPosition, plist[3].orientation);
-    // NEED TO CHECK NOW THE NEWEST FUNCTION TO JOIN COMPOUNDS
     REQUIRE((plist[3].position + newRelPosition - plist[4].position).norm() <= 0.000001);
     REQUIRE((plist[3].orientation * relOrientation - plist[4].orientation).norm() <= 0.000001);
 }
-
-// PREVIOUS TEMPORARY TEST THAT MIGHT COME IN HANDY
-
-//// One more TEMP test. OK
-//auto tvec = vec3<double>(0,1,0);
-//auto tvec1 = msmrdtools::rotateVecOffAxis(tvec, myIntegrator.particleCompounds[0].orientation,
-//                                          myIntegrator.pentamerCenter);
-//auto tvec2 = msmrdtools::rotateVec(tvec, plist[0].orientation);
-////REQUIRE(plist[1].orientation == quatRotations[1] * quatRotations[0] * myIntegrator.particleCompounds[0].orientation);
-//
-//// Another TEMP test again HERE WAS THE ESSENCE OF THE PROBLEM, now ok.
-//auto relVec = plist[1].position - plist[2].position;
-////relVec = msmrdtools::rotateVec(relVec, quatRotations[0].conj() *
-////myIntegrator.particleCompounds[0].orientation.conj()); // THIS WORKS BUT IT IS NOT plist[2].orientation.conj()
-//relVec = msmrdtools::rotateVec(relVec, plist[2].orientation.conj());
-////REQUIRE(relVec == relPosition);
-////REQUIRE(plist[2].orientation == quatRotations[0] * myIntegrator.particleCompounds[0].orientation);  //TRUE
-//
-//
-//// Another TEMP test OK
-//auto origin = -1*myIntegrator.pentamerCenter + relPos1 + msmrdtools::rotateVec(relPos1, quatRotations[0]);
-//auto v1 = origin + vec3<double>(1,1,0);
-//auto v2 = origin + vec3<double>(1,-1,0);
-//auto rv1 = msmrdtools::rotateVec(v1, myIntegrator.particleCompounds[0].orientation);
-//auto rv2 = msmrdtools::rotateVec(v2, myIntegrator.particleCompounds[0].orientation);
-//auto rorigin = msmrdtools::rotateVec(origin, myIntegrator.particleCompounds[0].orientation);
-//auto rot = msmrdtools::recoverRotationFromVectors(origin, v1, v2, rorigin, rv1, rv2);
-////    REQUIRE(quatRotations[1] * quatRotations[0] * rot == plist[1].orientation); //or
-//// REQUIRE(myIntegrator.particleCompounds[0].relativeOrientations[1] * rot == plist[1].orientation);
-//
-//
-//// Another TEMP test OK
-//auto a1 = plist[1].position - myIntegrator.particleCompounds[0].position;
-//a1 = msmrdtools::rotateVec(a1, myIntegrator.particleCompounds[0].orientation.conj());
-////    REQUIRE(a1 == -1*myIntegrator.pentamerCenter + relPos1 + msmrdtools::rotateVec(relPos1, quatRotations[0]));
-//
-//// TEMP test OK
-//relPosition = myIntegrator.discreteTrajClass->getRelativePosition(1);
-////auto vecTest = msmrdtools::rotateVecOffAxis(relPosition,
-////        myIntegrator.particleCompounds[0].orientation, myIntegrator.pentamerCenter); // Not OK
-//auto vecTest = msmrdtools::rotateVec(relPosition,plist[2].orientation);
-//auto vecTest2 = plist[1].position - plist[2].position;
-////vecTest2 = msmrdtools::rotateVec(vecTest2, plist[2].orientation.conj());
-////REQUIRE(myIntegrator.particleCompounds[0].relativeOrientations[1] * plist[0].orientation
-////== plist[1].orientation);
-////REQUIRE(vecTest2 == relPosition);
-////REQUIRE(vecTest == vecTest2);
-//
-//// AS SHOWN HERE EVERYTHING SEEMS TO WORK FINE HERE< SO WHERE IS THE DAMN PROBLEMMM?????
-//auto vecA = plist[1].position - myIntegrator.particleCompounds[0].position;
-//auto vecB = plist[2].position - myIntegrator.particleCompounds[0].position;
-//vecA = msmrdtools::rotateVec(vecA, myIntegrator.particleCompounds[0].orientation.conj());
-//vecB = msmrdtools::rotateVec(vecB, myIntegrator.particleCompounds[0].orientation.conj());
-//auto vecC = vecA - vecB;
-//relPosition = myIntegrator.discreteTrajClass->getRelativePosition(1);
-//relPosition = msmrdtools::rotateVec(relPosition, quatRotations[0]);
-////REQUIRE(quatRotations[0] == plist[2].orientation * plist[0].orientation.conj());
-////REQUIRE(quatRotations[1] == plist[1].orientation * plist[2].orientation.conj());
-////REQUIRE(vecC == relPosition);
-////plist[2].orientation == quatRotations[0] * myIntegrator.particleCompounds[0].orientation  //TRUE
-
-//    auto v0 = myIntegrator.particleCompounds[0].relativePositions[0];
-//    auto v1 = myIntegrator.particleCompounds[0].relativePositions[1];
-//    auto v2 = myIntegrator.particleCompounds[0].relativePositions[2];
-//    //v1 = msmrdtools::rotateVec(v1, myIntegrator.particleCompounds[0].orientation.conj());
-//    //v2 = msmrdtools::rotateVec(v2, myIntegrator.particleCompounds[0].orientation.conj());
-//    relPosition = myIntegrator.discreteTrajClass->getRelativePosition(0);
-//    REQUIRE(v2-v0 == relPosition);
-//    relPosition = myIntegrator.discreteTrajClass->getRelativePosition(1);
-//    relPosition= msmrdtools::rotateVec(relPosition, quatRotations[0]);
-//    //REQUIRE(v1-v2 == relPosition);
-//    relPosition = msmrdtools::rotateVecOffAxis(relPosition,myIntegrator.particleCompounds[0].orientation,-1*v2);
-////    REQUIRE(plist[2].position + relPosition == plist[1].position);
-////    auto vecTest = plist[2].position - myIntegrator.particleCompounds[0].position;
-////    vecTest = msmrdtools::rotateVec(vecTest, myIntegrator.particleCompounds[0].orientation.conj());
-////    REQUIRE(vecTest == myIntegrator.particleCompounds[0].relativePositions[2]);

@@ -125,9 +125,7 @@ namespace msmrd {
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::integrateDiffusionCompounds(std::vector<particle> &parts, double dt0){
         for (auto &particleCompound : particleCompounds) {
-            // Calculate change teVecOffAxis(relVec,
-    ////        myIntegrator.particleCompounds[0].orientation.conj(),
-    ////        myIntegrator.particleCompounds[0].position - plist[2].position);in position
+            // Calculate change in position
             vec3<double> dr =  std::sqrt(2 * dt0 * particleCompound.D) * integrator::randg.normal3D(0, 1);
             // Calculate change in orientation
             vec3<double> dphi = std::sqrt(2 * dt0 * particleCompound.Drot) *
@@ -184,39 +182,13 @@ namespace msmrd {
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::updateParticlesInCompound(std::vector<particle> &parts,
         particleCompound &partCompound, vec3<double> deltar, quaternion<double> deltaq) {
-        // Update orientations of the particles
-//        auto refParticlePosition = parts[partCompound.referenceParticleIndex].position;
-//        auto origin = partCompound.relativePositions[partCompound.referenceParticleIndex];
-//        auto vec1 = origin + vec3<double>(1, 1, 0); //ref vector1 to track orientation(z=0,see testTools.cpp)
-//        auto vec2 = origin + vec3<double>(1, -1, 0); //ref vector2 to track orientation (keep z=0)
-//        auto rotatedOrigin = msmrdtools::rotateVec(origin, deltaq * partCompound.orientation);
-//        auto rotatedVec1 = msmrdtools::rotateVec(vec1, deltaq * partCompound.orientation);
-//        auto rotatedVec2 = msmrdtools::rotateVec(vec2, deltaq * partCompound.orientation);
-//        auto deltaOrientation = msmrdtools::recoverRotationFromVectors(origin, vec1, vec2,
-//                                                                       rotatedOrigin, rotatedVec1, rotatedVec2);
-        auto refOrientation = deltaq * partCompound.orientation; // NOTE refParticle and compound always have same orientation
+        // Update orientations of the particles. NOTE refParticle and compound always have same orientation!
+        auto refOrientation = deltaq * partCompound.orientation;
         for (auto element : partCompound.relativeOrientations) {
             auto partIndex = element.first;
             auto relOrientation = element.second;
             parts[partIndex].orientation = refOrientation * relOrientation; //deltaOrientation;
         }
-//        // Calculate change of orientation of reference particle
-//        auto refParticlePosition = parts[partCompound.referenceParticleIndex].position;
-//        auto refParticleOrientation = parts[partCompound.referenceParticleIndex].orientation;
-//        auto origin = refParticlePosition - partCompound.position;
-//        auto vec1 = origin + vec3<double>(1, 1, 0); //ref vector1 to track orientation(z=0,see testTools.cpp)
-//        auto vec2 = origin + vec3<double>(1, -1, 0); //ref vector2 to track orientation (keep z=0)
-//        auto rotatedOrigin = msmrdtools::rotateVec(origin, deltaq);
-//        auto rotatedVec1 = msmrdtools::rotateVec(vec1, deltaq);
-//        auto rotatedVec2 = msmrdtools::rotateVec(vec2, deltaq);
-//        auto deltaOrientation = msmrdtools::recoverRotationFromVectors(origin, vec1, vec2,
-//                                                                       rotatedOrigin, rotatedVec1, rotatedVec2);
-//        // Update orientations of the particles
-//        for (auto element : partCompound.relativeOrientations) {
-//            auto partIndex = element.first;
-//            auto relOrientation = element.second;
-//            parts[partIndex].orientation = relOrientation * deltaOrientation * refParticleOrientation;
-//        }
         // Update positions of the particles
         for (auto element : partCompound.relativePositions) {
             auto partIndex = element.first;
@@ -224,20 +196,6 @@ namespace msmrd {
             parts[partIndex].position = partCompound.position + deltar +
                                         msmrdtools::rotateVec(relPosition, deltaq * partCompound.orientation);
         }
-        //        // Update positions of the particles, alt vesion
-//        auto relPosition = partCompound.relativePositions[partCompound.referenceParticleIndex];
-//        parts[partCompound.referenceParticleIndex].position = partCompound.position + deltar +
-//                                                              msmrdtools::rotateVec(relPosition, deltaq * partCompound.orientation);
-//        refParticleOrientation = parts[partCompound.referenceParticleIndex].orientation;
-//        for (auto element : partCompound.relativePositions) {
-//            auto partIndex = element.first;
-//            if (partIndex != partCompound.referenceParticleIndex) {
-//                relPosition = element.second;
-//                relPosition += pentamerCenter;
-//                parts[partIndex].position = partCompound.position + deltar +
-//                                            msmrdtools::rotateVec(relPosition, refParticleOrientation);
-//            }
-//        }
     }
 
     /* Deletes inactive complexes in particle complex vector, and updates indexes in particle list. Doesn't
@@ -365,7 +323,7 @@ namespace msmrd {
         relPosition = particleCompounds[mainCompoundIndex].relativePositions[mainIndex]
                       + msmrdtools::rotateVec(relPosition,
                               particleCompounds[mainCompoundIndex].relativeOrientations[mainIndex]);
-        relOrientation = relOrientation * particleCompounds[mainCompoundIndex].relativeOrientations[mainIndex];
+        relOrientation = particleCompounds[mainCompoundIndex].relativeOrientations[mainIndex] * relOrientation ;
         particleCompounds[mainCompoundIndex].relativePositions.insert(std::pair<int, vec3<double>>(secondIndex,
                                                                                                relPosition));
         particleCompounds[mainCompoundIndex].relativeOrientations.insert(std::pair<int, quaternion<double>>(
@@ -400,28 +358,36 @@ namespace msmrd {
                 auto state = it->second;
                 auto relPos = discreteTrajClass->getRelativePosition(state);
                 auto relOrient = discreteTrajClass->getRelativeOrientation(state);
-                relPos += particleCompounds[mainCompoundIndex].relativePositions[refParticleIndex];
-                relOrient = relOrient * particleCompounds[mainCompoundIndex].relativeOrientations[refParticleIndex];
                 if (index1 == refParticleIndex) {
+                    parts[index2].position = parts[index1].position +
+                            msmrdtools::rotateVec(relPos, parts[index1].orientation);
+                    parts[index2].orientation = parts[index1].orientation * relOrient;
+                    relPos = particleCompounds[mainCompoundIndex].relativePositions[index1]
+                                  + msmrdtools::rotateVec(relPos,
+                                          particleCompounds[mainCompoundIndex].relativeOrientations[index1]);
+                    relOrient = particleCompounds[mainCompoundIndex].relativeOrientations[index1] * relOrient;
                     particleCompounds[mainCompoundIndex].relativePositions.insert(std::pair<int, vec3<double>>(
                             index2, relPos));
                     particleCompounds[mainCompoundIndex].relativeOrientations.insert(std::pair<int,
                             quaternion<double>>(index2, relOrient));
-                    parts[index2].position = parts[refParticleIndex].position + relPos;
-                    parts[index2].orientation = relOrient * parts[refParticleIndex].orientation;
                     refParticleIndex = index2;
                     // Remove element from reference map and break for loop
                     it = boundPairsDictionaryCopy.erase(it);
                     break;
                 }
                 else if (index2 == refParticleIndex){
+                    parts[index2].position = parts[index2].position +
+                                             msmrdtools::rotateVec(relPos, parts[index2].orientation);
+                    parts[index2].orientation = parts[index2].orientation * relOrient;
+                    relPos = particleCompounds[mainCompoundIndex].relativePositions[index2]
+                             + msmrdtools::rotateVec(relPos,
+                                                     particleCompounds[mainCompoundIndex].relativeOrientations[index2]);
+                    relOrient = particleCompounds[mainCompoundIndex].relativeOrientations[index2] * relOrient;
                     particleCompounds[mainCompoundIndex].relativePositions.insert(std::pair<int, vec3<double>>(
-                            index1,relPos));
+                            index1, relPos));
                     particleCompounds[mainCompoundIndex].relativeOrientations.insert(std::pair<int,
                             quaternion<double>>(index1, relOrient));
                     refParticleIndex = index1;
-                    parts[index1].position = parts[refParticleIndex].position + relPos;
-                    parts[index1].orientation = relOrient * parts[refParticleIndex].orientation;
                     // Remove element from reference map and break loop
                     it = boundPairsDictionaryCopy.erase(it);
                     break;
