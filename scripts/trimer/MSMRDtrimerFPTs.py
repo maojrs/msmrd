@@ -86,7 +86,7 @@ def MSMRDsimulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../data/trimer/MSMs/MSM_patchyDimer_t3.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/trimer/MSMs/MSM_dimer4trimer_t3.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']

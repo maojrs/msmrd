@@ -28,7 +28,7 @@ fnamebase = parentDirectory + 'simDimer4Trimer_'
 
 # Parameters for MSM generation
 numBoundStates = 4
-lagtimes = [100, 150, 175, 200, 250, 300] #[50, 75, 100, 150] # [75]
+lagtimes = [30, 40, 50, 60, 70, 80, 90, 100] #[100, 150, 175, 200, 250, 300] #[50, 75, 100, 150] # [75]
 reversible = True #False
 stitching = True
 
@@ -77,7 +77,7 @@ print("\nGenerated all MSMs.")
 # Generate implied timescales plots (draft verision)
 if plotImpliedTimescalesDraft:
     print("Generating implied timescales plots (draft version)")
-    maxlagtime = 300 #100 #200 #300
+    maxlagtime = 100 #100 #200 #300
     its = pyemma.msm.its(finalTrajs, maxlagtime, reversible=reversible)
     nits = 20
     fig, ax = plt.subplots(figsize=(10, 7))
@@ -96,7 +96,7 @@ if plotImpliedTimescalesDraft:
 # Generate implied timescales plots (paper verision w/error bars)	
 if plotImpliedTimescalesPaperVersion:
     print("Generating implied timescales plots (paper version)")
-    maxlagtime = 300
+    maxlagtime = 100
     its = pyemma.msm.its(finalTrajs, maxlagtime, reversible=reversible, errors='bayes')
     nits = 20
     fig, ax = plt.subplots(figsize=(10, 7))
