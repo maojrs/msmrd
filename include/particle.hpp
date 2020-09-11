@@ -121,6 +121,8 @@ namespace msmrd {
 
         int getBoundState() const { return boundState; }
 
+        int getCompoundIndex() const { return compoundIndex; }
+
 
 
         // Setter functions

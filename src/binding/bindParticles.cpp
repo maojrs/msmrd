@@ -35,6 +35,8 @@ namespace msmrd {
                 .def_property_readonly("isMSMactive", &particle::isMSMactive)
                 .def_property_readonly("boundTo", &particle::getBoundTo)
                 .def_property_readonly("boundState", &particle::getBoundState)
+                .def_property_readonly("compoundIndex", &particle::getCompoundIndex)
+
 
                 .def("activate", &particle::activate)
                 .def("deactivate", &particle::deactivate)

@@ -3,6 +3,7 @@
 #include "integrators/overdampedLangevinMarkovSwitch.hpp"
 #include "integrators/msmrdIntegrator.hpp"
 #include "integrators/msmrdPatchyProtein.hpp"
+#include "integrators/msmrdMultiParticleIntegrator.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
 
 
@@ -75,6 +76,17 @@ namespace msmrd {
                                                                "relativeDistanceCutOff,"
                                                                "MSMlist, mainMarkovModel, "
                                                                "positionOrientationPartition)")
+                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, ctmsm &, msmrdMSM &>())
+                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, std::vector<ctmsm> &,
+                        msmrdMSM &>());
+
+        py::class_<msmrdMultiParticleIntegrator<ctmsm>, msmrdIntegrator<ctmsm>>(m, "msmrdMultiParticleIntegrator",
+                                                               "Integrator for msmrd algorithm, specialized for"
+                                                               "multiparticle intergation of dimer molecules"
+                                                               "(timestep, seed, "
+                                                               "particlesbodytype, numParticleTypes, "
+                                                               "radialBounds,"
+                                                               "MSMlist, mainMarkovModel)")
                 .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, ctmsm &, msmrdMSM &>())
                 .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, std::vector<ctmsm> &,
                         msmrdMSM &>());
