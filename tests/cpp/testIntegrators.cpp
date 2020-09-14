@@ -324,4 +324,11 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     newRelPosition = msmrdtools::rotateVec(relPosition, plist[3].orientation);
     REQUIRE((plist[3].position + newRelPosition - plist[4].position).norm() <= 0.000001);
     REQUIRE((plist[3].orientation * relOrientation - plist[4].orientation).norm() <= 0.000001);
+
+    // Close compound into a pentamer (closes it by binding 4 with 1)
+    iIndex = 1;
+    jIndex = 4;
+    boundState = 2;
+    myIntegrator.addCompound(plist, iIndex, jIndex, boundState);
+    REQUIRE(myIntegrator.getNumberOfBindingsInCompound(0) == 5);
 }

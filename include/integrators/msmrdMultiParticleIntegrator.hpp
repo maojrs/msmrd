@@ -75,6 +75,8 @@ namespace msmrd {
 
         void cleanParticleCompoundsVector(std::vector<particle> &parts);
 
+        int getNumberOfBindingsInCompound(int compoundIndex);
+
     protected:
 
         /* Auxiliary functions used by functions above */
@@ -86,6 +88,9 @@ namespace msmrd {
         void joinParticleCompounds(std::vector<particle> &parts, int mainIndex, int secondIndex, int endState);
 
         void alignParticlesInCompound(std::vector<particle> &parts, int mainIndex, int secondIndex);
+
+        void closeCompound(std::vector<particle> &parts, int mainIndex, int secondIndex, int endState);
+
 
 //        quaternion<double> getParticleCompoundOrientation(particle &mainParticle);
 
@@ -153,11 +158,11 @@ namespace msmrd {
          * exists the mainIndex is the one corresponding to the particle in the compound. */
         int mainIndex = 1 * iIndex;
         int secondIndex = 1 * jIndex;
-        // If neither particle belongs to a complex, create one.
+        // If neither particle belongs to a compound, create one.
         if (parts[iIndex].compoundIndex == -1 and parts[jIndex].compoundIndex == -1) {
             createCompound(parts, mainIndex, secondIndex, endState);
         }
-        // If one of the two doesn't belong to a complex, join the solo particle into the complex.
+        // If one of the two doesn't belong to a compound, join the solo particle into the compound.
         else if (parts[iIndex].compoundIndex < 0 or parts[jIndex].compoundIndex < 0) {
             // Switch main and second index if neccesary (main particle must be in compound)
             if (parts[iIndex].compoundIndex < 0){
@@ -166,13 +171,15 @@ namespace msmrd {
             }
             addParticleToCompound(parts, mainIndex, secondIndex, endState);
         }
-        // If both belong to a complex, join the complexes together (keep the one with lower index)
-        else {
+        // If both belong to a compound, join the compounds together (keep the one with lower index)
+        else if (parts[iIndex].compoundIndex != parts[jIndex].compoundIndex){
             joinParticleCompounds(parts, mainIndex, secondIndex, endState);
         }
-
-        /* TODO: Add the case where two particles from the same complex bind. Likely not necessary for simple cases,
-         * like the pentamer, where the binding of 5 particles together, essentially implies the pentamer formation. */
+        // If both belong to the same compound, close a loop in that complex
+        else {
+            closeCompound(parts, mainIndex, secondIndex, endState);
+        }
+         /* like the pentamer, where the binding of 5 particles together, essentially implies the pentamer formation. */
         // Deactivate corresponding particles since now their diffusion will be controlled by a particle compound */
         parts[mainIndex].deactivate();
         parts[secondIndex].deactivate();
@@ -394,6 +401,27 @@ namespace msmrd {
                 }
             }
         }
+    };
+
+
+    /* Closes a compound through a binding event that takes place within the same compound. Note relative positions
+     * and orientations are not modified since this will in general be the end of the simulation. */
+    template <typename templateMSM>
+    void msmrdMultiParticleIntegrator<templateMSM>::closeCompound(std::vector<particle> &parts, int mainIndex,
+                                                                          int secondIndex, int endState) {
+        particle &mainPart = parts[mainIndex];
+        particle &secondPart = parts[secondIndex];
+        int compoundIndex = mainPart.compoundIndex;
+        // Insert new binding into boundsPairs dicitionary
+        std::tuple<int,int> pairIndices = std::make_tuple(mainIndex, secondIndex);
+        particleCompounds[compoundIndex].boundPairsDictionary.insert (
+                std::pair<std::tuple<int,int>, int>(pairIndices, endState) );
+    };
+
+    /* Extracts number of bindings in a compound indexed by compoundIndex */
+    template <typename templateMSM>
+    int msmrdMultiParticleIntegrator<templateMSM>::getNumberOfBindingsInCompound(int compoundIndex) {
+        return particleCompounds[compoundIndex].boundPairsDictionary.size();
     };
 
 

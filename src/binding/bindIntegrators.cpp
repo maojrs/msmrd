@@ -89,7 +89,9 @@ namespace msmrd {
                                                                "MSMlist, mainMarkovModel)")
                 .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, ctmsm &, msmrdMSM &>())
                 .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, std::vector<ctmsm> &,
-                        msmrdMSM &>());
+                        msmrdMSM &>())
+                .def("getNumberOfBindingsInCompound", &msmrdMultiParticleIntegrator<ctmsm>::getNumberOfBindingsInCompound,
+                     "gets number of bindings in a give compound");
 
 
         // Created c++ compatible particle list/vector/array of particles in python
