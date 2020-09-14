@@ -29,8 +29,8 @@ numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 6000
 
 # Other important parameters
-lagtime = 100 #300
-boxsize = 2.5 #6 #8 #6
+lagtime = 40 #100 #300
+boxsize = 6 #2.5 #6 #8 #6
 angleDiff = 3*np.pi/5.0
 dtMDsimulation = 0.00001
 stride = 25
@@ -119,14 +119,14 @@ def MSMRDsimulationFPT(trajectorynum):
     unbound = True
     while(unbound):
         integrator.integrate(partlist)
-        binding1 = partlist[0].compoundIndex
-        binding2 = partlist[1].compoundIndex
-        binding3 = partlist[2].compoundIndex
-        if (binding1 != -1):
-            if (binding1 == binding2 == binding3):
+        compound1 = partlist[0].compoundIndex
+        compound2 = partlist[1].compoundIndex
+        compound3 = partlist[2].compoundIndex
+        if (compound1 != -1):
+            if (compound1 == compound2 == compound3):
                 unbound = False
                 return "trimer", integrator.clock
-            elif integrator.clock >= 100.0:
+            elif integrator.clock >= 1000.0:
                 unbound = False
                 return 'Failed at:', integrator.clock
 

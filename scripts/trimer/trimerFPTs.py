@@ -24,7 +24,7 @@ Drot = 1.0
 overlapThreshold = 1.5 # to avoid overlapping when randomly generating particles
 numTrajectories = 6000
 # Other important parameters
-boxsize = 2.5 #6 #8 #6
+boxsize = 6 #2.5 #6 #8 #6
 
 # Parameters of patchy Particle potential with angular dependence (make sure it is consistent with msmrd data)
 sigma = 1.0
@@ -87,14 +87,16 @@ def simulationFPT(trajectorynum):
     unbound = True
     while(unbound):
         integrator.integrate(partlist)
-        # Trimer needs three bindings
-        binding1 = dummyTraj.getState(partlist[0], partlist[1])
-        binding2 = dummyTraj.getState(partlist[0], partlist[2])
-        binding3 = dummyTraj.getState(partlist[1], partlist[2])
-        if (binding1 in boundStates) and (binding2 in boundStates) and (binding3 in boundStates):
+        # Trimer needs two bindings (not three since we are using pentamer alineation. This is just a test for pentamer)
+        binding01 = dummyTraj.getState(partlist[0], partlist[1])
+        binding02 = dummyTraj.getState(partlist[0], partlist[2])
+        binding12 = dummyTraj.getState(partlist[1], partlist[2])
+        if ( (binding01 in boundStates) and (binding02 in boundStates) ) or \
+           ( (binding02 in boundStates) and (binding12 in boundStates) ) or \
+           ( (binding01 in boundStates) and (binding12 in boundStates) ):
             unbound = False
             return "trimer", integrator.clock
-        elif integrator.clock >= 100.0:
+        elif integrator.clock >= 1000.0:
             unbound = False
             return 'Failed at:', integrator.clock
 
