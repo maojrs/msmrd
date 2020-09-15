@@ -126,9 +126,9 @@ def MSMRDsimulationFPT(trajectorynum):
             if (compound1 == compound2 == compound3):
                 unbound = False
                 return "trimer", integrator.clock
-            elif integrator.clock >= 1000.0:
-                unbound = False
-                return 'Failed at:', integrator.clock
+        elif integrator.clock >= 1000.0:
+            unbound = False
+            return 'Failed at:', integrator.clock
 
 
 

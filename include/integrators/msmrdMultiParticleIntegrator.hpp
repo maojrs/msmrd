@@ -77,6 +77,8 @@ namespace msmrd {
 
         int getNumberOfBindingsInCompound(int compoundIndex);
 
+        std::map<std::tuple<int,int>, int> getBindingsInCompound(int compoundIndex);
+
     protected:
 
         /* Auxiliary functions used by functions above */
@@ -422,6 +424,12 @@ namespace msmrd {
     template <typename templateMSM>
     int msmrdMultiParticleIntegrator<templateMSM>::getNumberOfBindingsInCompound(int compoundIndex) {
         return particleCompounds[compoundIndex].boundPairsDictionary.size();
+    };
+
+    /* Extracts bindings in a compound indexed by compoundIndex */
+    template <typename templateMSM>
+    std::map<std::tuple<int,int>, int> msmrdMultiParticleIntegrator<templateMSM>::getBindingsInCompound(int compoundIndex) {
+        return particleCompounds[compoundIndex].boundPairsDictionary;
     };
 
 
