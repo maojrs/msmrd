@@ -93,7 +93,9 @@ namespace msmrd {
                 .def("getNumberOfBindingsInCompound", &msmrdMultiParticleIntegrator<ctmsm>::getNumberOfBindingsInCompound,
                      "gets number of bindings in a give compound")
                 .def("getBindingsInCompound", &msmrdMultiParticleIntegrator<ctmsm>::getBindingsInCompound,
-                     "gets bindings in a give compound")     ;
+                     "gets bindings in a give compound")
+                .def("getCompoundSize", &msmrdMultiParticleIntegrator<ctmsm>::getCompoundSize,
+                     "gets compound size");
 
 
         // Created c++ compatible particle list/vector/array of particles in python

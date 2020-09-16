@@ -119,13 +119,15 @@ def MSMRDsimulationFPT(trajectorynum):
     unbound = True
     while(unbound):
         integrator.integrate(partlist)
-        if (partlist[0].compoundIndex != -1):
-            numBindings = integrator.getNumberOfBindingsInCompound(partlist[0].compoundIndex)
-            print(integrator.clock, numBindings)
-            if (numBindings >= 4):
+        #if (partlist[0].compoundIndex > -1):
+        if (partlist[0].compoundIndex != -1): #FIND SEGFAULT, PROBABLY IN joinParticleCompounds FNCTION
+            #numBindings = integrator.getNumberOfBindingsInCompound(partlist[0].compoundIndex)
+            numBindings = integrator.getCompoundSize(partlist[0].compoundIndex)
+            print(integrator.clock, partlist[0].compoundIndex, numBindings)
+            if (numBindings >= 5 and numBindings <= 10):
                 unbound = False
                 return "pentamer", integrator.clock
-        elif integrator.clock >= 5000.0:
+        elif integrator.clock >= 1000.0:
             unbound = False
             return 'Failed at:', integrator.clock
 
