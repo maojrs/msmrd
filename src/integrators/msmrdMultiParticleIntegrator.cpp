@@ -45,8 +45,22 @@ namespace msmrd {
                         auto transition = msmrdMSM.calculateTransition(currentTransitionState);
                         transitionTime = std::get<0>(transition);
                         nextState = std::get<1>(transition);
+                        // Add binding transition
                         if (nextState <= index0) {
-                            eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState, "binding");
+                            /* Only add transition if bound location is not already being taken (needs to be
+                             * adjusted for each implementation) This is rejection sampling. */
+                            if (parts[i].boundList.size() > 0) {
+                                if ((parts[i].boundStates[0] == 0 or parts[i].boundStates[0] == 1) and (nextState > 1)) {
+                                    eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState,
+                                            "binding");
+                                }
+                                else if ((parts[i].boundStates[0] == 2 or parts[i].boundStates[0] == 3) and (nextState < 2)) {
+                                    eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState,
+                                            "binding");
+                                }
+                            } else {
+                                eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState, "binding");
+                            }
                         } else {
                             eventMgr.addEvent(transitionTime, i, j, currentTransitionState,
                                               nextState, "transition2transition");
@@ -72,7 +86,8 @@ namespace msmrd {
         parts[jIndex].deactivate();
         // Set bound state for particle
         parts[iIndex].boundStates.push_back(endState);
-        parts[jIndex].boundStates.push_back(endState);
+        auto flippedBoundState = discreteTrajClass->getFlippedBoundState(endState);
+        parts[jIndex].boundStates.push_back(flippedBoundState);
 
         // Add particle complex to particleComplexes vector.
         addCompound(parts, iIndex, jIndex, endState);
@@ -128,10 +143,10 @@ namespace msmrd {
          * events will happen at end of the timestep exactly */
         applyEvents(parts);
 
-        // Enforce boundary and set new positions into parts[i].nextPosition (only if particle is active).
+        // Enforce boundary and set new positions into parts[i].nextPosition (only for active particles).
         enforceBoundary(parts);
 
-        // Enforce boundary and updates positions of particleCompounds.
+        // Enforce boundary and updates positions of particleCompounds (made of inactive particles).
         enforceBoundary(particleCompounds);
 
         /* Update positions and orientations (sets calculated next position/orientation

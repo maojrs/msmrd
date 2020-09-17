@@ -50,7 +50,7 @@ Dlist = np.array([1.0])
 Drotlist = np.array([1.0])
 
 # Parameters to define coupling Markov model for bound dynamics: couplingMSM
-Dbound = 0.5*np.ones(numBoundStates)
+Dbound = np.ones(numBoundStates)
 DboundRot = np.ones(numBoundStates)
 
 # Bound states definition, needed to calculate boundstate
@@ -117,7 +117,9 @@ def MSMRDsimulationFPT(trajectorynum):
     # Calculates the first passage times to a given bound state. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.
     unbound = True
+    ii=0
     while(unbound):
+        ii += 1
         integrator.integrate(partlist)
         if (partlist[0].compoundIndex > -1):
         #if (partlist[0].compoundIndex != -1): #FIND SEGFAULT, PROBABLY IN joinParticleCompounds FNCTION
@@ -127,8 +129,12 @@ def MSMRDsimulationFPT(trajectorynum):
             compoundSize2 = integrator.getCompoundSize(partlist[2].compoundIndex)
             compoundSize3 = integrator.getCompoundSize(partlist[3].compoundIndex)
             compoundSize4 = integrator.getCompoundSize(partlist[4].compoundIndex)
-            print('%.4f' %integrator.clock, partlist[0].compoundIndex, partlist[1].compoundIndex, partlist[2].compoundIndex, partlist[3].compoundIndex, partlist[4].compoundIndex, \
-                  'Compsize:', compoundSize, compoundSize1, compoundSize2, compoundSize3, compoundSize4)
+            if ii % 1000 == 0:
+                loops = integrator.findClosedBindingLoops()
+                print('%.4f' %integrator.clock, partlist[0].compoundIndex, partlist[1].compoundIndex, partlist[2].compoundIndex, partlist[3].compoundIndex, partlist[4].compoundIndex, \
+                      'Compsize:', compoundSize, compoundSize1, compoundSize2, compoundSize3, compoundSize4)
+                # print(partlist[0].position, partlist[1].position, partlist[2].position, partlist[3].position, partlist[4].position)
+                print(loops)
             if (compoundSize >= 5):
                 unbound = False
                 return "pentamer", integrator.clock

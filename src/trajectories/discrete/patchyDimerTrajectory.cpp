@@ -113,6 +113,8 @@ namespace msmrd {
                                                                                  numRadialSectionsQuat,
                                                                                  numSphericalSectionsQuat);
         setBoundStates();
+        setFlippedBoundStates();
+
 
     };
 
@@ -130,6 +132,7 @@ namespace msmrd {
                                                                                  numRadialSectionsQuat,
                                                                                  numSphericalSectionsQuat);
         setBoundStates();
+        setFlippedBoundStates();
     };
 
 
@@ -166,5 +169,15 @@ namespace msmrd {
         boundStates[2] = std::make_tuple(relPos2, quatRotations[2]);
         boundStates[3] = std::make_tuple(relPos2, quatRotations[3]);
     }
+
+    /* Gets the corresponding bound state if the reference particle is flipped. Useful for multiparticle MSMRD */
+    void patchyDimerTrajectory2::setFlippedBoundStates(){
+        // State 0 becomes state 2 when flipped and state 2 becomes state 0, while states 1 and 3 remain the same.
+        flippedBoundStates[0] = 2;
+        flippedBoundStates[1] = 1;
+        flippedBoundStates[2] = 0;
+        flippedBoundStates[3] = 3;
+    };
+
 
 }

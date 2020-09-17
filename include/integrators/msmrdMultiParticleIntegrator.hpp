@@ -172,7 +172,9 @@ namespace msmrd {
         else if (parts[iIndex].compoundIndex < 0 or parts[jIndex].compoundIndex < 0) {
             // Switch main and second index if neccesary (main particle must be in compound)
             if (parts[iIndex].compoundIndex < 0){
-                addParticleToCompound(parts, jIndex, iIndex, endState); // Inverted mainIndex and secondIndex.
+                // Inverts mainIndex and secondIndex and thus the definition of bound state
+                auto flippedBoundState = discreteTrajClass->getFlippedBoundState(endState);
+                addParticleToCompound(parts, jIndex, iIndex, flippedBoundState);
             } else {
                 addParticleToCompound(parts, iIndex, jIndex, endState);
             }
@@ -247,10 +249,12 @@ namespace msmrd {
     std::vector<int> msmrdMultiParticleIntegrator<templateMSM>::findClosedBindingLoops(){
         std::vector<int> boundLoops = {};
         for (auto &particleCompound : particleCompounds) {
-            auto compoundSize = particleCompound.getSizeOfCompound();
-            auto numBindings = particleCompound.getNumberOfbindings();
-            if (compoundSize == numBindings) {
-                boundLoops.insert(numBindings);
+            if (particleCompound.active) {
+                auto compoundSize = particleCompound.getSizeOfCompound();
+                auto numBindings = particleCompound.getNumberOfbindings();
+                if (compoundSize == numBindings) {
+                    boundLoops.push_back(numBindings);
+                }
             }
         }
         return boundLoops;

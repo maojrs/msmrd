@@ -212,9 +212,9 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     REQUIRE(plist[2].compoundIndex == 0);
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(boundState);
     relOrientation = myIntegrator.discreteTrajClass->getRelativeOrientation(boundState);
-    newRelPosition = msmrdtools::rotateVec(relPosition, plist[jIndex].orientation);
-    REQUIRE(plist[jIndex].position + newRelPosition == plist[iIndex].position);
-    REQUIRE(plist[jIndex].orientation * relOrientation == plist[iIndex].orientation);
+    newRelPosition = msmrdtools::rotateVec(relPosition, plist[iIndex].orientation);
+    REQUIRE((plist[iIndex].position + newRelPosition - plist[jIndex].position).norm() <= 0.000001);
+    REQUIRE((plist[iIndex].orientation * relOrientation - -1*plist[jIndex].orientation).norm() <= 0.000001);
     // Check relative position and orientation of previous binding is conserved
     iIndex = 0;
     jIndex = 2;
@@ -334,4 +334,6 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     boundState = 2;
     myIntegrator.addCompound(plist, iIndex, jIndex, boundState);
     REQUIRE(myIntegrator.getNumberOfBindingsInCompound(0) == 5);
+    auto bindingLoops = myIntegrator.findClosedBindingLoops();
+    REQUIRE(bindingLoops[0] == 5);
 }

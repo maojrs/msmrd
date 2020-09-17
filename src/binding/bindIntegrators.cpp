@@ -90,6 +90,8 @@ namespace msmrd {
                 .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, ctmsm &, msmrdMSM &>())
                 .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, std::vector<ctmsm> &,
                         msmrdMSM &>())
+                .def("findClosedBindingLoops", &msmrdMultiParticleIntegrator<ctmsm>::findClosedBindingLoops, "finds "
+                                      "closed binding loops in all compounds")
                 .def("getNumberOfBindingsInCompound", &msmrdMultiParticleIntegrator<ctmsm>::getNumberOfBindingsInCompound,
                      "gets number of bindings in a give compound")
                 .def("getBindingsInCompound", &msmrdMultiParticleIntegrator<ctmsm>::getBindingsInCompound,
