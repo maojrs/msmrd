@@ -176,13 +176,15 @@ namespace msmrd {
             }
         }
         // If both belong to a compound, join the compounds together (keep the one with lower index)
-        else { // else if (parts[iIndex].compoundIndex != parts[jIndex].compoundIndex){
-            joinParticleCompounds(parts, mainIndex, secondIndex, endState);
-        }
-//        // If both belong to the same compound, close a loop in that complex
-//        else {
-//            closeCompound(parts, mainIndex, secondIndex, endState);
+        //else {
+        else if (parts[iIndex].compoundIndex != parts[jIndex].compoundIndex){
+                joinParticleCompounds(parts, mainIndex, secondIndex, endState);
+            }
 //        }
+//        // If both belong to the same compound, close a loop in that complex
+        else {
+            closeCompound(parts, mainIndex, secondIndex, endState);
+        }
          /* like the pentamer, where the binding of 5 particles together, essentially implies the pentamer formation. */
         // Deactivate corresponding particles since now their diffusion will be controlled by a particle compound */
         parts[mainIndex].deactivate();
@@ -214,18 +216,22 @@ namespace msmrd {
      * memory overflow in large systems. */
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::cleanParticleCompoundsVector(std::vector<particle> &parts) {
-        for (size_t i = particleCompounds.size(); i--;) {
-            if (particleCompounds[i].active == false) {
+        // Reverse iterator loop on particle compounds
+        auto it = particleCompounds.end();
+        while (it > particleCompounds.begin()) {
+            it--;
+            auto index = std::distance(particleCompounds.begin(), it);
+            if (particleCompounds[index].active == false) {
                 // Erase particle complex
-                particleCompounds.erase(particleCompounds.begin() + i);
+                it = particleCompounds.erase(it);
                 // Readjust the indexes of particles
                 for (int j = 0; j < parts.size(); j++) {
                     // this should never happen
-                    if (parts[j].compoundIndex == i) {
+                    if (parts[j].compoundIndex == index) {
                         parts[j].compoundIndex = -1;
                     }
                     // move all the indices larger than i by -1 since we will delete one element
-                    if (parts[j].compoundIndex > i) {
+                    if (parts[j].compoundIndex > index) {
                         parts[j].compoundIndex--;
                     }
                 }
@@ -302,8 +308,6 @@ namespace msmrd {
                 relPosition));
         particleCompounds[compoundIndex].relativeOrientations.insert(std::pair<int, quaternion<double>>(
                 secondIndex, relOrientation));
-        // Increase complex size by one.
-        particleCompounds[compoundIndex].compoundSize ++;
         // Set new particle compound indices.
         secondPart.compoundIndex = 1 * compoundIndex;
     };
@@ -314,15 +318,14 @@ namespace msmrd {
             int secondIndex, int endState) {
         particle &mainPart = parts[mainIndex];
         particle &secondPart = parts[secondIndex];
-        int mainCompoundIndex = mainPart.compoundIndex;
-        int secondCompoundIndex = secondPart.compoundIndex;
+        int mainCompoundIndex = 1 * mainPart.compoundIndex;
+        int secondCompoundIndex = 1 * secondPart.compoundIndex;
         // Insert new binding into boundsPairs dicitionary
         std::tuple<int,int> pairIndices = std::make_tuple(mainIndex, secondIndex);
         particleCompounds[mainCompoundIndex].boundPairsDictionary.insert (
                 std::pair<std::tuple<int,int>, int>(pairIndices, endState) );
-        // Join complexes and flag complex with larger index to be deleted.
-        particleCompounds[mainCompoundIndex].joinParticleCompound(particleCompounds[secondCompoundIndex]);
-        particleCompounds[secondCompoundIndex].active = false;
+        // Join complexes
+        particleCompounds[mainCompoundIndex].joinCompound(particleCompounds[secondCompoundIndex]);
         // Set relative positions/orientations in particle compound, first for the particle where there was a binding.
         auto relPosition = discreteTrajClass->getRelativePosition(endState);
         auto relOrientation = discreteTrajClass->getRelativeOrientation(endState);
@@ -341,11 +344,10 @@ namespace msmrd {
         /* ... then assign them to all the other particles in newly bound complex (aligns particles positions and
          * orientations of binding complex) */
         alignParticlesInCompound(parts, mainIndex, secondIndex);
-        // Extract main compound size, increase complex size and make zero the empty one
-        particleCompounds[mainCompoundIndex].compoundSize += particleCompounds[secondCompoundIndex].compoundSize;
-        particleCompounds[secondCompoundIndex].compoundSize = 0;
+        /* Deactivates secondary compound (empties dictionaries and flags complex to be deleted). */
+        particleCompounds[secondCompoundIndex].deactivateCompound();
         // Set new particle complex indices to the one of the main compound index.
-        secondPart.compoundIndex = mainCompoundIndex;
+        secondPart.compoundIndex = 1 * mainCompoundIndex;
     };
 
     /* Aligns remaining particles in compound that just binded with another compound. This means rewriting positions
@@ -436,7 +438,7 @@ namespace msmrd {
 
     template <typename templateMSM>
     int msmrdMultiParticleIntegrator<templateMSM>::getCompoundSize(int compoundIndex) {
-        return particleCompounds[compoundIndex].compoundSize;
+        return particleCompounds[compoundIndex].getSizeOfCompound();
     };
 
 

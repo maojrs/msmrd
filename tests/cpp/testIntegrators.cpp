@@ -179,7 +179,7 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     int boundState = 0;
     myIntegrator.addCompound(plist, iIndex, jIndex, boundState);
     REQUIRE(myIntegrator.particleCompounds.size() == 1);
-    REQUIRE(myIntegrator.particleCompounds[0].compoundSize == 2);
+    REQUIRE(myIntegrator.getCompoundSize(0) == 2);
     // Check particles are set into the correct particleCompound index
     REQUIRE(plist[iIndex]. compoundIndex == 0);
     REQUIRE(plist[jIndex]. compoundIndex == 0);
@@ -203,7 +203,7 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     boundState = 1;
     myIntegrator.addCompound(plist, iIndex, jIndex, boundState);
     REQUIRE(myIntegrator.particleCompounds.size() == 1);
-    REQUIRE(myIntegrator.particleCompounds[0].compoundSize == 3);
+    REQUIRE(myIntegrator.getCompoundSize(0) == 3);
     REQUIRE(myIntegrator.particleCompounds[0].relativePositions.size() == 3);
     REQUIRE(myIntegrator.particleCompounds[0].relativeOrientations.size() == 3);
     // Check particles are set into the correct particleCompound index
@@ -253,7 +253,7 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     boundState = 2;
     myIntegrator.addCompound(plist, iIndex, jIndex, boundState);
     REQUIRE(myIntegrator.particleCompounds.size() == 2);
-    REQUIRE(myIntegrator.particleCompounds[1].compoundSize == 2);
+    REQUIRE(myIntegrator.getCompoundSize(1) == 2);
     // Check particles are set into the correct particleCompound index
     REQUIRE(plist[iIndex].compoundIndex == 1);
     REQUIRE(plist[jIndex].compoundIndex == 1);
@@ -296,9 +296,12 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     boundState = 2;
     myIntegrator.addCompound(plist, iIndex, jIndex, boundState);
     REQUIRE(myIntegrator.particleCompounds.size() == 2);
+    REQUIRE(myIntegrator.getCompoundSize(0) == 5);
+    REQUIRE(myIntegrator.getCompoundSize(1) == 0);
     myIntegrator.cleanParticleCompoundsVector(plist);
     REQUIRE(myIntegrator.particleCompounds.size() == 1);
-    REQUIRE(myIntegrator.particleCompounds[0].compoundSize == 5);
+    REQUIRE(myIntegrator.getCompoundSize(0) == 5);
+    //REQUIRE(myIntegrator.getCompoundSize(0) == 5);
     // Check relative positions/orientations match pentamer ring.
     // New binding 0-3 with bound state 3
     relPosition = myIntegrator.discreteTrajClass->getRelativePosition(boundState);
@@ -325,7 +328,7 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     REQUIRE((plist[3].position + newRelPosition - plist[4].position).norm() <= 0.000001);
     REQUIRE((plist[3].orientation * relOrientation - plist[4].orientation).norm() <= 0.000001);
 
-    // Close compound into a pentamer (closes it by binding 4 with 1)
+    // Close compound into a pentamer (closes it by binding 4 with 1) Closing compound deactivated for now.
     iIndex = 1;
     jIndex = 4;
     boundState = 2;

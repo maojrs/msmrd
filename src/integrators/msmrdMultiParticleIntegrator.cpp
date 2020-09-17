@@ -83,7 +83,7 @@ namespace msmrd {
         /* Set diffusion coefficients of bound particle compound (note states start counting from 1, not zero).
          * In general this should be a more complicated when binding larger complexes. */
         int MSMindex = msmrdMSM.getMSMindex(endState);
-        if (particleCompounds[parts[iIndex].compoundIndex].compoundSize == 2) {
+        if (particleCompounds[parts[iIndex].compoundIndex].getSizeOfCompound() == 2) {
             particleCompounds[parts[iIndex].compoundIndex].setDs(msmrdMSM.Dlist[MSMindex],
                                                                  msmrdMSM.Drotlist[MSMindex]);
         }
@@ -142,7 +142,7 @@ namespace msmrd {
 
         /* Cleans the vector of particle compounds in case any compound needs to be deleted. Can be run just
          * every several timesteps or avoided completely for small systems. */
-        cleanParticleCompoundsVector(parts);
+        // cleanParticleCompoundsVector(parts);
 
 
         // Output eventlog (useful for debugging)

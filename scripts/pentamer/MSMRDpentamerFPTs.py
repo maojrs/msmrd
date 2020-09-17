@@ -119,12 +119,17 @@ def MSMRDsimulationFPT(trajectorynum):
     unbound = True
     while(unbound):
         integrator.integrate(partlist)
-        #if (partlist[0].compoundIndex > -1):
-        if (partlist[0].compoundIndex != -1): #FIND SEGFAULT, PROBABLY IN joinParticleCompounds FNCTION
+        if (partlist[0].compoundIndex > -1):
+        #if (partlist[0].compoundIndex != -1): #FIND SEGFAULT, PROBABLY IN joinParticleCompounds FNCTION
             #numBindings = integrator.getNumberOfBindingsInCompound(partlist[0].compoundIndex)
-            numBindings = integrator.getCompoundSize(partlist[0].compoundIndex)
-            print(integrator.clock, partlist[0].compoundIndex, numBindings)
-            if (numBindings >= 5 and numBindings <= 10):
+            compoundSize = integrator.getCompoundSize(partlist[0].compoundIndex)
+            compoundSize1 = integrator.getCompoundSize(partlist[1].compoundIndex)
+            compoundSize2 = integrator.getCompoundSize(partlist[2].compoundIndex)
+            compoundSize3 = integrator.getCompoundSize(partlist[3].compoundIndex)
+            compoundSize4 = integrator.getCompoundSize(partlist[4].compoundIndex)
+            print('%.4f' %integrator.clock, partlist[0].compoundIndex, partlist[1].compoundIndex, partlist[2].compoundIndex, partlist[3].compoundIndex, partlist[4].compoundIndex, \
+                  'Compsize:', compoundSize, compoundSize1, compoundSize2, compoundSize3, compoundSize4)
+            if (compoundSize >= 5):
                 unbound = False
                 return "pentamer", integrator.clock
         elif integrator.clock >= 1000.0:

@@ -26,13 +26,21 @@ namespace msmrd {
                                        std::map<std::tuple<int,int>, int> boundPairsDictionary) :
             position(position), boundPairsDictionary(boundPairsDictionary) {};
 
+    /* Deactivates compound, clears all dictionaries and sets active to falase*/
+    void particleCompound::deactivateCompound() {
+        relativePositions.clear();
+        relativeOrientations.clear();
+        boundPairsDictionary.clear();
+        active = false;
+    };
 
     /* Joins another particle complex into this particle complex. The local dictionary has preference if
      * equal keys. However, that should never happen. */
-    void particleCompound::joinParticleCompound(particleCompound pComplex) {
-        boundPairsDictionary.insert(pComplex.boundPairsDictionary.begin(),
-                                    pComplex.boundPairsDictionary.end());
+    void particleCompound::joinCompound(particleCompound partComplex) {
+        boundPairsDictionary.insert(partComplex.boundPairsDictionary.begin(),
+                                    partComplex.boundPairsDictionary.end());
     };
+
 
 
     // TODO: FUNCTION BELOW IN PROGESS

@@ -24,7 +24,6 @@ namespace msmrd {
         std::map<int, vec3<double>> relativePositions = {};
         std::map<int, quaternion<double>> relativeOrientations = {};
         int referenceParticleIndex = -1;
-        int compoundSize = 2;
         bool active = true;
         /**
          * @param D diffusion constant
@@ -47,7 +46,6 @@ namespace msmrd {
          * as the one with smallest index when the compund is created. Once the compound is created it will not
          * change reference particle, unless the reference particle unbounds from complex. If two compounds join
          * the reference particle will remain the one with the smallest index.
-         * @param compoundSize number of particles contained in complex. Defaults to 2 for newly created
          * compounds. If 0, it means compound is inactive.
          * @param active if true the compound is active, if false it is no longer active and can be deleted
          * by integrator to free up memory.
@@ -69,11 +67,15 @@ namespace msmrd {
 
         // Utility functions
 
-        void joinParticleCompound(particleCompound partComplex);
+        void deactivateCompound();
+
+        void joinCompound(particleCompound partComplex);
 
         std::vector<particleCompound> splitCompound(std::tuple<int,int> pairToBeRemoved);
 
         bool isActive() { return active; }
+
+        int getSizeOfCompound() {return relativePositions.size(); }
 
         // Setters
 
