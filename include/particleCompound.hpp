@@ -77,6 +77,8 @@ namespace msmrd {
 
         int getSizeOfCompound() {return relativePositions.size(); }
 
+        int getNumberOfbindings() {return boundPairsDictionary.size(); }
+
         // Setters
 
         void setD(double Dnew) { D = Dnew; }

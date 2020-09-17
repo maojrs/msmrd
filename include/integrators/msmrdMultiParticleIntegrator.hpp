@@ -75,6 +75,8 @@ namespace msmrd {
 
         void cleanParticleCompoundsVector(std::vector<particle> &parts);
 
+        std::vector<int> findClosedBindingLoops();
+
         int getNumberOfBindingsInCompound(int compoundIndex);
 
         std::map<std::tuple<int,int>, int> getBindingsInCompound(int compoundIndex);
@@ -238,6 +240,40 @@ namespace msmrd {
             }
         }
     };
+
+    /* Checks if there is any closed binding loop in any of the particle compounds. If so, it returns the size of
+     * the loops found in a vector of intergers, which size is the number of loops */
+    template <typename templateMSM>
+    std::vector<int> msmrdMultiParticleIntegrator<templateMSM>::findClosedBindingLoops(){
+        std::vector<int> boundLoops = {};
+        for (auto &particleCompound : particleCompounds) {
+            auto compoundSize = particleCompound.getSizeOfCompound();
+            auto numBindings = particleCompound.getNumberOfbindings();
+            if (compoundSize == numBindings) {
+                boundLoops.insert(numBindings);
+            }
+        }
+        return boundLoops;
+    };
+
+    /* Extracts number of bindings in a compound indexed by compoundIndex */
+    template <typename templateMSM>
+    int msmrdMultiParticleIntegrator<templateMSM>::getNumberOfBindingsInCompound(int compoundIndex) {
+        return particleCompounds[compoundIndex].boundPairsDictionary.size();
+    };
+
+    /* Extracts bindings in a compound indexed by compoundIndex */
+    template <typename templateMSM>
+    std::map<std::tuple<int,int>, int> msmrdMultiParticleIntegrator<templateMSM>::getBindingsInCompound(int compoundIndex) {
+        return particleCompounds[compoundIndex].boundPairsDictionary;
+    };
+
+    template <typename templateMSM>
+    int msmrdMultiParticleIntegrator<templateMSM>::getCompoundSize(int compoundIndex) {
+        return particleCompounds[compoundIndex].getSizeOfCompound();
+    };
+
+
 
 
     /*
@@ -424,22 +460,7 @@ namespace msmrd {
                 std::pair<std::tuple<int,int>, int>(pairIndices, endState) );
     };
 
-    /* Extracts number of bindings in a compound indexed by compoundIndex */
-    template <typename templateMSM>
-    int msmrdMultiParticleIntegrator<templateMSM>::getNumberOfBindingsInCompound(int compoundIndex) {
-        return particleCompounds[compoundIndex].boundPairsDictionary.size();
-    };
 
-    /* Extracts bindings in a compound indexed by compoundIndex */
-    template <typename templateMSM>
-    std::map<std::tuple<int,int>, int> msmrdMultiParticleIntegrator<templateMSM>::getBindingsInCompound(int compoundIndex) {
-        return particleCompounds[compoundIndex].boundPairsDictionary;
-    };
-
-    template <typename templateMSM>
-    int msmrdMultiParticleIntegrator<templateMSM>::getCompoundSize(int compoundIndex) {
-        return particleCompounds[compoundIndex].getSizeOfCompound();
-    };
 
 
 //    /* Recovers the rotation quaternion for the particle compound based on the reference particle of the compound. It
