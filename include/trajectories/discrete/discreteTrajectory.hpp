@@ -32,7 +32,7 @@ namespace msmrd {
     protected:
         std::unique_ptr<positionOrientationPartition> positionOrientationPart;
         std::array< std::tuple<vec3<double>, quaternion<double>>, numBoundStates> boundStates{};
-        std::array<int, numBoundStates> flippedBoundStates{};
+        std::array<int, numBoundStates> flippedBoundStatesIndexes{};
         int maxNumberBoundStates = int (std::pow(10, std::ceil(std::log10(numBoundStates))));
         double rLowerBound = 1.25;
         double rUpperBound = 2.25;
@@ -51,10 +51,10 @@ namespace msmrd {
          * is in its default initial orientation. The quaternion corresponds to the relative orientation between the
          * two particles, also measured from the fixed frame of reference of particle 1. These bound states are
          * calculated by the setBoundStates function.
-         * @flippedBoundStates array. Each entry represents the corresponding flipped bound state of the input
-         * bound state. If the reference particle is flipped, the flipped bound state represents the bound state
-         * observed from the new reference particle. not implemented for every example and only useful for
-         * multiparticleMSMRD
+         * @flippedBoundStatesIndexes array. Each entry represents the corresponding index of the flipped bound state
+         * of the input bound state index. If the reference particle is flipped, the flipped bound state represents
+         * the bound state observed from the new reference particle. Not implemented for every example as it is
+         * only useful for multiparticleMSMRD
          * @param maxNumberBoundStates maximum number of bound states supported. It is used to determine how to
          * count (index) the transition states. The state maxNumberBoundStates + 1 will correspond not to a bound state
          * but to the first transition state. This parameter has to be consistent with the one used
@@ -93,7 +93,7 @@ namespace msmrd {
 
         quaternion<double> getRelativeOrientation(int boundStateIndex);
 
-        int getFlippedBoundState(int boundState);
+        int getFlippedBoundStateIndex(int boundStateIndex);
 
 
 
@@ -224,8 +224,8 @@ namespace msmrd {
     /* Returns the flipped bound state for the corresponding input bound states. Needs to set flipped
      * boundstates for it to work */
     template<int numBoundStates>
-    int discreteTrajectory<numBoundStates>::getFlippedBoundState(int boundState) {
-        return flippedBoundStates[boundState];
+    int discreteTrajectory<numBoundStates>::getFlippedBoundStateIndex(int boundStateIndex) {
+        return flippedBoundStatesIndexes[boundStateIndex];
     }
 
     /* Returns relative position corresponding to a given bound state, indexed by boundStateIndex. */

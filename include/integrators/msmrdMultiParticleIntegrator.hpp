@@ -52,6 +52,10 @@ namespace msmrd {
 
         void transition2BoundState(std::vector<particle> &parts, int iIndex, int jIndex, int endState) override;
 
+        void applyBindingEvent(std::vector<particle> &parts, int iIndex, int jIndex, int endState);
+
+        void applyEvents(std::vector<particle> &parts) override;
+
 
         /* Functions below might need to be overridden for more complex implementations. */
 
@@ -164,6 +168,7 @@ namespace msmrd {
          * exists the mainIndex is the one corresponding to the particle in the compound. */
         int mainIndex = 1 * iIndex;
         int secondIndex = 1 * jIndex;
+        int endStateIndex = endState - 1;
         // If neither particle belongs to a compound, create one.
         if (parts[iIndex].compoundIndex == -1 and parts[jIndex].compoundIndex == -1) {
             createCompound(parts, mainIndex, secondIndex, endState);
@@ -172,8 +177,8 @@ namespace msmrd {
         else if (parts[iIndex].compoundIndex < 0 or parts[jIndex].compoundIndex < 0) {
             // Switch main and second index if neccesary (main particle must be in compound)
             if (parts[iIndex].compoundIndex < 0){
-                // Inverts mainIndex and secondIndex and thus the definition of bound state
-                auto flippedBoundState = discreteTrajClass->getFlippedBoundState(endState);
+                // Inverts main and secondIndex and thus the def. of bound state (+1 to pass from index to boundstate)
+                auto flippedBoundState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endStateIndex);
                 addParticleToCompound(parts, jIndex, iIndex, flippedBoundState);
             } else {
                 addParticleToCompound(parts, iIndex, jIndex, endState);
@@ -288,6 +293,7 @@ namespace msmrd {
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::createCompound(std::vector<particle> &parts, int mainIndex,
             int secondIndex, int endState) {
+        int endStateIndex = endState - 1;
         particle &mainPart = parts[mainIndex];
         particle &secondPart = parts[secondIndex];
         std::tuple<int,int> pairIndices = std::make_tuple(mainIndex, secondIndex);
@@ -300,8 +306,8 @@ namespace msmrd {
         pComplex.relativeOrientations.insert(std::pair<int, quaternion<double>>(mainIndex,
                 quaternion<double>(1,0,0,0)));
         // Get relative position and orientation with respect to main particle
-        auto relPosition = discreteTrajClass->getRelativePosition(endState);
-        auto relOrientation = discreteTrajClass->getRelativeOrientation(endState);
+        auto relPosition = discreteTrajClass->getRelativePosition(endStateIndex);
+        auto relOrientation = discreteTrajClass->getRelativeOrientation(endStateIndex);
         // Set fixed position and orientation of newly bound particle
         secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
         secondPart.orientation = mainPart.orientation * relOrientation;
@@ -327,6 +333,7 @@ namespace msmrd {
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::addParticleToCompound(std::vector<particle> &parts, int mainIndex,
             int secondIndex, int endState) {
+        int endStateIndex = endState - 1;
         particle &mainPart = parts[mainIndex];
         particle &secondPart = parts[secondIndex];
         // Generate new binding description and insert it into compound.
@@ -335,8 +342,8 @@ namespace msmrd {
         particleCompounds[compoundIndex].boundPairsDictionary.insert (
                 std::pair<std::tuple<int,int>, int>(pairIndices, endState) );
         // Get relative position and orientation of new particle in complex
-        auto relPosition = discreteTrajClass->getRelativePosition(endState);
-        auto relOrientation = discreteTrajClass->getRelativeOrientation(endState);
+        auto relPosition = discreteTrajClass->getRelativePosition(endStateIndex);
+        auto relOrientation = discreteTrajClass->getRelativeOrientation(endStateIndex);
         // Set fixed position and orientation of newly bound particle
         secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
         secondPart.orientation = mainPart.orientation * relOrientation;
@@ -356,6 +363,7 @@ namespace msmrd {
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::joinParticleCompounds(std::vector<particle> &parts, int mainIndex,
             int secondIndex, int endState) {
+        int endStateIndex = endState - 1;
         particle &mainPart = parts[mainIndex];
         particle &secondPart = parts[secondIndex];
         int mainCompoundIndex = 1 * mainPart.compoundIndex;
@@ -367,8 +375,8 @@ namespace msmrd {
         // Join complexes
         particleCompounds[mainCompoundIndex].joinCompound(particleCompounds[secondCompoundIndex]);
         // Set relative positions/orientations in particle compound, first for the particle where there was a binding.
-        auto relPosition = discreteTrajClass->getRelativePosition(endState);
-        auto relOrientation = discreteTrajClass->getRelativeOrientation(endState);
+        auto relPosition = discreteTrajClass->getRelativePosition(endStateIndex);
+        auto relOrientation = discreteTrajClass->getRelativeOrientation(endStateIndex);
         // Set fixed position and orientation of newly bound particle
         secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
         secondPart.orientation = mainPart.orientation * relOrientation;
@@ -407,8 +415,9 @@ namespace msmrd {
                 auto index1 = std::get<0>(it->first);
                 auto index2 = std::get<1>(it->first);
                 auto state = it->second;
-                auto relPos = discreteTrajClass->getRelativePosition(state);
-                auto relOrient = discreteTrajClass->getRelativeOrientation(state);
+                auto stateIndex = state - 1;
+                auto relPos = discreteTrajClass->getRelativePosition(stateIndex);
+                auto relOrient = discreteTrajClass->getRelativeOrientation(stateIndex);
                 if (index1 == refParticleIndex) {
                     parts[index2].position = parts[index1].position +
                             msmrdtools::rotateVec(relPos, parts[index1].orientation);

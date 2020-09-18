@@ -23,10 +23,10 @@ namespace msmrd {
         int nextState;
         int index0 = msmrdMSM.getMaxNumberBoundStates();
         // Loop over all pairs of particles without repetition with i < j
-        for (int i = 0; i < parts.size(); i++) {
+        for (int i = 0; i < parts.size() - 1; i++) {
             for (int j = i + 1; j < parts.size(); j++) {
-                /* Only compute transitions if both particles have at least one bound site free (bound to one or zero
-                 * other particles) */
+                 /* Only compute transitions if both particles have at least one bound site free (bound to one or zero
+                  * other particles). Note some transisitions might still be rejected by applyBindingEvent function. */
                 if (parts[i].boundList.size() < 2 and parts[j].boundList.size() < 2) {
                     /* Computes new transition if particles drifted into transition region for
                      * the first time, i.e. empty event and relativeDistance < radialBounds[1], or if
@@ -47,20 +47,7 @@ namespace msmrd {
                         nextState = std::get<1>(transition);
                         // Add binding transition
                         if (nextState <= index0) {
-                            /* Only add transition if bound location is not already being taken (needs to be
-                             * adjusted for each implementation) This is rejection sampling. */
-                            if (parts[i].boundList.size() > 0) {
-                                if ((parts[i].boundStates[0] == 0 or parts[i].boundStates[0] == 1) and (nextState > 1)) {
-                                    eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState,
-                                            "binding");
-                                }
-                                else if ((parts[i].boundStates[0] == 2 or parts[i].boundStates[0] == 3) and (nextState < 2)) {
-                                    eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState,
-                                            "binding");
-                                }
-                            } else {
                                 eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState, "binding");
-                            }
                         } else {
                             eventMgr.addEvent(transitionTime, i, j, currentTransitionState,
                                               nextState, "transition2transition");
@@ -79,14 +66,16 @@ namespace msmrd {
     template<>
     void msmrdMultiParticleIntegrator<ctmsm>::transition2BoundState(std::vector<particle> &parts, int iIndex,
                                                              int jIndex, int endState) {
+        int endStateIndex = endState - 1;
         /* Establish pair connection in particle class and deactivate both particles */
         parts[iIndex].boundList.push_back(jIndex);
         parts[jIndex].boundList.push_back(iIndex);
         parts[iIndex].deactivate();
         parts[jIndex].deactivate();
-        // Set bound state for particle
+        // Set bound states for main particle
         parts[iIndex].boundStates.push_back(endState);
-        auto flippedBoundState = discreteTrajClass->getFlippedBoundState(endState);
+        // Set boundstate for secondary particle, need the flipped bound state (+1 to go from index to boundstate)
+        auto flippedBoundState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endStateIndex);
         parts[jIndex].boundStates.push_back(flippedBoundState);
 
         // Add particle complex to particleComplexes vector.
@@ -96,15 +85,116 @@ namespace msmrd {
         //setCompoundPositionOrientation(parts, iIndex, jIndex, mainCompoundSize);
 
         /* Set diffusion coefficients of bound particle compound (note states start counting from 1, not zero).
-         * In general this should be a more complicated when binding larger complexes. */
+         * In general this should be a more complicated when binding larger complexes. Also note that it is
+         * assigned when the compound is created (size 2) and remains the same for lager compounds. */
         int MSMindex = msmrdMSM.getMSMindex(endState);
         if (particleCompounds[parts[iIndex].compoundIndex].getSizeOfCompound() == 2) {
             particleCompounds[parts[iIndex].compoundIndex].setDs(msmrdMSM.Dlist[MSMindex],
                                                                  msmrdMSM.Drotlist[MSMindex]);
         }
-        /* TODO: implement diffusion coeffcients assignments for larger complexes (> 2 particles).
+        /* TODO: implement different diffusion coeffcients assignments for larger complexes (> 2 particles).
          * Not too relevant in first implementation since all diffusion coefficients are constats,
          * so left for future implemenation. */
+    }
+
+
+    /* Applies a binding event in a multiparticle simulation. Needs to consider all possible combinations of patches
+     * to avoid multiple binding to the same patch. It is called by apply events function. This function applies
+     * rejection sampling since it only allow the transition2BoundState fucntion to act on very specific cases. */
+    template<>
+    void msmrdMultiParticleIntegrator<ctmsm>::applyBindingEvent(std::vector<particle> &parts, int iIndex,
+                                                                int jIndex, int endState) {
+        /* Only applies transition if bound location is not already being taken (needs to be
+        * adjusted for each implementation) There are many possible cases.*/
+
+        // Case 1: Particle i is bound to other one and particle j is free
+        if (parts[iIndex].boundList.size() > 0 and parts[jIndex].boundList.size() == 0){
+            if ((parts[iIndex].boundStates[0] == 1 or parts[iIndex].boundStates[0] == 2) and (endState > 2)) {
+                transition2BoundState(parts, iIndex, jIndex, endState);
+            }
+            else if ((parts[iIndex].boundStates[0] == 3 or parts[iIndex].boundStates[0] == 4) and (endState < 3)) {
+                transition2BoundState(parts, iIndex, jIndex, endState);
+            }
+        // Case 2: Particle i is free and particle j is bound to other one
+        } else if (parts[iIndex].boundList.size() == 0 and parts[jIndex].boundList.size() > 0) {
+            auto flippedEndState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endState - 1);
+            if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
+                flippedEndState != 1 and flippedEndState != 2) {
+                transition2BoundState(parts, iIndex, jIndex, endState);
+            }
+            else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
+                     flippedEndState != 3 and flippedEndState != 4) {
+                transition2BoundState(parts, iIndex, jIndex, endState);
+            }
+        // Case 3: Both particles are each bound to another particle (combination of case 1 and 2)
+        } else if (parts[iIndex].boundList.size() > 0 and parts[jIndex].boundList.size() > 0) {
+            auto flippedEndState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endState - 1);
+            if ((parts[iIndex].boundStates[0] == 1 or parts[iIndex].boundStates[0] == 2) and (endState > 2)) {
+                if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
+                    flippedEndState != 1 and flippedEndState != 2) {
+                    transition2BoundState(parts, iIndex, jIndex, endState);
+                }
+                else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
+                         flippedEndState != 3 and flippedEndState != 4) {
+                    transition2BoundState(parts, iIndex, jIndex, endState);
+
+                }
+            }
+            else if ((parts[iIndex].boundStates[0] == 3 or parts[iIndex].boundStates[0] == 4) and (endState < 3)) {
+                if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
+                    flippedEndState != 1 and flippedEndState != 2) {
+                    transition2BoundState(parts, iIndex, jIndex, endState);
+                }
+                else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
+                         flippedEndState != 3 and flippedEndState != 4) {
+                    transition2BoundState(parts, iIndex, jIndex, endState);
+
+                }
+            }
+        }
+        // Case 4: Both particles are completely free
+        else {
+            transition2BoundState(parts, iIndex, jIndex, endState);
+        }
+    }
+
+
+    /* Apply events in event manager that should happen during the current time step. */
+    template<>
+    void msmrdMultiParticleIntegrator<ctmsm>::applyEvents(std::vector<particle> &parts) {
+        std::list<std::map<std::string, decltype(eventMgr.emptyEvent)>::const_iterator> iteratorList;
+        // Loop over dictionary using iterators
+        for (auto it = eventMgr.eventDictionary.cbegin(); it != eventMgr.eventDictionary.cend(); it++) {
+            auto transitionTime = it->second.waitTime;
+            /* Only apply events that should happen in during this
+             * timestep (they correspond to transitionTime < 0) */
+            if (transitionTime <= 0) {
+                // Load event data
+                auto iIndex = it->second.part1Index;
+                auto jIndex = it->second.part2Index;
+                auto endState = it->second.endState;
+                auto eventType = it->second.eventType;
+                // Make event happen (depending on event type) and remove event once it has happened
+                if (eventType == "binding") {
+                    applyBindingEvent(parts, iIndex, jIndex, endState); // can reject transitions if binding site taken.
+                    iteratorList.push_back(it);
+                } else if (eventType == "unbinding") {
+                    transition2UnboundState(parts, iIndex, jIndex, endState);
+                    iteratorList.push_back(it);
+                } else if (eventType == "bound2bound") {
+                    transitionBetweenBoundStates(parts, iIndex, jIndex, endState);
+                    iteratorList.push_back(it);
+                } else if (eventType == "transition2transition") {
+                    /* Note event is not removed until a new event is computed later in
+                     * the computeTransitionsFromTransitionStates routine */
+                    transitionBetweenTransitionStates(iIndex, jIndex);
+                }
+            }
+        }
+        // Erase events that just were applied
+        for (auto it : iteratorList) {
+            eventMgr.eventDictionary.erase(it);
+        }
     }
 
 
