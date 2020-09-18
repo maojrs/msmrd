@@ -340,6 +340,6 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     boundState = 2;
     myIntegrator.addCompound(plist, iIndex, jIndex, boundState);
     REQUIRE(myIntegrator.getNumberOfBindingsInCompound(0) == 5);
-    auto bindingLoops = myIntegrator.findClosedBindingLoops();
+    auto bindingLoops = myIntegrator.findClosedBindingLoops(plist);
     REQUIRE(bindingLoops[0] == 5);
 }

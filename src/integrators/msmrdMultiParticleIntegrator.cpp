@@ -115,8 +115,9 @@ namespace msmrd {
             else if ((parts[iIndex].boundStates[0] == 3 or parts[iIndex].boundStates[0] == 4) and (endState < 3)) {
                 transition2BoundState(parts, iIndex, jIndex, endState);
             }
+        }
         // Case 2: Particle i is free and particle j is bound to other one
-        } else if (parts[iIndex].boundList.size() == 0 and parts[jIndex].boundList.size() > 0) {
+        else if (parts[iIndex].boundList.size() == 0 and parts[jIndex].boundList.size() > 0) {
             auto flippedEndState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endState - 1);
             if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
                 flippedEndState != 1 and flippedEndState != 2) {
@@ -126,32 +127,32 @@ namespace msmrd {
                      flippedEndState != 3 and flippedEndState != 4) {
                 transition2BoundState(parts, iIndex, jIndex, endState);
             }
-        // Case 3: Both particles are each bound to another particle (combination of case 1 and 2)
-        } else if (parts[iIndex].boundList.size() > 0 and parts[jIndex].boundList.size() > 0) {
-            auto flippedEndState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endState - 1);
-            if ((parts[iIndex].boundStates[0] == 1 or parts[iIndex].boundStates[0] == 2) and (endState > 2)) {
-                if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
-                    flippedEndState != 1 and flippedEndState != 2) {
-                    transition2BoundState(parts, iIndex, jIndex, endState);
-                }
-                else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
-                         flippedEndState != 3 and flippedEndState != 4) {
-                    transition2BoundState(parts, iIndex, jIndex, endState);
-
-                }
-            }
-            else if ((parts[iIndex].boundStates[0] == 3 or parts[iIndex].boundStates[0] == 4) and (endState < 3)) {
-                if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
-                    flippedEndState != 1 and flippedEndState != 2) {
-                    transition2BoundState(parts, iIndex, jIndex, endState);
-                }
-                else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
-                         flippedEndState != 3 and flippedEndState != 4) {
-                    transition2BoundState(parts, iIndex, jIndex, endState);
-
-                }
-            }
         }
+        // Case 3: Both particles are each bound to another particle (combination of case 1 and 2 and some extra)
+        else if (parts[iIndex].boundList.size() > 0 and parts[jIndex].boundList.size() > 0) {
+            if (parts[iIndex].boundList[0] != jIndex) { // Do not allow two bindings between same particles
+                    auto flippedEndState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endState - 1);
+                    if ((parts[iIndex].boundStates[0] == 1 or parts[iIndex].boundStates[0] == 2) and (endState > 2)) {
+                        if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
+                            flippedEndState != 1 and flippedEndState != 2) {
+                            transition2BoundState(parts, iIndex, jIndex, endState);
+                        } else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
+                                   flippedEndState != 3 and flippedEndState != 4) {
+                            transition2BoundState(parts, iIndex, jIndex, endState);
+
+                        }
+                    } else if ((parts[iIndex].boundStates[0] == 3 or parts[iIndex].boundStates[0] == 4) and
+                               (endState < 3)) {
+                        if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
+                            flippedEndState != 1 and flippedEndState != 2) {
+                            transition2BoundState(parts, iIndex, jIndex, endState);
+                        } else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
+                                   flippedEndState != 3 and flippedEndState != 4) {
+                            transition2BoundState(parts, iIndex, jIndex, endState);
+                        }
+                    }
+                }
+            }
         // Case 4: Both particles are completely free
         else {
             transition2BoundState(parts, iIndex, jIndex, endState);

@@ -130,10 +130,12 @@ def MSMRDsimulationFPT(trajectorynum):
             compoundSize3 = integrator.getCompoundSize(partlist[3].compoundIndex)
             compoundSize4 = integrator.getCompoundSize(partlist[4].compoundIndex)
             if ii % 1000 == 0:
-                loops = integrator.findClosedBindingLoops()
+                loops = integrator.findClosedBindingLoops(partlist)
                 print('%.4f' %integrator.clock, partlist[0].compoundIndex, partlist[1].compoundIndex, partlist[2].compoundIndex, partlist[3].compoundIndex, partlist[4].compoundIndex, \
                       'Compsize:', compoundSize, compoundSize1, compoundSize2, compoundSize3, compoundSize4)
                 # print(partlist[0].position, partlist[1].position, partlist[2].position, partlist[3].position, partlist[4].position)
+                print("Bound lists:", partlist[0].boundList, partlist[1].boundList, partlist[2].boundList, partlist[3].boundList, partlist[4].boundList)
+                print("Bound State:", partlist[0].boundStates, partlist[1].boundStates, partlist[2].boundStates, partlist[3].boundStates, partlist[4].boundStates)
                 print(loops)
             if (compoundSize >= 5):
                 unbound = False

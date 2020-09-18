@@ -79,7 +79,7 @@ namespace msmrd {
 
         void cleanParticleCompoundsVector(std::vector<particle> &parts);
 
-        std::vector<int> findClosedBindingLoops();
+        std::vector<int> findClosedBindingLoops(std::vector<particle> &parts);
 
         int getNumberOfBindingsInCompound(int compoundIndex);
 
@@ -251,7 +251,7 @@ namespace msmrd {
     /* Checks if there is any closed binding loop in any of the particle compounds. If so, it returns the size of
      * the loops found in a vector of intergers, which size is the number of loops */
     template <typename templateMSM>
-    std::vector<int> msmrdMultiParticleIntegrator<templateMSM>::findClosedBindingLoops(){
+    std::vector<int> msmrdMultiParticleIntegrator<templateMSM>::findClosedBindingLoops(std::vector<particle> &parts){
         std::vector<int> boundLoops = {};
         for (auto &particleCompound : particleCompounds) {
             if (particleCompound.active) {
@@ -259,6 +259,14 @@ namespace msmrd {
                 auto numBindings = particleCompound.getNumberOfbindings();
                 if (compoundSize == numBindings) {
                     boundLoops.push_back(numBindings);
+                }
+                // Check for two-particle closed loop bindings (will not appear with method below )
+                if (compoundSize == 2){
+                    auto particleIndexes = particleCompound.boundPairsDictionary.begin()->first;
+                    auto iIndex = std::get<0>(particleIndexes);
+                    if (parts[iIndex].boundList[0] == parts[iIndex].boundList[1]) {
+                        boundLoops.push_back(2);
+                    }
                 }
             }
         }

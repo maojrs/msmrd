@@ -121,6 +121,10 @@ namespace msmrd {
 
         int getBoundState() const { return boundState; }
 
+        std::vector<int> getBoundList() const { return boundList; }
+
+        std::vector<int> getBoundStates() const { return boundStates; }
+
         int getCompoundIndex() const { return compoundIndex; }
 
 
