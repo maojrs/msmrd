@@ -138,7 +138,7 @@ def MSMRDsimulationFPT(trajectorynum):
             if (compoundSize >= 5):
                 unbound = False
                 return "pentamer", integrator.clock
-        elif ii % 5000 == 0:
+        if ii % 5000 == 0:
             loops = integrator.findClosedBindingLoops(partlist)
             if len(loops) > 0:
                 unbound = False
