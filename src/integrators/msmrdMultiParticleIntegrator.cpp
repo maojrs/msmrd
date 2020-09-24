@@ -13,6 +13,69 @@ namespace msmrd {
      * @param rotation boolean to indicate if rotational degrees of freedom should be integrated
      */
 
+
+    /* Accepts a binding event in a multiparticle simulation. Needs to consider all possible combinations of patches
+     * to avoid multiple binding to the same patch. It is called by computeTransitionsFromTransitionStates function.
+     * This function applies rejection sampling since it only allow the transitions to bound states events to be
+     * added to the event manager in very specific cases. */
+    template<>
+    bool msmrdMultiParticleIntegrator<ctmsm>::acceptBindingEvent(std::vector<particle> &parts, int iIndex,
+                                                                 int jIndex, int endState) {
+        /* Only allows transition evet to be added if bound location is not already being taken (needs to be
+        * adjusted for each implementation) There are many possible cases.*/
+        bool acceptBinding = false;
+        // Case 0: Both particles are completely free
+        if (parts[iIndex].boundList.size() == 0 and parts[jIndex].boundList.size() == 0){
+            acceptBinding = true;
+        }
+            // Case 1: Particle i is bound to other one and particle j is free
+        else if (parts[iIndex].boundList.size() > 0 and parts[jIndex].boundList.size() == 0){
+            if ((parts[iIndex].boundStates[0] == 1 or parts[iIndex].boundStates[0] == 2) and (endState > 2)) {
+                acceptBinding = true;
+            }
+            else if ((parts[iIndex].boundStates[0] == 3 or parts[iIndex].boundStates[0] == 4) and (endState < 3)) {
+                acceptBinding = true;
+            }
+        }
+            // Case 2: Particle i is free and particle j is bound to other one
+        else if (parts[iIndex].boundList.size() == 0 and parts[jIndex].boundList.size() > 0) {
+            auto flippedEndState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endState - 1);
+            if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
+                (flippedEndState != 1 and flippedEndState != 2)) {
+                acceptBinding = true;
+            }
+            else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
+                     (flippedEndState != 3 and flippedEndState != 4)) {
+                acceptBinding = true;
+            }
+        }
+            /* Case 3: Both particles are each bound to another particle (combination of case 1 and 2 and some extra)
+             * The remaining case is: (parts[iIndex].boundList.size() > 0 and parts[jIndex].boundList.size() > 0) */
+        else if (parts[iIndex].boundList[0] != jIndex) { // Do not allow two bindings between same particles
+            auto flippedEndState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endState - 1);
+            if ((parts[iIndex].boundStates[0] == 1 or parts[iIndex].boundStates[0] == 2) and (endState > 2)) {
+                if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
+                    (flippedEndState != 1 and flippedEndState != 2)) {
+                    acceptBinding = true;
+                } else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
+                           (flippedEndState != 3 and flippedEndState != 4)) {
+                    acceptBinding = true;
+                }
+            } else if ((parts[iIndex].boundStates[0] == 3 or parts[iIndex].boundStates[0] == 4) and
+                       (endState < 3)) {
+                if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
+                    (flippedEndState != 1 and flippedEndState != 2)) {
+                    acceptBinding = true;
+                } else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
+                           (flippedEndState != 3 and flippedEndState != 4)) {
+                    acceptBinding = true;
+                }
+            }
+        }
+        return acceptBinding;
+    }
+
+
     /* Computes possible transitions from transition states to bound states or other transition states from
      * particles sufficiently close to each other (in transition states) and saves them in the event manager.
      * Used by integrate function. */
@@ -45,9 +108,12 @@ namespace msmrd {
                         auto transition = msmrdMSM.calculateTransition(currentTransitionState);
                         transitionTime = std::get<0>(transition);
                         nextState = std::get<1>(transition);
-                        // Add binding transition
+                        // Add binding transition (with rejection sampling)
                         if (nextState <= index0) {
+                            auto acceptBinding = acceptBindingEvent(parts, i, j, nextState);
+                            if (acceptBinding) {
                                 eventMgr.addEvent(transitionTime, i, j, currentTransitionState, nextState, "binding");
+                            }
                         } else {
                             eventMgr.addEvent(transitionTime, i, j, currentTransitionState,
                                               nextState, "transition2transition");
@@ -98,68 +164,6 @@ namespace msmrd {
     }
 
 
-    /* Applies a binding event in a multiparticle simulation. Needs to consider all possible combinations of patches
-     * to avoid multiple binding to the same patch. It is called by apply events function. This function applies
-     * rejection sampling since it only allow the transition2BoundState fucntion to act on very specific cases. */
-    template<>
-    void msmrdMultiParticleIntegrator<ctmsm>::applyBindingEvent(std::vector<particle> &parts, int iIndex,
-                                                                int jIndex, int endState) {
-        /* Only applies transition if bound location is not already being taken (needs to be
-        * adjusted for each implementation) There are many possible cases.*/
-
-        // Case 1: Particle i is bound to other one and particle j is free
-        if (parts[iIndex].boundList.size() > 0 and parts[jIndex].boundList.size() == 0){
-            if ((parts[iIndex].boundStates[0] == 1 or parts[iIndex].boundStates[0] == 2) and (endState > 2)) {
-                transition2BoundState(parts, iIndex, jIndex, endState);
-            }
-            else if ((parts[iIndex].boundStates[0] == 3 or parts[iIndex].boundStates[0] == 4) and (endState < 3)) {
-                transition2BoundState(parts, iIndex, jIndex, endState);
-            }
-        }
-        // Case 2: Particle i is free and particle j is bound to other one
-        else if (parts[iIndex].boundList.size() == 0 and parts[jIndex].boundList.size() > 0) {
-            auto flippedEndState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endState - 1);
-            if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
-                flippedEndState != 1 and flippedEndState != 2) {
-                transition2BoundState(parts, iIndex, jIndex, endState);
-            }
-            else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
-                     flippedEndState != 3 and flippedEndState != 4) {
-                transition2BoundState(parts, iIndex, jIndex, endState);
-            }
-        }
-        // Case 3: Both particles are each bound to another particle (combination of case 1 and 2 and some extra)
-        else if (parts[iIndex].boundList.size() > 0 and parts[jIndex].boundList.size() > 0) {
-            if (parts[iIndex].boundList[0] != jIndex) { // Do not allow two bindings between same particles
-                    auto flippedEndState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endState - 1);
-                    if ((parts[iIndex].boundStates[0] == 1 or parts[iIndex].boundStates[0] == 2) and (endState > 2)) {
-                        if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
-                            flippedEndState != 1 and flippedEndState != 2) {
-                            transition2BoundState(parts, iIndex, jIndex, endState);
-                        } else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
-                                   flippedEndState != 3 and flippedEndState != 4) {
-                            transition2BoundState(parts, iIndex, jIndex, endState);
-
-                        }
-                    } else if ((parts[iIndex].boundStates[0] == 3 or parts[iIndex].boundStates[0] == 4) and
-                               (endState < 3)) {
-                        if ((parts[jIndex].boundStates[0] == 1 or parts[jIndex].boundStates[0] == 2) and
-                            flippedEndState != 1 and flippedEndState != 2) {
-                            transition2BoundState(parts, iIndex, jIndex, endState);
-                        } else if ((parts[jIndex].boundStates[0] == 3 or parts[jIndex].boundStates[0] == 4) and
-                                   flippedEndState != 3 and flippedEndState != 4) {
-                            transition2BoundState(parts, iIndex, jIndex, endState);
-                        }
-                    }
-                }
-            }
-        // Case 4: Both particles are completely free
-        else {
-            transition2BoundState(parts, iIndex, jIndex, endState);
-        }
-    }
-
-
     /* Apply events in event manager that should happen during the current time step. */
     template<>
     void msmrdMultiParticleIntegrator<ctmsm>::applyEvents(std::vector<particle> &parts) {
@@ -177,7 +181,7 @@ namespace msmrd {
                 auto eventType = it->second.eventType;
                 // Make event happen (depending on event type) and remove event once it has happened
                 if (eventType == "binding") {
-                    applyBindingEvent(parts, iIndex, jIndex, endState); // can reject transitions if binding site taken.
+                    transition2BoundState(parts, iIndex, jIndex, endState);
                     iteratorList.push_back(it);
                 } else if (eventType == "unbinding") {
                     transition2UnboundState(parts, iIndex, jIndex, endState);
@@ -208,6 +212,7 @@ namespace msmrd {
         if (firstrun or pairPotentialActive or externalPotentialActive) {
             calculateForceTorqueFields<particle>(parts);
             firstrun = false;
+            //setRecordEventLog(true);
         }
 
         /* NOTE: the ordering of the following routines is very important, draw a timeline if necessary.*/

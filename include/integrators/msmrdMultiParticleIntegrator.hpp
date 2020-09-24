@@ -52,8 +52,6 @@ namespace msmrd {
 
         void transition2BoundState(std::vector<particle> &parts, int iIndex, int jIndex, int endState) override;
 
-        void applyBindingEvent(std::vector<particle> &parts, int iIndex, int jIndex, int endState);
-
         void applyEvents(std::vector<particle> &parts) override;
 
 
@@ -69,6 +67,8 @@ namespace msmrd {
 
 
         /* Functions exclusive to multiparticle MSM/RD*/
+
+        bool acceptBindingEvent(std::vector<particle> &parts, int iIndex, int jIndex, int endState);
 
         void integrateDiffusionCompounds(std::vector<particle> &parts, double dt0);
 
@@ -174,9 +174,9 @@ namespace msmrd {
             createCompound(parts, mainIndex, secondIndex, endState);
         }
         // If one of the two doesn't belong to a compound, join the solo particle into the compound.
-        else if (parts[iIndex].compoundIndex < 0 or parts[jIndex].compoundIndex < 0) {
+        else if (parts[iIndex].compoundIndex == -1 or parts[jIndex].compoundIndex == -1) {
             // Switch main and second index if neccesary (main particle must be in compound)
-            if (parts[iIndex].compoundIndex < 0){
+            if (parts[iIndex].compoundIndex == -1){
                 // Inverts main and secondIndex and thus the def. of bound state (+1 to pass from index to boundstate)
                 auto flippedBoundState = 1 + discreteTrajClass->getFlippedBoundStateIndex(endStateIndex);
                 addParticleToCompound(parts, jIndex, iIndex, flippedBoundState);
@@ -337,7 +337,8 @@ namespace msmrd {
         secondPart.compoundIndex = static_cast<int>(particleCompounds.size() - 1);
     };
 
-    /* Adds a particle into an existing compound after a binding between a compound and a particle. */
+    /* Adds a particle into an existing compound after a binding between a compound and a particle. The endState is
+     * the bound state from the main particle (mainIndex) to the secondary particle (secondIndex)*/
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::addParticleToCompound(std::vector<particle> &parts, int mainIndex,
             int secondIndex, int endState) {

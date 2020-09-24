@@ -51,7 +51,7 @@ Drotlist = np.array([1.0])
 
 # Parameters to define coupling Markov model for bound dynamics: couplingMSM
 Dbound = np.ones(numBoundStates)
-DboundRot = np.ones(numBoundStates)
+DboundRot = 0.5*np.ones(numBoundStates)
 
 # Bound states definition, needed to calculate boundstate
 boundStates = [1, 2, 3, 4]
@@ -140,7 +140,10 @@ def MSMRDsimulationFPT(trajectorynum):
             if (compoundSize >= 5):
                 unbound = False
                 return "pentamer", integrator.clock
-        elif integrator.clock >= 1000.0:
+        if integrator.clock >= 1000.0: #1000.0:
+            #filenameLog = filename = "/run/media/maojrs/Mr300/Documents/Posdoc/projects/MSMRD2/" \
+            #                         "msmrd2/data/pentamer/debug/eventLog_" + str(trajectorynum)
+            #integrator.printEventLog(filenameLog)
             unbound = False
             return 'Failed at:', integrator.clock
 
