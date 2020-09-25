@@ -85,20 +85,26 @@ def simulationFPT(trajectorynum):
     # Calculates the first passage times for the trime. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.
     unbound = True
+    ii = 0
     while(unbound):
+        ii += 1
         integrator.integrate(partlist)
         # Pentamer needs at least five bindings
         numBindings = 0
-        for i in range(5):
+        bindingsList = [0,0,0,0,0] # number of bindings for each particle (must be two for each one for the pentamer)
+        for i in range(5-1):
             for j in range(i+1,5):
                 binding = dummyTraj.getState(partlist[i], partlist[j])
                 if binding in boundStates:
                     numBindings += 1
-        #print(integrator.clock, numBindings)
-        if ( numBindings >= 5 ):
+                    bindingsList[i] += 1
+                    bindingsList[j] += 1
+        #if (ii % 50000):
+        #    print('%.4f' %integrator.clock, numBindings, bindingsList)
+        if ( numBindings >= 5):# and bindingsList == [2,2,2,2,2]):
             unbound = False
             return "pentamer", integrator.clock
-        elif integrator.clock >= 1000.0:
+        elif integrator.clock >= 600.0:
             unbound = False
             return 'Failed at:', integrator.clock
 
