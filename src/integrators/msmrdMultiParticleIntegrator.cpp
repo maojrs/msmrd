@@ -212,7 +212,7 @@ namespace msmrd {
         if (firstrun or pairPotentialActive or externalPotentialActive) {
             calculateForceTorqueFields<particle>(parts);
             firstrun = false;
-            setRecordEventLog(true);
+            //setRecordEventLog(true);
         }
 
         /* NOTE: the ordering of the following routines is very important, draw a timeline if necessary.*/

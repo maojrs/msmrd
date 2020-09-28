@@ -148,9 +148,9 @@ def MSMRDsimulationFPT(trajectorynum):
                     unbound = False
                     return 'loop', integrator.clock
         elif integrator.clock >= 600.0: #1000.0:
-            filenameLog = filename = "/run/media/maojrs/Mr300/Documents/Posdoc/projects/MSMRD2/" \
-                                     "msmrd2/data/pentamer/debug/eventLog_" + str(trajectorynum)
-            integrator.printEventLog(filenameLog)
+            #filenameLog = filename = "/run/media/maojrs/Mr300/Documents/Posdoc/projects/MSMRD2/" \
+            #                         "msmrd2/data/pentamer/debug/eventLog_" + str(trajectorynum)
+            #integrator.printEventLog(filenameLog)
             unbound = False
             return 'Failed at:', integrator.clock
 
@@ -176,19 +176,19 @@ def multiprocessingHandler():
 
 
 # Run parallel code
-#multiprocessingHandler()
+multiprocessingHandler()
 
 # Serial code for testing with gdb
-with open(filename, 'w') as file:
-    for index in range(numTrajectories):
-        state, time = MSMRDsimulationFPT(index)
-        if state == 'pentamer':
-            file.write(state + ' ' + str(time) + '\n')
-            print("Simulation " + str(index) + ", done. Success!")
-            input("Press the <ENTER> key to continue...")
-        elif state == 'loop':
-            print("Simulation " + str(index) + ", done. Failed by loop formation :(")
-            input("Press the <ENTER> key to continue...")
-        else:
-            print("Simulation " + str(index) + ", done. Failed :(")
-            input("Press the <ENTER> key to continue...")
+# with open(filename, 'w') as file:
+#     for index in range(numTrajectories):
+#         state, time = MSMRDsimulationFPT(index)
+#         if state == 'pentamer':
+#             file.write(state + ' ' + str(time) + '\n')
+#             print("Simulation " + str(index) + ", done. Success!")
+#             input("Press the <ENTER> key to continue...")
+#         elif state == 'loop':
+#             print("Simulation " + str(index) + ", done. Failed by loop formation :(")
+#             input("Press the <ENTER> key to continue...")
+#         else:
+#             print("Simulation " + str(index) + ", done. Failed :(")
+#             input("Press the <ENTER> key to continue...")
