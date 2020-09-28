@@ -88,21 +88,21 @@ namespace msmrd {
         // Loop over all pairs of particles without repetition with i < j
         for (int i = 0; i < parts.size() - 1; i++) {
             for (int j = i + 1; j < parts.size(); j++) {
-                 /* Only compute transitions if both particles have at least one bound site free (bound to one or zero
-                  * other particles). Note some transisitions might still be rejected by applyBindingEvent function. */
+                /* Computes new transition if particles drifted into transition region for
+                 * the first time, i.e. empty event and relativeDistance < radialBounds[1], or if
+                 * particles transitioned between transition states. */
+                auto previousEvent = eventMgr.getEvent(i, j);
+                if (previousEvent.eventType == "empty") {
+                    // returns -1 if |relativePosition| > radialBounds[1]
+                    currentTransitionState = computeCurrentTransitionState(parts[i], parts[j]);
+                } else if (previousEvent.eventType == "inTransition") {
+                    //previous endState is current starting state
+                    currentTransitionState = previousEvent.endState;
+                    eventMgr.removeEvent(i, j);
+                }
+                /* Only compute transitions if both particles have at least one bound site free (bound to one or zero
+                 * other particles). Note some transisitions might still be rejected by applyBindingEvent function. */
                 if (parts[i].boundList.size() < 2 and parts[j].boundList.size() < 2) {
-                    /* Computes new transition if particles drifted into transition region for
-                     * the first time, i.e. empty event and relativeDistance < radialBounds[1], or if
-                     * particles transitioned between transition states. */
-                    auto previousEvent = eventMgr.getEvent(i, j);
-                    if (previousEvent.eventType == "empty") {
-                        // returns -1 if |relativePosition| > radialBounds[1]
-                        currentTransitionState = computeCurrentTransitionState(parts[i], parts[j]);
-                    } else if (previousEvent.eventType == "inTransition") {
-                        //previous endState is current starting state
-                        currentTransitionState = previousEvent.endState;
-                        eventMgr.removeEvent(i, j);
-                    }
                     // If valid currentTransitionState (see computeCurrentTransitionState), calculate next transition.
                     if (currentTransitionState != -1) {
                         auto transition = msmrdMSM.calculateTransition(currentTransitionState);
@@ -212,7 +212,7 @@ namespace msmrd {
         if (firstrun or pairPotentialActive or externalPotentialActive) {
             calculateForceTorqueFields<particle>(parts);
             firstrun = false;
-            //setRecordEventLog(true);
+            setRecordEventLog(true);
         }
 
         /* NOTE: the ordering of the following routines is very important, draw a timeline if necessary.*/

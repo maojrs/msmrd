@@ -101,7 +101,7 @@ def simulationFPT(trajectorynum):
                     bindingsList[j] += 1
         #if (ii % 50000):
         #    print('%.4f' %integrator.clock, numBindings, bindingsList)
-        if ( numBindings >= 5):# and bindingsList == [2,2,2,2,2]):
+        if ( numBindings >= 5 and bindingsList == [2,2,2,2,2]):
             unbound = False
             return "pentamer", integrator.clock
         elif integrator.clock >= 600.0:

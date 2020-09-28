@@ -210,6 +210,8 @@ namespace msmrd {
             auto partIndex = element.first;
             auto relOrientation = element.second;
             parts[partIndex].orientation = refOrientation * relOrientation; //deltaOrientation;
+            // Also updates next orientation in case it is needed for parent functions calculations
+            parts[partIndex].setNextOrientation(parts[partIndex].orientation);
         }
         // Update positions of the particles
         for (auto element : partCompound.relativePositions) {
@@ -217,6 +219,8 @@ namespace msmrd {
             auto relPosition = element.second;
             parts[partIndex].position = partCompound.position + deltar +
                                         msmrdtools::rotateVec(relPosition, deltaq * partCompound.orientation);
+            // Also updates next position in case it is needed for parent functions calculations
+            parts[partIndex].setNextPosition(parts[partIndex].position);
         }
     }
 
@@ -319,6 +323,9 @@ namespace msmrd {
         // Set fixed position and orientation of newly bound particle
         secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
         secondPart.orientation = mainPart.orientation * relOrientation;
+        // Updates nextPosition and orientation in case it is needed by parent functions
+        secondPart.setNextPosition(secondPart.position);
+        secondPart.setNextOrientation(secondPart.orientation);
         // Set particle compound position and orientation (as the center of a pentamer, same for all compounds)
         pComplex.position = mainPart.position + msmrdtools::rotateVec(pentamerCenter, mainPart.orientation);
         pComplex.orientation = mainPart.orientation; // make a drawing to understand why
@@ -356,6 +363,9 @@ namespace msmrd {
         // Set fixed position and orientation of newly bound particle
         secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
         secondPart.orientation = mainPart.orientation * relOrientation;
+        // Updates nextPosition and orientation in case it is needed by parent functions
+        secondPart.setNextPosition(secondPart.position);
+        secondPart.setNextOrientation(secondPart.orientation);
         // Set relative position w/respect to compound center and orientation w/respect to reference particle
         relPosition = particleCompounds[compoundIndex].relativePositions[mainIndex]
                 + msmrdtools::rotateVec(relPosition, particleCompounds[compoundIndex].relativeOrientations[mainIndex]);
@@ -389,6 +399,9 @@ namespace msmrd {
         // Set fixed position and orientation of newly bound particle
         secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
         secondPart.orientation = mainPart.orientation * relOrientation;
+        // Updates nextPosition and orientation in case it is needed by parent functions
+        secondPart.setNextPosition(secondPart.position);
+        secondPart.setNextOrientation(secondPart.orientation);
         // Set relative position w/respect to compound center and orientation w/respect reference particle
         relPosition = particleCompounds[mainCompoundIndex].relativePositions[mainIndex]
                       + msmrdtools::rotateVec(relPosition,
@@ -431,6 +444,10 @@ namespace msmrd {
                     parts[index2].position = parts[index1].position +
                             msmrdtools::rotateVec(relPos, parts[index1].orientation);
                     parts[index2].orientation = parts[index1].orientation * relOrient;
+                    // Updates nextPosition and orientation in case it is needed by parent functions
+                    parts[index2].setNextPosition(parts[index2].position);
+                    parts[index2].setNextOrientation(parts[index2].orientation);
+                    // Set relative positon/orientation
                     relPos = particleCompounds[mainCompoundIndex].relativePositions[index1]
                                   + msmrdtools::rotateVec(relPos,
                                           particleCompounds[mainCompoundIndex].relativeOrientations[index1]);
@@ -449,6 +466,10 @@ namespace msmrd {
                     parts[index1].position = parts[index2].position +
                                              msmrdtools::rotateVec(relPos, parts[index2].orientation);
                     parts[index1].orientation = parts[index2].orientation * relOrient;
+                    // Updates nextPosition and orientation in case it is needed by parent functions
+                    parts[index1].setNextPosition(parts[index1].position);
+                    parts[index1].setNextOrientation(parts[index1].orientation);
+                    // Set relative positon/orientation
                     relPos = particleCompounds[mainCompoundIndex].relativePositions[index2]
                              + msmrdtools::rotateVec(relPos,
                                                      particleCompounds[mainCompoundIndex].relativeOrientations[index2]);
@@ -475,11 +496,31 @@ namespace msmrd {
                                                                           int secondIndex, int endState) {
         particle &mainPart = parts[mainIndex];
         particle &secondPart = parts[secondIndex];
-        int compoundIndex = mainPart.compoundIndex;
+        int endStateIndex = endState - 1;
+        int mainCompoundIndex = mainPart.compoundIndex;
         // Insert new binding into boundsPairs dicitionary
         std::tuple<int,int> pairIndices = std::make_tuple(mainIndex, secondIndex);
-        particleCompounds[compoundIndex].boundPairsDictionary.insert (
+        particleCompounds[mainCompoundIndex].boundPairsDictionary.insert (
                 std::pair<std::tuple<int,int>, int>(pairIndices, endState) );
+        // Set relative position and orientation
+        // Set relative positions/orientations in particle compound, first for the particle where there was a binding.
+        auto relPosition = discreteTrajClass->getRelativePosition(endStateIndex);
+        auto relOrientation = discreteTrajClass->getRelativeOrientation(endStateIndex);
+        // Set fixed position and orientation of newly bound particle
+        secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
+        secondPart.orientation = mainPart.orientation * relOrientation;
+        // Updates nextPosition and orientation in case it is needed by parent functions
+        secondPart.setNextPosition(secondPart.position);
+        secondPart.setNextOrientation(secondPart.orientation);
+        // Set relative position w/respect to compound center and orientation w/respect reference particle
+        relPosition = particleCompounds[mainCompoundIndex].relativePositions[mainIndex]
+                      + msmrdtools::rotateVec(relPosition,
+                                              particleCompounds[mainCompoundIndex].relativeOrientations[mainIndex]);
+        relOrientation = particleCompounds[mainCompoundIndex].relativeOrientations[mainIndex] * relOrientation ;
+        particleCompounds[mainCompoundIndex].relativePositions.insert(std::pair<int, vec3<double>>(secondIndex,
+                                                                                                   relPosition));
+        particleCompounds[mainCompoundIndex].relativeOrientations.insert(std::pair<int, quaternion<double>>(
+                secondIndex, relOrientation));
     };
 
 
