@@ -77,24 +77,27 @@ namespace msmrd {
         }
     }
 
+
+    /*____FOR PARTICLE COMPOUNDS____*/
+
     // Enforces periodic box boundary condition for particle compounds (acts directly on position)
-    void box::enforcePeriodicBoundary(particleCompound &part) {
+    void box::enforcePeriodicBoundary(particleCompound &pCompound) {
         for (int i = 0; i < 3; i++) {
-            if (part.position[i] >= boxsize[i] / 2) { part.position[i] -= boxsize[i]; }
-            if (part.position[i] <= -boxsize[i] / 2) { part.position[i] += boxsize[i]; }
+            if (pCompound.position[i] >= boxsize[i] / 2) { pCompound.position[i] -= boxsize[i]; }
+            if (pCompound.position[i] <= -boxsize[i] / 2) { pCompound.position[i] += boxsize[i]; }
         }
     };
 
-    void box::enforceReflectiveBoundary(particleCompound &part) {
+    void box::enforceReflectiveBoundary(particleCompound &pCompound) {
         throw std::invalid_argument("Reflective boundary not implemented for particle Compounds, see box.cpp");
     }
 
     // Enforces open boundary condition for particle compounds (acts directly on position)
-    void box::enforceOpenBoundary(particleCompound &part) {
-        if (std::abs(part.position[0]) > xx ||
-            std::abs(part.position[1]) > yy ||
-            std::abs(part.position[2]) > zz) {
-            part.active = false;
+    void box::enforceOpenBoundary(particleCompound &pCompound) {
+        if (std::abs(pCompound.position[0]) > xx ||
+            std::abs(pCompound.position[1]) > yy ||
+            std::abs(pCompound.position[2]) > zz) {
+            pCompound.active = false;
         }
     }
 
