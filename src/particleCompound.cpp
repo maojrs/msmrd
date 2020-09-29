@@ -26,7 +26,7 @@ namespace msmrd {
                                        std::map<std::tuple<int,int>, int> boundPairsDictionary) :
             position(position), boundPairsDictionary(boundPairsDictionary) {};
 
-    /* Deactivates compound, clears all dictionaries and sets active to falase*/
+    /* Deactivates compound, clears all dictionaries and sets active to false */
     void particleCompound::deactivateCompound() {
         relativePositions.clear();
         relativeOrientations.clear();

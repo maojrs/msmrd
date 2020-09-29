@@ -90,19 +90,23 @@ namespace msmrd {
             for (int j = i + 1; j < parts.size(); j++) {
                 /* Only compute transitions if both particles have at least one bound site free (bound to one or zero
                  * other particles). Note some transisitions might still be rejected by applyBindingEvent function. */
-                if (parts[i].boundList.size() < 2 and parts[j].boundList.size() < 2) {
-                    /* Computes new transition if particles drifted into transition region for
-                     * the first time, i.e. empty event and relativeDistance < radialBounds[1], or if
-                     * particles transitioned between transition states. */
-                    auto previousEvent = eventMgr.getEvent(i, j);
-                    if (previousEvent.eventType == "empty") {
+                auto bindingPossible = parts[i].boundList.size() < 2 and parts[j].boundList.size() < 2;
+                /* Computes new transition if particles drifted into transition region for
+                 * the first time, i.e. empty event and relativeDistance < radialBounds[1], or if
+                 * particles transitioned between transition states. */
+                currentTransitionState = -1;
+                auto previousEvent = eventMgr.getEvent(i, j);
+                if (previousEvent.eventType == "empty") {
+                    if (bindingPossible) {
                         // returns -1 if |relativePosition| > radialBounds[1]
                         currentTransitionState = computeCurrentTransitionState(parts[i], parts[j]);
-                    } else if (previousEvent.eventType == "inTransition") {
-                        //previous endState is current starting state
-                        currentTransitionState = previousEvent.endState;
-                        eventMgr.removeEvent(i, j);
                     }
+                } else if (previousEvent.eventType == "inTransition") {
+                    //previous endState is current starting state
+                    currentTransitionState = previousEvent.endState;
+                    eventMgr.removeEvent(i, j);
+                }
+                if (bindingPossible) {
                     // If valid currentTransitionState (see computeCurrentTransitionState), calculate next transition.
                     if (currentTransitionState != -1) {
                         auto transition = msmrdMSM.calculateTransition(currentTransitionState);

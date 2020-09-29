@@ -142,17 +142,19 @@ namespace msmrd {
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::integrateDiffusionCompounds(std::vector<particle> &parts, double dt0){
         for (auto &particleCompound : particleCompounds) {
-            // Calculate change in position
-            vec3<double> dr =  std::sqrt(2 * dt0 * particleCompound.D) * integrator::randg.normal3D(0, 1);
-            // Calculate change in orientation
-            vec3<double> dphi = std::sqrt(2 * dt0 * particleCompound.Drot) *
-                    integrator::randg.normal3D(0, 1);
-            quaternion<double> dquat = msmrdtools::axisangle2quaternion(dphi);
-            // Update position and orientation of particles in compound
-            updateParticlesInCompound(parts, particleCompound, dr,  dquat);
-            // Update position and orientation of compound
-            particleCompound.position += dr;
-            particleCompound.orientation = dquat * particleCompound.orientation;
+            if (particleCompound.isActive()) {
+                // Calculate change in position
+                vec3<double> dr = std::sqrt(2 * dt0 * particleCompound.D) * integrator::randg.normal3D(0, 1);
+                // Calculate change in orientation
+                vec3<double> dphi = std::sqrt(2 * dt0 * particleCompound.Drot) *
+                                    integrator::randg.normal3D(0, 1);
+                quaternion<double> dquat = msmrdtools::axisangle2quaternion(dphi);
+                // Update position and orientation of particles in compound
+                updateParticlesInCompound(parts, particleCompound, dr, dquat);
+                // Update position and orientation of compound
+                particleCompound.position += dr;
+                particleCompound.orientation = dquat * particleCompound.orientation;
+            }
         }
     }
 
