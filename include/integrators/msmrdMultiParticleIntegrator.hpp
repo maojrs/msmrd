@@ -236,6 +236,7 @@ namespace msmrd {
                 }
                 // Update positions of the particles
                 for (auto element : partCompound.relativePositions) {
+                    auto partIndex = element.first;
                     // Updates next position in case it is needed for parent functions calculations
                     parts[partIndex].setNextPosition(parts[partIndex].position);
                 }
