@@ -251,7 +251,7 @@ namespace msmrd {
          * of particles in compounds are updated directly in the integrateDiffusionCompounds function. */
         updatePositionOrientation(parts);
 
-        /* Refreshes next positions and orientations of inactive particles in compounds, so they can be used
+        /* Refreshes next positions and orientations of inactive particles in active compounds, so they can be used
          * by parent class to computeCurrentTransitionStates*/
         refreshParticlesInCompounds(parts);
 

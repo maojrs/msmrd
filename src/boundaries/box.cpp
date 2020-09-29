@@ -78,7 +78,7 @@ namespace msmrd {
     }
 
 
-    /*____FOR PARTICLE COMPOUNDS____*/
+    /*____FOR PARTICLE COMPOUNDS____ (act directly on position)*/
 
     // Enforces periodic box boundary condition for particle compounds (acts directly on position)
     void box::enforcePeriodicBoundary(particleCompound &pCompound) {

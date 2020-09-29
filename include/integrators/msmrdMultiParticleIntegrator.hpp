@@ -227,17 +227,18 @@ namespace msmrd {
     template <typename templateMSM>
     void msmrdMultiParticleIntegrator<templateMSM>::refreshParticlesInCompounds(std::vector<particle> &parts) {
         // Update orientations of the particles. NOTE refParticle and compound always have same orientation!
-        for (auto &partCompound : particleCompounds){
-            for (auto element : partCompound.relativeOrientations) {
-                auto partIndex = element.first;
-                // Updates ext orientation in case it is needed for parent functions calculations
-                parts[partIndex].setNextOrientation(parts[partIndex].orientation);
-            }
-            // Update positions of the particles
-            for (auto element : partCompound.relativePositions) {
-                auto partIndex = element.first;
-                // Updates next position in case it is needed for parent functions calculations
-                parts[partIndex].setNextPosition(parts[partIndex].position);
+        for (auto &partCompound : particleCompounds) {
+            if (partCompound.isActive()) {
+                for (auto element : partCompound.relativeOrientations) {
+                    auto partIndex = element.first;
+                    // Updates next orientation in case it is needed for parent functions calculations
+                    parts[partIndex].setNextOrientation(parts[partIndex].orientation);
+                }
+                // Update positions of the particles
+                for (auto element : partCompound.relativePositions) {
+                    // Updates next position in case it is needed for parent functions calculations
+                    parts[partIndex].setNextPosition(parts[partIndex].position);
+                }
             }
         }
     }
