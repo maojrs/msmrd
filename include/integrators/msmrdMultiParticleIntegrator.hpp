@@ -198,10 +198,6 @@ namespace msmrd {
         else {
             closeCompound(parts, mainIndex, secondIndex, endState);
         }
-         /* like the pentamer, where the binding of 5 particles together, essentially implies the pentamer formation. */
-        // Deactivate corresponding particles since now their diffusion will be controlled by a particle compound */
-        parts[mainIndex].deactivate();
-        parts[secondIndex].deactivate();
     };
 
     /* Updates particles positions and orientations in a compound that diffused by deltar and rotated by deltaq */

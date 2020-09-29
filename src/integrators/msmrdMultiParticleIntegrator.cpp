@@ -88,13 +88,13 @@ namespace msmrd {
         // Loop over all pairs of particles without repetition with i < j
         for (int i = 0; i < parts.size() - 1; i++) {
             for (int j = i + 1; j < parts.size(); j++) {
+                currentTransitionState = -1;
                 /* Only compute transitions if both particles have at least one bound site free (bound to one or zero
                  * other particles). Note some transisitions might still be rejected by applyBindingEvent function. */
                 auto bindingPossible = parts[i].boundList.size() < 2 and parts[j].boundList.size() < 2;
                 /* Computes new transition if particles drifted into transition region for
                  * the first time, i.e. empty event and relativeDistance < radialBounds[1], or if
                  * particles transitioned between transition states. */
-                currentTransitionState = -1;
                 auto previousEvent = eventMgr.getEvent(i, j);
                 if (previousEvent.eventType == "empty") {
                     if (bindingPossible) {

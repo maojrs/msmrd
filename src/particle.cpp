@@ -50,8 +50,8 @@ namespace msmrd {
             : type(type), state(state), D(D), Drot(Drot), position(position), orientation(orientation) {
         orientvector = vec3<double>(0., 0., 1.);
         orientvector = msmrdtools::rotateVec(orientvector, orientation);
-        nextPosition = position;
-        nextOrientation = orientation;
+        nextPosition = vec3<double>(position);
+        nextOrientation = quaternion<double>(orientation);
         nextOrientvector = 1.0 * orientvector;
     };
 
