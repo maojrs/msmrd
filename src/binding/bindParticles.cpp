@@ -30,6 +30,12 @@ namespace msmrd {
                 .def_property_readonly("orientation", [](const particle &part) {
                     return vec2numpy(4, part.orientation);
                 })
+                .def_property_readonly("nextPosition", [](const particle &part) {
+                    return vec2numpy(3, part.nextPosition);
+                }, "particle position")
+                .def_property_readonly("nextOrientation", [](const particle &part) {
+                    return vec2numpy(4, part.nextOrientation);
+                })
                 .def_property_readonly("state", &particle::getState)
                 .def_property_readonly("lagtime", &particle::getLagtime)
                 .def_property_readonly("isMSMactive", &particle::isMSMactive)

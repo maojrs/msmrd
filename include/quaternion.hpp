@@ -81,52 +81,52 @@ public:
     quaternion &operator*=(arithmetic a) {
         std::transform(data.begin(), data.end(), data.begin(), std::bind1st(std::multiplies<scalar>(), a));
         return *this;
-    };
+    }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     quaternion &operator/=(arithmetic a) {
         std::transform(data.begin(), data.end(), data.begin(), std::bind2nd(std::divides<scalar>(), a));
         return *this;
-    };
+    }
 
     scalar norm() const {
         return std::sqrt(normSquared());
-    };
+    }
 
     scalar normSquared() const {
         return std::inner_product(data.begin(), data.end(), data.begin(), static_cast<scalar>(0));
-    };
+    }
 
     scalar operator[](std::size_t i) const {
         return data.at(i);
-    };
+    }
 
     scalar &operator[](std::size_t i) {
         return data.at(i);
-    };
+    }
 
     quaternion &invertElementWise() {
         for (auto i = 0; i < 3; ++i) {
             data[i] = static_cast<scalar>(1.) / data[i];
         }
         return *this;
-    };
+    }
 
     bool operator==(const quaternion &rhs) const {
         return data == rhs.data;
-    };
+    }
 
     bool operator!=(const quaternion &rhs) const {
         return data != rhs.data;
-    };
+    }
 
     bool operator ==(const data_arr &rhs) const {
         return data == rhs;
-    };
+    }
 
     bool operator ==(const std::vector<scalar> &rhs) const {
         return data == rhs;
-    };
+    }
 //    bool almostEquals(const quaternion &rhs) const {
 //        bool result {true};
 //        for(std::uint8_t i = 0; i < 3; ++i) {
@@ -141,35 +141,35 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const quaternion &vec) {
         os << "(" << vec[0] << ", " << vec[1] << ", " << vec[2] << ", " << vec[3] << ")";
         return os;
-    };
+    }
 
     friend quaternion operator+(quaternion lhs, const quaternion &rhs) {
         lhs += rhs;
         return lhs;
-    };
+    }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     friend quaternion operator+(quaternion lhs, arithmetic rhs) {
         lhs += rhs;
         return lhs;
-    };
+    }
 
     friend quaternion operator-(quaternion lhs, const quaternion &rhs) {
         lhs -= rhs;
         return lhs;
-    };
+    }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     friend quaternion operator-(quaternion lhs, arithmetic rhs) {
         lhs -= rhs;
         return lhs;
-    };
+    }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     friend quaternion operator/(quaternion lhs, arithmetic rhs) {
         lhs /= rhs;
         return lhs;
-    };
+    }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     friend quaternion operator*(quaternion lhs, const arithmetic rhs) {

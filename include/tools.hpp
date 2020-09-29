@@ -43,7 +43,7 @@ namespace msmrdtools {
         }
         diff = std::sqrt(diff);
         return diff;
-    };
+    }
 
     /*
      * Useful quaternion functions definitions.
