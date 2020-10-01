@@ -73,6 +73,6 @@ namespace msmrd {
         } else if (boundarytype != "none") {
             throw std::runtime_error("Unknown boundary type; it should be either periodic, reflective or open.");
         }
-    };
+    }
 
 }

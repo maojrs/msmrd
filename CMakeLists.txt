@@ -9,6 +9,9 @@ macro(use_cxx14)
 endmacro(use_cxx14)
 use_cxx14()
 
+#set(CMAKE_CXX_FLAGS_DEBUG_INIT "-fsanitize=address,undefined -fsanitize-undefined-trap-on-error")
+#set(CMAKE_EXE_LINKER_FLAGS_INIT "-fsanitize=address,undefined -static-libasan")
+
 FIND_PROGRAM(PYTHON "python")
 
 # Find and add headers location of HDF5 library
@@ -131,6 +134,9 @@ pybind11_add_module(msmrd2binding MODULE ${PY_SOURCES})
 
 #target_include_directories(msmrd2 PUBLIC include libraries/pybind11/include)
 target_link_libraries(msmrd2binding PUBLIC msmrd2core)
+
+#pedantic compiling options to search for undefined behavior (only uncomment for debugging)
+#target_compile_options(msmrd2binding PUBLIC -Werror -Wall -Wextra -Wpedantic)
 
 #EXECUTE_PROCESS(COMMAND git submodule update --init WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 

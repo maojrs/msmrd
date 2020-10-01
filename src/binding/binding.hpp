@@ -12,7 +12,7 @@
 /* Needed to connect lists/arrays of particles in python with cpp integrator methods.
  * PyBind classes defined at end of bindIntegrators.cpp*/
 using myParticle = msmrd::particle;
-PYBIND11_MAKE_OPAQUE(std::vector<myParticle>);
+PYBIND11_MAKE_OPAQUE(std::vector<myParticle>)
 
 
 namespace py = pybind11;
@@ -38,7 +38,7 @@ namespace msmrd {
         auto result = py::array_t<double>(size);
         py::buffer_info buf = result.request();
         auto *ptr = (double *) buf.ptr;
-        for (size_t idx = 0; idx < size; idx++)
+        for (size_t idx = 0; idx < static_cast<size_t>(size); idx++)
             ptr[idx] = v[idx];
         return result;
     }

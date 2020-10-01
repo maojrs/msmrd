@@ -63,13 +63,13 @@ public:
     vec3 &operator*=(arithmetic a) {
         std::transform(data.begin(), data.end(), data.begin(), std::bind1st(std::multiplies<scalar>(), a));
         return *this;
-    };
+    }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     vec3 &operator/=(arithmetic a) {
         std::transform(data.begin(), data.end(), data.begin(), std::bind2nd(std::divides<scalar>(), a));
         return *this;
-    };
+    }
 
     vec3 cross(const vec3 &other) const {
         return {
@@ -77,15 +77,15 @@ public:
                 data[2] * other.data[0] - data[0] * other.data[2],
                 data[0] * other.data[1] - data[1] * other.data[0]
         };
-    };
+    }
 
     scalar norm() const {
         return std::sqrt(normSquared());
-    };
+    }
 
     scalar normSquared() const {
         return std::inner_product(data.begin(), data.end(), data.begin(), static_cast<scalar>(0));
-    };
+    }
 
     scalar infnorm() const {
         scalar inorm = 0;
@@ -93,11 +93,11 @@ public:
             inorm += std::abs(data[i]);
         }
         return inorm;
-    };
+    }
 
     scalar operator[](std::size_t i) const {
         return data.at(i);
-    };
+    }
 
     scalar &operator[](std::size_t i) {
         return data.at(i);
@@ -108,15 +108,15 @@ public:
             data[i] = static_cast<scalar>(1.) / data[i];
         }
         return *this;
-    };
+    }
 
     bool operator==(const vec3 &rhs) const {
         return data == rhs.data;
-    };
+    }
 
     bool operator!=(const vec3 &rhs) const {
         return data != rhs.data;
-    };
+    }
 
 //    bool almostEquals(const vec3 &rhs) const {
 //        bool result {true};
@@ -132,35 +132,35 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const vec3 &vec) {
         os << "(" << vec[0] << ", " << vec[1] << ", " << vec[2] << ")";
         return os;
-    };
+    }
 
     friend vec3 operator+(vec3 lhs, const vec3 &rhs) {
         lhs += rhs;
         return lhs;
-    };
+    }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     friend vec3 operator+(vec3 lhs, arithmetic rhs) {
         lhs += rhs;
         return lhs;
-    };
+    }
 
     friend vec3 operator-(vec3 lhs, const vec3 &rhs) {
         lhs -= rhs;
         return lhs;
-    };
+    }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     friend vec3 operator-(vec3 lhs, arithmetic rhs) {
         lhs -= rhs;
         return lhs;
-    };
+    }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     friend vec3 operator/(vec3 lhs, arithmetic rhs) {
         lhs /= rhs;
         return lhs;
-    };
+    }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     friend vec3 operator*(vec3 lhs, const arithmetic rhs) {
@@ -172,21 +172,21 @@ public:
         bool result{true};
         for (auto i = 0; i < 3; ++i) { result &= lhs[i] >= rhs[i]; }
         return result;
-    };
+    }
 
     friend bool operator<=(const vec3 &lhs, const vec3 &rhs) {
         bool result{true};
         for (auto i = 0; i < 3; ++i) { result &= lhs[i] <= rhs[i]; }
         return result;
-    };
+    }
 
     friend bool operator>(const vec3 &lhs, const vec3 &rhs) {
         return !(lhs <= rhs);
-    };
+    }
 
     friend bool operator<(const vec3 &lhs, const vec3 &rhs) {
         return !(lhs >= rhs);
-    };
+    }
 
     friend scalar operator*(const vec3 &lhs, const vec3 &rhs) {
         return std::inner_product(lhs.data.begin(), lhs.data.end(), rhs.data.begin(), static_cast<scalar>(0));
