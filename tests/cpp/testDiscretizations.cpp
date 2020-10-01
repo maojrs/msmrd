@@ -295,7 +295,7 @@ TEST_CASE("position orientation partition", "[positionOrientationPartition]") {
     int numSphericalSectionsPos = 7;
     int numRadialSectionsQuat = 5;
     int numSphericalSectionsQuat = 7;
-    auto positionOrientationPart = new positionOrientationPartition(2.2,
+    auto positionOrientationPart = std::make_unique<positionOrientationPartition>(2.2,
             numSphericalSectionsPos, numRadialSectionsQuat, numSphericalSectionsQuat);
 
     int totalnumSecsQuat = numSphericalSectionsQuat*(numRadialSectionsQuat -1) + 1;

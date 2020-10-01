@@ -49,11 +49,11 @@ namespace msmrd{
         // Initialize variables for number of regions in each collar
         std::vector<double> ideal_regionsPerCollar;
         ideal_regionsPerCollar.resize(num_collars);
+        regionsPerCollar.resize(num_collars + 2);
         phis.resize(num_collars + 2);
         phis[0] = 0;
-        regionsPerCollar.resize(num_collars);
-        thetas.resize(0);
-        std::vector<double> a{0};
+        thetas.resize(num_collars);
+        double a = 0;
         /* Iterate over each collar to get right number of regions per collar
          * and correct location of phi angles of each collar. */
         double cap_area_phi1;
@@ -68,32 +68,31 @@ namespace msmrd{
             cap_area_phi1 = angle2CapArea(phi0 + i * collar_angle);
             cap_area_phi2 = angle2CapArea(phi0 + (i + 1) * collar_angle);
             ideal_regionsPerCollar[i] = (cap_area_phi2 - cap_area_phi1) / state_area;
-            regionsPerCollar[i] = static_cast<int>(std::round(ideal_regionsPerCollar[i] + a[i]));
+            regionsPerCollar[i+1] = static_cast<int>(std::round(ideal_regionsPerCollar[i] + a));
             // Correct values of phi around collar i
             suma = 0;
             for (int j = 0; j < i + 1; j++) {
-                suma = suma + ideal_regionsPerCollar[j] - regionsPerCollar[j];
+                suma = suma + ideal_regionsPerCollar[j] - regionsPerCollar[j+1];
             }
-            a.push_back(suma);
+            a = suma;
             summ = 1;
             for (int j = 0; j < i; j++) {
-                summ = summ + regionsPerCollar[j];
+                summ = summ + regionsPerCollar[j+1];
             }
             phis[i + 1] = capArea2Angle(summ * state_area);
             phis[num_collars + 1] = M_PI - phi0;
             // Obtain list of thetas for a given collar
-            regsPerCollar_i = static_cast<unsigned long>(regionsPerCollar[i]);
+            regsPerCollar_i = static_cast<unsigned long>(regionsPerCollar[i+1]);
             std::vector<double> thetasi;
-            thetasi.resize(regsPerCollar_i);
-            dth = 2.0 * M_PI / regionsPerCollar[i] / scaling;
+            thetas[i].resize(regsPerCollar_i);
+            dth = 2.0 * M_PI / regionsPerCollar[i+1] / scaling;
             for (int j = 0; j < regsPerCollar_i; j++) {
-                thetasi[j] = j * dth;
+                thetas[i][j] = j * dth;
             }
-            thetas.push_back(thetasi);
         }
-        regionsPerCollar.push_back(1);
-        it = regionsPerCollar.begin();
-        regionsPerCollar.insert(it, 1);
+        // Adds one at the beginning and end of the array for caps at top and bottom
+        regionsPerCollar[0] = 1;
+        regionsPerCollar[num_collars + 1] = 1;
     }
 
 
