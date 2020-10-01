@@ -137,6 +137,7 @@ target_link_libraries(msmrd2binding PUBLIC msmrd2core)
 
 #pedantic compiling options to search for undefined behavior (only uncomment for debugging)
 #target_compile_options(msmrd2binding PUBLIC -Werror -Wall -Wextra -Wpedantic)
+#target_compile_options(msmrd2core PUBLIC -g)
 
 #EXECUTE_PROCESS(COMMAND git submodule update --init WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 

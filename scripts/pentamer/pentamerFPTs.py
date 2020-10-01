@@ -105,7 +105,7 @@ def simulationFPT(trajectorynum):
             unbound = False
             return "pentamer", integrator.clock
         elif (max(bindingsList) > 2):
-            unbound False
+            unbound = False
             return 'triple-bound', integrator.clock
         elif integrator.clock >= 600.0:
             unbound = False
