@@ -104,6 +104,9 @@ def simulationFPT(trajectorynum):
         if ( numBindings >= 5 and bindingsList == [2,2,2,2,2]):
             unbound = False
             return "pentamer", integrator.clock
+        elif (max(bindingsList) > 2):
+            unbound False
+            return 'triple-bound', integrator.clock
         elif integrator.clock >= 600.0:
             unbound = False
             return 'Failed at:', integrator.clock
@@ -123,6 +126,8 @@ def multiprocessingHandler():
             if state == 'pentamer':
                 file.write(state + ' ' + str(time) + '\n')
                 print("Simulation " + str(index) + ", done. Success!")
+            elif state == 'triple-bound':
+                print("Simulation " + str(index) + ", done. Failed due to triple bound :(")
             else:
                 print("Simulation " + str(index) + ", done. Failed :(")
 
