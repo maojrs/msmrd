@@ -6,6 +6,7 @@ from msmrd2.integrators import overdampedLangevin as odLangevin
 import msmrd2.tools.particleTools as particleTools
 import multiprocessing
 from multiprocessing import Pool
+import itertools
 import os
 
 '''
@@ -92,13 +93,15 @@ def simulationFPT(trajectorynum):
         # Pentamer needs at least five bindings
         numBindings = 0
         bindingsList = [0,0,0,0,0] # number of bindings for each particle (must be two for each one for the pentamer)
-        for i in range(5-1):
-            for j in range(i+1,5):
-                binding = dummyTraj.getState(partlist[i], partlist[j])
-                if binding in boundStates:
-                    numBindings += 1
-                    bindingsList[i] += 1
-                    bindingsList[j] += 1
+        # Loop over all possible pairs of particles
+        for pair in itertools.combinations([0,1,2,3,4],2):
+            i = pair[0]
+            j = pair[1]
+            binding = dummyTraj.getState(partlist[i], partlist[j])
+            if binding in boundStates:
+                numBindings += 1
+                bindingsList[i] += 1
+                bindingsList[j] += 1
         #if (ii % 50000):
         #    print('%.4f' %integrator.clock, numBindings, bindingsList)
         if ( numBindings >= 5 and bindingsList == [2,2,2,2,2]):
