@@ -23,7 +23,7 @@ bodytype = 'rigidbody'
 D = 1.0
 Drot = 1.0
 overlapThreshold = 1.5 # to avoid overlapping when randomly generating particles
-numTrajectories = 6000
+numTrajectories = 2*6000
 # Other important parameters
 boxsize = 6 #2.5 #6 #8 #6
 
@@ -87,6 +87,7 @@ def simulationFPT(trajectorynum):
     # a bound state is reached. The output in the files is the elapsed time.
     unbound = True
     ii = 0
+    condition = [False]*5
     while(unbound):
         ii += 1
         integrator.integrate(partlist)
@@ -102,14 +103,18 @@ def simulationFPT(trajectorynum):
                 numBindings += 1
                 bindingsList[i] += 1
                 bindingsList[j] += 1
-        #if (ii % 50000):
+        for i in range(5):
+            if (bindingsList[i] ==2):
+                condition[i] = True
+        #if (ii % 50000000):
         #    print('%.4f' %integrator.clock, numBindings, bindingsList)
-        if ( numBindings >= 5 and bindingsList == [2,2,2,2,2]):
+        #    print(condition)
+        if ( numBindings >= 5 and condition == [True]*5): #bindingsList == [2,2,2,2,2]):
             unbound = False
             return "pentamer", integrator.clock
-        elif (max(bindingsList) > 2):
-            unbound = False
-            return 'triple-bound', integrator.clock
+        #elif (max(bindingsList) > 2):
+        #    unbound = False
+        #    return 'triple-bound', integrator.clock
         elif integrator.clock >= 600.0:
             unbound = False
             return 'Failed at:', integrator.clock
