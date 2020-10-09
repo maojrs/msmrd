@@ -25,6 +25,8 @@ namespace msmrd {
         std::map<int, quaternion<double>> relativeOrientations = {};
         int referenceParticleIndex = -1;
         bool active = true;
+        std::vector<double> Dlist;
+        std::vector<double> Drotlist;
         /**
          * @param D diffusion constant
          * @param Drot rotational diffusion constant
@@ -49,6 +51,9 @@ namespace msmrd {
          * compounds. If 0, it means compound is inactive.
          * @param active if true the compound is active, if false it is no longer active and can be deleted
          * by integrator to free up memory.
+         * @param Dlist list of diffusion coefficients. Compounds of different sizes will diffuse
+         * with different diffusion coefficients.
+         * @param Drotlist same as Dlist, but for rotational diffusion.
          */
 
         /* Constructors for particle complex. */
@@ -71,7 +76,9 @@ namespace msmrd {
 
         void joinCompound(particleCompound partComplex);
 
-        std::vector<particleCompound> splitCompound(std::tuple<int,int> pairToBeRemoved);
+        void updateDiffusionCoefficients();
+
+        //std::vector<particleCompound> splitCompound(std::tuple<int,int> pairToBeRemoved);
 
         bool isActive() { return active; }
 
@@ -87,8 +94,9 @@ namespace msmrd {
 
         void setDs(double Dnew, double Drotnew) { D = Dnew, Drot = Drotnew; }
 
+        void setDlist(std::vector<double> newDlist) { Dlist = newDlist; }
 
-
+        void setDrotlist(std::vector<double> newDrotlist) { Drotlist = newDrotlist; }
     };
 
 

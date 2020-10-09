@@ -26,7 +26,7 @@ maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyDimer discretization
 minimumUnboundRadius = 1.5
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
-numTrajectories = 3*6000
+numTrajectories = 100 #3*6000
 
 # Other important parameters
 lagtime = 40 #100 #300
@@ -52,6 +52,14 @@ Drotlist = np.array([1.0])
 # Parameters to define coupling Markov model for bound dynamics: couplingMSM
 Dbound = np.ones(numBoundStates)
 DboundRot = 0.5*np.ones(numBoundStates)
+
+# Complex diffusion coefficients (D,Drot) (taken from estimateDiffusionCoefficients script)
+DlistCompound = np.array([0.6424, 0.2484, 0.06956, 0.0196])
+DrotlistCompound = np.array([0.7234, 0.1869, 0.04041, 0.0341])
+# 2 0.6423712078535424 0.7233534913946515
+# 3 0.24844179777215183 0.1868690626702439
+# 4 0.06956378582632722 0.04040898930201607
+# 5 0.019619258022256694 0.034116943729134555
 
 # Bound states definition, needed to calculate boundstate
 boundStates = [1, 2, 3, 4]
@@ -105,7 +113,8 @@ def MSMRDsimulationFPT(trajectorynum):
 
     # Define integrator, boundary and discretization
     seed = -int(1*trajectorynum) # Negative seed, uses random device as seed
-    integrator = msmrdMultiParticleIntegrator(dt, seed, bodytype, numParticleTypes, radialBounds, unboundMSM, couplingMSM)
+    integrator = msmrdMultiParticleIntegrator(dt, seed, bodytype, numParticleTypes, radialBounds,
+                                              unboundMSM, couplingMSM, DlistCompound, DrotlistCompound)
     integrator.setBoundary(boxBoundary)
     integrator.setDiscretization(discretization)
 

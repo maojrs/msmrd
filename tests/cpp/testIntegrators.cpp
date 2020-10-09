@@ -153,8 +153,10 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     // Define and set up integrators
     double dt = 0.0001;
     std::string bodytype = "rigidbody";
+    auto DlistCompound = std::vector<double>{1,1,1,1};
+    auto DrotlistCompound = std::vector<double>{1,1,1,1};
     auto myIntegrator = msmrdMultiParticleIntegrator<ctmsm>(dt, seed, bodytype, numParticleTypes,
-            radialBounds, unboundMSM, msmrdMSM);
+            radialBounds, unboundMSM, msmrdMSM, DlistCompound, DrotlistCompound);
     myIntegrator.setBoundary(&boundary);
 
     // Check  msmrdMSM is loaded correctly

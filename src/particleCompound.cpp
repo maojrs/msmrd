@@ -10,21 +10,21 @@ namespace msmrd {
      */
 
     /* Constructors */
-    particleCompound::particleCompound(vec3<double> position) : position(position){};
+    particleCompound::particleCompound(vec3<double> position) : position(position) { };
 
     
-    particleCompound::particleCompound(std::vector<double> &position) : position(position) {};
+    particleCompound::particleCompound(std::vector<double> &position) : position(position) { };
 
     
     particleCompound::particleCompound(std::map<std::tuple<int,int>, int> boundPairsDictionary):
-            boundPairsDictionary(boundPairsDictionary) {};
+            boundPairsDictionary(boundPairsDictionary) { };
 
     particleCompound::particleCompound(vec3<double> position, std::map<std::tuple<int,int>, int> boundPairsDictionary):
-            position(position), boundPairsDictionary(boundPairsDictionary) {};
+            position(position), boundPairsDictionary(boundPairsDictionary) { };
 
     particleCompound::particleCompound(std::vector<double> &position,
                                        std::map<std::tuple<int,int>, int> boundPairsDictionary) :
-            position(position), boundPairsDictionary(boundPairsDictionary) {};
+            position(position), boundPairsDictionary(boundPairsDictionary) { };
 
     /* Deactivates compound, clears all dictionaries and sets active to false */
     void particleCompound::deactivateCompound() {
@@ -41,6 +41,18 @@ namespace msmrd {
                                     partComplex.boundPairsDictionary.end());
     };
 
+    /* Updates diffusion coefficients fo compound depending on the size of the compound. It
+     * set D and Drot from the correct value of Dlist and Drot list.
+     */
+    void particleCompound::updateDiffusionCoefficients() {
+        auto sizeOfCompound = getSizeOfCompound();
+        if (sizeOfCompound >= 2) {
+            D = Dlist[sizeOfCompound - 2];
+            Drot = Drotlist[sizeOfCompound - 2];
+        } else{
+            throw std::domain_error("Size of active particle compound cannot be smaller than two.");
+        }
+    }
 
 
     // TODO: FUNCTION BELOW IN PROGESS

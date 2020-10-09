@@ -158,13 +158,7 @@ namespace msmrd {
          * In general this should be a more complicated when binding larger complexes. Also note that it is
          * assigned when the compound is created (size 2) and remains the same for lager compounds. */
         int MSMindex = msmrdMSM.getMSMindex(endState);
-        if (particleCompounds[parts[iIndex].compoundIndex].getSizeOfCompound() == 2) {
-            particleCompounds[parts[iIndex].compoundIndex].setDs(msmrdMSM.Dlist[MSMindex],
-                                                                 msmrdMSM.Drotlist[MSMindex]);
-        }
-        /* TODO: implement different diffusion coeffcients assignments for larger complexes (> 2 particles).
-         * Not too relevant in first implementation since all diffusion coefficients are constats,
-         * so left for future implemenation. */
+        particleCompounds[parts[iIndex].compoundIndex].updateDiffusionCoefficients();
     }
 
 

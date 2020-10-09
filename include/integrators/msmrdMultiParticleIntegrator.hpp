@@ -28,6 +28,8 @@ namespace msmrd {
     public:
         std::vector<particleCompound> particleCompounds;
         std::shared_ptr<discreteTrajectory<4>> discreteTrajClass;
+        std::vector<double> DlistCompound;
+        std::vector<double> DrotlistCompound;
         const vec3<double> pentamerCenter = {1.0/(2.0 * std::sin(M_PI/5.0)), 0.0, 0.0};
         /**
          * @param particleCompounds: vector containing particle compounds (two or more particles bound
@@ -35,16 +37,21 @@ namespace msmrd {
          * @param discreteTrajClass: pointer to trajectory class used for the discretization. We need this to extract
          * the bound states and their relative positions and orientations. The specific discrete trajectory
          * class will be fixed in the constructor, so this needs to be modified for different MSM/RD applications.
+         * @param DlistCompound list of diffusion coefficients. Compounds of different sizes will diffuse
+         * with different diffusion coefficients.
+         * @param DrotlistCompound same as Dlist, but for rotational diffusion.
          * @param pentamerCenter location of pentamer center with respect to the main particle in a compound. Uniquely
          * for trimer and pentamer implementations of multi-particle MSM/RD.
          */
 
         msmrdMultiParticleIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
                         std::array<double,2> radialBounds, std::vector<templateMSM> MSMlist,
-                        msmrdMarkovModel msmrdMSM);
+                        msmrdMarkovModel msmrdMSM, std::vector<double> DlistCompound,
+                        std::vector<double> DrotlistCompound);
 
         msmrdMultiParticleIntegrator(double dt, long seed, std::string particlesbodytype, int numParticleTypes,
-                        std::array<double,2> radialBounds, templateMSM MSMlist, msmrdMarkovModel msmrdMSM);
+                        std::array<double,2> radialBounds, templateMSM MSMlist, msmrdMarkovModel msmrdMSM,
+                        std::vector<double> DlistCompound, std::vector<double> DrotlistCompound);
 
         void integrate(std::vector<particle> &parts) override;
 
@@ -116,18 +123,21 @@ namespace msmrd {
     template <typename templateMSM>
     msmrdMultiParticleIntegrator<templateMSM>::msmrdMultiParticleIntegrator(double dt, long seed,
             std::string particlesbodytype, int numParticleTypes,std::array<double,2> radialBounds,
-            std::vector<templateMSM> MSMlist, msmrdMarkovModel msmrdMSM) :
+            std::vector<templateMSM> MSMlist, msmrdMarkovModel msmrdMSM, std::vector<double> DlistCompound,
+            std::vector<double> DrotlistCompound) :
             msmrdIntegrator<templateMSM>(dt, seed, particlesbodytype, numParticleTypes, radialBounds,
-                  MSMlist, msmrdMSM) {
+                  MSMlist, msmrdMSM), DlistCompound(DlistCompound), DrotlistCompound(DrotlistCompound) {
         discreteTrajClass = std::make_shared<patchyDimerTrajectory2> (patchyDimerTrajectory2(2,1));
             };
 
     template <typename templateMSM>
     msmrdMultiParticleIntegrator<templateMSM>::msmrdMultiParticleIntegrator(double dt, long seed,
             std::string particlesbodytype, int numParticleTypes, std::array<double,2> radialBounds,
-            templateMSM MSMlist, msmrdMarkovModel msmrdMSM) :
+            templateMSM MSMlist, msmrdMarkovModel msmrdMSM, std::vector<double> DlistCompound,
+            std::vector<double> DrotlistCompound) :
             msmrdIntegrator<templateMSM>(dt, seed, particlesbodytype, numParticleTypes, radialBounds,
-                                         MSMlist, msmrdMSM) {
+                                         MSMlist, msmrdMSM), DlistCompound(DlistCompound),
+                                         DrotlistCompound(DrotlistCompound) {
         discreteTrajClass = std::make_shared<patchyDimerTrajectory2> (patchyDimerTrajectory2(2,1));
     };
 
@@ -330,6 +340,9 @@ namespace msmrd {
         std::map<std::tuple<int,int>, int> boundPairsDictionary = {{pairIndices, endState}};
         particleCompound pComplex = particleCompound(boundPairsDictionary);
         pComplex.referenceParticleIndex = mainIndex;
+        // Set compound diffusion coefficients for any size
+        pComplex.setDlist(DlistCompound);
+        pComplex.setDrotlist(DrotlistCompound);
         /* Set relative positions and orientations in particle compound with respect to pentamer center, assuming
          * main particle is in origin with identity orientation. */
         pComplex.relativePositions.insert(std::pair<int, vec3<double>>(mainIndex, -1.0 * pentamerCenter));

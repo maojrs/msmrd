@@ -85,11 +85,12 @@ namespace msmrd {
                                                                "multiparticle intergation of dimer molecules"
                                                                "(timestep, seed, "
                                                                "particlesbodytype, numParticleTypes, "
-                                                               "radialBounds,"
-                                                               "MSMlist, mainMarkovModel)")
-                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, ctmsm &, msmrdMSM &>())
+                                                               "radialBounds, MSMlist, mainMarkovModel),"
+                                                               "DlistCompound, DrotlistCompound ")
+                .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, ctmsm &, msmrdMSM &,
+                        std::vector<double> &, std::vector<double> &>())
                 .def(py::init<double &, long &, std::string &, int &, std::array<double,2> &, std::vector<ctmsm> &,
-                        msmrdMSM &>())
+                        msmrdMSM, std::vector<double> &, std::vector<double> &>())
                 .def("findClosedBindingLoops", &msmrdMultiParticleIntegrator<ctmsm>::findClosedBindingLoops, "finds "
                                       "closed binding loops in all compounds")
                 .def("getNumberOfBindingsInCompound", &msmrdMultiParticleIntegrator<ctmsm>::getNumberOfBindingsInCompound,
