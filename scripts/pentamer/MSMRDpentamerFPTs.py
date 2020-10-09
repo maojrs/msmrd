@@ -26,7 +26,7 @@ maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyDimer discretization
 minimumUnboundRadius = 1.5
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
-numTrajectories = 100 #3*6000
+numTrajectories = 3*6000
 
 # Other important parameters
 lagtime = 40 #100 #300
@@ -185,19 +185,19 @@ def multiprocessingHandler():
 
 
 # Run parallel code
-#multiprocessingHandler()
+multiprocessingHandler()
 
-# Serial code for testing with gdb
-with open(filename, 'w') as file:
-    for index in range(numTrajectories):
-        state, time = MSMRDsimulationFPT(index)
-        if state == 'pentamer':
-            file.write(state + ' ' + str(time) + '\n')
-            print("Simulation " + str(index) + ", done. Success!")
-            #input("Press the <ENTER> key to continue...")
-        elif state == 'loop':
-            print("Simulation " + str(index) + ", done. Failed by loop formation :(")
-            #input("Press the <ENTER> key to continue...")
-        else:
-            print("Simulation " + str(index) + ", done. Failed :(")
-            #input("Press the <ENTER> key to continue...")
+# # Serial code for testing with gdb
+# with open(filename, 'w') as file:
+#     for index in range(numTrajectories):
+#         state, time = MSMRDsimulationFPT(index)
+#         if state == 'pentamer':
+#             file.write(state + ' ' + str(time) + '\n')
+#             print("Simulation " + str(index) + ", done. Success!")
+#             #input("Press the <ENTER> key to continue...")
+#         elif state == 'loop':
+#             print("Simulation " + str(index) + ", done. Failed by loop formation :(")
+#             #input("Press the <ENTER> key to continue...")
+#         else:
+#             print("Simulation " + str(index) + ", done. Failed :(")
+#             #input("Press the <ENTER> key to continue...")
