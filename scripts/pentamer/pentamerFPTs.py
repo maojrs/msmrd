@@ -87,8 +87,7 @@ def simulationFPT(trajectorynum):
     # a bound state is reached. The output in the files is the elapsed time.
     unbound = True
     ii = 0
-    conditionPatch1 = [False]*5 # Becomes true on the particle index when patch 1 of that particle is bound
-    conditionPatch2 = [False]*5 # Becomes true on the particle index when patch 2 of that particle is bound
+    conditionBound = [False]*5 # Becomes true when the particle index is bound on both patches
     while(unbound):
         ii += 1
         integrator.integrate(partlist)
@@ -116,14 +115,12 @@ def simulationFPT(trajectorynum):
                     bindingsListPatch2[i] += 1
                     bindingsListPatch2[j] += 1
         for i in range(5):
-            if (bindingsListPatch1[i] == 1):
-                conditionPatch1[i] = True
-            if (bindingsListPatch2[i] == 1):
-                conditionPatch2[i] = True
+            if (bindingsListPatch1[i] == 1 and bindingsListPatch2[i] == 1):
+                conditionBound[i] = True
         #if (ii % 50000000):
         #    print('%.4f' %integrator.clock, numBindings, bindingsList)
         #    print(condition)
-        if ( numBindings >= 5 and conditionPatch1 == [True]*5 and conditionPatch2 == [True]*5):
+        if ( numBindings >= 5 and conditionBound == [True]*5):
             unbound = False
             return "pentamer", integrator.clock
         #elif (max(bindingsList) > 2):
