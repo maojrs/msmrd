@@ -87,22 +87,19 @@ def simulationFPT(trajectorynum):
     # a bound state is reached. The output in the files is the elapsed time.
     unbound = True
     ii = 0
-    conditionPatch1 = [False]*5 # Becomes true when the particle index is bound on patch1
-    conditionPatch2 = [False]*5 # Becomes true when the particle index is bound on patch2
+    conditionBound = [False]*5 # Becomes true when the particle index is bound on both patches
     while(unbound):
         ii += 1
         integrator.integrate(partlist)
-        # Pentamer needs at least five bindings
-        numBindings = 0
+        # Pentamer needs at least five bindings, each involving two different patches
         bindingsListPatch1 = [0]*5 # counts bindings to patch1  of particle given by index
-        bindingsListPatch2 = [0]*5 # counts bindings to patch1  of particle given by index
+        bindingsListPatch2 = [0]*5 # counts bindings to patch2  of particle given by index
         # Loop over all possible pairs of particles
         for pair in itertools.combinations([0,1,2,3,4],2):
             i = pair[0]
             j = pair[1]
             binding = dummyTraj.getState(partlist[i], partlist[j])
             if binding in boundStates:
-                numBindings += 1
                 if binding == 1:
                     bindingsListPatch1[i] += 1
                     bindingsListPatch2[j] += 1
@@ -116,14 +113,12 @@ def simulationFPT(trajectorynum):
                     bindingsListPatch2[i] += 1
                     bindingsListPatch2[j] += 1
         for i in range(5):
-            if (bindingsListPatch1[i] > 0):
-                conditionPatch1[i] = True
-            if (bindingsListPatch2[i] > 0):
-                conditionPatch2[i] = True
+            if (bindingsListPatch1[i] > 0 and bindingsListPatch2[i] > 0):
+                conditionBound[i] = True
         #if (ii % 50000000):
         #    print('%.4f' %integrator.clock, numBindings, bindingsList)
         #    print(condition)
-        if ( numBindings >= 5 and (conditionPatch1 and conditionPatch2) == [True]*5):
+        if (conditionBound == [True]*5):
             unbound = False
             return "pentamer", integrator.clock
         #elif (max(bindingsList) > 2):
