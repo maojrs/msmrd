@@ -266,6 +266,7 @@ namespace msmrd {
         bool patchyBindingActive = true;
         if (part1.activePatchList.size() > 0) {
             patchyBindingActive = false;
+            // Only activate if particles are not already bound or if they are bound with each other.
             if (part1.activePatchList[indexPatch1] < 0 and part2.activePatchList[indexPatch2] < 0) {
                 patchyBindingActive = true;
             }
