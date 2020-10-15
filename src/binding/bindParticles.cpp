@@ -61,7 +61,8 @@ namespace msmrd {
                 .def("setState", &particle::setState)
                 .def("setLagtime", &particle::setLagtime)
                 .def("setMSMoff", &particle::setMSMoff)
-                .def("setMSMon", &particle::setMSMon);
+                .def("setMSMon", &particle::setMSMon)
+                .def("setActivePatchList", &particle::setActivePatchList);
 
 
         py::class_<particleCompound>(m, "particleCompound", "particle complex class that keeps track of"

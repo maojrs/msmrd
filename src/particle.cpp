@@ -103,6 +103,15 @@ namespace msmrd {
         lagtime = 0;
     }
 
+    /* Sets active patch list to active for all the patches (given by numPatches). Only
+     * used for multiparticle simulations where patches should sometimes be deactivated
+     * to avoid three particle bindings. */
+    void particle::setActivePatchList(int numPatches) {
+        for (int i=0; i < numPatches; i++) {
+            activePatchList.push_back(true);
+        }
+    }
+
 
 
 }

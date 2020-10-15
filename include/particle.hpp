@@ -42,6 +42,9 @@ namespace msmrd {
         std::vector<int> boundList;
         std::vector<int> boundStates;
         int compoundIndex = -1;
+        /* Next variables exlusive for multiparticle behavior
+         * (have default values if not initialized) */
+        std::vector<bool> activePatchList;
         /**
          * @param pid ID of the particle
          * @param active determines if particle currently active
@@ -82,6 +85,10 @@ namespace msmrd {
          * @param compoundIndex if the particle is part of a particle compund; it corresponds to the index
          * in the particleCompounds vector in the multiparticle MSM/RD integrator. If it is -1, it means either
          * the particle does not belong to any particle compound, or that this functionality is not in use.
+         * @param activePatchList If using patchy particles, this is a list of boolean values of which patches are
+         * active in this specifc particle. For instance, if a particle is bound with a given patch, then the
+         * that patch cannot interact with a third particle, so it is deactivated. Only used for some multiparticle
+         * simulations.
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
@@ -175,7 +182,6 @@ namespace msmrd {
 
         void setMSMon() { activeMSM = true; }
 
-
         /* Additional functions. */
         void updatePosition();
 
@@ -198,6 +204,8 @@ namespace msmrd {
         void deactivateMSM() { activeMSM = false; }
 
         void deactivateResetMSM();
+
+        void setActivePatchList(int numPatches);
 
     };
 

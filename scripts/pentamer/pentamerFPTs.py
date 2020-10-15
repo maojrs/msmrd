@@ -83,6 +83,10 @@ def simulationFPT(trajectorynum):
     seed = int(trajectorynum)
     partlist = particleTools.randomParticleList(numparticles, boxsize, overlapThreshold, D, Drot, seed)
 
+    # Set activePatchList
+    for part in partlist:
+        part.setActivePatchList(len(patchesCoordinates))
+
     # Calculates the first passage times for the trime. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.
     unbound = True
@@ -126,7 +130,7 @@ def simulationFPT(trajectorynum):
             #if (ii % 50000000):
             #    print('%.4f' %integrator.clock, numBindings, bindingsList)
             #    print(condition)
-            if (conditionBound == [True]*5):
+            if (conditionBoundPatch1 == [True]*5 and conditionBoundPatch2 == [True]*5):
                 unbound = False
                 return "pentamer", integrator.clock
             #elif (max(bindingsList) > 2):

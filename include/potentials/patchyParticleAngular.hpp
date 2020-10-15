@@ -59,6 +59,13 @@ namespace msmrd {
 
         // Additional auxiliary functions
 
+        std::array<vec3<double>, 4> normalForceTorque(particle &part1, particle &part2);
+
+        std::tuple<vec3<double>, vec3<double>, vec3<double>, vec3<double>> forceTorquePatchesSelective(
+                particle &part1, particle &part2, const vec3<double> pos1virtual);
+
+        bool isPatchBindingActive(particle &part1, particle &part2, int indexPatch1, int indexPatch2);
+
         std::tuple<vec3<double>, vec3<double>> calculatePlanes(const particle &part1, const particle &part2);
 
     };

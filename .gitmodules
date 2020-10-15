@@ -1,6 +1,8 @@
 [submodule "libraries/Catch2"]
 	path = libraries/Catch2
 	url = https://github.com/catchorg/Catch2.git
+	ignore = all
 [submodule "libraries/pybind11"]
 	path = libraries/pybind11
 	url = https://github.com/pybind/pybind11.git
+	ignore = all
