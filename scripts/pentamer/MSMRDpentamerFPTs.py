@@ -156,7 +156,7 @@ def MSMRDsimulationFPT(trajectorynum):
                 if i in [2,3,4]:
                     unbound = False
                     return 'loop', integrator.clock
-        elif integrator.clock >= 600.0: #1000.0:
+        elif integrator.clock >= 400.0: #1000.0:
             #filenameLog = filename = "/run/media/maojrs/Mr300/Documents/Posdoc/projects/MSMRD2/" \
             #                         "msmrd2/data/pentamer/debug/eventLog_" + str(trajectorynum)
             #integrator.printEventLog(filenameLog)
