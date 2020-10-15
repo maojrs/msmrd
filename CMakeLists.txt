@@ -49,8 +49,10 @@ set(SOURCES
         src/integrators/integrator.cpp
         src/integrators/msmrdIntegrator.cpp
         src/integrators/msmrdMultiParticleIntegrator.cpp
+        src/integrators/msmrdPatchyProtein.cpp
         src/integrators/overdampedLangevin.cpp
         src/integrators/overdampedLangevinMarkovSwitch.cpp
+        src/integrators/overdampedLangevinSelective.cpp
         src/markovModels/continuousTimeMarkovModel.cpp
         src/markovModels/discreteTimeMarkovModel.cpp
         src/markovModels/markovModel.cpp
@@ -69,7 +71,7 @@ set(SOURCES
         src/trajectories/trajectoryPositionOrientation.cpp
         src/trajectories/discrete/patchyDimerTrajectory.cpp
         src/trajectories/discrete/patchyProteinTrajectory.cpp
-        include/integrators/msmrdPatchyProtein.hpp src/integrators/msmrdPatchyProtein.cpp)
+        )
 
 set(PY_SOURCES
         src/binding/binding.hpp
@@ -102,8 +104,10 @@ set(PY_SOURCES
         include/integrators/integrator.hpp
         include/integrators/msmrdIntegrator.hpp
         include/integrators/msmrdMultiParticleIntegrator.hpp
+        include/integrators/msmrdPatchyProtein.hpp
         include/integrators/overdampedLangevin.hpp
         include/integrators/overdampedLangevinMarkovSwitch.hpp
+        include/integrators/overdampedLangevinSelective.hpp
         include/markovModels/continuousTimeMarkovModel.hpp
         include/markovModels/discreteTimeMarkovModel.hpp
         include/markovModels/markovModel.hpp

@@ -266,7 +266,11 @@ namespace msmrd {
         bool patchyBindingActive = true;
         if (part1.activePatchList.size() > 0) {
             patchyBindingActive = false;
-            if (part1.activePatchList[indexPatch1] and part2.activePatchList[indexPatch2]) {
+            if (part1.activePatchList[indexPatch1] < 0 and part2.activePatchList[indexPatch2] < 0) {
+                patchyBindingActive = true;
+            }
+            else if (part1.activePatchList[indexPatch1] == part2.getID() and
+                    part2.activePatchList[indexPatch2] == part1.getID()) {
                 patchyBindingActive = true;
             }
         }

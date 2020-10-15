@@ -2,7 +2,7 @@ import numpy as np
 import msmrd2
 import msmrd2.tools.quaternions as quats
 from msmrd2.potentials import patchyParticleAngular2
-from msmrd2.integrators import overdampedLangevin as odLangevin
+from msmrd2.integrators import overdampedLangevinSelective as odLangevinSelective
 import msmrd2.tools.particleTools as particleTools
 import multiprocessing
 from multiprocessing import Pool
@@ -23,7 +23,7 @@ bodytype = 'rigidbody'
 D = 1.0
 Drot = 1.0
 overlapThreshold = 1.5 # to avoid overlapping when randomly generating particles
-numTrajectories = 2*6000
+numTrajectories = 2*6
 # Other important parameters
 boxsize = 6 #2.5 #6 #8 #6
 
@@ -75,7 +75,7 @@ def simulationFPT(trajectorynum):
 
     # Define integrator and boundary (over-damped Langevin)
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
-    integrator = odLangevin(dt, seed, bodytype)
+    integrator = odLangevinSelective(dt, seed, bodytype)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPatchyParticleAngular2)
 
@@ -90,6 +90,7 @@ def simulationFPT(trajectorynum):
     # Calculates the first passage times for the trime. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.
     unbound = True
+    pentamerFormed = False
     ii = 0
     conditionBoundPatch1 = [False]*5 # Becomes true when the particle index is bound on patch 1
     conditionBoundPatch2 = [False]*5 # Becomes true when the particle index is bound on patch 2
@@ -97,48 +98,52 @@ def simulationFPT(trajectorynum):
         ii += 1
         integrator.integrate(partlist)
         if (ii % 50): # Cehck status every 50 timesteps
-            # Pentamer needs at least five bindings, each involving two different patches
-            bindingsListPatch1 = [0]*5 # counts bindings to patch1  of particle given by index
-            bindingsListPatch2 = [0]*5 # counts bindings to patch2  of particle given by index
-            # Loop over all possible pairs of particles
-            for pair in itertools.combinations([0,1,2,3,4],2):
-                i = pair[0]
-                j = pair[1]
-                binding = dummyTraj.getState(partlist[i], partlist[j])
-                if binding in boundStates:
-                    if binding == 1:
-                        bindingsListPatch1[i] += 1
-                        bindingsListPatch2[j] += 1
-                    if binding == 2:
-                        bindingsListPatch1[i] += 1
-                        bindingsListPatch1[j] += 1
-                    if binding == 3:
-                        bindingsListPatch2[i] += 1
-                        bindingsListPatch1[j] += 1
-                    if binding == 4:
-                        bindingsListPatch2[i] += 1
-                        bindingsListPatch2[j] += 1
-            for i in range(5):
-                if (bindingsListPatch1[i] == 1):
-                    conditionBoundPatch1[i] = True
-                if (bindingsListPatch2[i] == 1):
-                    conditionBoundPatch2[i] = True
-                if (bindingsListPatch1[i] > 1 or bindingsListPatch2[i] > 1):
-                    unbound = False
-                    return 'triple-bound', integrator.clock
-
-            #if (ii % 50000000):
-            #    print('%.4f' %integrator.clock, numBindings, bindingsList)
-            #    print(condition)
-            if (conditionBoundPatch1 == [True]*5 and conditionBoundPatch2 == [True]*5):
-                unbound = False
-                return "pentamer", integrator.clock
+            pentamerFormed = integrator.hasPentamerFormed(partlist)
+            # # Pentamer needs at least five bindings, each involving two different patches
+            # bindingsListPatch1 = [0]*5 # counts bindings to patch1  of particle given by index
+            # bindingsListPatch2 = [0]*5 # counts bindings to patch2  of particle given by index
+            # # Loop over all possible pairs of particles
+            # for pair in itertools.combinations([0,1,2,3,4],2):
+            #     i = pair[0]
+            #     j = pair[1]
+            #     binding = dummyTraj.getState(partlist[i], partlist[j])
+            #     if binding in boundStates:
+            #         if binding == 1:
+            #             bindingsListPatch1[i] += 1
+            #             bindingsListPatch2[j] += 1
+            #         if binding == 2:
+            #             bindingsListPatch1[i] += 1
+            #             bindingsListPatch1[j] += 1
+            #         if binding == 3:
+            #             bindingsListPatch2[i] += 1
+            #             bindingsListPatch1[j] += 1
+            #         if binding == 4:
+            #             bindingsListPatch2[i] += 1
+            #             bindingsListPatch2[j] += 1
+            # for i in range(5):
+            #     if (bindingsListPatch1[i] == 1):
+            #         conditionBoundPatch1[i] = True
+            #     if (bindingsListPatch2[i] == 1):
+            #         conditionBoundPatch2[i] = True
+            #     if (bindingsListPatch1[i] > 1 or bindingsListPatch2[i] > 1):
+            #         unbound = False
+            #         return 'triple-bound', integrator.clock
+            #
+            # #if (ii % 50000000):
+            # #    print('%.4f' %integrator.clock, numBindings, bindingsList)
+            # #    print(condition)
+            # if (conditionBoundPatch1 == [True]*5 and conditionBoundPatch2 == [True]*5):
+            #     unbound = False
+            #     return "pentamer", integrator.clock
             #elif (max(bindingsList) > 2):
             #    unbound = False
             #    return 'triple-bound', integrator.clock
-            elif integrator.clock >= 400.0:
-                unbound = False
-                return 'Failed at:', integrator.clock
+        if pentamerFormed:
+            unbound = False
+            return "pentamer", integrator.clock
+        elif integrator.clock >= 400.0:
+            unbound = False
+            return 'Failed at:', integrator.clock
 
 
 

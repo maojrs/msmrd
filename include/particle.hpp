@@ -37,16 +37,14 @@ namespace msmrd {
         bool activeMSM = true;
         int boundTo = -1;
         int boundState = -1;
-        /* Next variables exclusive for multiparticle MSM/RD behavior
+        /* Next variables exclusive for multiparticle or multiparticle MSM/RD behavior
          * (have default values if not initialized) */
         std::vector<int> boundList;
         std::vector<int> boundStates;
         int compoundIndex = -1;
-        /* Next variables exlusive for multiparticle behavior
-         * (have default values if not initialized) */
-        std::vector<bool> activePatchList;
+        std::vector<int> activePatchList;
         /**
-         * @param pid ID of the particle
+         * @param pid ID of the particle (can be the index in a particle list if it is part of particle list.)
          * @param active determines if particle currently active
          * @param type particle type (defaults to zero), for Markovian switching should be
          * considered the same as the msmid.
@@ -85,10 +83,11 @@ namespace msmrd {
          * @param compoundIndex if the particle is part of a particle compund; it corresponds to the index
          * in the particleCompounds vector in the multiparticle MSM/RD integrator. If it is -1, it means either
          * the particle does not belong to any particle compound, or that this functionality is not in use.
-         * @param activePatchList If using patchy particles, this is a list of boolean values of which patches are
-         * active in this specifc particle. For instance, if a particle is bound with a given patch, then the
-         * that patch cannot interact with a third particle, so it is deactivated. Only used for some multiparticle
-         * simulations.
+         * @param activePatchList If using patchy particles, this is a list of int values. The size
+         * of the list correspond to the number of patches, a -1 value in the list indicates the corresponding
+         * patch is unbound and active, a positive value corresponds to the index of the particle to which it
+         * is bound, and it indicates the patch is only allow to interact with the particle with which it is bound.
+         * Only used for some multiparticle simulations.
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
@@ -137,6 +136,8 @@ namespace msmrd {
 
 
         // Setter functions
+
+        void setID(int newID) { pid = newID; }
 
         void setD(double Dnew) { D = Dnew; }
 

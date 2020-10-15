@@ -55,6 +55,7 @@ def randomParticleList(numparticles, boxsize, separationDistance, D, Drot, rando
         orientation = np.array([random.random(), random.random(), random.random(), random.random()])
         orientation = orientation/np.linalg.norm(orientation)
         part = msmrd2.particle(D, Drot, position, orientation)
+        part.setID(i)
         pyPartlist.append(part)
 
     partlist = msmrd2.integrators.particleList(pyPartlist)
@@ -121,6 +122,7 @@ def randomParticleMSList(numparticles, boxsize, separationDistance, types, unbou
         D = unboundMSMs[types[i]].D[states[i]]
         Drot = unboundMSMs[types[i]].Drot[states[i]]
         part = msmrd2.particle(types[i], states[i], D, Drot, position, orientation)
+        part.setID(i)
         # Deactivate inner unbound MSM if there is only one state.
         if len(unboundMSMs[types[i]].D) == 1:
             part.deactivateMSM()

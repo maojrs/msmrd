@@ -1,6 +1,7 @@
 #include "binding.hpp"
 #include "integrators/overdampedLangevin.hpp"
 #include "integrators/overdampedLangevinMarkovSwitch.hpp"
+#include "integrators/overdampedLangevinSelective.hpp"
 #include "integrators/msmrdIntegrator.hpp"
 #include "integrators/msmrdPatchyProtein.hpp"
 #include "integrators/msmrdMultiParticleIntegrator.hpp"
@@ -23,6 +24,16 @@ namespace msmrd {
                                                                 "pointmix, rodmix or rigidbodymix) )")
                 .def(py::init<double &, long &, std::string &>())
                 .def("integrate", &overdampedLangevin::integrate);
+
+        py::class_<overdampedLangevinSelective, overdampedLangevin>(m, "overdampedLangevinSelective", "overdamped "
+                                                                    "Langevin integrator with selective active patches."
+                                                                    " Special for multiparticle simulations w/patchy "
+                                                                    "particles that avoid triple bindings. (timestep, "
+                                                                    "seed, particlesbodytype (point, rod, rigidbody, "
+                                                                            "pointmix, rodmix or rigidbodymix) )")
+                .def(py::init<double &, long &, std::string &>())
+                .def("integrate", &overdampedLangevinSelective::integrate)
+                .def("hasPentamerFormed", &overdampedLangevinSelective::hasPentamerFormed);
 
         py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch",
                                                                               "overdamped Langevin integrator with "

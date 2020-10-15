@@ -108,7 +108,7 @@ namespace msmrd {
      * to avoid three particle bindings. */
     void particle::setActivePatchList(int numPatches) {
         for (int i=0; i < numPatches; i++) {
-            activePatchList.push_back(true);
+            activePatchList.push_back(-1);
         }
     }
 

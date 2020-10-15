@@ -48,6 +48,7 @@ namespace msmrd {
 
                 .def("activate", &particle::activate)
                 .def("deactivate", &particle::deactivate)
+                .def("setID", &particle::setID)
                 .def("setD", &particle::setD)
                 .def("setDrot", &particle::setDrot)
                 .def("setType", &particle::setType)
