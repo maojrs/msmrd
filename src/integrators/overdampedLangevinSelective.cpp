@@ -81,9 +81,6 @@ namespace msmrd {
      */
     bool overdampedLangevinSelective::hasPentamerFormed(std::vector<particle> &parts) {
         auto pentamerFormed = false;
-        std::vector<bool> referenceCondition(5, true);
-        std::vector<bool> conditionBoundPatch1(5, false);
-        std::vector<bool> conditionBoundPatch2(5, false);
         std::vector<int> bindingsListPatch1(5, 0);
         std::vector<int> bindingsListPatch2(5, 0);
         // Count bindings in patches
@@ -108,14 +105,14 @@ namespace msmrd {
         }
         // Check conditions for bound patches are satisfied
         for (int i = 0; i < parts.size() - 1; i++) {
-            if (bindingsListPatch1[i] == 1) {
+            if (bindingsListPatch1[i] >= 1) {
                 conditionBoundPatch1[i] = true;
             }
-            if (bindingsListPatch2[i] == 1) {
+            if (bindingsListPatch2[i] >= 1) {
                 conditionBoundPatch2[i] = true;
             }
         }
-        // Check if oentamer has formed
+        // Check if pentamer has formed
         if (conditionBoundPatch1 == referenceCondition and conditionBoundPatch2 == referenceCondition) {
             pentamerFormed = true;
         }

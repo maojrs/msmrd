@@ -27,6 +27,10 @@ namespace msmrd {
          * @param discreteTraj pointer to patchy trajectory. The 4 indicate the number of bound states.
          * Can be extened to template to avoid hardcoding. As the functionality of this integrator is
          * heavily specialized, we live the number of bound states hard coded.
+         * @param referenceCondition reference condition to be satisfied to check pentamer formation.
+         * @param conditionBoundPatch1 vector of booleans if all true it means the patch1 of all particles
+         * has been bound
+         * @param conditionBoundPatch2, the same as above but for patch2
          */
 
         overdampedLangevinSelective(double dt, long seed, std::string particlesbodytype);
@@ -35,7 +39,10 @@ namespace msmrd {
 
         bool hasPentamerFormed(std::vector<particle> &parts);
 
-        protected:
+    protected:
+        std::vector<bool> referenceCondition = std::vector<bool>(5, true);
+        std::vector<bool> conditionBoundPatch1 = std::vector<bool>(5, false);
+        std::vector<bool> conditionBoundPatch2 = std::vector<bool>(5, false);
 
         void setActivePatches(std::vector<particle> &parts);
         };
