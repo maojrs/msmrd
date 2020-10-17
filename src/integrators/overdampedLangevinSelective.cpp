@@ -104,7 +104,7 @@ namespace msmrd {
             }
         }
         // Check conditions for bound patches are satisfied
-        for (int i = 0; i < parts.size() - 1; i++) {
+        for (int i = 0; i < parts.size(); i++) {
             if (bindingsListPatch1[i] >= 1) {
                 conditionBoundPatch1[i] = true;
             }
