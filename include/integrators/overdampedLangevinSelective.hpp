@@ -41,8 +41,6 @@ namespace msmrd {
 
     protected:
         std::vector<bool> referenceCondition = std::vector<bool>(5, true);
-        std::vector<bool> conditionBoundPatch1 = std::vector<bool>(5, false);
-        std::vector<bool> conditionBoundPatch2 = std::vector<bool>(5, false);
 
         void setActivePatches(std::vector<particle> &parts);
         };

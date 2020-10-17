@@ -83,6 +83,8 @@ namespace msmrd {
         auto pentamerFormed = false;
         std::vector<int> bindingsListPatch1(5, 0);
         std::vector<int> bindingsListPatch2(5, 0);
+        std::vector<bool> conditionBoundPatch1 = std::vector<bool>(5, false);
+        std::vector<bool> conditionBoundPatch2 = std::vector<bool>(5, false);
         // Count bindings in patches
         for (int i = 0; i < parts.size() - 1; i++) {
             for (int j = i + 1; j < parts.size(); j++) {
@@ -105,10 +107,10 @@ namespace msmrd {
         }
         // Check conditions for bound patches are satisfied
         for (int i = 0; i < parts.size(); i++) {
-            if (bindingsListPatch1[i] >= 1) {
+            if (bindingsListPatch1[i] == 1) {
                 conditionBoundPatch1[i] = true;
             }
-            if (bindingsListPatch2[i] >= 1) {
+            if (bindingsListPatch2[i] == 1) {
                 conditionBoundPatch2[i] = true;
             }
         }
