@@ -130,40 +130,25 @@ def MSMRDsimulationFPT(trajectorynum):
     while(unbound):
         ii += 1
         integrator.integrate(partlist)
-        if (partlist[0].compoundIndex > -1):
-            compoundSize = integrator.getCompoundSize(partlist[0].compoundIndex)
-            # compoundSize1 = integrator.getCompoundSize(partlist[1].compoundIndex)
-            # compoundSize2 = integrator.getCompoundSize(partlist[2].compoundIndex)
-            # compoundSize3 = integrator.getCompoundSize(partlist[3].compoundIndex)
-            # compoundSize4 = integrator.getCompoundSize(partlist[4].compoundIndex)
-            # if ii % 1000 == 0:
-            #     loops = integrator.findClosedBindingLoops(partlist)
-            #     print('%.4f' %integrator.clock, partlist[0].compoundIndex, partlist[1].compoundIndex, partlist[2].compoundIndex, partlist[3].compoundIndex, partlist[4].compoundIndex, \
-            #            'Compsize:', compoundSize, compoundSize1, compoundSize2, compoundSize3, compoundSize4)
-            # #     # print(partlist[0].position, partlist[1].position, partlist[2].position, partlist[3].position, partlist[4].position)
-            #     print("Bound lists:", partlist[0].boundList, partlist[1].boundList, partlist[2].boundList, partlist[3].boundList, partlist[4].boundList)
-            #     print("Bound State:", partlist[0].boundStates, partlist[1].boundStates, partlist[2].boundStates, partlist[3].boundStates, partlist[4].boundStates)
-            #     print(loops)
-            #if (compoundSize == 5):
-            #    unbound = False
-            #    return 'pentamer', integrator.clock
-            if (compoundSize >= 5):
-                loops = integrator.findClosedBindingLoops(partlist)
-                if 5 in loops:
-                    unbound = False
-                    return 'pentamer', integrator.clock
-        if ii % 5000 == 0:
-            loops = integrator.findClosedBindingLoops(partlist)
-            for i in loops:
-                if i in [2,3,4]:
-                    unbound = False
-                    return 'loop', integrator.clock
-        elif integrator.clock >= 400.0: #1000.0:
-            #filenameLog = filename = "/run/media/maojrs/Mr300/Documents/Posdoc/projects/MSMRD2/" \
-            #                         "msmrd2/data/pentamer/debug/eventLog_" + str(trajectorynum)
-            #integrator.printEventLog(filenameLog)
-            unbound = False
-            return 'Failed at:', integrator.clock
+        # Check status every 5000 timesteps (adds possible error of up to 5000*dt = 0.5), but
+        # speeds up simulations
+        if (ii % 5000 == 0):
+            ringFormations = integrator.findClosedBindingLoops(partlist)
+            if (3 in ringFormations):
+                unbound = False
+                return 'trimeric-loop', integrator.clock
+            elif (4 in ringFormations):
+                unbound = False
+                return 'tetrameric-loop', integrator.clock
+            elif (5 in ringFormations):
+                unbound = False
+                return "pentameric-loop", integrator.clock
+            elif integrator.clock >= 400.0:
+                unbound = False
+                return 'Failed at:', integrator.clock
+                #filenameLog = filename = "/run/media/maojrs/Mr300/Documents/Posdoc/projects/MSMRD2/" \
+                #                         "msmrd2/data/pentamer/debug/eventLog_" + str(trajectorynum)
+                #integrator.printEventLog(filenameLog)
 
 
 
@@ -177,13 +162,17 @@ def multiprocessingHandler():
     with open(filename, 'w') as file:
         for index, result in enumerate(pool.imap(MSMRDsimulationFPT, trajNumList)):
             state, time = result
-            if state == 'pentamer':
+            if state == 'trimeric-loop':
                 file.write(state + ' ' + str(time) + '\n')
-                print("Simulation " + str(index) + ", done. Success!")
-            elif state == 'loop':
-                print("Simulation " + str(index) + ", done. Failed by loop formation :(")
+                print("Simulation " + str(index).zfill(5) + ", done. Trimeric loop formed!")
+            elif state == 'tetrameric-loop':
+                file.write(state + ' ' + str(time) + '\n')
+                print("Simulation " + str(index).zfill(5) + ", done. Tetrameric loop formed!!")
+            elif state == 'pentameric-loop':
+                file.write(state + ' ' + str(time) + '\n')
+                print("Simulation " + str(index).zfill(5) + ", done. PENTAMERIC loop formed!!!")
             else:
-                print("Simulation " + str(index) + ", done. Failed :(")
+                print("Simulation " + str(index).zfill(5) + ", done. Failed :(")
 
 
 # Run parallel code

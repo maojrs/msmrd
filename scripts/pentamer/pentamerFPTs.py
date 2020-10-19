@@ -96,7 +96,7 @@ def simulationFPT(trajectorynum):
         integrator.integrate(partlist)
         # Check status every 5000 timesteps (adds possible error of up to 5000*dt = 0.5), but
         # speeds up simulations
-        if (ii % 5000):
+        if (ii % 5000 == 0):
             ringFormations = integrator.findClosedBindingLoops(partlist)
             if (3 in ringFormations):
                 unbound = False
