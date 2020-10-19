@@ -23,26 +23,35 @@ namespace msmrd {
     class overdampedLangevinSelective : public overdampedLangevin {
     public:
         std::shared_ptr<discreteTrajectory<4>> patchyTraj;
+        std::vector<particleCompound> particleCompounds;
+        std::vector<bool> conditionBoundPatch1 = std::vector<bool>(5, false);
+        std::vector<bool> conditionBoundPatch2 = std::vector<bool>(5, false);
         /**
          * @param discreteTraj pointer to patchy trajectory. The 4 indicate the number of bound states.
          * Can be extened to template to avoid hardcoding. As the functionality of this integrator is
          * heavily specialized, we live the number of bound states hard coded.
-         * @param referenceCondition reference condition to be satisfied to check pentamer formation.
+         * @param particleCompounds vector of particle compounds just used to keep track of what is
+         * bound to what and to check for formation of ring molecules.
          * @param conditionBoundPatch1 vector of booleans if all true it means the patch1 of all particles
          * has been bound
          * @param conditionBoundPatch2, the same as above but for patch2
+         * @param referenceCondition reference condition to be satisfied to check pentamer formation.
          */
 
         overdampedLangevinSelective(double dt, long seed, std::string particlesbodytype);
 
         void integrate(std::vector<particle> &parts) override;
 
-        bool hasPentamerFormed(std::vector<particle> &parts);
+        void updateParticleCompounds(std::vector<particle> &parts);
+
+        std::vector<int> findClosedBindingLoops(std::vector<particle> &parts);
+
+        // int hasRingFormed(std::vector<particle> &parts);
 
     protected:
         std::vector<bool> referenceCondition = std::vector<bool>(5, true);
 
         void setActivePatches(std::vector<particle> &parts);
-        };
+    };
 
 }

@@ -20,9 +20,11 @@ namespace msmrd {
 
         // Calculate forces and torques and save them into forceField and torqueField
         calculateForceTorqueFields(parts);
-        // Integrate and save next positions/orientations in parts[i].next***
+
         for (int i = 0; i < parts.size(); i++) {
+            // Sets active patches to calculate force-field avoind triple bindings
             setActivePatches(parts);
+            // Integrate and save next positions/orientations in parts[i].next***
             integrateOne(i, parts, dt);
         }
 
@@ -77,49 +79,148 @@ namespace msmrd {
         }
     }
 
-    /* Check if pentamer was formed
-     */
-    bool overdampedLangevinSelective::hasPentamerFormed(std::vector<particle> &parts) {
-        auto pentamerFormed = false;
-        std::vector<int> bindingsListPatch1(5, 0);
-        std::vector<int> bindingsListPatch2(5, 0);
-        std::vector<bool> conditionBoundPatch1 = std::vector<bool>(5, false);
-        std::vector<bool> conditionBoundPatch2 = std::vector<bool>(5, false);
-        // Count bindings in patches
+    /* Updates the vector of particle compounds. Whenever it is calles, it erases the vector
+     * of particleCompounds and repopulates it depending on the current configuration. Note it
+     * doesn't keep track of actual realtive positions nor orientations. It is only to track bindings. */
+    void overdampedLangevinSelective::updateParticleCompounds(std::vector<particle> &parts) {
+        auto dummyRelPosition = vec3<double>(0,0,0);
+        particleCompounds.clear();
+        for (int i = 0; i < parts.size(); i++) {
+            parts[i].compoundIndex = -1;
+        }
         for (int i = 0; i < parts.size() - 1; i++) {
-            for (int j = i + 1; j < parts.size(); j++) {
+            for (int j = i+1; j < parts.size(); j++) {
                 // Only allow a new bound state if there is no previous bound state between
-                auto state = patchyTraj->sampleDiscreteState(parts[i], parts[j]);
-                if (state == 1) {
-                    bindingsListPatch1[i] += 1;
-                    bindingsListPatch2[j] += 1;
-                } else if (state == 2) {
-                    bindingsListPatch1[i] += 1;
-                    bindingsListPatch1[j] += 1;
-                } else if (state == 3) {
-                    bindingsListPatch2[i] += 1;
-                    bindingsListPatch1[j] += 1;
-                } else if (state == 4) {
-                    bindingsListPatch2[i] += 1;
-                    bindingsListPatch2[j] += 1;
+                int state = patchyTraj->sampleDiscreteState(parts[i], parts[j]);
+                if (state == 1 or state == 2 or state == 3 or state == 4) {
+                    // Create compound
+                    if (parts[i].compoundIndex == -1 and parts[j].compoundIndex == -1) {
+                        std::tuple<int, int> pairIndices = std::make_tuple(i, j);
+                        std::map<std::tuple<int, int>, int> boundPairsDictionary = {{pairIndices, state}};
+                        particleCompound pComplex = particleCompound(boundPairsDictionary);
+                        pComplex.relativePositions.insert(std::pair<int, vec3<double>>(1, dummyRelPosition));
+                        particleCompounds.push_back(pComplex);
+                        parts[i].compoundIndex = static_cast<int>(particleCompounds.size() - 1);
+                        parts[j].compoundIndex = static_cast<int>(particleCompounds.size() - 1);
+                    }
+                    // Add particle to compound
+                    else if (parts[i].compoundIndex == -1 or parts[j].compoundIndex == -1) {
+                        if (parts[i].compoundIndex != -1){
+                            auto compIndex = parts[i].compoundIndex;
+                            std::tuple<int,int> pairIndices = std::make_tuple(i,j);
+                            particleCompounds[compIndex].boundPairsDictionary.insert (
+                                    std::pair<std::tuple<int,int>, int>(pairIndices, state));
+                            particleCompounds[compIndex].relativePositions.insert(
+                                    std::pair<int, vec3<double>>(j,1 * dummyRelPosition));
+                            parts[j].compoundIndex = 1 * parts[i].compoundIndex;
+                        }
+                        else{
+                            auto compIndex = parts[j].compoundIndex;
+                            std::tuple<int,int> pairIndices = std::make_tuple(j,i);
+                            particleCompounds[compIndex].boundPairsDictionary.insert (
+                                    std::pair<std::tuple<int,int>, int>(pairIndices, state));
+                            particleCompounds[compIndex].relativePositions.insert(
+                                    std::pair<int, vec3<double>>(i,1 * dummyRelPosition));
+                            parts[i].compoundIndex = 1 * parts[j].compoundIndex;
+                        }
+                    }
+                    // Join compounds
+                    else if (parts[i].compoundIndex != parts[j].compoundIndex) {
+                        auto compIndex = std::min(parts[i].compoundIndex, parts[j].compoundIndex);
+                        auto secondCompIndex = std::max(parts[i].compoundIndex, parts[j].compoundIndex);
+                        std::tuple<int,int> pairIndices = std::make_tuple(i, j);
+                        particleCompounds[compIndex].boundPairsDictionary.insert (
+                                std::pair<std::tuple<int,int>, int>(pairIndices, state));
+                        particleCompounds[compIndex].relativePositions.insert(
+                                std::pair<int, vec3<double>>(j,dummyRelPosition));
+                        particleCompounds[compIndex].joinCompound(particleCompounds[secondCompIndex]);
+                        particleCompounds[compIndex].relativePositions.insert(
+                                particleCompounds[secondCompIndex].relativePositions.begin(),
+                                particleCompounds[secondCompIndex].relativePositions.end());
+                        particleCompounds[secondCompIndex].deactivateCompound();
+                        for (int k=0; k < parts.size(); k++) {
+                            if(parts[k].compoundIndex == parts[j].compoundIndex){
+                                parts[k].compoundIndex = compIndex;
+                            }
+                        }
+                    }
+                    // Close compound
+                    else{
+                        std::tuple<int,int> pairIndices = std::make_tuple(i, j);
+                        particleCompounds[parts[i].compoundIndex].boundPairsDictionary.insert (
+                                std::pair<std::tuple<int,int>, int>(pairIndices, state) );
+                        particleCompounds[parts[i].compoundIndex].relativePositions.insert(
+                                std::pair<int, vec3<double>>(j,dummyRelPosition));
+                    }
                 }
             }
         }
-        // Check conditions for bound patches are satisfied
-        for (int i = 0; i < parts.size(); i++) {
-            if (bindingsListPatch1[i] == 1) {
-                conditionBoundPatch1[i] = true;
-            }
-            if (bindingsListPatch2[i] == 1) {
-                conditionBoundPatch2[i] = true;
-            }
-        }
-        // Check if pentamer has formed
-        if (conditionBoundPatch1 == referenceCondition and conditionBoundPatch2 == referenceCondition) {
-            pentamerFormed = true;
-        }
-        return pentamerFormed;
     }
+
+    /* Checks if there is any closed binding loop in any of the particle compounds. If so, it returns the size of
+     * the loops found in a vector of integers, which size is the number of loops */
+    std::vector<int> overdampedLangevinSelective::findClosedBindingLoops(std::vector<particle> &parts){
+        // Updates particle compounds array to keep track of bindings.
+        updateParticleCompounds(parts);
+        // Check for ring loops in updated particle compounds vector.
+        std::vector<int> boundLoops;
+        for (auto &particleCompound : particleCompounds) {
+            if (particleCompound.active) {
+                auto compoundSize = particleCompound.getSizeOfCompound();
+                auto numBindings = particleCompound.getNumberOfbindings();
+                if (compoundSize == numBindings) {
+                    boundLoops.push_back(numBindings);
+                }
+                if (numBindings == 5) {
+                    boundLoops.push_back(numBindings);
+                }
+            }
+        }
+        return boundLoops;
+    };
+
+
+//    /* Check if ring molecule was formed. It returns 0 if it was not formed or it returns an
+//     * indteger indicating the number of molecules involved in the ring.  */
+//    int overdampedLangevinSelective::hasRingFormed(std::vector<particle> &parts) {
+//        auto pentamerFormed = false;
+//        std::vector<int> bindingsListPatch1(5, 0);
+//        std::vector<int> bindingsListPatch2(5, 0);
+//        // Count bindings in patches
+//        for (int i = 0; i < parts.size() - 1; i++) {
+//            for (int j = i + 1; j < parts.size(); j++) {
+//                // Only allow a new bound state if there is no previous bound state between
+//                auto state = patchyTraj->sampleDiscreteState(parts[i], parts[j]);
+//                if (state == 1) {
+//                    bindingsListPatch1[i] += 1;
+//                    bindingsListPatch2[j] += 1;
+//                } else if (state == 2) {
+//                    bindingsListPatch1[i] += 1;
+//                    bindingsListPatch1[j] += 1;
+//                } else if (state == 3) {
+//                    bindingsListPatch2[i] += 1;
+//                    bindingsListPatch1[j] += 1;
+//                } else if (state == 4) {
+//                    bindingsListPatch2[i] += 1;
+//                    bindingsListPatch2[j] += 1;
+//                }
+//            }
+//        }
+//        // Check conditions for bound patches are satisfied
+//        for (int i = 0; i < parts.size(); i++) {
+//            if (bindingsListPatch1[i] == 1) {
+//                conditionBoundPatch1[i] = true;
+//            }
+//            if (bindingsListPatch2[i] == 1) {
+//                conditionBoundPatch2[i] = true;
+//            }
+//        }
+//        // Check if pentamer has formed
+//        if (conditionBoundPatch1 == referenceCondition and conditionBoundPatch2 == referenceCondition) {
+//            pentamerFormed = true;
+//        }
+//        return pentamerFormed;
+//    }
 
 
 

@@ -23,7 +23,7 @@ bodytype = 'rigidbody'
 D = 1.0
 Drot = 1.0
 overlapThreshold = 1.5 # to avoid overlapping when randomly generating particles
-numTrajectories = 2*6
+numTrajectories = 3*6000
 # Other important parameters
 boxsize = 6 #2.5 #6 #8 #6
 
@@ -92,13 +92,14 @@ def simulationFPT(trajectorynum):
     unbound = True
     pentamerFormed = False
     ii = 0
-    conditionBoundPatch1 = [False]*5 # Becomes true when the particle index is bound on patch 1
-    conditionBoundPatch2 = [False]*5 # Becomes true when the particle index is bound on patch 2
+    # conditionBoundPatch1 = [False]*5 # Becomes true when the particle index is bound on patch 1
+    # conditionBoundPatch2 = [False]*5 # Becomes true when the particle index is bound on patch 2
+    ringFormations = []
     while(unbound):
         ii += 1
         integrator.integrate(partlist)
         if (ii % 50): # Cehck status every 50 timesteps
-            pentamerFormed = integrator.hasPentamerFormed(partlist)
+            ringFormations = integrator.findClosedBindingLoops(partlist)
             # # Pentamer needs at least five bindings, each involving two different patches
             # bindingsListPatch1 = [0]*5 # counts bindings to patch1  of particle given by index
             # bindingsListPatch2 = [0]*5 # counts bindings to patch2  of particle given by index
@@ -135,15 +136,21 @@ def simulationFPT(trajectorynum):
             # if (conditionBoundPatch1 == [True]*5 and conditionBoundPatch2 == [True]*5):
             #     unbound = False
             #     return "pentamer", integrator.clock
-            #elif (max(bindingsList) > 2):
+            # elif (max(bindingsList) > 2):
             #    unbound = False
             #    return 'triple-bound', integrator.clock
-        if pentamerFormed:
-            unbound = False
-            return "pentamer", integrator.clock
-        elif integrator.clock >= 400.0:
-            unbound = False
-            return 'Failed at:', integrator.clock
+            if (3 in ringFormations or 4 in ringFormations):
+                unbound = False
+                return 'loop', integrator.clock
+            elif (5 in ringFormations):
+                unbound = False
+                return "pentamer", integrator.clock
+        # if pentamerFormed:
+        #     unbound = False
+        #     return "pentamer", integrator.clock
+            elif integrator.clock >= 400.0:
+                unbound = False
+                return 'Failed at:', integrator.clock
 
 
 
@@ -160,8 +167,8 @@ def multiprocessingHandler():
             if state == 'pentamer':
                 file.write(state + ' ' + str(time) + '\n')
                 print("Simulation " + str(index) + ", done. Success!")
-            elif state == 'triple-bound':
-                print("Simulation " + str(index) + ", done. Failed due to triple bound :(")
+            elif state == 'loop':
+                print("Simulation " + str(index) + ", done. Failed due to loop formation :(")
             else:
                 print("Simulation " + str(index) + ", done. Failed :(")
 
@@ -176,6 +183,8 @@ multiprocessingHandler()
 #         if state == 'pentamer':
 #             file.write(state + ' ' + str(time) + '\n')
 #             print("Simulation " + str(index) + ", done. Success!")
+#         elif state == 'loop':
+#             print("Simulation " + str(index) + ", done. Failed due to loop formation :(")
 #         else:
 #             print("Simulation " + str(index) + ", done. Failed :(")
 

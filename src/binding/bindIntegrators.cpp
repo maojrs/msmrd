@@ -33,7 +33,8 @@ namespace msmrd {
                                                                             "pointmix, rodmix or rigidbodymix) )")
                 .def(py::init<double &, long &, std::string &>())
                 .def("integrate", &overdampedLangevinSelective::integrate)
-                .def("hasPentamerFormed", &overdampedLangevinSelective::hasPentamerFormed);
+                .def("updateParticleCompounds", &overdampedLangevinSelective::updateParticleCompounds)
+                .def("findClosedBindingLoops", &overdampedLangevinSelective::findClosedBindingLoops);
 
         py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch",
                                                                               "overdamped Langevin integrator with "

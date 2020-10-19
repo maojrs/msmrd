@@ -281,7 +281,7 @@ namespace msmrd {
     };
 
     /* Checks if there is any closed binding loop in any of the particle compounds. If so, it returns the size of
-     * the loops found in a vector of intergers, which size is the number of loops */
+     * the loops found in a vector of integers, which size is the number of loops */
     template <typename templateMSM>
     std::vector<int> msmrdMultiParticleIntegrator<templateMSM>::findClosedBindingLoops(std::vector<particle> &parts){
         std::vector<int> boundLoops = {};
