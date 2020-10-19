@@ -46,6 +46,9 @@ namespace msmrd {
 
         std::vector<int> findClosedBindingLoops(std::vector<particle> &parts);
 
+        int getCompoundSize(int compoundIndex);
+
+
         // int hasRingFormed(std::vector<particle> &parts);
 
     protected:

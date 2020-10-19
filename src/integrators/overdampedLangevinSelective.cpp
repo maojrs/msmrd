@@ -98,7 +98,8 @@ namespace msmrd {
                         std::tuple<int, int> pairIndices = std::make_tuple(i, j);
                         std::map<std::tuple<int, int>, int> boundPairsDictionary = {{pairIndices, state}};
                         particleCompound pComplex = particleCompound(boundPairsDictionary);
-                        pComplex.relativePositions.insert(std::pair<int, vec3<double>>(1, dummyRelPosition));
+                        pComplex.relativePositions.insert(std::pair<int, vec3<double>>(i, dummyRelPosition));
+                        pComplex.relativePositions.insert(std::pair<int, vec3<double>>(j, dummyRelPosition));
                         particleCompounds.push_back(pComplex);
                         parts[i].compoundIndex = static_cast<int>(particleCompounds.size() - 1);
                         parts[j].compoundIndex = static_cast<int>(particleCompounds.size() - 1);
@@ -126,13 +127,11 @@ namespace msmrd {
                     }
                     // Join compounds
                     else if (parts[i].compoundIndex != parts[j].compoundIndex) {
-                        auto compIndex = std::min(parts[i].compoundIndex, parts[j].compoundIndex);
-                        auto secondCompIndex = std::max(parts[i].compoundIndex, parts[j].compoundIndex);
+                        auto compIndex = parts[i].compoundIndex;
+                        auto secondCompIndex = parts[j].compoundIndex;
                         std::tuple<int,int> pairIndices = std::make_tuple(i, j);
                         particleCompounds[compIndex].boundPairsDictionary.insert (
                                 std::pair<std::tuple<int,int>, int>(pairIndices, state));
-                        particleCompounds[compIndex].relativePositions.insert(
-                                std::pair<int, vec3<double>>(j,dummyRelPosition));
                         particleCompounds[compIndex].joinCompound(particleCompounds[secondCompIndex]);
                         particleCompounds[compIndex].relativePositions.insert(
                                 particleCompounds[secondCompIndex].relativePositions.begin(),
@@ -149,8 +148,6 @@ namespace msmrd {
                         std::tuple<int,int> pairIndices = std::make_tuple(i, j);
                         particleCompounds[parts[i].compoundIndex].boundPairsDictionary.insert (
                                 std::pair<std::tuple<int,int>, int>(pairIndices, state) );
-                        particleCompounds[parts[i].compoundIndex].relativePositions.insert(
-                                std::pair<int, vec3<double>>(j,dummyRelPosition));
                     }
                 }
             }
@@ -171,13 +168,21 @@ namespace msmrd {
                 if (compoundSize == numBindings) {
                     boundLoops.push_back(numBindings);
                 }
-                if (numBindings == 5) {
-                    boundLoops.push_back(numBindings);
-                }
             }
         }
         return boundLoops;
     };
+
+
+    int overdampedLangevinSelective::getCompoundSize(int compoundIndex) {
+        if (compoundIndex < particleCompounds.size()) {
+            return particleCompounds[compoundIndex].getSizeOfCompound();
+        }
+        else {
+            return -1;
+        }
+    };
+
 
 
 //    /* Check if ring molecule was formed. It returns 0 if it was not formed or it returns an

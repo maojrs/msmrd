@@ -34,7 +34,8 @@ namespace msmrd {
                 .def(py::init<double &, long &, std::string &>())
                 .def("integrate", &overdampedLangevinSelective::integrate)
                 .def("updateParticleCompounds", &overdampedLangevinSelective::updateParticleCompounds)
-                .def("findClosedBindingLoops", &overdampedLangevinSelective::findClosedBindingLoops);
+                .def("findClosedBindingLoops", &overdampedLangevinSelective::findClosedBindingLoops)
+                .def("getCompoundSize", &overdampedLangevinSelective::getCompoundSize);
 
         py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch",
                                                                               "overdamped Langevin integrator with "

@@ -26,7 +26,7 @@ maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyDimer discretization
 minimumUnboundRadius = 1.5
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
-numTrajectories = 3*6000
+numTrajectories = 4*6000
 
 # Other important parameters
 lagtime = 40 #100 #300
@@ -144,12 +144,14 @@ def MSMRDsimulationFPT(trajectorynum):
             #     print("Bound lists:", partlist[0].boundList, partlist[1].boundList, partlist[2].boundList, partlist[3].boundList, partlist[4].boundList)
             #     print("Bound State:", partlist[0].boundStates, partlist[1].boundStates, partlist[2].boundStates, partlist[3].boundStates, partlist[4].boundStates)
             #     print(loops)
+            #if (compoundSize == 5):
+            #    unbound = False
+            #    return 'pentamer', integrator.clock
             if (compoundSize >= 5):
                 loops = integrator.findClosedBindingLoops(partlist)
-                for i in loops:
-                    if i == 5:
-                        unbound = False
-                        return 'pentamer', integrator.clock
+                if 5 in loops:
+                    unbound = False
+                    return 'pentamer', integrator.clock
         if ii % 5000 == 0:
             loops = integrator.findClosedBindingLoops(partlist)
             for i in loops:
