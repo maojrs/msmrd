@@ -514,26 +514,69 @@ namespace msmrd {
         particle &secondPart = parts[secondIndex];
         int endStateIndex = endState - 1;
         int mainCompoundIndex = mainPart.compoundIndex;
+        auto &partCompound = particleCompounds[mainCompoundIndex];
         // Insert new binding into boundsPairs dicitionary
         std::tuple<int,int> pairIndices = std::make_tuple(mainIndex, secondIndex);
-        particleCompounds[mainCompoundIndex].boundPairsDictionary.insert (
-                std::pair<std::tuple<int,int>, int>(pairIndices, endState) );
-        // Set relative position and orientation
-        // Set relative positions/orientations in particle compound, first for the particle where there was a binding.
-        auto relPosition = discreteTrajClass->getRelativePosition(endStateIndex);
-        auto relOrientation = discreteTrajClass->getRelativeOrientation(endStateIndex);
-        // Set fixed position and orientation of newly bound particle
-        secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
-        secondPart.orientation = mainPart.orientation * relOrientation;
-        // Set relative position w/respect to compound center and orientation w/respect reference particle
-        relPosition = particleCompounds[mainCompoundIndex].relativePositions[mainIndex]
-                      + msmrdtools::rotateVec(relPosition,
-                                              particleCompounds[mainCompoundIndex].relativeOrientations[mainIndex]);
-        relOrientation = particleCompounds[mainCompoundIndex].relativeOrientations[mainIndex] * relOrientation ;
-        particleCompounds[mainCompoundIndex].relativePositions.insert(std::pair<int, vec3<double>>(secondIndex,
-                                                                                                   relPosition));
-        particleCompounds[mainCompoundIndex].relativeOrientations.insert(std::pair<int, quaternion<double>>(
-                secondIndex, relOrientation));
+        partCompound.boundPairsDictionary.insert (std::pair<std::tuple<int,int>, int>(pairIndices, endState) );
+        // Set relative position and orientation of close compound depending on its size (tri,tetra or pentameric ring)
+        auto compoundSize = partCompound.getSizeOfCompound();
+        // Set relative positions for trimeric ring
+        if (compoundSize == 3) {
+            auto k = 1;
+            for (auto &relPosMap : partCompound.relativePositions) {
+                auto partIndex = relPosMap.first;
+                auto refIndex = partCompound.referenceParticleIndex;
+                if (partIndex != refIndex){
+                    auto angle = M_PI/3.0;
+                    auto relPosition = vec3<double>(std::cos(angle/2.0), std::sin(k*angle/2.0),0);
+                    auto relPhi = vec3<double>(0,0,-k*2*angle);
+                    auto relOrientation = msmrdtools::axisangle2quaternion(relPhi);
+                    k = -1*k;
+                    relPosition = partCompound.relativePositions[refIndex]
+                                  + msmrdtools::rotateVec(relPosition,partCompound.relativeOrientations[refIndex]);
+                    relOrientation = partCompound.relativeOrientations[refIndex] * relOrientation;
+                    partCompound.relativePositions.find(partIndex)->second = relPosition;
+                    partCompound.relativeOrientations.find(partIndex)->second = relOrientation;
+                }
+            }
+        // Set relative positions for tetrameric ring
+        } else if (compoundSize == 4) {
+            auto k = 0;
+            for (auto &relPosMap : partCompound.relativePositions) {
+                auto partIndex = relPosMap.first;
+                auto refIndex = partCompound.referenceParticleIndex;
+                if (partIndex != refIndex){
+                    auto angle = M_PI/2.0;
+                    auto relPosition = vec3<double>(std::cos((1-k)*angle/2.0), std::sin((1-k)*angle/2.0),0);
+                    if (k==1) {
+                        relPosition = std::sqrt(2)*relPosition;
+                    }
+                    auto relPhi = vec3<double>(0,0,-(k+1)*angle);
+                    auto relOrientation = msmrdtools::axisangle2quaternion(relPhi);
+                    k += 1;
+                    relPosition = partCompound.relativePositions[refIndex]
+                                  + msmrdtools::rotateVec(relPosition,partCompound.relativeOrientations[refIndex]);
+                    relOrientation = partCompound.relativeOrientations[refIndex] * relOrientation;
+                    partCompound.relativePositions.find(partIndex)->second = relPosition;
+                    partCompound.relativeOrientations.find(partIndex)->second = relOrientation;
+                }
+            }
+        }
+        // Else we have a pentameric ring, which corresponds to default behavior
+        else {
+            // Set relative positions/orientations in particle compound, first for the particle where there was a binding.
+            auto relPosition = discreteTrajClass->getRelativePosition(endStateIndex);
+            auto relOrientation = discreteTrajClass->getRelativeOrientation(endStateIndex);
+            // Set fixed position and orientation of newly bound particle
+            secondPart.position = mainPart.position + msmrdtools::rotateVec(relPosition, mainPart.orientation);
+            secondPart.orientation = mainPart.orientation * relOrientation;
+            // Set relative position w/respect to compound center and orientation w/respect reference particle
+            relPosition = partCompound.relativePositions[mainIndex]
+                          + msmrdtools::rotateVec(relPosition, partCompound.relativeOrientations[mainIndex]);
+            relOrientation = partCompound.relativeOrientations[mainIndex] * relOrientation;
+            partCompound.relativePositions.find(secondIndex)->second = relPosition;
+            partCompound.relativeOrientations.find(secondIndex)->second = relOrientation;
+        }
     };
 
 
