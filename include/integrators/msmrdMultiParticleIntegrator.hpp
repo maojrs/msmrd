@@ -300,6 +300,9 @@ namespace msmrd {
                         boundLoops.push_back(2);
                     }
                 }
+                if (compoundSize == 5){
+                    boundLoops.push_back(numBindings);
+                }
             }
         }
         return boundLoops;
