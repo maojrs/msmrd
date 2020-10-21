@@ -27,6 +27,8 @@ radialBounds = [1.25, 2.25] # must match patchyDimer discretization
 minimumUnboundRadius = 1.5
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
 numTrajectories = 4*6000
+printAllRingFormations = False # if false, it only print the pentameric ring FPTs (not trimeric nor tetrameric)
+
 
 # Other important parameters
 lagtime = 40 #100 #300
@@ -163,11 +165,13 @@ def multiprocessingHandler():
         for index, result in enumerate(pool.imap(MSMRDsimulationFPT, trajNumList)):
             state, time = result
             if state == 'trimeric-loop':
-                file.write(state + ' ' + str(time) + '\n')
                 print("Simulation " + str(index).zfill(5) + ", done. Trimeric loop formed!")
+                if printAllRingFormations:
+                    file.write(state + ' ' + str(time) + '\n')
             elif state == 'tetrameric-loop':
-                file.write(state + ' ' + str(time) + '\n')
                 print("Simulation " + str(index).zfill(5) + ", done. Tetrameric loop formed!!")
+                if printAllRingFormations:
+                    file.write(state + ' ' + str(time) + '\n')
             elif state == 'pentameric-loop':
                 file.write(state + ' ' + str(time) + '\n')
                 print("Simulation " + str(index).zfill(5) + ", done. PENTAMERIC loop formed!!!")
