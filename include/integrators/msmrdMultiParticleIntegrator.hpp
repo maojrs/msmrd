@@ -301,7 +301,7 @@ namespace msmrd {
                     }
                 }
                 if (compoundSize == 5){
-                    boundLoops.push_back(numBindings);
+                    boundLoops.push_back(compoundSize);
                 }
             }
         }
