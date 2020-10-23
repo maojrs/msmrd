@@ -26,7 +26,7 @@ maxNumBoundStates = 10
 radialBounds = [1.25, 2.25] # must match patchyDimer discretization
 minimumUnboundRadius = 1.5
 numParticleTypes = 1 # num. of particle types (not states) in unbound state
-numTrajectories = 4*6000
+numTrajectories = 20000 #4*6000
 printAllRingFormations = False # if false, it only print the pentameric ring FPTs (not trimeric nor tetrameric)
 
 
