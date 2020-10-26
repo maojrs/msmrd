@@ -23,9 +23,9 @@ bodytype = 'rigidbody'
 D = 1.0
 Drot = 1.0
 overlapThreshold = 1.5 # to avoid overlapping when randomly generating particles
-numTrajectories = 100000
+numTrajectories = 400000
 # Other important parameters
-boxsize = 6 #2.5 #6 #8 #6
+boxsize = 9 #2.5 #6 #8 #6
 printAllRingFormations = False # if false, it only print the pentameric ring FPTs (not trimeric nor tetrameric)
 
 # Parameters of patchy Particle potential with angular dependence (make sure it is consistent with msmrd data)
@@ -129,7 +129,6 @@ def multiprocessingHandler():
                 if printAllRingFormations:
                     file.write(state + ' ' + str(time) + '\n')
             elif state == 'tetrameric-loop':
-                file.write(state + ' ' + str(time) + '\n')
                 print("Simulation " + str(index).zfill(5) + ", done. Tetrameric loop formed!!")
                 if printAllRingFormations:
                     file.write(state + ' ' + str(time) + '\n')
