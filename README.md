@@ -7,12 +7,20 @@ git clone https://github.com/maojrs/msmrd2.git
 cd msmrd2
 git submodule update --init --recursive
 python setup.py install
+
+```
+We recommend using the conda package manager to install all the dependencies required by msmrd. The fastest way to start is to (install miniconda)[https://conda.io/projects/conda/en/latest/user-guide/install/index.html], and then create a new environment for msmrd:
+
+```
+conda create --name msmrd-env
+conda activate msmrd-env 
+conda install {PACKAGE_NAME}
 ```
 
-We recommend creating a conda environment for msmrd
+Click [here](https://conda.io/projects/conda/en/latest/index.html) for more detailed information on conda.
 
 ## Software dependencies 
-Check the environment.yml for the specific dependencies in the conda environment. In general, the following dependencies are required:
+Check the environment.yml for the specific dependencies in the conda environment. The main dependencies required are the following:
 - GCC 10.2.0
 - cmake 3.19.4
 - HDF5 1.10.4
@@ -21,8 +29,15 @@ Check the environment.yml for the specific dependencies in the conda environment
 - scipy 1.4.1
 - matplotlib 3.2.1
 - h5py 2.10.0
+- jupyter v.1.0.0
 
-Versions below may work; versions above will most likely work. for the notebooks, we recommend also installing [Jupyter notebooks](https://jupyter.org/)
+Versions below may work; versions above will most likely work. We also recommend [VMD](http://www.ks.uiuc.edu/Research/vmd/) for visualization
 
-## To do:
-- [ ] Extend overdampedLangevinMS and msmrdIntegrator to handle discrete MSMs (not required but could be a nice addition).
+
+## Getting started
+To test your installation worked, you can load one of the notebook examples available. First activate the corresponding conda environment using `conda activate {ENVIRONMENT-NAME}`. Then:
+```
+cd examples/models
+jupyter notebook
+```
+Click on one of the notebooks, e.g. "odLangevin.ipynb". Then go to cell and click on run all. You should be able to see the output produced at the end of the notebook.
