@@ -23,3 +23,6 @@ Check the environment.yml for the specific dependencies in the conda environment
 - h5py 2.10.0
 
 Versions below may work; versions above will most likely work. for the notebooks, we recommend also installing [Jupyter notebooks](https://jupyter.org/)
+
+## To do:
+- [ ] Extend overdampedLangevinMS and msmrdIntegrator to handle discrete MSMs (not required but could be a nice addition).
