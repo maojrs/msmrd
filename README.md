@@ -41,3 +41,6 @@ cd examples/models
 jupyter notebook
 ```
 Click on one of the notebooks, e.g. "odLangevin.ipynb". Then go to cell and click on run all. You should be able to see the output produced at the end of the notebook.
+
+## To do:
+- [ ] Extend overdampedLangevinMS and msmrdIntegrator to handle discrete MSMs (not required but could be a nice addition).
