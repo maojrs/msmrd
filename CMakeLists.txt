@@ -47,6 +47,7 @@ set(SOURCES
         src/discretizations/quaternionPartition.cpp
         src/discretizations/spherePartition.cpp
         src/integrators/integrator.cpp
+        src/integrators/integratorMAPK.cpp
         src/integrators/msmrdIntegrator.cpp
         src/integrators/msmrdMultiParticleIntegrator.cpp
         src/integrators/msmrdPatchyProtein.cpp
@@ -102,6 +103,7 @@ set(PY_SOURCES
         include/discretizations/quaternionPartition.hpp
         include/discretizations/spherePartition.hpp
         include/integrators/integrator.hpp
+        include/integrators/integratorMAPK.hpp
         include/integrators/msmrdIntegrator.hpp
         include/integrators/msmrdMultiParticleIntegrator.hpp
         include/integrators/msmrdPatchyProtein.hpp

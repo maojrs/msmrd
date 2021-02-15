@@ -1,4 +1,5 @@
 #include "binding.hpp"
+#include "integrators/integratorMAPK.hpp"
 #include "integrators/overdampedLangevin.hpp"
 #include "integrators/overdampedLangevinMarkovSwitch.hpp"
 #include "integrators/overdampedLangevinSelective.hpp"
@@ -36,6 +37,14 @@ namespace msmrd {
                 .def("updateParticleCompounds", &overdampedLangevinSelective::updateParticleCompounds)
                 .def("findClosedBindingLoops", &overdampedLangevinSelective::findClosedBindingLoops)
                 .def("getCompoundSize", &overdampedLangevinSelective::getCompoundSize);
+
+        py::class_<integratorMAPK, overdampedLangevin>(m, "integratorMAPK", "integrator for MAPK (timestep, seed, "
+                                                                            "particlesbodytype (point, rod, rigidbody, "
+                                                                            "pointmix, rodmix or rigidbodymix), "
+                                                                            "mapkIndex, kinaseIndex, phosIndex )")
+                .def(py::init<double &, long &, std::string &, int &, int &, std::vector<int> &,
+                        std::vector<int> &, std::vector<int> &>())
+                .def("integrate", &integratorMAPK::integrate);
 
         py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch",
                                                                               "overdamped Langevin integrator with "
