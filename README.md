@@ -1,5 +1,5 @@
 # msmrd2:
-MSM/RD: A general framework to couple Markov models of molecular kinetics with reaction-diffusion simulations. This is the second version of the code (v2.0.0) rewritten in c++ with python bindings and additional functionality. The first version (v1.0.0) was a much simpler implementation written in python, and it can be found [here](https://github.com/markovmodel/msmrd). The code is still in constant development, and there is no official release.
+MSM/RD: A general framework to couple Markov models of molecular kinetics with reaction-diffusion simulations. This is the second version of the code written in c++ with python bindings and additional functionality. The first version (v1.0.0) was a much simpler implementation written in python, and it can be found [here](https://github.com/markovmodel/msmrd). The code is still in constant development, and there is no official release.
 
 ## Installation
 ```
@@ -9,15 +9,14 @@ git submodule update --init --recursive
 python setup.py install
 
 ```
-We recommend using the conda package manager to install all the dependencies required by msmrd. The fastest way to start is to (install miniconda)[https://conda.io/projects/conda/en/latest/user-guide/install/index.html], and then create a new environment for msmrd:
+We recommend using the conda package manager to install all the dependencies required by msmrd. The fastest way to start is to [install miniconda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html), and then create a new environment for msmrd:
 
 ```
 conda create --name msmrd-env
 conda activate msmrd-env 
-conda install {PACKAGE_NAME}
 ```
 
-Click [here](https://conda.io/projects/conda/en/latest/index.html) for more detailed information on conda.
+To install packages into your environment simply type `conda install {PACKAGE_NAME}`. Click [here](https://conda.io/projects/conda/en/latest/index.html) for more detailed information on conda. 
 
 ## Software dependencies 
 Check the environment.yml for the specific dependencies in the conda environment. The main dependencies required are the following:
@@ -31,7 +30,9 @@ Check the environment.yml for the specific dependencies in the conda environment
 - h5py 2.10.0
 - jupyter v.1.0.0
 
-Versions below may work; versions above will most likely work. We also recommend [VMD](http://www.ks.uiuc.edu/Research/vmd/) for visualization
+Versions below may work; versions above will most likely work. We also recommend [VMD](http://www.ks.uiuc.edu/Research/vmd/) for visualization. 
+
+The setup also automatically install two submodules: [pybind11](https://github.com/pybind/pybind11), to create Python bindings of existing C++ code and [catch2](https://github.com/catchorg/Catch2/tree/v2.x) a test framework for C++.
 
 
 ## Getting started
