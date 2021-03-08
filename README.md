@@ -1,5 +1,5 @@
-# msmrd:
-MSM/RD: A general framework to couple Markov models of molecular kinetics with reaction-diffusion simulations. This is the second version of the code (v2.0.0) rewritten in c++ with python bindings and additional functionality. The first version (v1.0.0) was a much simpler implementation written in python, and it can be found [here](https://github.com/markovmodel/msmrd). (Work in progress)
+# msmrd2:
+MSM/RD: A general framework to couple Markov models of molecular kinetics with reaction-diffusion simulations. This is the second version of the code (v2.0.0) rewritten in c++ with python bindings and additional functionality. The first version (v1.0.0) was a much simpler implementation written in python, and it can be found [here](https://github.com/markovmodel/msmrd). The code is still in constant development, and there is no official release.
 
 ## Installation
 ```
@@ -41,3 +41,11 @@ cd examples/models
 jupyter notebook
 ```
 Click on one of the notebooks, e.g. "odLangevin.ipynb". Then go to cell and click on run all. You should be able to see the output produced at the end of the notebook.
+
+## Visualization
+We recommend (VMD)[http://www.ks.uiuc.edu/Research/vmd/] to visualize the output of the particle-based simulations. Parts of the code will even generate files to automatically load into vmd. As an example try the following:
+- Install VMD
+- Run all the code in the notebook "patchyParticlesAngular2.ipynb"
+- This will generate a file "patchyParticlesAngular2.xyz" in the folder "data/vmd".
+- On a terminal prompt and run "vmd -e patchyParticlesAngular2_2vmd.tcl"
+
