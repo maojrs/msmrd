@@ -47,5 +47,5 @@ We recommend [VMD](http://www.ks.uiuc.edu/Research/vmd/) to visualize the output
 - Install VMD
 - Run all the code in the notebook `patchyParticlesAngular2.ipynb`
 - This will generate files `patchyParticlesAngular2.xyz`  and `patchyParticlesAngular2_2vmd.tcl` in the folder `data/vmd`.
-- On a terminal prompt and run `vmd -e patchyParticlesAngular2_2vmd.tcl`
+- On a terminal prompt run `vmd -e patchyParticlesAngular2_2vmd.tcl`
 
