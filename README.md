@@ -43,7 +43,7 @@ jupyter notebook
 Click on one of the notebooks, e.g. `odLangevin.ipynb`. Then go to cell and click on run all. You should be able to see the output produced at the end of the notebook.
 
 ## Visualization
-We recommend (VMD)[http://www.ks.uiuc.edu/Research/vmd/] to visualize the output of the particle-based simulations. Parts of the code will even generate files to automatically load into vmd. As an example try the following:
+We recommend [VMD](http://www.ks.uiuc.edu/Research/vmd/) to visualize the output of the particle-based simulations. Parts of the code will even generate files to automatically load into vmd. As an example try the following:
 - Install VMD
 - Run all the code in the notebook `patchyParticlesAngular2.ipynb`
 - This will generate files `patchyParticlesAngular2.xyz`  and `patchyParticlesAngular2_2vmd.tcl` in the folder `data/vmd`.
