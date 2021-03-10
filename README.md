@@ -34,6 +34,8 @@ Versions below may work; versions above will most likely work. We also recommend
 
 The setup also automatically install two submodules: [pybind11](https://github.com/pybind/pybind11), to create Python bindings of existing C++ code and [catch2](https://github.com/catchorg/Catch2/tree/v2.x) a test framework for C++.
 
+If you want to generate your own Markov models to use with MSM/RD, we also recommend installing [pyEMMA](http://emma-project.org/latest/).
+
 
 ## Getting started
 To test your installation worked, you can load one of the notebook examples available. First activate the corresponding conda environment using `conda activate {ENVIRONMENT-NAME}`. Then:
