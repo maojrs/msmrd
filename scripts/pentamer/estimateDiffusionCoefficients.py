@@ -40,9 +40,16 @@ refVec5 = np.array([0., 0., -3.])
 # output for vmd plotting to check configurations
 outputVMD = False
 
+# Create folder for MSMs
+Diffdirectory = '../../data/pentamer/diffusion_coefficients/'
+try:
+    os.mkdir(MSMdirectory)
+except OSError as error:
+    print("Folder already exists. Previous data files might be overwritten.")
+    proceed = True
+
 def calculateDiffusionCoefficeints(numparticles):
     '''
-    numparticles = 1 # It
     :param numparticles: must have a value between 1 and 5
     :return: translational diffusion coefficeint and rotational diffusion coefficient
     '''

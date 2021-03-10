@@ -12,6 +12,9 @@ import random
 import sys
 import os
 
+''' Runs bechmark simulations of two patchy particles. This simulation is used to extract the MSM for the pentamer
+multiparticle MSM/RD simulation'''
+
 # Main parameters for particle and integrator
 Nparticles = 2
 dt = 0.00001
@@ -47,10 +50,16 @@ boundaryType = 'periodic'
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
 
 # Parent directory location
-parentDirectory = "../../data/trimer/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/trimer/"
+parentDirectory = "../../data/pentamer/"
 
 # Create folder for data
+try:
+    os.mkdir(parentDirectory)
+except OSError as error:
+    print("Folder patchyProtein already exists.")
+    proceed = True
+
+# Create folder for benchmark data      
 foldername = "benchmark"
 filedirectory = os.path.join(parentDirectory, foldername)
 try:
@@ -71,7 +80,7 @@ analysisTools.writeParameters(parameterfilename, parameterDictionary)
 
 
 # Provides base filename (folder must exist (and preferably empty), otherwise H5 might fail)
-basefilename = os.path.join(filedirectory, "simDimer4Trimer")
+basefilename = os.path.join(filedirectory, "simDimerForPentamer")
 
 
 # Simulation wrapper for parallel runs

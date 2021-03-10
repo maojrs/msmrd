@@ -12,7 +12,7 @@ import os
 '''
 Creates an MD simulation of five particles and calculates their first passage times (FPTs) 
 from a random configuration to a pentamer configuration following the MSMRD algorithm. The data is written to 
-'../data/pentamer/first_passage_times/filename_here. It uses the patchy dimer model of molecules
+'../../data/pentamer/first_passage_times/filename_here. It uses the patchy dimer model of molecules
 with only one stable angular configuration.
 '''
 
@@ -68,7 +68,6 @@ boundStates = [1, 2, 3, 4]
 
 # Chooses parent directory
 parentDirectory = "../../data/pentamer/first_passage_times/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/pentamer/first_passage_times/"
 
 # Creates parent directory if it doesn't exist already
 try:
@@ -96,7 +95,7 @@ def MSMRDsimulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pentamer/MSMs/MSM_dimer4trimer_t3.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open("../../data/pentamer/MSMs/MSM_dimerForPentamer_t3.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb") # Same MSM as trimer
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']

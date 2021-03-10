@@ -14,17 +14,26 @@ plotImpliedTimescalesDraft = True
 plotImpliedTimescalesPaperVersion = False
 
 # Load parameters from parameters file (from original MD simulation)
-parentDirectory = '../../data/trimer/benchmark/'
-#parentDirectory = '/group/ag_cmb/scratch/maojrs/msmrd2_data/trimer/benchmark/'
+parentDirectory = '../../data/pentamer/benchmark/'
+MSMdirectory = '../../data/pentamer/MSMs/'
 parameterDictionary = analysisTools.readParameters(parentDirectory + "parameters")
 nfiles = parameterDictionary['numFiles']
 dt = parameterDictionary['dt']
 stride = parameterDictionary['stride']
 totalTimeSteps = parameterDictionary['timesteps']
 
+# Create folder for MSMs
+try:
+    os.mkdir(MSMdirectory)
+except OSError as error:
+    print("Folder MSMs already exists. Previous data files might be overwritten. Continue, y/n?")
+    proceed = input()
+    if proceed != 'y':
+        sys.exit()
+
 # Calculated parameters
 dtEffective = dt*stride # needed to obtain rate dictionary
-fnamebase = parentDirectory + 'simDimer4Trimer_'
+fnamebase = parentDirectory + 'simDimerForPentamer_'
 
 # Parameters for MSM generation
 numBoundStates = 4
@@ -68,7 +77,7 @@ for i, lagtime in enumerate(lagtimes):
 
     # Pickle MSM transition matrix and active set as a dictionary
     MSM = {'transition_matrix' : mainmsm.transition_matrix, 'active_set': mainmsm.active_set}
-    pickle_out = open(parentDirectory + "MSM_dimer4trimer_t" + "{:.2E}".format(totalTimeSteps ) +
+    pickle_out = open(MSMdirectory + "MSM_dimerForPentamer_t" + "{:.2E}".format(totalTimeSteps ) +
                       "_s" + "{:d}".format(stride) + "_lagt" + "{:d}".format(lagtime) + ".pickle","wb")
     pickle.dump(MSM, pickle_out)
     pickle_out.close()
@@ -84,13 +93,13 @@ if plotImpliedTimescalesDraft:
     mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=True, units='steps', linewidth=2, dt=1)
     plt.ylabel(r"log(timescale/steps)", fontsize = 18)
     plt.xlabel(r"lag time/steps", fontsize = 18)
-    plt.savefig(parentDirectory + 'its_draft_dimer4trimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_draft_dimer4trimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     # No log version
     fig, ax = plt.subplots(figsize=(10, 7))
     mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=False, units='steps', linewidth=2, dt=1)
     plt.ylabel(r"timescale/steps", fontsize = 24)
     plt.xlabel(r"lag time/steps", fontsize = 24)
-    plt.savefig(parentDirectory + 'its_draft_nolog_dimer4trimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_draft_nolog_dimer4trimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     print("Finished draft plots.")
 
 # Generate implied timescales plots (paper verision w/error bars)	
@@ -107,7 +116,7 @@ if plotImpliedTimescalesPaperVersion:
     plt.xticks(fontsize = 28)
     plt.yticks(fontsize = 28)
     #plt.ylim([10.0,100000])
-    plt.savefig(parentDirectory + 'its_paper_dimer4trimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_paper_dimer4trimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     # No log version
     fig, ax = plt.subplots(figsize=(10, 7))
     mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=False, units='steps', linewidth=2, dt=1, 
@@ -117,5 +126,5 @@ if plotImpliedTimescalesPaperVersion:
     plt.xticks(fontsize = 28)
     plt.yticks(fontsize = 28)
     #plt.ylim([10.0,4500])
-    plt.savefig(parentDirectory + 'its_paper_nolog_dimer4trimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_paper_nolog_dimer4trimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     print("Finished paper plots.")

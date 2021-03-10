@@ -5,8 +5,7 @@ import msmrd2.tools.analysis as analysisTools
 
 
 # Load parameters from parameters file (from original MD simulation)
-parentDirectory = '../../data/trimer/benchmark/'
-#parentDirectory = '/group/ag_cmb/scratch/maojrs/msmrd2_data/trimer/benchmark/'
+parentDirectory = '../../data/pentamer/benchmark/'
 parameterDictionary = analysisTools.readParameters(parentDirectory + "parameters")
 nfiles = parameterDictionary['numFiles']
 numParticles = parameterDictionary['numParticles']
@@ -19,7 +18,7 @@ boundaryType = parameterDictionary['boundaryType']
 # Calculated parameters
 #dtEffective = dt*stride # needed to obtain rate dictionary
 effectivetimeSteps = int(totalTimeSteps/stride)
-fnamebase = parentDirectory + 'simDimer4Trimer_'
+fnamebase = parentDirectory + 'simDimerForPentamer_'
 bufferSize = effectivetimeSteps
 
 # Set trajectory discretizator

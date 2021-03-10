@@ -24,8 +24,6 @@ stride = parameterDictionary['stride']
 totalTimeSteps = parameterDictionary['timesteps']
 
 # Create folder for MSMs
-foldername = "MSMs"
-filedirectory =  os.path.join(MSMdirectory, foldername)
 try:
     os.mkdir(MSMdirectory)
 except OSError as error:
