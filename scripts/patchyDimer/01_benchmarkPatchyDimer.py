@@ -48,7 +48,6 @@ boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
 
 # Parent directory location
 parentDirectory = "../../data/patchyDimer/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/"
 
 # Create folder for data
 try:

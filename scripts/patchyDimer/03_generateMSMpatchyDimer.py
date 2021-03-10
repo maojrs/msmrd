@@ -96,7 +96,7 @@ if plotImpliedTimescalesDraft:
     mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=True, units='steps', linewidth=2, dt=1)
     plt.ylabel(r"log(timescale/steps)", fontsize = 18)
     plt.xlabel(r"lag time/steps", fontsize = 18)
-    plt.savefig(parentDirectory + 'its_draft_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_draft_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     # No log version
     fig, ax = plt.subplots(figsize=(10, 7))
     mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=False, units='steps', linewidth=2, dt=1)
