@@ -4,11 +4,13 @@ import msmrd2
 import msmrd2.tools.quaternions as quats
 from msmrd2.potentials import patchyParticleAngular2
 from msmrd2.integrators import overdampedLangevin as odLangevin
+import os
 
 '''
 Estimates translational and rotational diffusion coefficients of pentamer or parts of the pentamer with a 
 given number of particles (between 1 and 5) Note that if ran with numparticles=1, we recover (with some error)
-the diffusion coefficients of the particles.
+the diffusion coefficients of the particles. The code will automatically loop over 1 to 5 particles. It also
+runs the becnhmarks simulations from which the diffusion coefficients re estimated.
 '''
 
 # Define global parameters
@@ -43,7 +45,7 @@ outputVMD = False
 # Create folder for MSMs
 Diffdirectory = '../../data/pentamer/diffusion_coefficients/'
 try:
-    os.mkdir(MSMdirectory)
+    os.mkdir(Diffdirectory)
 except OSError as error:
     print("Folder already exists. Previous data files might be overwritten.")
     proceed = True
@@ -189,7 +191,7 @@ def calculateDiffusionCoefficeints(numparticles):
     plt.plot(lagtimes, slope*lagtimes + b, '-', label = 'position fit')
     plt.plot(lagtimes, slope2*lagtimes + b2, '-', label = 'orientation fit')
     plt.legend()
-    plt.savefig('../../data/pentamer/diffusion_coefficients/diffusionFitPentamer_' + str(numparticles) + 'particles.pdf', bbox_inches='tight')
+    plt.savefig(Diffdirectory +'diffusionFitPentamer_' + str(numparticles) + 'particles.pdf', bbox_inches='tight')
     plt.close()
     print("Finished plots")
 
@@ -198,7 +200,7 @@ def calculateDiffusionCoefficeints(numparticles):
     simulationSuccess = True
     return simulationSuccess, Dapprox, DrotApprox
 
-datafile2  = open('../../data/pentamer/diffusion_coefficients/diffusionCoefficients.dat', 'w')
+datafile2  = open(Diffdirectory +'diffusionCoefficients.dat', 'w')
 for i in range(5):
     succesful = False
     while (not succesful):

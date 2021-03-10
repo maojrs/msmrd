@@ -112,6 +112,7 @@ def generateParticleList(state, boxsize, types, unboundMSMs, randomSeed = -1):
     # Define particles
     part1 = msmrd2.particle(0, p1State, D1, Drot1, position1, orientation1)
     part2 = msmrd2.particle(1, p2State, D2, Drot2, position2, orientation2)
+    part1.setMSMoff() #Important or it will yield error.
     partlist = msmrd2.integrators.particleList([part1, part2])
     return partlist
 

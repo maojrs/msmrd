@@ -5,6 +5,7 @@ import pyemma.plots as mplt
 import matplotlib.pyplot as plt
 import msmrd2.tools.trajectoryTools as trajectoryTools
 import msmrd2.tools.analysis as analysisTools
+import os
 
 # Given discrete data, creates MSMs for a list of lagtimes. To see
 # implied time scales use notebook version of this script.

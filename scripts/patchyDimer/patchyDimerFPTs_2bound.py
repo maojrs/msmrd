@@ -48,7 +48,7 @@ except OSError as error:
     print("First passage times directory already exists. Simulation continues.")
 
 # Create empty files to save the data in parallel algorithm
-filename = parentDirectory  + 'testpatchyDimerFPTs_2bound_trajs' + str(numTrajectories) \
+filename = parentDirectory  + 'patchyDimerFPTs_2bound_trajs' + str(numTrajectories) \
            +'_boxsize' + str(boxsize) + '.xyz'
 
 def simulationFPT(trajectorynum):
