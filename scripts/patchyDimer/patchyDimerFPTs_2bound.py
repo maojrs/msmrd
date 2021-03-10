@@ -10,7 +10,7 @@ import os
 '''
 Creates an MD simulation of two particle and calculates their first passage times (FPTs) from a random 
 unbound configuration to either of the two bound states (A or B). The data is written to 
-'../data/dimer/first_passage_times/filename_here.
+'../../data/patchyDimer/first_passage_times/filename_here.
 '''
 
 # Main parameters for particle and integrator
@@ -39,8 +39,7 @@ boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
 boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
 
 # Chooses parent directory
-parentDirectory = "../../data/dimer/first_passage_times/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/first_passage_times/"
+parentDirectory = "../../data/patchyDimer/first_passage_times/"
 
 # Creates parent directory if it doesn't exist already
 try:

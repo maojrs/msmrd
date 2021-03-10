@@ -5,6 +5,7 @@ import pyemma.plots as mplt
 import matplotlib.pyplot as plt
 import msmrd2.tools.trajectoryTools as trajectoryTools
 import msmrd2.tools.analysis as analysisTools
+import os
 
 # Given discrete data, creates MSMs for a list of lagtimes. To see
 # implied time scales use notebook version of this script.
@@ -14,18 +15,28 @@ plotImpliedTimescalesDraft = True
 plotImpliedTimescalesPaperVersion = False
 
 # Load parameters from parameters file (from original MD simulation)
-#parentDirectory = '../../data/patchyDimer/benchmark/'
-parentDirectory = '/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/benchmark/'
+parentDirectory = '../../data/patchyDimer/benchmark/'
+MSMdirectory = '../../data/patchyDimer/MSMs/'
 parameterDictionary = analysisTools.readParameters(parentDirectory + "parameters")
-nfiles = parameterDictionary['numFiles']
+nfiles = 5 #parameterDictionary['numFiles']
 dt = parameterDictionary['dt']
 stride = parameterDictionary['stride']
 totalTimeSteps = parameterDictionary['timesteps']
 
+# Create folder for MSMs
+foldername = "MSMs"
+filedirectory =  os.path.join(MSMdirectory, foldername)
+try:
+    os.mkdir(MSMdirectory)
+except OSError as error:
+    print("Folder MSMs already exists. Previous data files might be overwritten. Continue, y/n?")
+    proceed = input()
+    if proceed != 'y':
+        sys.exit()
+
 # Calculated parameters
 dtEffective = dt*stride # needed to obtain rate dictionary
 fnamebase = parentDirectory + 'simDimer_'
-#fnamebase = parentDirectory + 'fullSphereQuatOffset/simPatchyProtein_'
 
 # Parameters for MSM generation
 numBoundStates = 8
@@ -69,7 +80,7 @@ for i, lagtime in enumerate(lagtimes):
 
     # Pickle MSM transition matrix and active set as a dictionary
     MSM = {'transition_matrix' : mainmsm.transition_matrix, 'active_set': mainmsm.active_set}
-    pickle_out = open(parentDirectory + "MSM_patchyDimer_t" + "{:.2E}".format(totalTimeSteps ) +
+    pickle_out = open(MSMdirectory + "MSM_patchyDimer_t" + "{:.2E}".format(totalTimeSteps ) +
                       "_s" + "{:d}".format(stride) + "_lagt" + "{:d}".format(lagtime) + ".pickle","wb")
     pickle.dump(MSM, pickle_out)
     pickle_out.close()
@@ -91,7 +102,7 @@ if plotImpliedTimescalesDraft:
     mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=False, units='steps', linewidth=2, dt=1)
     plt.ylabel(r"timescale/steps", fontsize = 24)
     plt.xlabel(r"lag time/steps", fontsize = 24)
-    plt.savefig(parentDirectory + 'its_draft_nolog_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_draft_nolog_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     print("Finished draft plots.")
 
 # Generate implied timescales plots (paper verision w/error bars)	
@@ -108,7 +119,7 @@ if plotImpliedTimescalesPaperVersion:
     plt.xticks(fontsize = 28)
     plt.yticks(fontsize = 28)
     #plt.ylim([10.0,100000])
-    plt.savefig(parentDirectory + 'its_paper_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_paper_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     # No log version
     fig, ax = plt.subplots(figsize=(10, 7))
     mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=False, units='steps', linewidth=2, dt=1, 
@@ -118,5 +129,5 @@ if plotImpliedTimescalesPaperVersion:
     plt.xticks(fontsize = 28)
     plt.yticks(fontsize = 28)
     #plt.ylim([10.0,4500])
-    plt.savefig(parentDirectory + 'its_paper_nolog_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_paper_nolog_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
     print("Finished paper plots.")

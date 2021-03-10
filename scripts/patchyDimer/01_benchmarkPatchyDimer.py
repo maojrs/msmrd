@@ -47,16 +47,23 @@ boundaryType = 'periodic'
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
 
 # Parent directory location
-parentDirectory = "../../data/dimer/"
+parentDirectory = "../../data/patchyDimer/"
 # parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/"
 
 # Create folder for data
+try:
+    os.mkdir(parentDirectory)
+except OSError as error:
+    print("Folder patchyDimer already exists.")
+    proceed = True
+
+# Create folder for benchmark data        
 foldername = "benchmark"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
 except OSError as error:
-    print("Folder already exists. Previous data files might be overwritten. Continue, y/n?")
+    print("Folder patchyDimer/benchmark already exists. Previous data files might be overwritten. Continue, y/n?")
     proceed = input()
     if proceed != 'y':
         sys.exit()

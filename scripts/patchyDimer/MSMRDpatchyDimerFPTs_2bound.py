@@ -13,7 +13,7 @@ import os
 Creates an MSM/RD simulation of two particle that calculates first passage times (FPTs) from a random 
 unbound configuration to either of the two bound states (A or B). This requires as input a rate dictionary 
 calculated from an MSM of an MD simulation (the rate dictionary is loaded using pickle). The data is 
-written to '../data/dimer/first_passage_times/MSMRDfilename_here.
+written to '../../data/patchyDimer/first_passage_times/MSMRDfilename_here.
 '''
 
 # Main parameters for particle and integrator
@@ -58,8 +58,8 @@ boundStatesA = [1, 2, 5, 6] # U-shaped bound dimer, corresponds to A state
 boundStatesB = [3, 4, 7, 8] # Zigzag-shaped bound dimer, corresponds to B state
 
 # Chooses parent directory
-parentDirectory = "../../data/dimer/first_passage_times/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/dimer/first_passage_times/"
+parentDirectory = "../../data/patchyDimer/first_passage_times/"
+MSMdirectory = '../../data/patchyDimer/MSMs/'
 
 # Creates parent directory if it doesn't exist already
 try:
@@ -87,7 +87,7 @@ def MSMRDsimulationFPT(trajectorynum):
     boxBoundary = msmrd2.box(boxsize,boxsize,boxsize,'periodic')
 
     # Load rate dicitionary
-    pickle_in = open("../../data/pickled_data/MSM_patchyDimer_t3.00E+06_s25_lagt" + str(lagtime)
+    pickle_in = open(MSMdirectory + "MSM_patchyDimer_t3.00E+06_s25_lagt" + str(lagtime)
                      +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']
