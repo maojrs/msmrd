@@ -10,3 +10,4 @@
 Note the following 
 - Some plots might require you to do small modifictions of scripts and run them. For instance, the scripts with `bound2bound` suffix need that you specify initial and final bound states. So for each of those plots you need to rerun the script with the correct parameters.
 - If computations become too expensive on your computer, try running script 01 for a smaller number of simulation (e.g. numsiluations=300 instead of 600).
+- Alternatively, you can also get the data we already computed and used for the paper.
