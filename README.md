@@ -5,6 +5,8 @@ All the figures in the paper ``Multiscale molecular kinetics by coupling Markov 
 
 This is the second version of the code written in c++ with python bindings and additional functionality. The first version (v1.0.0) was a much simpler implementation written in python, and it can be found [here](https://github.com/markovmodel/msmrd). The code is still in constant development, and there is no official release.
 
+Active development of the code is done in [this github repository](https://github.com/maojrs/msmrd)
+
 ## Installation
 ```
 git clone https://github.com/markovmodel/msmrd2.git
