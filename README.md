@@ -1,7 +1,7 @@
 # msmrd2:
 MSM/RD: A general framework to couple Markov state models (MSM) of molecular kinetics with particle-based reaction-diffusion (RD) simulations. The software can also be used to simulate Brownian dynamics of rigid bodies with all the translational and rotational degrees of freedom, potential interactions and Markovian switching. 
 
-Active development of the code is done in the dev branch. The [master branch](/maojrs/msmrd/tree/master) is updated once new developments are final and tested.
+Active development of the code is done in the dev branch. The master branch is updated once new developments are final and tested.
 
 This is the second version of the code written in c++ with python bindings and additional functionality. The first version (v1.0.0) was a much simpler implementation written in python, and it can be found [here](https://github.com/markovmodel/msmrd). The code is still in constant development, and there is no official release.
 
