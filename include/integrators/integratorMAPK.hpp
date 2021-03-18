@@ -25,28 +25,41 @@ namespace msmrd {
      */
     class integratorMAPK : public overdampedLangevin {
     protected:
-        int reactivationRateK;
-        int reactivationRateP;
+        double anglePatches;
+        double reactivationRateK;
+        double reactivationRateP;
         std::vector<int> mapkIndex;
         std::vector<int> kinaseIndex;
         std::vector<int> phosIndex;
+        double toleranceBinding = 0.12;
+        vec3<double> MAPKpatch1;
+        vec3<double> MAPKpatch2;
+        vec3<double> ligandPatch;
         /**
+         * @param anglePatches angle between binding sites (patches) os MAPK molecules. The patches are
+         * assumed to be located at anglePatches/2 and -anglePacthes/2 for the MAPK molecules. And
+         * at -anglePatches/2 for the one patch of kinases and phosphotases. (Both in the xy plane).
          * @param reactivationRateK reactivation rate for kinase after binding
          * @param reactivationRateP reactivation rate for phosphatase after binding
          * @param mapkIndex is the indexes in the particle list of particles that correspond to
          * MAPK molecules
          * @param kinaseIndex same as mapkIndex but for kinase molecules
          * @param phosIndex same as mapkIndex but for phosphatase molecules
+         * @param toleranceBinding tolerance for evaluating if relative position/orientation corresponds
+         * to binding configuration
+         * @param MAPKpatch1/2 unit vector pointing to patch/binding site 1 or 2 of MAPK molecule in its initial
+         * orientation (1,0,0,0).
+         * @param ligandPatch same as above for the ligand (kinase or phosphotase) patch.
          */
 
         void integrateOne(int partIndex, std::vector<particle> &parts, double timestep) override;
 
-        std::array<int,2> checkMAPKbindings(int partIndex, std::vector<particle> &parts);
+        std::array<std::tuple<int,int>, 2> checkMAPKbindings(int partIndex, std::vector<particle> &parts);
 
         void assignState(int partIndex, std::vector<particle> &parts);
     public:
         integratorMAPK(double dt, long seed, std::string particlesbodytype,
-                int reactivationRateK, int reactivationRateP, std::vector<int> mapKIndex,
+                double anglePatches, double reactivationRateK, double reactivationRateP, std::vector<int> mapKIndex,
                 std::vector<int> kinaseIndex,std::vector<int> phosIndex);
     };
 

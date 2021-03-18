@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "potentials/patchyParticle.hpp"
+#include "potentials.hpp"
 
 namespace msmrd{
 

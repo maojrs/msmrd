@@ -41,8 +41,9 @@ namespace msmrd {
         py::class_<integratorMAPK, overdampedLangevin>(m, "integratorMAPK", "integrator for MAPK (timestep, seed, "
                                                                             "particlesbodytype (point, rod, rigidbody, "
                                                                             "pointmix, rodmix or rigidbodymix), "
-                                                                            "mapkIndex, kinaseIndex, phosIndex )")
-                .def(py::init<double &, long &, std::string &, int &, int &, std::vector<int> &,
+                                                                            "anglePatches, mapkIndex, kinaseIndex, "
+                                                                            "phosIndex )")
+                .def(py::init<double &, long &, std::string &, double &, double &, double &, std::vector<int> &,
                         std::vector<int> &, std::vector<int> &>())
                 .def("integrate", &integratorMAPK::integrate);
 
