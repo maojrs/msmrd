@@ -126,6 +126,7 @@ def randomParticleMSList(numparticles, boxsize, separationDistance, types, unbou
         # Deactivate inner unbound MSM if there is only one state.
         if len(unboundMSMs[types[i]].D) == 1:
             part.deactivateMSM()
+
         pyPartlist.append(part)
 
     partlist = msmrd2.integrators.particleList(pyPartlist)
