@@ -34,7 +34,7 @@ namespace msmrd {
         std::vector<int> mapkIndex;
         std::vector<int> kinaseIndex;
         std::vector<int> phosIndex;
-        double toleranceBinding = 0.12;
+        double toleranceBinding = 0.2; //0.12;
         vec3<double> MAPKpatch1;
         vec3<double> MAPKpatch2;
         vec3<double> ligandPatch;
@@ -63,7 +63,7 @@ namespace msmrd {
 
         void assignState(int partIndex, std::vector<particle> &parts);
 
-        void reactivationKorP(int partIndex, std::vector<particle> &parts, double timestep);
+        void reactivationKorP(particle &part, double timestep);
     public:
         integratorMAPK(double dt, long seed, std::string particlesbodytype,
                 double anglePatches, double reactivationRateK, double reactivationRateP, std::vector<int> mapKIndex,

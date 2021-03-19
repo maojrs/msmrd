@@ -99,7 +99,6 @@ namespace msmrd {
                  * Different type of interaction with kinase, state 0 corresponds to active state. */
                 // part1 is MAPK and part2 is kinase:
                 if (part1.type == 0 and part2.type == 1 and part2.state == 0) {
-
                     if ((i == 0 and (part1.state == 0 or part1.state == 2)) or
                         (i == 1 and (part1.state == 0 or part1.state == 1))) {
                         patchesPotential += quadraticPotential(rpatch.norm(), sigma, epsPatches[0],

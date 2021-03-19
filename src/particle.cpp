@@ -11,6 +11,7 @@ namespace msmrd {
      */
 
     /* Constructors of normal particles: receive input from vec3/quaternion or std::vector and
+    /* Constructors of normal particles: receive input from vec3/quaternion or std::vector and
      * numpy arrays (through pybind) */
     particle::particle(double D, double Drot, vec3<double> position, quaternion<double> orientation)
             : D(D), Drot(Drot), position(position), orientation(orientation) {

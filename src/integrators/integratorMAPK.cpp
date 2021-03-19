@@ -39,7 +39,7 @@ namespace msmrd {
         if (rotation) {
             rotate(parts[partIndex], torque, timestep);
         }
-        reactivationKorP(partIndex, parts, timestep);
+        reactivationKorP(parts[partIndex], timestep);
         assignState(partIndex, parts);
     }
 
@@ -98,12 +98,12 @@ namespace msmrd {
 
     /* Checks if the current molecule, in case of being a kinase or phosphotase, needs to be reactivated. If so,
      * it reacivates the molecule. It also updates the time counter for inactive particles */
-    void integratorMAPK::reactivationKorP(int partIndex, std::vector<particle> &parts, double timestep){
-        if (parts[partIndex].type >0 and parts[partIndex].state == 1) {
-            parts[partIndex].timeCounter -= timestep;
-            if (parts[partIndex].timeCounter <= 0){
+    void integratorMAPK::reactivationKorP(particle &part, double timestep){
+        if (part.type > 0 and part.state == 1) {
+            part.timeCounter -= timestep;
+            if (part.timeCounter <= 0){
                 // Reactivate particle
-                parts[partIndex].state = 0;
+                part.state = 0;
             }
         }
     }
