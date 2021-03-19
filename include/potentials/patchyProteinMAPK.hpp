@@ -22,9 +22,28 @@ namespace msmrd{
         // Need to call this function from constructor to define parameters
         void setPotentialParameters();
 
+    protected:
+        double evaluatePatchesPotential( particle &part1, particle &part2,
+                                         vec3<double> &pos1virtual,
+                                         std::vector<vec3<double>> &patchesCoords1,
+                                         std::vector<vec3<double>> &patchesCoords2) override;
+
+        std::array<vec3<double>, 4> forceTorquePatches(particle &part1, particle &part2,
+                                                       vec3<double> &pos1virtual,
+                                                       std::vector<vec3<double>> &patchesCoords1,
+                                                       std::vector<vec3<double>> &patchesCoords2) override;
+
+        std::vector<vec3<double>> assignPatches(int type) override;
+
+
     public:
 
-        using patchyProtein::patchyProtein;
+        patchyProteinMAPK(double sigma, double strength,
+                      std::vector<vec3<double>> patchesCoordinatesA,
+                      std::vector<vec3<double>> patchesCoordinatesB);
+        patchyProteinMAPK(double sigma, double strength,
+                      std::vector<std::vector<double>> patchesCoordinatesA,
+                      std::vector<std::vector<double>> patchesCoordinatesB);
 
     };
 

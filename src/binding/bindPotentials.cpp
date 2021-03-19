@@ -8,6 +8,7 @@
 #include "potentials/patchyParticleAngular.hpp"
 #include "potentials/patchyProtein.hpp"
 #include "potentials/patchyProteinMarkovSwitch.hpp"
+#include "potentials/patchyProteinMAPK.hpp"
 
 
 namespace msmrd {
@@ -60,10 +61,18 @@ namespace msmrd {
 
         py::class_<patchyProteinMarkovSwitch, patchyProtein>(m, "patchyProteinMarkovSwitch",
                                                  "Patchy protein with Markov Switch potential (sigma, "
-                                                 "strength, patches coordinates A, patches coordinates B)")
+                                                 "strength, angular strength, patches coordinates A, patches coordinates B)")
                 .def(py::init<double &, double &, double &,
                         std::vector<std::vector<double>> &,
                         std::vector<std::vector<double>> &>());
+
+        py::class_<patchyProteinMAPK, patchyProtein>(m, "patchyProteinMAPK", "patchy protein potenial for MAPK "
+                                                        "simulation (sigma, strength, patches coordinates A, "
+                                                        "patches coordinates B)")
+                .def(py::init<double &, double &,
+                        std::vector<std::vector<double>> &,
+                        std::vector<std::vector<double>> &>());
+
     }
 
 }

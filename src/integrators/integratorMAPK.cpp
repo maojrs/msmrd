@@ -12,9 +12,21 @@ namespace msmrd {
                                    overdampedLangevin(dt, seed, particlesbodytype), anglePatches(anglePatches),
                                    reactivationRateK(reactivationRateK), reactivationRateP(reactivationRateP),
                                    mapkIndex(mapkIndex), kinaseIndex(kinaseIndex), phosIndex(phosIndex) {
+        // Define patches locations in terms of the anglePatches variable
         MAPKpatch1 = {std::cos(anglePatches/2.0),std::sin(anglePatches/2.0), 0.};
         MAPKpatch2 = {std::cos(-anglePatches/2.0),std::sin(-anglePatches/2.0), 0.};
         ligandPatch = {std::cos(-anglePatches/2.0),std::sin(-anglePatches/2.0), 0.};
+//        // Define Markov models for reactivation of kinase and phosphotase
+//        int msmidKinase = 1;
+//        int msmidPhos = 2
+//        long seed = -1;
+//        std::vector<std::vector<double>> tmatrixKinase ={ {-reactivationRateK, reactivationRateK},
+//                                                    {reactivationRateK, -reactivationRateK} };
+//        std::vector<std::vector<double>> tmatrixPhos ={ {-reactivationRateP, reactivationRateP},
+//                                                          {reactivationRateP, -reactivationRateP} };
+//        ctmsmKinase = std::make_unique<ctmsm>(msmidKinase, tmatrixKinase, seed);
+//        ctmsmPhos = std::make_unique<ctmsm>(msmidPhos, tmatrixPhos, seed);
+
     }
 
     // Integrate one particle from the particle list main routine (visible only inside the class)
@@ -27,6 +39,7 @@ namespace msmrd {
         if (rotation) {
             rotate(parts[partIndex], torque, timestep);
         }
+        reactivationKorP(partIndex, parts, timestep);
         assignState(partIndex, parts);
     }
 
@@ -34,22 +47,23 @@ namespace msmrd {
         double reactivationRate = 0;
         int stateMAPK;
         std::array<bool,2> MAPKphosphorilated = {false, false}; // site1 and site2 respectively
-        // Check current phosphorilated state of MAPK
-        if (parts[partIndex].state == 1 or parts[partIndex].state == 3){
-            MAPKphosphorilated[0] = true;
-        }
-        if (parts[partIndex].state == 2 or parts[partIndex].state == 3){
-            MAPKphosphorilated[1] = true;
-        }
         // If current particle corresponds to an MAPK molecule, check binding and assign states
         if (std::find(mapkIndex.begin(), mapkIndex.end(), partIndex) != mapkIndex.end()) {
+            // Check current phosphorilated state of MAPK
+            if (parts[partIndex].state == 1 or parts[partIndex].state == 3){
+                MAPKphosphorilated[0] = true;
+            }
+            if (parts[partIndex].state == 2 or parts[partIndex].state == 3){
+                MAPKphosphorilated[1] = true;
+            }
+            // Check for current bindings
             auto MAPKbindingsAndTypes = checkMAPKbindings(partIndex, parts);
             // Assign bound states to kinase and phosphate molecules and time to reactivation
             for (int i = 0; i < MAPKbindingsAndTypes.size(); i++) {
                 auto bindingIndex = std::get<0>(MAPKbindingsAndTypes[i]);
                 auto bindingType = std::get<1>(MAPKbindingsAndTypes[i]);
                 if (bindingIndex > -1) {
-                    parts[bindingIndex].state = 1;
+                    parts[bindingIndex].state = 1; // set ligand particle to inactive state
                     if (bindingType == 1){
                         if (not MAPKphosphorilated[i]) {
                             reactivationRate = 1.0 * reactivationRateK;
@@ -78,6 +92,18 @@ namespace msmrd {
                 parts[partIndex].state = 2;
             } else{
                 parts[partIndex].state = 3;
+            }
+        }
+    }
+
+    /* Checks if the current molecule, in case of being a kinase or phosphotase, needs to be reactivated. If so,
+     * it reacivates the molecule. It also updates the time counter for inactive particles */
+    void integratorMAPK::reactivationKorP(int partIndex, std::vector<particle> &parts, double timestep){
+        if (parts[partIndex].type >0 and parts[partIndex].state == 1) {
+            parts[partIndex].timeCounter -= timestep;
+            if (parts[partIndex].timeCounter <= 0){
+                // Reactivate particle
+                parts[partIndex].state = 0;
             }
         }
     }

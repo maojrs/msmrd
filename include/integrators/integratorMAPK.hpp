@@ -6,6 +6,9 @@
 #include "integrators/overdampedLangevin.hpp"
 #include "particle.hpp"
 #include "potentials/potentials.hpp"
+#include "markovModels/continuousTimeMarkovModel.hpp"
+
+using ctmsm = msmrd::continuousTimeMarkovStateModel;
 
 namespace msmrd {
     /**
@@ -35,6 +38,8 @@ namespace msmrd {
         vec3<double> MAPKpatch1;
         vec3<double> MAPKpatch2;
         vec3<double> ligandPatch;
+//        std::unique_ptr<ctmsm> ctmsmKinase;
+//        std::unique_ptr<ctmsm> ctmsmPhos;
         /**
          * @param anglePatches angle between binding sites (patches) os MAPK molecules. The patches are
          * assumed to be located at anglePatches/2 and -anglePacthes/2 for the MAPK molecules. And
@@ -57,6 +62,8 @@ namespace msmrd {
         std::array<std::tuple<int,int>, 2> checkMAPKbindings(int partIndex, std::vector<particle> &parts);
 
         void assignState(int partIndex, std::vector<particle> &parts);
+
+        void reactivationKorP(int partIndex, std::vector<particle> &parts, double timestep);
     public:
         integratorMAPK(double dt, long seed, std::string particlesbodytype,
                 double anglePatches, double reactivationRateK, double reactivationRateP, std::vector<int> mapKIndex,
