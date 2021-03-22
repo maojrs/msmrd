@@ -52,19 +52,19 @@ namespace msmrd {
         epsRepulsive = 1.0*strength;
         epsAttractive = 0.0; //-0.15*strength;
         epsPatches[0] = -0.15*strength; // When interacting with Kinase
-        epsPatches[1] = -0.20*strength; // When interacting with Phsphotase
+        epsPatches[1] = -0.15*strength; // When interacting with Phosphotase
 
         // Set stiffness of potentials parts
         aRepulsive = 1.5;
         aAttractive = 0.75;
         aPatches[0] = 40.0; // When interacting with Kinase
-        aPatches[1] = 40.0; // When interacting with Phsphotase
+        aPatches[1] = 40.0; // When interacting with Phosphotase
 
         // Set range parameter potentials parts
         rstarRepulsive = 0.75*sigma;
         rstarAttractive = 0.85*sigma;
         rstarPatches[0] = 0.1*sigma; // When interacting with Kinase
-        rstarPatches[1] = 0.1*sigma; // When interacting with Phsphotase
+        rstarPatches[1] = 0.1*sigma; // When interacting with Phosphotase
 
         // Check there are patches, if not, turn patchy interaction off
         if (patchesCoordinatesA.size() == 0 or patchesCoordinatesB.size() == 0) {
