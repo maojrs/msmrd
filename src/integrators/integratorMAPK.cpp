@@ -65,20 +65,19 @@ namespace msmrd {
                 // if binding occured with an active ligand
                 if (bindingIndex > -1) {
                     if (parts[bindingIndex].state == 0) { // 0 equals active state
+                        parts[bindingIndex].state = 1; // set ligand particle to inactive state
+                        auto r1 = randg.uniformRange(0, 1);
                         if (bindingType == 1) {
                             if (not MAPKphosphorilated[i]) {
-                                reactivationRate = 1.0 * reactivationRateK;
+                                parts[bindingIndex].timeCounter = std::log(1.0 / r1) / reactivationRateK;
                                 MAPKphosphorilated[i] = true;
                             }
                         } else { //bindingType 2
                             if (MAPKphosphorilated[i]) {
-                                reactivationRate = 1.0 * reactivationRateP;
+                                parts[bindingIndex].timeCounter = std::log(1.0 / r1) / reactivationRateP;
                                 MAPKphosphorilated[i] = false;
                             }
                         }
-                        parts[bindingIndex].setState(1); // set ligand particle to inactive state
-                        auto r1 = randg.uniformRange(0, 1);
-                        parts[bindingIndex].timeCounter = std::log(1.0 / r1) / reactivationRate;
                     }
                 }
             }
@@ -99,10 +98,11 @@ namespace msmrd {
      * it reacivates the molecule. It also updates the time counter for inactive particles */
     void integratorMAPK::reactivationKorP(particle &part, double timestep){
         if (part.type > 0 and part.state == 1) {
-            part.timeCounter = part.timeCounter - timestep;
+            part.timeCounter -= timestep;
             if (part.timeCounter <= 0){
                 // Reactivate particle
-                part.setState(0);
+                part.state = 0;
+                part.timeCounter = 0;
             }
         }
     }

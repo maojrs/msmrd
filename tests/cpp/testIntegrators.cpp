@@ -400,15 +400,18 @@ TEST_CASE("Initialization of integratorMAPK class", "[integratorMAPK]") {
     auto potentialPatchyProteinMAPK = patchyProteinMAPK(sigma, strength, patchesCoordinates1, patchesCoordinates2);
     myIntegrator.setPairPotential(&potentialPatchyProteinMAPK);
 
+    REQUIRE(plist[0].state == 0);
+    REQUIRE(plist[1].state == 0);
     myIntegrator.integrate(plist);
     REQUIRE(plist[0].state == 2);
+    REQUIRE(plist[1].state == 1);
 
-    // For debugging
-//    int timesteps = 100;
+//    // For debugging
+//    int timesteps = 2500;
 //    for (int i = 0; i < timesteps; i++) {
 //        myIntegrator.integrate(plist);
 //        if (plist[1].state == 1) {
-//            WARN("The particle 2 timeCounter is: " << plist[1].timeCounter);
+//            WARN("The particle 2 timeCounter is: " << plist[1].timeCounter << " " << plist[1].state);
 //        }
 //    }
 }

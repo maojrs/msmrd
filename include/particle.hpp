@@ -60,9 +60,10 @@ namespace msmrd {
          * Next variables only for Markovian switching behavior
          * @param state particle current unbound state (begins in zero). If -1, then particle is in bound state.
          * @param nextState particle next state given and changed by the msm/ctmsm. Only useful in certain contexts.
-         * @param lagtime saves the current lagtime from the MSM
+         * @param lagtime saves the current lagtime from the MSM.
          * @param timeCounter counts time in between CTMSM iterations. It keeps track of time elapsed within one
-         * timestep of the accumulated lagtimes from transisins of the CTMSM.
+         * timestep of the accumulated lagtimes from transitions of the CTMSM. Also used to store time left until
+         * next reaction (activation) in the MAPK implementation.
          * @param propagateTMSM determines if MSM/CTMSM should be propagated on a given timestep
          * tcount and propagateTMSM are used to synchronize TMSM with diffusion/rotation timestepping
          * @param activeMSM determines if MSM behavior is active or dormant. This applied only to the MSM for
