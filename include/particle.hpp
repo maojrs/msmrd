@@ -87,7 +87,7 @@ namespace msmrd {
          * @param activePatchList If using patchy particles, this is a list of int values. The size
          * of the list correspond to the number of patches, a -1 value in the list indicates the corresponding
          * patch is unbound and active, a positive value corresponds to the index of the particle to which it
-         * is bound, and it indicates the patch is only allow to interact with the particle with which it is bound.
+         * is bound, and it indicates the patch is only allowed to interact with the particle with which it is bound.
          * Only used for some multiparticle simulations.
          */
 

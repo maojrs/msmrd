@@ -12,7 +12,7 @@ namespace msmrd {
                                    overdampedLangevin(dt, seed, particlesbodytype), anglePatches(anglePatches),
                                    reactivationRateK(reactivationRateK), reactivationRateP(reactivationRateP),
                                    mapkIndex(mapkIndex), kinaseIndex(kinaseIndex), phosIndex(phosIndex) {
-        // Define patches locations in terms of the anglePatches variable
+        // Define patches normals in terms of the anglePatches variable
         MAPKpatch1 = {std::cos(anglePatches/2.0),std::sin(anglePatches/2.0), 0.};
         MAPKpatch2 = {std::cos(-anglePatches/2.0),std::sin(-anglePatches/2.0), 0.};
         ligandPatch = {std::cos(-anglePatches/2.0),std::sin(-anglePatches/2.0), 0.};
@@ -62,7 +62,7 @@ namespace msmrd {
             for (int i = 0; i < MAPKbindingsAndTypes.size(); i++) {
                 auto bindingIndex = std::get<0>(MAPKbindingsAndTypes[i]);
                 auto bindingType = std::get<1>(MAPKbindingsAndTypes[i]);
-                // if binding occured with an active ligand
+                // if binding occurred with an active ligand
                 if (bindingIndex > -1) {
                     if (parts[bindingIndex].state == 0) { // 0 equals active state
                         parts[bindingIndex].state = 1; // set ligand particle to inactive state

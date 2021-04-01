@@ -22,7 +22,7 @@ namespace msmrd {
         calculateForceTorqueFields(parts);
 
         for (int i = 0; i < parts.size(); i++) {
-            // Sets active patches to calculate force-field avoind triple bindings
+            // Sets active patches to calculate force-field avoding triple bindings
             setActivePatches(parts);
             // Integrate and save next positions/orientations in parts[i].next***
             integrateOne(i, parts, dt);

@@ -189,16 +189,16 @@ namespace msmrd {
                 }
                 // part1 is MAPK and part2 is phosphotase:
                 else if (part1.type == 0  and part2.type == 2 and part2.state == 0) {
-                    if ((i == 0 and (part1.state == 1 or part1.state == 4)) or
-                        (i == 1 and (part1.state == 2 or part1.state == 4))) {
+                    if ((i == 0 and (part1.state == 1 or part1.state == 3)) or
+                        (i == 1 and (part1.state == 2 or part1.state == 3))) {
                         patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[1],
                                                                         aPatches[1], rstarPatches[1]);
                     }
                 }
                 // part2 is MAPK and part1 is phosphotase:
                 else if (part2.type == 0  and part1.type == 2 and part1.state == 0) {
-                    if ((j == 0 and (part2.state == 1 or part2.state == 4)) or
-                        (j == 1 and (part2.state == 2 or part2.state == 4))) {
+                    if ((j == 0 and (part2.state == 1 or part2.state == 3)) or
+                        (j == 1 and (part2.state == 2 or part2.state == 3))) {
                         patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[1],
                                                                         aPatches[1], rstarPatches[1]);
                     }
