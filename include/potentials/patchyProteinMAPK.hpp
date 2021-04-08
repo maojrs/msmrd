@@ -44,7 +44,6 @@ namespace msmrd{
         patchyProteinMAPK(double sigma, double strength,
                       std::vector<std::vector<double>> patchesCoordinatesA,
                       std::vector<std::vector<double>> patchesCoordinatesB);
-
     };
 
 }

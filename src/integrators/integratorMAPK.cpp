@@ -48,7 +48,8 @@ namespace msmrd {
         int stateMAPK;
         std::array<bool,2> MAPKphosphorilated = {false, false}; // site1 and site2 respectively
         // If current particle corresponds to an MAPK molecule, check binding and assign states
-        if (std::find(mapkIndex.begin(), mapkIndex.end(), partIndex) != mapkIndex.end()) {
+        if (parts[partIndex].type == 0) {
+        //if (std::find(mapkIndex.begin(), mapkIndex.end(), partIndex) != mapkIndex.end()) {
             // Check current phosphorilated state of MAPK
             if (parts[partIndex].state == 1 or parts[partIndex].state == 3){
                 MAPKphosphorilated[0] = true; // at site 1
@@ -132,7 +133,7 @@ namespace msmrd {
                     // Calculate vectors pointing to binding patches
                     auto rotatedMAPKpatch1 = msmrdtools::rotateVec(MAPKpatch1, particleMAPK->orientation);
                     auto rotatedLigandPatch = msmrdtools::rotateVec(ligandPatch, parts[i].orientation);
-                    if ((rotatedMAPKpatch1 + rotatedLigandPatch).norm() <= toleranceBinding){
+                    if ((rotatedMAPKpatch1 + rotatedLigandPatch).norm() <= toleranceBindingOrientation){
                         //BINDING
                         bindingIndexAt1 = i;
                         bindingTypeAt1 = parts[i].type;
@@ -143,7 +144,7 @@ namespace msmrd {
                     // Calculate vectors pointing to binding patches
                     auto rotatedMAPKpatch2 = msmrdtools::rotateVec(MAPKpatch2, particleMAPK->orientation);
                     auto rotatedLigandPatch = msmrdtools::rotateVec(ligandPatch, parts[i].orientation);
-                    if ((rotatedMAPKpatch2 + rotatedLigandPatch).norm() <= toleranceBinding){
+                    if ((rotatedMAPKpatch2 + rotatedLigandPatch).norm() <= toleranceBindingOrientation){
                         //BINDING
                         bindingIndexAt2 = i;
                         bindingTypeAt2 = parts[i].type;

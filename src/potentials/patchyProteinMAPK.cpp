@@ -148,7 +148,7 @@ namespace msmrd {
         vec3<double> torque2 = vec3<double> (0.0, 0.0, 0.0);
 
         // auxiliary variables to calculate force and torque
-        double patchesForceNorm;
+        double patchesForceNorm = 0.0;
         vec3<double> patchForce;
         vec3<double> patch1;
         vec3<double> patch2;
@@ -172,7 +172,7 @@ namespace msmrd {
                  * Only allow for interactions between MAPK and kinase or MAPK and phosphosate .It also assumes
                  * different type of interaction with kinase/phosphotase, and state 0 corresponds to active state. */
                 // part1 is MAPK and part2 is kinase:
-                if (part1.type == 0 and part2.type == 1 and part2.state == 0) {
+                if ((part1.type == 0 and part2.type == 1) and part2.state == 0) {
                     if ((i == 0 and (part1.state == 0 or part1.state == 2)) or
                         (i == 1 and (part1.state == 0 or part1.state == 1))) {
                         patchesForceNorm = derivativeQuadraticPotential(rpatch.norm(), sigma, epsPatches[0],

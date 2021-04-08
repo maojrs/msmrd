@@ -35,6 +35,7 @@ namespace msmrd {
         std::vector<int> kinaseIndex;
         std::vector<int> phosIndex;
         double toleranceBinding = 0.2; //0.12;
+        double toleranceBindingOrientation = 0.2;
         vec3<double> MAPKpatch1;
         vec3<double> MAPKpatch2;
         vec3<double> ligandPatch;
@@ -50,7 +51,9 @@ namespace msmrd {
          * MAPK molecules
          * @param kinaseIndex same as mapkIndex but for kinase molecules
          * @param phosIndex same as mapkIndex but for phosphatase molecules
-         * @param toleranceBinding tolerance for evaluating if relative position/orientation corresponds
+         * @param toleranceBinding tolerance for evaluating if relative position corresponds
+         * to binding configuration
+         * @param toleranceBinding tolerance for evaluating if relative orientation corresponds
          * to binding configuration
          * @param MAPKpatch1/2 unit vector pointing to patch/binding site 1 or 2 of MAPK molecule in its initial
          * orientation (1,0,0,0).
