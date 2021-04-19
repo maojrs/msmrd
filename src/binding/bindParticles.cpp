@@ -36,6 +36,10 @@ namespace msmrd {
                 .def_property_readonly("nextOrientation", [](const particle &part) {
                     return vec2numpy(4, part.nextOrientation);
                 })
+                .def_property_readonly("velocity", [](const particle &part) {
+                    return vec2numpy(3, part.velocity);
+                .def_property_readonly("nextVelocity", [](const particle &part) {
+                    return vec2numpy(3, part.nextVelocity);
                 .def_property_readonly("state", &particle::getState)
                 .def_property_readonly("lagtime", &particle::getLagtime)
                 .def_property_readonly("isMSMactive", &particle::isMSMactive)
@@ -44,7 +48,7 @@ namespace msmrd {
                 .def_property_readonly("boundList", &particle::getBoundList)
                 .def_property_readonly("boundStates", &particle::getBoundStates)
                 .def_property_readonly("compoundIndex", &particle::getCompoundIndex)
-
+                .def_property_readonly("mass", &particle::getMass)
 
                 .def("activate", &particle::activate)
                 .def("deactivate", &particle::deactivate)
