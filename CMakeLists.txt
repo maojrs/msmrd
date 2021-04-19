@@ -63,6 +63,7 @@ set(SOURCES
         src/potentials/gaussians3D.cpp
         src/potentials/gayBerne.cpp
         src/potentials/harmonicRepulsion.cpp
+        src/potentials/lennardJones.cpp
         src/potentials/patchyParticle.cpp
         src/potentials/patchyParticleAngular.cpp
         src/potentials/patchyProtein.cpp
@@ -122,6 +123,7 @@ set(PY_SOURCES
         include/potentials/gaussians3D.hpp
         include/potentials/gayBerne.hpp
         include/potentials/harmonicRepulsion.hpp
+        include/potentials/lennardJones.hpp
         include/potentials/patchyParticle.hpp
         include/potentials/patchyParticleAngular.hpp
         include/potentials/patchyProtein.hpp
