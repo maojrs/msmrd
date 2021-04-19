@@ -16,6 +16,7 @@ namespace msmrd {
                                             "for MArkovian switch behavior")
                 .def(py::init<double &, double &, std::vector<double> &, std::vector<double> &>())
                 .def(py::init<int &, int &, double &, double &, std::vector<double> &, std::vector<double> &>())
+                .def(py::init<double &, std::vector<double> &, std::vector<double> &, double &>())
                 .def_property_readonly("ID", &particle::getID)
                 .def_property_readonly("D", &particle::getD)
                 .def_property_readonly("Drot", &particle::getDrot)
@@ -38,8 +39,10 @@ namespace msmrd {
                 })
                 .def_property_readonly("velocity", [](const particle &part) {
                     return vec2numpy(3, part.velocity);
+                })
                 .def_property_readonly("nextVelocity", [](const particle &part) {
                     return vec2numpy(3, part.nextVelocity);
+                })
                 .def_property_readonly("state", &particle::getState)
                 .def_property_readonly("lagtime", &particle::getLagtime)
                 .def_property_readonly("isMSMactive", &particle::isMSMactive)
@@ -67,7 +70,9 @@ namespace msmrd {
                 .def("setLagtime", &particle::setLagtime)
                 .def("setMSMoff", &particle::setMSMoff)
                 .def("setMSMon", &particle::setMSMon)
-                .def("setActivePatchList", &particle::setActivePatchList);
+                .def("setActivePatchList", &particle::setActivePatchList)
+                .def("setVelocity", &particle::setVelocity)
+                .def("setMass", &particle::setMass);
 
 
         py::class_<particleCompound>(m, "particleCompound", "particle complex class that keeps track of"

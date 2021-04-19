@@ -35,7 +35,7 @@ namespace msmrd {
         vec3<double> dr;
         vec3<double> dv;
         double eta = KbTemp / part.D; // friction coefficient
-        dr = dv * dt0;
+        dr = part.velocity * dt0;
         dv = - eta * part.velocity * dt0 / part.mass
                 + force * dt0 / part.mass
                 + (std::sqrt(2 * KbTemp * eta * dt0 )/part.mass) * randg.normal3D(0, 1);

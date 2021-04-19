@@ -114,6 +114,12 @@ namespace msmrd {
         particle(int type, int state, double D, double Drot, std::vector<double> &position,
                  std::vector<double> &orientation);
 
+        // Constructors of particle for Langevin integrators.
+        particle(double D, vec3<double> position, vec3<double> velocity, double mass);
+
+        particle(double D, std::vector<double> &position, std::vector<double> &velocity, double mass);
+
+
         /* The functions below of the particle class are used by c++ and python,
          * some of them are only useful to generate the python bindings. Functions
          * longer than one line are implemented in particle.cpp*/
