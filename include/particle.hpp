@@ -43,6 +43,10 @@ namespace msmrd {
         std::vector<int> boundStates;
         int compoundIndex = -1;
         std::vector<int> activePatchList;
+        /* Next variables exclusive for Langevin integrators (no
+         * orientation allowed). */
+        vec3<double> velocity = vec3<double>();
+        vec3<double> nextVelocity = vec3<double>();
         /**
          * @param pid ID of the particle (can be the index in a particle list if it is part of particle list.)
          * @param active determines if particle currently active
@@ -89,6 +93,9 @@ namespace msmrd {
          * patch is unbound and active, a positive value corresponds to the index of the particle to which it
          * is bound, and it indicates the patch is only allowed to interact with the particle with which it is bound.
          * Only used for some multiparticle simulations.
+         *
+         * Next variables exclusive for Langevin integrators (no orientation allowed)
+         * @param velocity this is the current velocity of the particle
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
@@ -160,6 +167,10 @@ namespace msmrd {
 
         void setNextOrientation(quaternion<double> nextorientation) { nextOrientation = nextorientation; }
 
+        void setVelocity(vec3<double> newvelocity) { velocity = newvelocity; }
+
+        void setNextVelocity(vec3<double> nextvelocity) { nextVelocity = nextvelocity; }
+
         // Exclusive for pybindings
 
         void setPositionPyBind(std::vector<double> newposition) { position = newposition; }
@@ -188,6 +199,8 @@ namespace msmrd {
         void updatePosition();
 
         void updateOrientation();
+
+        void updateVelocity();
 
         void activate() { active = true; }
 

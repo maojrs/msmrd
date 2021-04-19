@@ -68,6 +68,10 @@ namespace msmrd {
         orientation = 1 * nextOrientation;
     };
 
+    void particle::updateVelocity() {
+        velocity = 1.0 * nextVelocity;
+    };
+
     void particle::setOrientationPyBind(std::vector<double> neworientation) {
         quaternion<double> quat(neworientation);
         orientation = quat;
