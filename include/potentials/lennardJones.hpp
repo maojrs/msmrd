@@ -16,12 +16,15 @@ namespace msmrd {
     public:
         double epsilon;
         double sigma;
+        double cutOff;
 
         /**
          * @param epsilon depth of the potential well
          * @param sigma distance at which the potential is zero (a.k.a 'size of the particle')
          */
         lennardJones(double epsilon, double sigma);
+
+        lennardJones(double epsilon, double sigma, double cutOff);
 
         double evaluate(particle &part1, particle &part2) override;
 

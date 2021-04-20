@@ -97,6 +97,9 @@ namespace msmrd {
         void updatePositionOrientation(std::vector<PARTICLE> &parts);
 
         template< typename PARTICLE >
+        void updateVelocities(std::vector<PARTICLE> &parts);
+
+        template< typename PARTICLE >
         void enforceBoundary(std::vector<PARTICLE> &parts);
 
 
@@ -207,7 +210,7 @@ namespace msmrd {
 
     /* Update positions and orientations (sets calculated next position/orientation
      * calculated by integrator and boundary as current position/orientation). Only
-     * updated isparticle is active. Orientation only updated if rotation is active */
+     * updated if particle is active. Orientation only updated if rotation is active */
     template <typename PARTICLE>
     void integrator::updatePositionOrientation(std::vector<PARTICLE> &parts){
         for (int i = 0; i < parts.size(); i++) {
@@ -216,7 +219,18 @@ namespace msmrd {
                 if (rotation) {
                     parts[i].updateOrientation();
                 }
-                if (velocityIntegration) {
+            }
+        }
+    }
+
+    /* Update velocities (sets calculated next velocity
+     * calculated by integrator and boundary as current velocity). Only
+     * updated if particle is active and if velocityIntegration is active. */
+    template <typename PARTICLE>
+    void integrator::updateVelocities(std::vector<PARTICLE> &parts) {
+        if (velocityIntegration) {
+            for (int i = 0; i < parts.size(); i++) {
+                if (parts[i].isActive()) {
                     parts[i].updateVelocity();
                 }
             }

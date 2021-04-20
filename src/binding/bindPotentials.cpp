@@ -28,7 +28,8 @@ namespace msmrd {
 
         py::class_<lennardJones, pairPotential>(m, "lennardJones", "Lennard-Jones potential "
                                                            "(epsilon, sigma)")
-                .def(py::init<double &, double &>());
+                .def(py::init<double &, double &>())
+                .def(py::init<double &, double &, double &>());
 
         py::class_<harmonicRepulsion, pairPotential>(m, "HarmonicRepulsion", "Harmonic repulsion potential "
                                                                    "(k, range)")
