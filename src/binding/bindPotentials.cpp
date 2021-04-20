@@ -2,8 +2,9 @@
 #include "potentials/potentials.hpp"
 #include "potentials/dipole.hpp"
 #include "potentials/gaussians3D.hpp"
-#include "potentials/harmonicRepulsion.hpp"
 #include "potentials/gayBerne.hpp"
+#include "potentials/harmonicRepulsion.hpp"
+#include "potentials/lennardJones.hpp"
 #include "potentials/patchyParticle.hpp"
 #include "potentials/patchyParticleAngular.hpp"
 #include "potentials/patchyProtein.hpp"
@@ -25,6 +26,13 @@ namespace msmrd {
                                                                          "directionEField)")
                 .def(py::init<double &, std::vector<double> &>());
 
+        py::class_<lennardJones, pairPotential>(m, "lennardJones", "Lennard-Jones potential "
+                                                           "(epsilon, sigma)")
+                .def(py::init<double &, double &>());
+
+        py::class_<harmonicRepulsion, pairPotential>(m, "HarmonicRepulsion", "Harmonic repulsion potential "
+                                                                   "(k, range)")
+                .def(py::init<double &, double &>());
 
         py::class_<gayBerne, pairPotential>(m, "gayBerne", "Gay-Berne potential "
                                                            "(a, d, eps0, sig0)")

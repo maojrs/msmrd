@@ -25,7 +25,20 @@ namespace msmrd {
     }
 
     std::array<vec3<double>, 4> lennardJones::forceTorque(particle &part1, particle &part2) {
-    // MISSING IMPLEMENTATION
+        std::array<vec3<double>, 2> relPos = relativePositionComplete(part1.position, part2.position);
+        //vec3<double> pos1virtual = relPos[0]; // virtual pos1 if periodic boundary; otherwise pos1.
+        vec3<double> rvec = relPos[1]; //part2.position - part1.position if non-periodic boundary;
+        double r = rvec.norm();
+
+        double term0 = std::pow((sigma/r),6);
+        double dVdr = (24 * epsilon / r) * (term0 - 2 * std::pow(term0,2));
+        double dVdx = dVdr * rvec[0]/ r;
+        double dVdy = dVdr * rvec[1]/ r;
+        double dVdz = dVdr * rvec[2]/ r;
+
+        vec3<double> force = vec3<double>(-dVdx, -dVdy, -dVdz);
+        vec3<double> torque = 0 * force;
+        return {force, torque, -1*force, torque};
     }
 
 
