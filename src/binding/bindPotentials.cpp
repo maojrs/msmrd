@@ -31,7 +31,7 @@ namespace msmrd {
                 .def(py::init<double &, double &>())
                 .def(py::init<double &, double &, double &>());
 
-        py::class_<WCA, pairPotential>(m, "WCA", "WCA potential (epsilon, sigma)")
+        py::class_<WCA, lennardJones>(m, "WCA", "WCA potential (epsilon, sigma)")
                 .def(py::init<double &, double &>());
 
         py::class_<harmonicRepulsion, pairPotential>(m, "HarmonicRepulsion", "Harmonic repulsion potential "
