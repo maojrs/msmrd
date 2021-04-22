@@ -197,7 +197,7 @@ namespace msmrd {
         vec3<double> torque2 = vec3<double> (0.0, 0.0, 0.0);
 
         // auxiliary variables to calculate force and torque
-        double patchesForceNorm;
+        double patchesForceNorm = 0.0;
         vec3<double> patchForce;
         vec3<double> patch1;
         vec3<double> patch2;

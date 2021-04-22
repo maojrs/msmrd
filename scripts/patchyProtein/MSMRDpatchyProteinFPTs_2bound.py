@@ -15,7 +15,7 @@ import os
 Creates an MSM/RD simulation of two particle that calculates first passage times (FPTs) from a random 
 unbound configuration to a given bound state. This requires to input the MSM for the MSM/RD algorithm 
 calculated from an MD simulation (the MSM is loaded using pickle). The data is 
-written to '../data/patchyProtein/first_passage_times/MSMRDfilename_here.
+written to '../../data/patchyProtein/first_passage_times/MSMRDfilename_here.
 '''
 
 # Main parameters for particle and integrator
@@ -63,8 +63,8 @@ boundStates = [1, 2, 3, 4, 5, 6]
 #boundStates = [1]
 
 # Chooses parent directory
-#parentDirectory = "../../data/patchyProtein/first_passage_times/"
-parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/first_passage_times/"
+parentDirectory = "../../data/patchyProtein/first_passage_times/"
+MSMdirectory = '../../data/patchyProtein/MSMs/'
 
 # Creates parent directory if it doesn't exist already
 try:
@@ -101,12 +101,7 @@ def MSMRDsimulationFPT(trajectorynum):
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
 
     # Load rate dicitionary
-    #pickle_in = open("../../data/patchyProtein/benchmark/"
-    #                 "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
-    #                 +  ".pickle","rb")
-    pickle_in = open("/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/benchmark/"
-                     "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
-                     +  ".pickle","rb")
+    pickle_in = open(MSMdirectory + "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime) +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']
     activeSet = mainMSM['active_set']
@@ -155,8 +150,7 @@ def MSMRDsimulationFPT(trajectorynum):
         currentState = partlist[0].boundState
         if currentState in boundStates:
             unbound = False
-            #filenameLog = filename = "/home/maojrs/Dokumente/Postdoc/projects/MSMRD2/" \
-            #                         "msmrd2/data/patchyProtein/debug/eventLog_" + str(trajectorynum)
+            #filenameLog = filename = "../../data/patchyProtein/eventLog_" + str(trajectorynum)
             #integrator.printEventLog(filenameLog)
             return currentState, integrator.clock
         elif integrator.clock >= 15000.0:

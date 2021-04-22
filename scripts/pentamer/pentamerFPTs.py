@@ -12,7 +12,7 @@ import os
 '''
 Creates an MD simulation of five particles and calculates their first passage times (FPTs) 
 from a random configuration to a pentamer configuration. The data is written to 
-'../data/pentamer/first_passage_times/filename_here. It uses the patchy dimer model of molecules
+'../../data/pentamer/first_passage_times/filename_here. It uses the patchy dimer model of molecules
 with only one stable angular configuration created in the trimer example.
 '''
 
@@ -42,7 +42,6 @@ boundStates = [1, 2, 3, 4]
 
 # Chooses parent directory
 parentDirectory = "../../data/pentamer/first_passage_times/"
-# parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/pentamer/first_passage_times/"
 
 # Creates parent directory if it doesn't exist already
 try:

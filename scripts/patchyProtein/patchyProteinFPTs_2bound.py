@@ -11,7 +11,7 @@ import os
 '''
 Creates an MD simulation of two patchyProtein particle and calculates their first passage times (FPTs) from a random 
 unbound configuration to any given bound state(s). The data is written to 
-'../data/patchyProtein/first_passage_times/filename_here.
+'../../data/patchyProtein/first_passage_times/filename_here.
 '''
 
 # Main parameters for particle and integrator
@@ -40,8 +40,7 @@ boundStates = [1,2,3,4,5,6]
 #boundStates = [1] # Main bound state
 
 # Chooses parent directory
-#parentDirectory = "../../data/patchyProtein/first_passage_times/"
-parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/first_passage_times/"
+parentDirectory = "../../data/patchyProtein/first_passage_times/"
 
 # Creates parent directory if it doesn't exist already
 try:

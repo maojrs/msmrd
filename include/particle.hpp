@@ -43,6 +43,11 @@ namespace msmrd {
         std::vector<int> boundStates;
         int compoundIndex = -1;
         std::vector<int> activePatchList;
+        /* Next variables exclusive for Langevin integrators (no
+         * orientation allowed). */
+        vec3<double> velocity = vec3<double>();
+        vec3<double> nextVelocity = vec3<double>();
+        double mass = 0.0;
         /**
          * @param pid ID of the particle (can be the index in a particle list if it is part of particle list.)
          * @param active determines if particle currently active
@@ -60,9 +65,10 @@ namespace msmrd {
          * Next variables only for Markovian switching behavior
          * @param state particle current unbound state (begins in zero). If -1, then particle is in bound state.
          * @param nextState particle next state given and changed by the msm/ctmsm. Only useful in certain contexts.
-         * @param lagtime saves the current lagtime from the MSM
+         * @param lagtime saves the current lagtime from the MSM.
          * @param timeCounter counts time in between CTMSM iterations. It keeps track of time elapsed within one
-         * timestep of the accumulated lagtimes from transisins of the CTMSM.
+         * timestep of the accumulated lagtimes from transitions of the CTMSM. Also used to store time left until
+         * next reaction (activation) in the MAPK implementation.
          * @param propagateTMSM determines if MSM/CTMSM should be propagated on a given timestep
          * tcount and propagateTMSM are used to synchronize TMSM with diffusion/rotation timestepping
          * @param activeMSM determines if MSM behavior is active or dormant. This applied only to the MSM for
@@ -86,8 +92,13 @@ namespace msmrd {
          * @param activePatchList If using patchy particles, this is a list of int values. The size
          * of the list correspond to the number of patches, a -1 value in the list indicates the corresponding
          * patch is unbound and active, a positive value corresponds to the index of the particle to which it
-         * is bound, and it indicates the patch is only allow to interact with the particle with which it is bound.
+         * is bound, and it indicates the patch is only allowed to interact with the particle with which it is bound.
          * Only used for some multiparticle simulations.
+         *
+         * Next variables exclusive for Langevin integrators (no orientation allowed)
+         * @param velocity this is the current velocity of the particle
+         * @param nextVelocity saves next velocity for integrator to update
+         * @param mass saves the mass of the particle
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)
@@ -102,6 +113,12 @@ namespace msmrd {
 
         particle(int type, int state, double D, double Drot, std::vector<double> &position,
                  std::vector<double> &orientation);
+
+        // Constructors of particle for Langevin integrators.
+        particle(double D, vec3<double> position, vec3<double> velocity, double mass);
+
+        particle(double D, std::vector<double> &position, std::vector<double> &velocity, double mass);
+
 
         /* The functions below of the particle class are used by c++ and python,
          * some of them are only useful to generate the python bindings. Functions
@@ -188,6 +205,8 @@ namespace msmrd {
 
         void updateOrientation();
 
+        void updateVelocity();
+
         void activate() { active = true; }
 
         void deactivate() { active = false; }
@@ -207,6 +226,16 @@ namespace msmrd {
         void deactivateResetMSM();
 
         void setActivePatchList(int numPatches);
+
+        // For velocity integration (Langevin integrators)
+
+        void setVelocity(vec3<double> newvelocity) { velocity = newvelocity; }
+
+        void setNextVelocity(vec3<double> nextvelocity) { nextVelocity = nextvelocity; }
+
+        void setMass(double newmass) { mass = newmass; }
+
+        double getMass() {return mass;}
 
     };
 

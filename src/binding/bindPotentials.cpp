@@ -2,12 +2,14 @@
 #include "potentials/potentials.hpp"
 #include "potentials/dipole.hpp"
 #include "potentials/gaussians3D.hpp"
-#include "potentials/harmonicRepulsion.hpp"
 #include "potentials/gayBerne.hpp"
+#include "potentials/harmonicRepulsion.hpp"
+#include "potentials/lennardJones.hpp"
 #include "potentials/patchyParticle.hpp"
 #include "potentials/patchyParticleAngular.hpp"
 #include "potentials/patchyProtein.hpp"
 #include "potentials/patchyProteinMarkovSwitch.hpp"
+#include "potentials/patchyProteinMAPK.hpp"
 
 
 namespace msmrd {
@@ -24,6 +26,14 @@ namespace msmrd {
                                                                          "directionEField)")
                 .def(py::init<double &, std::vector<double> &>());
 
+        py::class_<lennardJones, pairPotential>(m, "lennardJones", "Lennard-Jones potential "
+                                                           "(epsilon, sigma)")
+                .def(py::init<double &, double &>())
+                .def(py::init<double &, double &, double &>());
+
+        py::class_<harmonicRepulsion, pairPotential>(m, "HarmonicRepulsion", "Harmonic repulsion potential "
+                                                                   "(k, range)")
+                .def(py::init<double &, double &>());
 
         py::class_<gayBerne, pairPotential>(m, "gayBerne", "Gay-Berne potential "
                                                            "(a, d, eps0, sig0)")
@@ -60,10 +70,18 @@ namespace msmrd {
 
         py::class_<patchyProteinMarkovSwitch, patchyProtein>(m, "patchyProteinMarkovSwitch",
                                                  "Patchy protein with Markov Switch potential (sigma, "
-                                                 "strength, patches coordinates A, patches coordinates B)")
+                                                 "strength, angular strength, patches coordinates A, patches coordinates B)")
                 .def(py::init<double &, double &, double &,
                         std::vector<std::vector<double>> &,
                         std::vector<std::vector<double>> &>());
+
+        py::class_<patchyProteinMAPK, patchyProtein>(m, "patchyProteinMAPK", "patchy protein potenial for MAPK "
+                                                        "simulation (sigma, strength, patches coordinates A, "
+                                                        "patches coordinates B)")
+                .def(py::init<double &, double &,
+                        std::vector<std::vector<double>> &,
+                        std::vector<std::vector<double>> &>());
+
     }
 
 }

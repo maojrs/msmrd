@@ -5,6 +5,8 @@
 #include <catch2/catch.hpp>
 #include "integrators/msmrdIntegrator.hpp"
 #include "integrators/msmrdMultiParticleIntegrator.hpp"
+#include "integrators/integratorMAPK.hpp"
+#include "potentials/patchyProteinMAPK.hpp"
 #include "boundaries/box.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
 #include "markovModels/msmrdMarkovModel.hpp"
@@ -344,4 +346,72 @@ TEST_CASE("Initialization and functions of MSMRD multi-particle integrator class
     REQUIRE(myIntegrator.getNumberOfBindingsInCompound(0) == 5);
     auto bindingLoops = myIntegrator.findClosedBindingLoops(plist);
     REQUIRE(bindingLoops[0] == 5);
+}
+
+
+TEST_CASE("Initialization of integratorMAPK class", "[integratorMAPK]") {
+    int numparticles = 3;
+    double boxsize = 4;
+    double D = 1.0;
+    double Drot = 1.0;
+    long seed = -1;
+
+    // Create particle list
+    auto position1 = vec3<double>{0.0, 0.0, 0.0};
+    auto position2 = vec3<double>{std::cos(M_PI/4.0), std::sin(-M_PI/4.0), 0};
+    auto position3 = vec3<double>{-1.5, 0, 0};
+    auto orientation1 = quaternion<double>{1.0, 0.0, 0.0, 0.0};
+    auto orientation2 = quaternion<double>{std::cos(M_PI/2.0), 0.0, 0.0, std::sin(M_PI/2.0)};
+    auto orientation3 = quaternion<double>{1.0, 0.0, 0.0, 0.0};
+    particle part1 = particle(0, 0, D, Drot, position1, orientation1);
+    particle part2 = particle(1, 0, D, Drot, position2, orientation2);
+    particle part3 = particle(2, 0, D, Drot, position3, orientation3);
+    auto plist = std::vector<particle>{part1, part2, part3};
+
+    // Define boundary
+    auto boundary = box(boxsize, boxsize, boxsize, "reflective");
+
+    // Define and set up integrator
+    double dt = 0.00001;
+    std::string bodytype = "rigidbody";
+    double anglePatches = M_PI/2.0;
+    double reactivationRateK = 500;
+    double reactivationRateP = 500;
+    auto mapkIndex = std::vector<int>(1);
+    mapkIndex[0] = 0; // index of MAPK particle (type 0)
+    auto kinaseIndex = std::vector<int>(1);
+    kinaseIndex[0] = 1; // index of kinase particle (type 1)
+    auto phosIndex = std::vector<int>(1);
+    phosIndex[0] = 2; // index of phosphotase particle (type 2)
+    auto myIntegrator = integratorMAPK(dt, seed, bodytype, anglePatches, reactivationRateK, reactivationRateP,
+                                mapkIndex, kinaseIndex, phosIndex);
+    myIntegrator.setBoundary(&boundary);
+
+    // Define MAPK potential (not required to test integrator but implemented for reference)
+    double sigma = 1.0;
+    double strength = 60;
+    auto patch1 = vec3<double>(std::cos(anglePatches/2.0), std::sin(anglePatches/2.0), 0.);
+    auto patch2 = vec3<double>(std::cos(-anglePatches/2.0), std::sin(-anglePatches/2.0), 0.);
+    std::vector<vec3<double>> patchesCoordinates1(2);
+    std::vector<vec3<double>> patchesCoordinates2(0);
+    patchesCoordinates1[0] = vec3<double> (std::cos(anglePatches/2), std::sin(anglePatches/2), 0.);
+    patchesCoordinates1[1] = vec3<double> (std::cos(-anglePatches/2), std::sin(-anglePatches/2), 0.);
+    //patchesCoordinates2[0] = vec3<double> (std::cos(-anglePatches/2), std::sin(-anglePatches/2), 0.);
+    auto potentialPatchyProteinMAPK = patchyProteinMAPK(sigma, strength, patchesCoordinates1, patchesCoordinates2);
+    myIntegrator.setPairPotential(&potentialPatchyProteinMAPK);
+
+    REQUIRE(plist[0].state == 0);
+    REQUIRE(plist[1].state == 0);
+    myIntegrator.integrate(plist);
+    REQUIRE(plist[0].state == 2);
+    REQUIRE(plist[1].state == 1);
+
+//    // For debugging
+//    int timesteps = 2500;
+//    for (int i = 0; i < timesteps; i++) {
+//        myIntegrator.integrate(plist);
+//        if (plist[1].state == 1) {
+//            WARN("The particle 2 timeCounter is: " << plist[1].timeCounter << " " << plist[1].state);
+//        }
+//    }
 }

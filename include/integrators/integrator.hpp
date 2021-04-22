@@ -24,6 +24,7 @@ namespace msmrd {
         long seed;
         std::string particlesbodytype;
         bool rotation = false;
+        bool velocityIntegration = false;
         randomgen randg = randomgen();
 
 
@@ -52,6 +53,8 @@ namespace msmrd {
         * be either point, rod or rigidbody, and it is determined by orientational degrees of freedom, points
         * have no orientation, rods need only one vector and rigidsolid requires a complete quaternion).
         * @param rotation boolean to indicate if rotation should be integrated
+        * @param velocityIntegration boolean to indicate if velocity should be integrated. Can only be set to
+        * true for Langevin type integrators.
         * @param randg random number generator based in mt19937
         *
         * @param forceField stores force experienced by each particle at a given time
@@ -92,6 +95,9 @@ namespace msmrd {
 
         template< typename PARTICLE >
         void updatePositionOrientation(std::vector<PARTICLE> &parts);
+
+        template< typename PARTICLE >
+        void updateVelocities(std::vector<PARTICLE> &parts);
 
         template< typename PARTICLE >
         void enforceBoundary(std::vector<PARTICLE> &parts);
@@ -204,7 +210,7 @@ namespace msmrd {
 
     /* Update positions and orientations (sets calculated next position/orientation
      * calculated by integrator and boundary as current position/orientation). Only
-     * updated isparticle is active. Orientation only updated if rotation is active */
+     * updated if particle is active. Orientation only updated if rotation is active */
     template <typename PARTICLE>
     void integrator::updatePositionOrientation(std::vector<PARTICLE> &parts){
         for (int i = 0; i < parts.size(); i++) {
@@ -212,6 +218,20 @@ namespace msmrd {
                 parts[i].updatePosition();
                 if (rotation) {
                     parts[i].updateOrientation();
+                }
+            }
+        }
+    }
+
+    /* Update velocities (sets calculated next velocity
+     * calculated by integrator and boundary as current velocity). Only
+     * updated if particle is active and if velocityIntegration is active. */
+    template <typename PARTICLE>
+    void integrator::updateVelocities(std::vector<PARTICLE> &parts) {
+        if (velocityIntegration) {
+            for (int i = 0; i < parts.size(); i++) {
+                if (parts[i].isActive()) {
+                    parts[i].updateVelocity();
                 }
             }
         }

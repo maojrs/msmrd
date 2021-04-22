@@ -15,7 +15,7 @@ import os
 Creates an MSM/RD simulation of two particle that calculates first passage times (FPTs) from a 
 given bound state to any unbound configuration. This requires to input the MSM for the MSM/RD algorithm 
 calculated from an MD simulation (the MSM is loaded using pickle). The data is 
-written to '../data/patchyProtein/first_passage_times/MSMRDfilename_here.
+written to '../../data/patchyProtein/first_passage_times/MSMRDfilename_here.
 '''
 
 # Main parameters for particle and integrator
@@ -61,8 +61,8 @@ Dbound = 0.5*np.ones(numBoundStates)
 DboundRot = np.ones(numBoundStates)
 
 # Chooses parent directory
-#parentDirectory = "../../data/patchyProtein/first_passage_times/"
-parentDirectory = "/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/first_passage_times/"
+parentDirectory = "../../data/patchyProtein/first_passage_times/"
+MSMdirectory = '../../data/patchyProtein/MSMs/'
 
 # Creates parent directory if it doesn't exist already
 try:
@@ -173,12 +173,7 @@ def MSMRDsimulationFPT(trajectorynum):
     seed = int(-1*trajectorynum) # Negative seed, uses random device as seed
 
     # Load rate dicitionary
-    #pickle_in = open("../../data/patchyProtein/benchmark/"
-    #                 "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
-    #                 +  ".pickle","rb")
-    pickle_in = open("/group/ag_cmb/scratch/maojrs/msmrd2_data/patchyProtein/benchmark/"
-                     "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime)
-                     +  ".pickle","rb")
+    pickle_in = open(MSMdirectory + "MSM_patchyProtein_t6.00E+06_s25_lagt" + str(lagtime) +  ".pickle","rb")
     mainMSM = pickle.load(pickle_in)
     tmatrix = mainMSM['transition_matrix']
     activeSet = mainMSM['active_set']

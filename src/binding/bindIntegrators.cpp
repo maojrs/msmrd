@@ -1,4 +1,6 @@
 #include "binding.hpp"
+#include "integrators/integratorMAPK.hpp"
+#include "integrators/langevin.hpp"
 #include "integrators/overdampedLangevin.hpp"
 #include "integrators/overdampedLangevinMarkovSwitch.hpp"
 #include "integrators/overdampedLangevinSelective.hpp"
@@ -25,6 +27,12 @@ namespace msmrd {
                 .def(py::init<double &, long &, std::string &>())
                 .def("integrate", &overdampedLangevin::integrate);
 
+        py::class_<langevin, integrator>(m, "langevin", "Langevin integrator (timestep, seed, "
+                                                        "particlesbodytype (point, rod, rigidbody, "
+                                                        "pointmix, rodmix or rigidbodymix) )")
+                .def(py::init<double &, long &, std::string &>())
+                .def("integrate", &langevin::integrate);
+
         py::class_<overdampedLangevinSelective, overdampedLangevin>(m, "overdampedLangevinSelective", "overdamped "
                                                                     "Langevin integrator with selective active patches."
                                                                     " Special for multiparticle simulations w/patchy "
@@ -36,6 +44,15 @@ namespace msmrd {
                 .def("updateParticleCompounds", &overdampedLangevinSelective::updateParticleCompounds)
                 .def("findClosedBindingLoops", &overdampedLangevinSelective::findClosedBindingLoops)
                 .def("getCompoundSize", &overdampedLangevinSelective::getCompoundSize);
+
+        py::class_<integratorMAPK, overdampedLangevin>(m, "integratorMAPK", "integrator for MAPK (timestep, seed, "
+                                                                            "particlesbodytype (point, rod, rigidbody, "
+                                                                            "pointmix, rodmix or rigidbodymix), "
+                                                                            "anglePatches, mapkIndex, kinaseIndex, "
+                                                                            "phosIndex )")
+                .def(py::init<double &, long &, std::string &, double &, double &, double &, std::vector<int> &,
+                        std::vector<int> &, std::vector<int> &>())
+                .def("integrate", &integratorMAPK::integrate);
 
         py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch",
                                                                               "overdamped Langevin integrator with "

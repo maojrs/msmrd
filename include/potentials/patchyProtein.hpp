@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "potentials/patchyParticle.hpp"
+#include "potentials.hpp"
 
 namespace msmrd{
 
@@ -42,18 +42,18 @@ namespace msmrd{
         double rstarAttractive;
         std::array<double, 2> rstarPatches;
 
-        std::vector<vec3<double>> assignPatches(int type);
-
         double quadraticPotential(double r, double sig, double eps, double a, double rstar);
 
         double derivativeQuadraticPotential(double r, double sig, double eps, double a, double rstar);
 
-        double evaluatePatchesPotential( particle &part1, particle &part2,
+        virtual std::vector<vec3<double>> assignPatches(int type);
+
+        virtual double evaluatePatchesPotential( particle &part1, particle &part2,
                                         vec3<double> &pos1virtual,
                                         std::vector<vec3<double>> &patchesCoords1,
                                         std::vector<vec3<double>> &patchesCoords2);
 
-        std::array<vec3<double>, 4> forceTorquePatches(particle &part1, particle &part2,
+        virtual std::array<vec3<double>, 4> forceTorquePatches(particle &part1, particle &part2,
                                                        vec3<double> &pos1virtual,
                                                        std::vector<vec3<double>> &patchesCoords1,
                                                        std::vector<vec3<double>> &patchesCoords2);

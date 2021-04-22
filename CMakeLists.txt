@@ -47,6 +47,8 @@ set(SOURCES
         src/discretizations/quaternionPartition.cpp
         src/discretizations/spherePartition.cpp
         src/integrators/integrator.cpp
+        src/integrators/integratorMAPK.cpp
+        src/integrators/langevin.cpp
         src/integrators/msmrdIntegrator.cpp
         src/integrators/msmrdMultiParticleIntegrator.cpp
         src/integrators/msmrdPatchyProtein.cpp
@@ -61,9 +63,11 @@ set(SOURCES
         src/potentials/gaussians3D.cpp
         src/potentials/gayBerne.cpp
         src/potentials/harmonicRepulsion.cpp
+        src/potentials/lennardJones.cpp
         src/potentials/patchyParticle.cpp
         src/potentials/patchyParticleAngular.cpp
         src/potentials/patchyProtein.cpp
+        src/potentials/patchyProteinMAPK.cpp
         src/potentials/patchyProteinMarkovSwitch.cpp
         src/potentials/potentials.cpp
         src/trajectories/trajectory.cpp
@@ -102,6 +106,8 @@ set(PY_SOURCES
         include/discretizations/quaternionPartition.hpp
         include/discretizations/spherePartition.hpp
         include/integrators/integrator.hpp
+        include/integrators/integratorMAPK.hpp
+        include/integrators/langevin.hpp
         include/integrators/msmrdIntegrator.hpp
         include/integrators/msmrdMultiParticleIntegrator.hpp
         include/integrators/msmrdPatchyProtein.hpp
@@ -117,9 +123,11 @@ set(PY_SOURCES
         include/potentials/gaussians3D.hpp
         include/potentials/gayBerne.hpp
         include/potentials/harmonicRepulsion.hpp
+        include/potentials/lennardJones.hpp
         include/potentials/patchyParticle.hpp
         include/potentials/patchyParticleAngular.hpp
         include/potentials/patchyProtein.hpp
+        include/potentials/patchyProteinMAPK.hpp
         include/potentials/patchyProteinMarkovSwitch.hpp
         include/trajectories/trajectory.hpp
         include/trajectories/trajectoryPosition.hpp
