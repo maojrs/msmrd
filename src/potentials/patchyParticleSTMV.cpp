@@ -36,7 +36,7 @@ namespace msmrd {
         aPatches[2] = 40.0; // Special binding site
 
         // Set range parameter potentials parts
-        rstarRepulsive = 0.75*sigmaPatches;
+        rstarRepulsive = 0.75 * sigma[1];
         rstarPatches[0] = 0.1*sigmaPatches;
         rstarPatches[1] = 0.1*sigmaPatches;
         rstarPatches[2] = 0.1*sigmaPatches;
@@ -164,12 +164,12 @@ namespace msmrd {
                     repulsiveForce = repulsiveForceNorm * relM / relM.norm();
                 }
                 // Calculate force and torque acting on particle 1 and add values to previous forces and torques
-                force1 += patchPotentialScaling * repulsiveForce;
-                torque1 += patchPotentialScaling * mVecA.cross(repulsiveForce);
+                force1 += repulsiveForce;
+                torque1 += mVecA.cross(repulsiveForce);
 
                 // Calculate force and torque acting on particle 2 and add values to previous forces and torques
-                force2 += -1.0 * patchPotentialScaling * repulsiveForce;
-                torque2 += patchPotentialScaling * mVecB.cross(-1.0 * repulsiveForce);
+                force2 += -1.0 * repulsiveForce;
+                torque2 += mVecB.cross(-1.0 * repulsiveForce);
             }
         }
         return {force1, torque1, force2, torque2};
@@ -269,5 +269,36 @@ namespace msmrd {
             return 0.0;
         }
     }
+
+    // Returns actual position of different parts of particle (m1 to m3 or i1 to i5). Used for pybind.
+    std::array<double, 3> patchyParticleSTMV::getPartPosition(std::string particlePart, particle &part) {
+        vec3<double> position = vec3<double>();
+        std::array<double, 3> outputPosition;
+        if (particlePart == "m1"){
+            position = part.position + msmrdtools::rotateVec(structureCoordinates[0], part.orientation);
+        }
+        else if (particlePart == "m2"){
+            position = part.position + msmrdtools::rotateVec(structureCoordinates[1], part.orientation);
+        }
+        else if (particlePart == "m3"){
+            position = part.position + msmrdtools::rotateVec(structureCoordinates[2], part.orientation);
+        }
+        else if (particlePart == "i1"){
+            position = part.position + msmrdtools::rotateVec(patchesCoordinates[0], part.orientation);
+        }
+        else if (particlePart == "i2"){
+            position = part.position + msmrdtools::rotateVec(patchesCoordinates[1], part.orientation);
+        }
+        else if (particlePart == "i3"){
+            position = part.position + msmrdtools::rotateVec(patchesCoordinates[2], part.orientation);
+        }
+        else if (particlePart == "i4"){
+            position = part.position + msmrdtools::rotateVec(patchesCoordinates[3], part.orientation);
+        }
+        else if (particlePart == "i5"){
+            position = part.position + msmrdtools::rotateVec(patchesCoordinates[4], part.orientation);
+        }
+        return {position[0],position[1], position[2]};
+    };
 
 }

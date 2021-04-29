@@ -66,7 +66,8 @@ namespace msmrd {
         py::class_<patchyParticleSTMV, pairPotential>(m, "patchyParticleSTMV", "Patchy "
                                                       "particle potential for Satellite Tobacco"
                                                       "Mosaic virus (sigma, strength, angularStrength)")
-                .def(py::init<double &, double &>());
+                .def(py::init<double &, double &>())
+                .def("getPartPosition", &patchyParticleSTMV::getPartPosition);
 
         py::class_<patchyProtein, pairPotential>(m, "patchyProtein",
                                                  "Patchy protein potential (sigma, strength, patches"

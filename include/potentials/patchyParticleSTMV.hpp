@@ -73,6 +73,8 @@ namespace msmrd {
         std::array<vec3<double>, 4>
         forceTorque(particle &part1, particle &part2) override;
 
+        std::array<double, 3> getPartPosition(std::string particlePart, particle &part);
+
     };
 
 
