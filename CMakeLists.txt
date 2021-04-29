@@ -66,6 +66,7 @@ set(SOURCES
         src/potentials/lennardJones.cpp
         src/potentials/patchyParticle.cpp
         src/potentials/patchyParticleAngular.cpp
+        src/potentials/patchyParticleSTMV.cpp
         src/potentials/patchyProtein.cpp
         src/potentials/patchyProteinMAPK.cpp
         src/potentials/patchyProteinMarkovSwitch.cpp
@@ -126,6 +127,7 @@ set(PY_SOURCES
         include/potentials/lennardJones.hpp
         include/potentials/patchyParticle.hpp
         include/potentials/patchyParticleAngular.hpp
+        include/potentials/patchyParticleSTMV.hpp
         include/potentials/patchyProtein.hpp
         include/potentials/patchyProteinMAPK.hpp
         include/potentials/patchyProteinMarkovSwitch.hpp

@@ -7,6 +7,7 @@
 #include "potentials/lennardJones.hpp"
 #include "potentials/patchyParticle.hpp"
 #include "potentials/patchyParticleAngular.hpp"
+#include "potentials/patchyParticleSTMV.hpp"
 #include "potentials/patchyProtein.hpp"
 #include "potentials/patchyProteinMarkovSwitch.hpp"
 #include "potentials/patchyProteinMAPK.hpp"
@@ -62,6 +63,10 @@ namespace msmrd {
                 .def(py::init<double &, double &, std::vector<std::vector<double>> &>())
                 .def(py::init<double &, double &, double &, std::vector<std::vector<double>> &>());
 
+        py::class_<patchyParticleSTMV, pairPotential>(m, "patchyParticleSTMV", "Patchy "
+                                                      "particle potential for Satellite Tobacco"
+                                                      "Mosaic virus (sigma, strength, angularStrength)")
+                .def(py::init<double &, double &>());
 
         py::class_<patchyProtein, pairPotential>(m, "patchyProtein",
                                                  "Patchy protein potential (sigma, strength, patches"
