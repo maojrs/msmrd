@@ -231,10 +231,24 @@ def generateTCL_patchyParticleSTMV(numparticles = 2, outfname = "patchyParticleS
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
 
-    # For patches
+    # For patches i1 and i2
     file.write('mol representation VDW 0.40000 0.5 \n')
     file.write('mol selection name type_3 \n')
     file.write('mol color ColorID 3 \n')
+    file.write('mol material AOShiny \n')
+    file.write('mol addrep top \n \n')
+
+    # For patches i3 and i4
+    file.write('mol representation VDW 0.40000 0.5 \n')
+    file.write('mol selection name type_4 \n')
+    file.write('mol color ColorID 4 \n')
+    file.write('mol material AOShiny \n')
+    file.write('mol addrep top \n \n')
+
+    # For patches i5
+    file.write('mol representation VDW 0.40000 0.5 \n')
+    file.write('mol selection name type_5 \n')
+    file.write('mol color ColorID 5 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
 

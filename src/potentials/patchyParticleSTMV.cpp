@@ -25,18 +25,18 @@ namespace msmrd {
 
         // Set strengths of potential parts
         epsRepulsive = 1.0*strength;
-        epsPatches[0] = -0.15*strength;
-        epsPatches[1] = -0.15*strength;
-        epsPatches[2] = -0.15*strength;
+        epsPatches[0] = -0.30*strength;
+        epsPatches[1] = -0.30*strength;
+        epsPatches[2] = -0.30*strength;
 
         // Set stiffness of potentials parts
         aRepulsive = 1.5;
-        aPatches[0] = 40.0;
-        aPatches[1] = 40.0;
-        aPatches[2] = 40.0; // Special binding site
+        aPatches[0] = 5.0; //40.0;
+        aPatches[1] = 5.0; //40.0;
+        aPatches[2] = 5.0; //40.0;
 
         // Set range parameter potentials parts
-        rstarRepulsive = 0.75 * sigma[1];
+        rstarRepulsive = 0.75; // needs to be multiplied by correct sigma in potential evaluation
         rstarPatches[0] = 0.1*sigmaPatches;
         rstarPatches[1] = 0.1*sigmaPatches;
         rstarPatches[2] = 0.1*sigmaPatches;
@@ -73,8 +73,9 @@ namespace msmrd {
                 auto mB = part2.position + mVecB;
                 auto relM = mB - mA;
                 auto sigmaTotal = 0.5 * (sigma[i]+sigma[j]);
+                auto rstarTotal = sigmaTotal * rstarRepulsive;
                 repulsivePotential += quadraticPotential(relM.norm(), sigmaTotal,
-                        epsRepulsive, aRepulsive, rstarRepulsive);
+                        epsRepulsive, aRepulsive, rstarTotal);
             }
         }
 
@@ -83,23 +84,20 @@ namespace msmrd {
             auto patchVec1 = msmrdtools::rotateVec(patchesCoordinates[i], part1.orientation);
             auto patch1 = pos1virtual + patchVec1;
             for (int j = 0; j < patchesCoordinates.size(); j++) {
-                auto index = i+j;
-                if (index== 1 or index == 5 or index == 8) {
-                    auto patchVec2 = msmrdtools::rotateVec(patchesCoordinates[j], part2.orientation);
-                    auto patch2 = part2.position + patchVec2;
-                    auto relpatch = patch2 - patch1; // Scale unit distance of patches by sigma
-                    if (index == 1){ // interaction type 1 (i1:i2)
-                        patchesPotential += patchPotentialScaling * quadraticPotential(relpatch.norm(),
-                                sigmaPatches,epsPatches[0], aPatches[0],rstarPatches[0]);
-                    }
-                    else if (index == 5){ //interaction type 2 (i3:i4)
-                        patchesPotential += patchPotentialScaling * quadraticPotential(relpatch.norm(),
-                                sigmaPatches,epsPatches[1], aPatches[1],rstarPatches[1]);
-                    }
-                    else { // interaction type 3 (i5:i5)
-                        patchesPotential += patchPotentialScaling * quadraticPotential(relpatch.norm(),
-                                sigmaPatches,epsPatches[2], aPatches[2],rstarPatches[2]);
-                    }
+                auto patchVec2 = msmrdtools::rotateVec(patchesCoordinates[j], part2.orientation);
+                auto patch2 = part2.position + patchVec2;
+                auto relpatch = patch2 - patch1;
+                if ((i == 0 and j == 1) or (i == 1 and j == 0)){ // interaction type 1 (i1:i2)
+                    patchesPotential += patchPotentialScaling * quadraticPotential(relpatch.norm(),
+                            sigmaPatches,epsPatches[0], aPatches[0],rstarPatches[0]);
+                }
+                else if ((i == 2 and j == 3) or (i == 3 and j == 2)){ //interaction type 2 (i3:i4)
+                    patchesPotential += patchPotentialScaling * quadraticPotential(relpatch.norm(),
+                            sigmaPatches,epsPatches[1], aPatches[1],rstarPatches[1]);
+                }
+                else if (i == 4 and j == 4) { // interaction type 3 (i5:i5)
+                    patchesPotential += patchPotentialScaling * quadraticPotential(relpatch.norm(),
+                            sigmaPatches,epsPatches[2], aPatches[2],rstarPatches[2]);
                 }
             }
         }
@@ -153,10 +151,11 @@ namespace msmrd {
                 auto mB = part2.position + mVecB;
                 auto relM = mB - mA;
                 auto sigmaTotal = 0.5 * (sigma[i]+sigma[j]);
+                auto rstarTotal = sigmaTotal * rstarRepulsive;
 
                 // Calculate force vector between patches , correct sign of force given by relpatch/relpatch.norm().
                 repulsiveForceNorm = derivativeQuadraticPotential(relM.norm(),
-                        sigmaTotal, epsRepulsive, aRepulsive, rstarRepulsive);
+                        sigmaTotal, epsRepulsive, aRepulsive, rstarTotal);
 
                 if (relM.norm() == 0) {
                     repulsiveForce = vec3<double>(0, 0, 0);
@@ -183,7 +182,7 @@ namespace msmrd {
             particle &part1, particle &part2, const vec3<double> pos1virtual) {
 
         vec3<double> patchForce;
-        double patchesForceNorm = 0.0;
+        double patchesForceNorm;
 
         vec3<double> force1 = vec3<double> (0.0, 0.0, 0.0);
         vec3<double> force2 = vec3<double> (0.0, 0.0, 0.0);
@@ -196,37 +195,35 @@ namespace msmrd {
             auto patch1 = pos1virtual + patchVec1;
             // Loop over all patches of particle 2
             for (int j = 0; j < patchesCoordinates.size(); j++) {
-                auto index = i + j;
-                if (index == 1 or index == 5 or index == 8) {
-                    auto patchVec2 = msmrdtools::rotateVec(patchesCoordinates[j], part2.orientation);
-                    auto patch2 = part2.position + patchVec2;
-                    auto relpatch = patch2 - patch1;
-                    if (index == 1) { // interaction type 1 (i1:i2)
-                        // Calculate force vector between patches , correct sign of force given by relpatch/relpatch.norm().
-                        patchesForceNorm = derivativeQuadraticPotential(relpatch.norm(),
-                                sigmaPatches, epsPatches[0], aPatches[0], rstarPatches[0]);
-                    }
-                    else if (index == 5) { // interaction type 2 (i3:i4)
-                        patchesForceNorm = derivativeQuadraticPotential(relpatch.norm(),
-                                sigmaPatches, epsPatches[1], aPatches[1], rstarPatches[1]);
-                    }
-                    else{ // interaction type 2 (i5:i5)
-                        patchesForceNorm = derivativeQuadraticPotential(relpatch.norm(),
-                                sigmaPatches, epsPatches[2], aPatches[2], rstarPatches[2]);
-                    }
-                    if (relpatch.norm() == 0) {
-                        patchForce = vec3<double>(0, 0, 0);
-                    } else {
-                        patchForce = patchesForceNorm * relpatch / relpatch.norm();
-                    }
-                    // Calculate force and torque acting on particle 1 and add values to previous forces and torques
-                    force1 += patchPotentialScaling * patchForce;
-                    torque1 += patchPotentialScaling * patchVec1.cross(patchForce);
-
-                    // Calculate force and torque acting on particle 2 and add values to previous forces and torques
-                    force2 += -1.0 * patchPotentialScaling * patchForce;
-                    torque2 += patchPotentialScaling * patchVec2.cross(-1.0 * patchForce);
+                patchesForceNorm = 0.0;
+                auto patchVec2 = msmrdtools::rotateVec(patchesCoordinates[j], part2.orientation);
+                auto patch2 = part2.position + patchVec2;
+                auto relpatch = patch2 - patch1;
+                if ((i == 0 and j == 1) or (i == 1 and j == 0)) { // interaction type 1 (i1:i2)
+                    // Calculate force vector between patches , correct sign of force given by relpatch/relpatch.norm().
+                    patchesForceNorm = derivativeQuadraticPotential(relpatch.norm(),
+                            sigmaPatches, epsPatches[0], aPatches[0], rstarPatches[0]);
                 }
+                else if ((i == 2 and j == 3) or (i == 3 and j == 2)) { // interaction type 2 (i3:i4)
+                    patchesForceNorm = derivativeQuadraticPotential(relpatch.norm(),
+                            sigmaPatches, epsPatches[1], aPatches[1], rstarPatches[1]);
+                }
+                else if (i == 4 and j == 4){ // interaction type 2 (i5:i5)
+                    patchesForceNorm = derivativeQuadraticPotential(relpatch.norm(),
+                            sigmaPatches, epsPatches[2], aPatches[2], rstarPatches[2]);
+                }
+                if (relpatch.norm() == 0) {
+                    patchForce = vec3<double>(0, 0, 0);
+                } else {
+                    patchForce = patchesForceNorm * relpatch / relpatch.norm();
+                }
+                // Calculate force and torque acting on particle 1 and add values to previous forces and torques
+                force1 += patchPotentialScaling * patchForce;
+                torque1 += patchPotentialScaling * patchVec1.cross(patchForce);
+
+                // Calculate force and torque acting on particle 2 and add values to previous forces and torques
+                force2 += -1.0 * patchPotentialScaling * patchForce;
+                torque2 += patchPotentialScaling * patchVec2.cross(-1.0 * patchForce);
             }
         }
         return {force1, torque1, force2, torque2};
