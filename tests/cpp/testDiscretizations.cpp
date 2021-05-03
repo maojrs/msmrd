@@ -6,6 +6,7 @@
 #include "discretizations/halfSpherePartition.hpp"
 #include "discretizations/quaternionPartition.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
+#include "discretizations/positionOrientvectorPartition.hpp"
 #include "tools.hpp"
 
 using namespace msmrd;
@@ -322,4 +323,33 @@ TEST_CASE("position orientation partition", "[positionOrientationPartition]") {
     }
     auto numTotalSecs = positionOrientationPart->numTotalSections;
     REQUIRE(numTotalSecs == 203);
+}
+
+TEST_CASE("position orientvector partition", "[positionOrientvectorPartition]") {
+    // Create position orientation partition (six dimensional)
+    int numSphericalSectionsPos = 7;
+    int numSphericalSectionsOrientvec = 4;
+    auto positionOrientvectorPart = std::make_unique<positionOrientvectorPartition>(2.2,
+            numSphericalSectionsPos, numSphericalSectionsOrientvec);
+
+    int numTransitionsStates = numSphericalSectionsPos * numSphericalSectionsOrientvec; //28
+
+    std::vector<int> endStates = {0, 2, 4, 8, numTransitionsStates};
+    for (auto const &endState : endStates) {
+        auto intervals = positionOrientvectorPart->getSectionIntervals(endState);
+        auto interval = std::get<0>(intervals);
+        REQUIRE(0 <= interval[0]);
+        REQUIRE(interval[0] < interval[1]);
+        interval = std::get<1>(intervals);
+        REQUIRE(0 <= interval[0]);
+        REQUIRE(interval[0] <= interval[1]);
+        interval = std::get<2>(intervals);
+        REQUIRE(0 <= interval[0]);
+        REQUIRE(interval[0] <= interval[1]);
+        interval = std::get<3>(intervals);
+        REQUIRE(0 <= interval[0]);
+        REQUIRE(interval[0] <= interval[1]);
+    }
+    auto numTotalSecs = positionOrientvectorPart->numTotalSections;
+    REQUIRE(numTotalSecs == 28);
 }
