@@ -44,6 +44,7 @@ set(SOURCES
         src/boundaries/sphere.cpp
         src/discretizations/halfSpherePartition.cpp
         src/discretizations/positionOrientationPartition.cpp
+        src/discretizations/positionOrientvectorPartition.cpp
         src/discretizations/quaternionPartition.cpp
         src/discretizations/spherePartition.cpp
         src/integrators/integrator.cpp
@@ -74,6 +75,7 @@ set(SOURCES
         src/trajectories/trajectory.cpp
         src/trajectories/trajectoryPosition.cpp
         src/trajectories/trajectoryPositionOrientation.cpp
+        src/trajectories/discrete/MAPKtrajectory.cpp
         src/trajectories/discrete/patchyDimerTrajectory.cpp
         src/trajectories/discrete/patchyProteinTrajectory.cpp
         )
@@ -104,6 +106,7 @@ set(PY_SOURCES
         include/boundaries/sphere.hpp
         include/discretizations/halfSpherePartition.hpp
         include/discretizations/positionOrientationPartition.hpp
+        include/discretizations/positionOrientvectorPartition.hpp
         include/discretizations/quaternionPartition.hpp
         include/discretizations/spherePartition.hpp
         include/integrators/integrator.hpp
@@ -135,6 +138,7 @@ set(PY_SOURCES
         include/trajectories/trajectoryPosition.hpp
         include/trajectories/trajectoryPositionOrientation.hpp
         include/trajectories/discrete/discreteTrajectory.hpp
+        include/trajectories/discrete/MAPKtrajectory.hpp
         include/trajectories/discrete/patchyDimerTrajectory.hpp
         include/trajectories/discrete/patchyProteinTrajectory.hpp
         )
