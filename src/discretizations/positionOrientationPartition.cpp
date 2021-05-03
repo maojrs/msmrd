@@ -39,7 +39,8 @@ namespace msmrd {
     /* Gets the section number in this partition given a relative position and relative orientation.
      * Note in order to get consistent results relativePosition should be rotated by particle1.quat.conjugated(),
      * which is passed in as quaternionReference. This is equivalent to fixing the spherical surface partition
-     * to particle1, so they rotate together. */
+     * to particle1, so they rotate together. Alternatively, the quaternionReference can be set to identity if the values are already in
+     * the correct frame of reference. */
     int positionOrientationPartition::getSectionNumber(vec3<double> relativePosition,
                                                        quaternion<double> relativeOrientation,
                                                        quaternion<double> quaternionReference) {
@@ -80,7 +81,7 @@ namespace msmrd {
 
 
     /* Gets the exact intervals for all the involved partitions corresponding to a given section number. It uses
-     * the function getSectionNumbers to obtain the correspinding section numbers in the spherePartition and in
+     * the function getSectionNumbers to obtain the corresponding section numbers in the spherePartition and in
      * the quaternionPartition and calls spherePartition->getAngles(secNumRelativePos) and
      * quatPartition->getSectionIntervals(secNumRelativeQuat). The first two returned values in the tuple
      * correspond to the angles intervals in the spherePartition and the next three correspond to the section

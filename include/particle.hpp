@@ -56,7 +56,7 @@ namespace msmrd {
          * @param D diffusion constant
          * @param Drot rotational diffusion constant
          * @param position position vector of the particle
-         * @param orientvector orientation vector (only to be used by for rod-like particles)
+         * @param orientvector orientation vector (only to be used by for rod-like particles or specific applications.)
          * @param orientation normalized quaternion representing the initial orientation of the particle
          * @param nextPosition saves next position for integrator to update
          * @param nextOrientvector saves next orientation vector for integrator to update

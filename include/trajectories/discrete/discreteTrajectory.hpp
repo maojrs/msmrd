@@ -12,7 +12,7 @@
 namespace msmrd {
     /**
      * Base class to create discrete trajectories. The main difference with the general class
-     * trajectoryPositionOrientationSsate is that this class can sample the discrete trajectory that is
+     * trajectoryPositionOrientationState is that this class can sample the discrete trajectory that is
      * specific for the application. In short words, it chooses how to discretize the full
      * trajectory of two particles into a discretized trajectory to be analyzed and extracted into
      * a Markov state model. In general the discretizations will follow the core MSM approach. It
@@ -162,7 +162,7 @@ namespace msmrd {
      * also return -1 when not in any bound state. In this case, one would normally apply the coreMSM
      * approach and choose the previous value. However, this is done directly on sampleDiscreteTrajectory or
      * in discretizeTrajectoryH5 and discretizeTrajectory if discretizing directly a python array. This function
-     * is set a svirtual since it is likely the one that needs to be modified in child classes. */
+     * is set as virtual since it is likely that it needs to be modified in child classes. */
     template<int numBoundStates>
     int discreteTrajectory<numBoundStates>::sampleDiscreteState(particle part1, particle part2) {
         // Initialize sample with value zero (unbound state)
@@ -182,7 +182,7 @@ namespace msmrd {
 
         // Extract current state, save into sample and return sample
         if (relativePosition.norm() < rLowerBound) {
-            // Returns discrete state or -1 if it is no in any bound state
+            // Returns discrete state or -1 if it is not in any bound state
             discreteState = getBoundState(relativePosition, relativeOrientation);
         }
         // Returns a transitions state if it is in the transition region
