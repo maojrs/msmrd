@@ -19,11 +19,9 @@ namespace msmrd {
         setTolerances(0.12, 0.12*2*M_PI);
 
         int numSphericalSectionsPos = 6;
-        int numRadialSectionsQuat = 4;
-        int numSphericalSectionsQuat = 6;
-        positionOrientationPart = std::make_unique<positionOrientationPartition>(rUpperBound, numSphericalSectionsPos,
-                                                                                 numRadialSectionsQuat,
-                                                                                 numSphericalSectionsQuat);
+        int numSphericalSectionsOrientvec = 6;
+        positionOrientvectorPart = std::make_unique<positionOrientvectorPartition>(rUpperBound,
+                numSphericalSectionsPos, numSphericalSectionsOrientvec);
 
         // Set bound states defined for the patchy protein example
         setBoundStates();
@@ -36,11 +34,9 @@ namespace msmrd {
         setTolerances(0.12, 0.12*2*M_PI);
 
         int numSphericalSectionsPos = 6;
-        int numRadialSectionsQuat = 4;
-        int numSphericalSectionsQuat = 6;
-        positionOrientationPart = std::make_unique<positionOrientationPartition>(rUpperBound, numSphericalSectionsPos,
-                                                                                 numRadialSectionsQuat,
-                                                                                 numSphericalSectionsQuat);
+        int numSphericalSectionsOrientvec = 6;
+        positionOrientvectorPart = std::make_unique<positionOrientvectorPartition>(rUpperBound,
+                numSphericalSectionsPos, numSphericalSectionsOrientvec);
 
         // Set bound states defined for the patchy protein example
         setBoundStates();
@@ -53,6 +49,18 @@ namespace msmrd {
     int MAPKtrajectory::sampleDiscreteState(particle part1, particle part2) {
         return 0;
     }
+
+    int MAPKtrajectory::getBoundState(vec3<double> relativePosition, vec3<double> orientVector) {
+        return 0;
+    };
+
+    vec3<double> MAPKtrajectory::getRelativePosition(int boundStateIndex){
+        return vec3<double>(0,0,0);
+    };
+
+    quaternion<double> MAPKtrajectory::getRelativeOrientation(int boundStateIndex){
+        return quaternion<double>();
+    };
 
 
 }
