@@ -15,7 +15,6 @@ namespace msmrd{
      * of the ligand (kinase or phosphotase) only depends on the orientation vector (has one free orientational degree
      * of freedom).
      *
-     * WORKING TO MODIFY THIS POTENTIAL
      */
     class patchyProteinMAPK : public patchyProtein {
     private:

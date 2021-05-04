@@ -12,7 +12,10 @@ namespace msmrd {
 /**
  * Trajectory class for patchy protein trajectory for the MAPK model (specific application). This class
  * samples the discrete trajectory. We just need to specify how to discretize the full trajectory by
- * setting all the possible bound states between all the particles.
+ * setting all the possible bound states between all the particles. Note here particle 1 will always
+ * be the main MAPK particle and particle 2 will always be either the kinase or the phosphatase. It
+ * assumes the MAPK particle is type0, the kinase type 1 and the phosphatase type 2, as in the MAPK
+ * integrator.
  *
  * Note discretization used here should match the discretization of MSM/RD for consistent results.
  *
@@ -27,7 +30,7 @@ namespace msmrd {
     class MAPKtrajectory : public discreteTrajectory<4> {
     protected:
         std::unique_ptr<positionOrientvectorPartition> positionOrientvectorPart;
-        std::array< std::tuple<vec3<double>, vec3<double>>, 4> boundStates{};
+        std::array< std::tuple<vec3<double>, vec3<double>, int>, 4> boundStates{};
         /*
          * @positionOrientvectorPart five dimensional partition of phase space of relative position and
          * orientation given by an orientvector. This is required to sample the discrete trajectory in
@@ -35,8 +38,9 @@ namespace msmrd {
          * the same partition. Also this pointer should be set in constructor. This substitutes
          * positionOrientationPart functionality of the parent discreteTrajectory class.
          * @boundStates vector of tuples. Each tuple contains two vectors indicating each one of the
-         * bound states. The vector corresponds to the relative position (pos2-pos1) in the frame of reference of
-         * particle 1 (main particle). The fixed frame of reference also assumes particle 1
+         * bound states and an integer indicating the type of the ligand particle: 1:=kinase,
+         * 2:= phosphatase. The vector corresponds to the relative position (pos2-pos1) in the frame of
+         * reference of particle 1 (main particle). The fixed frame of reference also assumes particle 1
          * is in its default initial orientation. The second vector corresponds to the orientation vector
          * of the second particle in the frame of reference of particle 1. These bound states are
          * calculated by the setBoundStates function. This substitutes the variable with the same
@@ -45,19 +49,22 @@ namespace msmrd {
 
         public:
 
-        MAPKtrajectory(unsigned long Nparticles, int bufferSize);
+            MAPKtrajectory(unsigned long Nparticles, int bufferSize);
 
-        MAPKtrajectory(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
+            MAPKtrajectory(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
 
-        void setBoundStates();
+            MAPKtrajectory(unsigned long Nparticles, int bufferSize, int numSphericalSectionsPos,
+                           int numSphericalSectionsOrientvec, double rLowerBound, double rUpperBound);
 
-        int sampleDiscreteState(particle part1, particle part2) override;
+            void setBoundStates();
 
-        int getBoundState(vec3<double> relativePosition, vec3<double> orientVector);
+            int sampleDiscreteState(particle partA, particle partB) override;
 
-        vec3<double> getRelativePosition(int boundStateIndex);
+            int getBoundState(vec3<double> relativePosition, vec3<double> orientVector, int ligandType);
 
-        quaternion<double> getRelativeOrientation(int boundStateIndex);
+            vec3<double> getRelativePosition(int boundStateIndex);
+
+            quaternion<double> getRelativeOrientvector(int boundStateIndex);
 
         };
 

@@ -142,10 +142,11 @@ namespace msmrd {
         vec3<double> torque2 = vec3<double> (0.0, 0.0, 0.0);
 
         // Loop over all structure particles m1,m2 and m3 to calculate repulsive potential
+        // Loop over all structures of particle 1
         for (int i = 0; i < structureCoordinates.size(); i++) {
             auto mVecA = msmrdtools::rotateVec(structureCoordinates[i], part1.orientation);
             auto mA = pos1virtual + mVecA;
-            // Loop over all patches of particle 2
+            // Loop over all structures of particle 2
             for (int j = 0; j < structureCoordinates.size(); j++) {
                 auto mVecB = msmrdtools::rotateVec(structureCoordinates[j], part2.orientation);
                 auto mB = part2.position + mVecB;
