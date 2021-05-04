@@ -7,6 +7,7 @@
 #include "discretizations/quaternionPartition.hpp"
 #include "discretizations/spherePartition.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
+#include "discretizations/positionOrientvectorPartition.hpp"
 
 namespace msmrd {
     /*
@@ -55,5 +56,22 @@ namespace msmrd {
                 .def("getSectionNumbers", &positionOrientationPartition::getSectionNumbers)
                 .def("setThetasOffset", &positionOrientationPartition::setThetasOffset);
 
+        /* On binding of positionOrientationPartition, change default holder from unique_ptr to shared_ptr
+         * to allow msmrdIntegrator to set positionOrientationPartition as shared pointer. This should also
+         * be done for all of its child classes. */
+        py::class_<positionOrientvectorPartition, std::shared_ptr<positionOrientvectorPartition>>(m,
+                "positionOrientvectorPartition", "Combines two spherical partions "
+                "to discretize relative position and orientvector (2 degrees of freedom) "
+                "(relativeDistanceCutOff, "
+                "numSphericalSectionsPos,numSphericalSectionsOrientvec)")
+                .def(py::init<double &, int &, int &>())
+                .def_property_readonly("numSections", &positionOrientvectorPartition::getNumSections)
+                .def("getSectionNumber", &positionOrientvectorPartition::getSectionNumberPyBind)
+                .def("getSectionNumbers", &positionOrientvectorPartition::getSectionNumbers)
+                .def("setThetasOffset", &positionOrientvectorPartition::setThetasOffset);
+
+
     };
+
+
 }
