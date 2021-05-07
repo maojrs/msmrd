@@ -57,8 +57,8 @@ namespace msmrd {
         // Set stiffness of potentials parts
         aRepulsive = 1.5;
         aAttractive = 0.75;
-        aPatches[0] = 40.0; // When interacting with Kinase
-        aPatches[1] = 40.0; // When interacting with Phosphotase
+        aPatches[0] = 10.0; // 40.0; // When interacting with Kinase
+        aPatches[1] = 10.0; // 40.0; // When interacting with Phosphotase
 
         // Set range parameter potentials parts
         rstarRepulsive = 0.75*sigma;
