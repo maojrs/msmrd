@@ -131,3 +131,69 @@ def randomParticleMSList(numparticles, boxsize, separationDistance, types, unbou
 
     partlist = msmrd2.integrators.particleList(pyPartlist)
     return partlist
+
+
+def randomMAPKparticleList(numMAPKs, numKinases, numPhosphatases, boxsize, separationDistance, D, Drot, randomSeed = -1):
+    '''
+    :param numMAPKS, numKinases, numPhosphatases: number of particles of everykind
+    :param boxsize: size of simulation box, if scalar it assumes the three box edges are the same in all dimensions
+    :param separationDistance: separation distance between particle to avoid overlapping
+    :param D and Drot: diffusion coefficients of particles.
+    :param randomSeed seed for python random generator. Important to specify in parallel runs. Default value of -1
+    will use the default seed.
+    :return: particle list and indexes of particles corresponding to mapk, kinases and phophatases.
+    Generates particle list with uniformly random position and orientation. It also enforces the particles don't
+    overlap over a distance given by the relative distance cut off.
+    '''
+
+    # Set numpy seed if provided (important when running parallel processes, otherwise not required)
+    if randomSeed != -1:
+        random.seed(randomSeed) #better than np.random for parallel seeding
+
+    # Warning in case of not ideal parameters.
+    if separationDistance > boxsize:
+        warnings.warn("The separation distance between particles should be much smaller than the "
+                      "boxsize. Otherwise risk of infinite loop.")
+
+    # Transform boxsize to vector if neccesarry.
+    if np.isscalar(boxsize):
+       boxsize = np.array([boxsize, boxsize, boxsize])
+
+    numparticles = numMAPKs + numKinases + numPhosphatases
+    mapkIndex = []
+    kinaseIndex = []
+    phosIndex = []
+    pyPartlist = []
+    for i in range(numparticles):
+        overlap = True
+        numTrials = 0
+        while overlap:
+            numTrials = numTrials + 1
+            position = np.array([boxsize[0]*random.random()-0.5*boxsize[0],
+                                 boxsize[1]*random.random()-0.5*boxsize[1],
+                                 boxsize[2]*random.random()-0.5*boxsize[2]])
+            overlap = False
+            for j in range(len(pyPartlist)):
+                if np.linalg.norm(position - pyPartlist[j].position) < separationDistance:
+                    overlap = True
+                    continue
+            if numTrials >= 100000:
+                warnings.warn("Cannot easily set nonoverlapping particles with current setup. Check boxsize, "
+                              "number of particles and separation distance.")
+
+        orientation = np.array([np.random.rand(),np.random.rand(),np.random.rand(),np.random.rand()])
+        orientation = orientation/np.linalg.norm(orientation)
+        if i+1 <= numMAPKs:
+            ptype = 0
+            mapkIndex.append(i)
+        elif i+1 <= numMAPKs + numKinases:
+            ptype = 1
+            kinaseIndex.append(i)
+        else:
+            ptype = 2
+            phosIndex.append(i)
+        part = msmrd2.particle(ptype, 0, D, Drot, position, orientation)
+        pyPartlist.append(part)
+
+    partlist = msmrd2.integrators.particleList(pyPartlist)
+    return partlist, mapkIndex, kinaseIndex, phosIndex
