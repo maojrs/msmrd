@@ -1,0 +1,18 @@
+# Ignore data directory
+data/
+
+# Ignore msmrd2 build directories (pybindings)
+msmrd2/_internal
+msmrd2.egg-info/
+build/
+cmake-build-debug/
+
+# Ignore ipynb checkpoints
+*ipynb_checkpoints
+
+# Ignore pycache folders
+*__pycache__
+
+# Ignore others
+.idea/
+
