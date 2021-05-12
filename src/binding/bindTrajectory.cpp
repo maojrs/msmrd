@@ -120,6 +120,7 @@ namespace msmrd {
                 .def(py::init<int &, int &, double &>())
                 .def(py::init<int &, int &, double &, double &, double &>())
                 .def(py::init<int &, int &, double &, int &, int &, double &, double &>())
+                .def("setAnglePatches", &MAPKtrajectory::setBoundary)
                 .def("setBoundary", &MAPKtrajectory::setBoundary)
                 .def("setTolerances", &MAPKtrajectory::setTolerances)
                 .def("sample", &MAPKtrajectory::sample)

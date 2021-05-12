@@ -50,6 +50,7 @@ namespace msmrd {
          */
 
         public:
+            MAPKtrajectory(unsigned long Nparticles, int bufferSize);
 
             MAPKtrajectory(unsigned long Nparticles, int bufferSize, double anglePatches);
 
@@ -69,6 +70,8 @@ namespace msmrd {
             vec3<double> getRelativePosition(int boundStateIndex);
 
             quaternion<double> getRelativeOrientvector(int boundStateIndex);
+
+            void setAnglePatches(double newAnglePatches);
 
         };
 

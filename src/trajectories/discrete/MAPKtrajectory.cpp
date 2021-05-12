@@ -16,6 +16,21 @@ namespace msmrd {
      * functionality might break.
      */
 
+    MAPKtrajectory::MAPKtrajectory(unsigned long Nparticles, int bufferSize) :
+            discreteTrajectory(Nparticles, bufferSize) {
+
+        setRadialBounds(1.25, 2.25);
+        setTolerances(0.12, 0.12);
+        anglePatches = M_PI/2;
+        int numSphericalSectionsPos = 6;
+        int numSphericalSectionsOrientvec = 6;
+        positionOrientvectorPart = std::make_unique<positionOrientvectorPartition>(rUpperBound,
+                                                                                   numSphericalSectionsPos, numSphericalSectionsOrientvec);
+
+        // Set bound states defined for the patchy protein example
+        setBoundStates();
+    };
+
     MAPKtrajectory::MAPKtrajectory(unsigned long Nparticles, int bufferSize, double anglePatches) :
             discreteTrajectory(Nparticles, bufferSize), anglePatches(anglePatches) {
 
@@ -162,6 +177,11 @@ namespace msmrd {
 
     quaternion<double> MAPKtrajectory::getRelativeOrientvector(int boundStateIndex){
         return std::get<1>(boundStates[boundStateIndex]);
+    };
+
+    void MAPKtrajectory::setAnglePatches(double newAnglePatches) {
+        anglePatches = newAnglePatches;
+        setBoundStates();
     };
 
 

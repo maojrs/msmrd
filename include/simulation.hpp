@@ -13,6 +13,8 @@
 #include "trajectories/trajectoryPositionOrientation.hpp"
 #include "trajectories/discrete/patchyDimerTrajectory.hpp"
 #include "trajectories/discrete/patchyProteinTrajectory.hpp"
+#include "trajectories/discrete/MAPKtrajectory.hpp"
+
 
 namespace msmrd {
     class simulation {
