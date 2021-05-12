@@ -31,6 +31,7 @@ namespace msmrd {
     protected:
         std::unique_ptr<positionOrientvectorPartition> positionOrientvectorPart;
         std::array< std::tuple<vec3<double>, vec3<double>, int>, 4> boundStates{};
+        double anglePatches;
         /*
          * @positionOrientvectorPart five dimensional partition of phase space of relative position and
          * orientation given by an orientvector. This is required to sample the discrete trajectory in
@@ -40,21 +41,24 @@ namespace msmrd {
          * @boundStates vector of tuples. Each tuple contains two vectors indicating each one of the
          * bound states and an integer indicating the type of the ligand particle: 1:=kinase,
          * 2:= phosphatase. The vector corresponds to the relative position (pos2-pos1) in the frame of
-         * reference of particle 1 (main particle). The fixed frame of reference also assumes particle 1
+         * reference of particle 1 (MAPK particle). The fixed frame of reference also assumes particle 1
          * is in its default initial orientation. The second vector corresponds to the orientation vector
          * of the second particle in the frame of reference of particle 1. These bound states are
          * calculated by the setBoundStates function. This substitutes the variable with the same
          * name in the parent discreteTrajectory class.
+         * @anglePatches angle between patches of the MAPK molecule.
          */
 
         public:
 
-            MAPKtrajectory(unsigned long Nparticles, int bufferSize);
+            MAPKtrajectory(unsigned long Nparticles, int bufferSize, double anglePatches);
 
-            MAPKtrajectory(unsigned long Nparticles, int bufferSize, double rLowerBound, double rUpperBound);
+            MAPKtrajectory(unsigned long Nparticles, int bufferSize, double anglePatches,
+                    double rLowerBound, double rUpperBound);
 
-            MAPKtrajectory(unsigned long Nparticles, int bufferSize, int numSphericalSectionsPos,
-                           int numSphericalSectionsOrientvec, double rLowerBound, double rUpperBound);
+            MAPKtrajectory(unsigned long Nparticles, int bufferSize, double anglePatches,
+                    int numSphericalSectionsPos, int numSphericalSectionsOrientvec,
+                    double rLowerBound, double rUpperBound);
 
             void setBoundStates();
 

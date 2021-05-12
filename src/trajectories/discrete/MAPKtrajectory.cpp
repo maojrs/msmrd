@@ -16,8 +16,8 @@ namespace msmrd {
      * functionality might break.
      */
 
-    MAPKtrajectory::MAPKtrajectory(unsigned long Nparticles, int bufferSize) :
-            discreteTrajectory(Nparticles, bufferSize) {
+    MAPKtrajectory::MAPKtrajectory(unsigned long Nparticles, int bufferSize, double anglePatches) :
+            discreteTrajectory(Nparticles, bufferSize), anglePatches(anglePatches) {
 
         setRadialBounds(1.25, 2.25);
         setTolerances(0.12, 0.12);
@@ -31,9 +31,10 @@ namespace msmrd {
         setBoundStates();
     };
 
-    MAPKtrajectory::MAPKtrajectory(unsigned long Nparticles, int bufferSize,
+    MAPKtrajectory::MAPKtrajectory(unsigned long Nparticles, int bufferSize, double anglePatches,
             double rLowerBound, double rUpperBound) :
-            discreteTrajectory(Nparticles, bufferSize, rLowerBound, rUpperBound) {
+            discreteTrajectory(Nparticles, bufferSize, rLowerBound, rUpperBound),
+            anglePatches(anglePatches) {
 
         setTolerances(0.12, 0.12);
 
@@ -46,9 +47,11 @@ namespace msmrd {
         setBoundStates();
     };
 
-    MAPKtrajectory::MAPKtrajectory(unsigned long Nparticles, int bufferSize, int numSphericalSectionsPos,
-                                   int numSphericalSectionsOrientvec, double rLowerBound, double rUpperBound) :
-            discreteTrajectory(Nparticles, bufferSize, rLowerBound, rUpperBound) {
+    MAPKtrajectory::MAPKtrajectory(unsigned long Nparticles, int bufferSize, double anglePatches,
+            int numSphericalSectionsPos, int numSphericalSectionsOrientvec,
+            double rLowerBound, double rUpperBound) :
+            discreteTrajectory(Nparticles, bufferSize, rLowerBound, rUpperBound),
+            anglePatches(anglePatches) {
 
         setTolerances(0.12, 0.12);
 
@@ -68,7 +71,23 @@ namespace msmrd {
      * of reference of particle 1. Note here particle 1 will always be the main MAPK particle
      * and particle 2 will always be either the kinase or the phosphatase. */
     void MAPKtrajectory::setBoundStates() {
+        /* Define relative position vectors from particle 1 at the origin. These two patches
+         * point in the same direction as the two patches in the MAPK. */
+        vec3<double> relPos1 = {std::cos(anglePatches / 2.0), std::sin(anglePatches / 2.0), 0};
+        vec3<double> relPos2 = {std::cos(anglePatches / 2.0), std::sin(-anglePatches / 2.0), 0};
+        /* Relative orientation vectors (assuming particle 1 --MAPK-- fixed) of particle 2 that
+         * yield the bound states. */
+        std::array<vec3<double>, 2> orientVecs;
+        orientVecs[0] = -1 * relPos1; //bound in patch1
+        orientVecs[1] = -1 * relPos2; //bound in patch2
 
+        /* Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
+         * Note we define relativeOrientation as q2 * q1.conj(), so it matches the relative orientation from
+         * particle 1 as used in trajectories/discrete/discreteTrajectory.hpp */
+        boundStates[0] = std::make_tuple(relPos1, orientVecs[0], 1); // kinase (type 1) in patch1
+        boundStates[1] = std::make_tuple(relPos2, orientVecs[1], 1); // kinase (type 1) in patch2
+        boundStates[2] = std::make_tuple(relPos1, orientVecs[0], 2); // phosph (type 2) in patch1
+        boundStates[3] = std::make_tuple(relPos2, orientVecs[1], 2); // phosph (type 2) in patch2
     }
 
     /* Main function to sample the discrete state of two particles. It returns the corresponding

@@ -3,7 +3,7 @@
 #include "trajectories/trajectoryPositionOrientation.hpp"
 #include "trajectories/discrete/patchyDimerTrajectory.hpp"
 #include "trajectories/discrete/patchyProteinTrajectory.hpp"
-
+#include "trajectories/discrete/MAPKtrajectory.hpp"
 
 
 namespace msmrd {
@@ -111,6 +111,28 @@ namespace msmrd {
                 .def("getState", &patchyProteinTrajectory2::sampleDiscreteState);
 
 
+
+        /* Not defined as child class since parent class is a template with virtual fucntions, so need to
+         * add all functions from parent classes manually (all the way to the original trajectory.hpp parent).
+         * Also note sampleDiscreteState and getState are the same function. */
+        py::class_<MAPKtrajectory>(m, "MAPKtrajectory", "discrete trajectory for MAPK application"
+                                                        "example(#particles or #pairs of particles, approx size)")
+                .def(py::init<int &, int &, double &>())
+                .def(py::init<int &, int &, double &, double &, double &>())
+                .def(py::init<int &, int &, double &, int &, int &, double &, double &>())
+                .def("setBoundary", &MAPKtrajectory::setBoundary)
+                .def("setTolerances", &MAPKtrajectory::setTolerances)
+                .def("sample", &MAPKtrajectory::sample)
+                .def("sampleRelative", &MAPKtrajectory::sampleRelative)
+                .def("write2file", &MAPKtrajectory::write2file<double>)
+                .def("emptyBuffer", &MAPKtrajectory::emptyBuffer)
+                .def("sampleDiscreteTrajectory", &MAPKtrajectory::sampleDiscreteTrajectory)
+                .def("sampleDiscreteState", &MAPKtrajectory::sampleDiscreteState)
+                .def("getState", &MAPKtrajectory::sampleDiscreteState)
+                .def("discretizeTrajectory", &MAPKtrajectory::discretizeTrajectory)
+                .def("discretizeTrajectoryH5", &MAPKtrajectory::discretizeTrajectoryH5)
+                .def("write2H5file", &MAPKtrajectory::write2H5file<double, 8>)
+                .def("writeChunk2H5file", &MAPKtrajectory::writeChunk2H5file<double, 8>);
 
     }
 }
