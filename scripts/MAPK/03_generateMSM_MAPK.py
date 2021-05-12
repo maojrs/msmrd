@@ -10,13 +10,15 @@ import os
 # Given discrete data, creates MSMs for a list of lagtimes. To see
 # implied time scales use notebook version of this script.
 
+benchmark_type = '_kinase' # '_phosphatase' # ''
+
 # Plot implied time scales
 plotImpliedTimescalesDraft = True
 plotImpliedTimescalesPaperVersion = False
 
 # Load parameters from parameters file (from original MD simulation)
-parentDirectory = '../../data/patchyDimer/benchmark/'
-MSMdirectory = '../../data/patchyDimer/MSMs/'
+parentDirectory = '../../data/MAPK/benchmark' + benchmark_type + '/'
+MSMdirectory = '../../data/MAPK/MSMs/'
 parameterDictionary = analysisTools.readParameters(parentDirectory + "parameters")
 nfiles = parameterDictionary['numFiles']
 dt = parameterDictionary['dt']
@@ -34,18 +36,18 @@ except OSError as error:
 
 # Calculated parameters
 dtEffective = dt*stride # needed to obtain rate dictionary
-fnamebase = parentDirectory + 'simDimer_'
+fnamebase = parentDirectory + 'simMAPK_'
 
 # Parameters for MSM generation
-numBoundStates = 8
+numBoundStates = 4
 lagtimes = [100, 150, 175, 200, 250, 300] #[50, 75, 100, 150] # [75]
-reversible = True #False
+reversible = False
 stitching = True
 
 
 # Load discrete trajectories
 dtrajs = []
-fnamesuffix = '_discrete' #'_discrete_test' #'_discrete_python' # '_discrete' # '_discrete_new'
+fnamesuffix = '_discrete'
 filetype = 'xyz' # 'h5' or 'xyz'
 for i in range(nfiles):
     dtraj = trajectoryTools.loadDiscreteTrajectory(fnamebase, i, fnamesuffix, filetype)
@@ -78,7 +80,7 @@ for i, lagtime in enumerate(lagtimes):
 
     # Pickle MSM transition matrix and active set as a dictionary
     MSM = {'transition_matrix' : mainmsm.transition_matrix, 'active_set': mainmsm.active_set}
-    pickle_out = open(MSMdirectory + "MSM_patchyDimer_t" + "{:.2E}".format(totalTimeSteps ) +
+    pickle_out = open(MSMdirectory + "MSM_MAPK" + benchmark_type + "_t" + "{:.2E}".format(totalTimeSteps ) +
                       "_s" + "{:d}".format(stride) + "_lagt" + "{:d}".format(lagtime) + ".pickle","wb")
     pickle.dump(MSM, pickle_out)
     pickle_out.close()
@@ -94,13 +96,13 @@ if plotImpliedTimescalesDraft:
     mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=True, units='steps', linewidth=2, dt=1)
     plt.ylabel(r"log(timescale/steps)", fontsize = 18)
     plt.xlabel(r"lag time/steps", fontsize = 18)
-    plt.savefig(MSMdirectory + 'its_draft_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_draft_MAPK' + benchmark_type + "{:.2E}".format(totalTimeSteps) + '.pdf')
     # No log version
     fig, ax = plt.subplots(figsize=(10, 7))
     mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=False, units='steps', linewidth=2, dt=1)
     plt.ylabel(r"timescale/steps", fontsize = 24)
     plt.xlabel(r"lag time/steps", fontsize = 24)
-    plt.savefig(MSMdirectory + 'its_draft_nolog_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_draft_nolog_MAPK' + benchmark_type + "{:.2E}".format(totalTimeSteps) + '.pdf')
     print("Finished draft plots.")
 
 # Generate implied timescales plots (paper verision w/error bars)	
@@ -117,7 +119,7 @@ if plotImpliedTimescalesPaperVersion:
     plt.xticks(fontsize = 28)
     plt.yticks(fontsize = 28)
     #plt.ylim([10.0,100000])
-    plt.savefig(MSMdirectory + 'its_paper_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_paper_MAPK' + benchmark_type + "{:.2E}".format(totalTimeSteps) + '.pdf')
     # No log version
     fig, ax = plt.subplots(figsize=(10, 7))
     mplt.plot_implied_timescales(its, ax = ax, nits = nits, ylog=False, units='steps', linewidth=2, dt=1, 
@@ -127,5 +129,5 @@ if plotImpliedTimescalesPaperVersion:
     plt.xticks(fontsize = 28)
     plt.yticks(fontsize = 28)
     #plt.ylim([10.0,4500])
-    plt.savefig(MSMdirectory + 'its_paper_nolog_patchyDimer' + "{:.2E}".format(totalTimeSteps) + '.pdf')
+    plt.savefig(MSMdirectory + 'its_paper_nolog_MAPK' + benchmark_type + "{:.2E}".format(totalTimeSteps) + '.pdf')
     print("Finished paper plots.")

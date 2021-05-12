@@ -83,7 +83,7 @@ parameterfilename = os.path.join(filedirectory, "parameters")
 parameterDictionary = {'numFiles' : numSimulations, 'numParticles' : numparticles, 'dt' : dt, 'bodytype' : bodytype,
                        'D' : D, 'Drot' : Drot, 'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype,
                        'boxsize' : boxsize, 'boundaryType' : boundaryType, 'potentialStrength' : strength,
-                       'potentialAngularStrength' : angularStrength, 'potentialPatchesAngleDiff' : anglePatches}
+                       'potentialAngularStrength' : angularStrength, 'anglePatches' : anglePatches}
 analysisTools.writeParameters(parameterfilename, parameterDictionary)
 
 
