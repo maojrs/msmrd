@@ -115,9 +115,12 @@ def recoverRotationFromVectors(origin, vec1, vec2, newOrigin, rotatedVec1, rotat
     '''
     # Define relative vector a and b, and ap and bp in new and rotated frame of reference
     a = vec1 - origin
-    b = vec2 - origin
+    c = vec2 - origin
     ap = rotatedVec1 - newOrigin
-    bp = rotatedVec2 - newOrigin
+    cp = rotatedVec2 - newOrigin
+    # Make sure we only align orthogonal vectors (a and b are orthogonal, but a and c might not)
+    b = np.cross(a,c)
+    bp = np.cross(ap,cp)
     # Find first quaternion (align a with ap)
     a_cross = np.cross(a,ap)
     if np.linalg.norm(a_cross) != 0:

@@ -115,8 +115,8 @@ namespace msmrd {
         /* Not defined as child class since parent class is a template with virtual fucntions, so need to
          * add all functions from parent classes manually (all the way to the original trajectory.hpp parent).
          * Also note sampleDiscreteState and getState are the same function. */
-        py::class_<MAPKtrajectory>(m, "MAPKtrajectory", "discrete trajectory for MAPK application"
-                                                        "example(#particles or #pairs of particles, approx size)")
+        py::class_<MAPKtrajectory>(m, "MAPK", "discrete trajectory for MAPK application"
+                                              "example(#particles or #pairs of particles, approx size)")
                 .def(py::init<int &, int &, double &>())
                 .def(py::init<int &, int &, double &, double &, double &>())
                 .def(py::init<int &, int &, double &, int &, int &, double &, double &>())

@@ -187,9 +187,12 @@ namespace msmrdtools {
                                                   vec3<double>rotatedVec2) {
         // Define relative vector a and b, and ap and bp in new and rotated frame of reference
         auto a = vec1 - origin;
-        auto b = vec2 - origin;
+        auto c = vec2 - origin;
         auto ap = rotatedVec1 - newOrigin;
-        auto bp = rotatedVec2 - newOrigin;
+        auto cp = rotatedVec2 - newOrigin;
+        // Make sure we only align orthogonal vectors (a and b are orthogonal, but a and c might not)
+        auto b = a.cross(c);
+        auto bp = ap.cross(cp);
         // Find first quaternion (align a with ap)
         auto a_cross = a.cross(ap);
         vec3<double> axisRot1;

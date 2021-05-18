@@ -79,3 +79,19 @@ TEST_CASE("Recover rotation quaternion from vectors", "[recoverRotationFromVecto
 
 
 }
+
+TEST_CASE("Recover rotation quaternion from vectors 2", "[recoverRotationFromVectors2]") {
+    // Simple but tricky rotation (rotation by pi yields zero cross product)
+    vec3<double> origin = vec3<double>(0,0,0);
+    vec3<double> vec1 = vec3<double>(1.815254758, 0., 0.);
+    vec3<double> vec2 = vec3<double>(-0.586991122, 1.460740195, 0.);
+    vec3<double> rotOrigin = vec3<double>(0,0,0);
+    vec3<double> rotatedVec1 = vec3<double>(0.57005005,  0.88839989, -1.47680006);
+    vec3<double> rotatedVec2 = vec3<double>(-1.26544991,  0.68105011,  0.64275017);
+    auto recoveredQuaternion = msmrdtools::recoverRotationFromVectors(origin,vec1,vec2,
+                                                                      rotOrigin,rotatedVec1,rotatedVec2);
+    auto rotVec1 = msmrdtools::rotateVec(vec1, recoveredQuaternion);
+    auto rotVec2 = msmrdtools::rotateVec(vec2, recoveredQuaternion);
+    REQUIRE((rotatedVec1 - rotVec1).norm() < 0.000001);
+    REQUIRE((rotatedVec2 - rotVec2).norm() < 0.000001);
+}
