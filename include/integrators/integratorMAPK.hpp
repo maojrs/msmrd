@@ -39,8 +39,7 @@ namespace msmrd {
         vec3<double> MAPKpatch1;
         vec3<double> MAPKpatch2;
         vec3<double> ligandPatch;
-//        std::unique_ptr<ctmsm> ctmsmKinase;
-//        std::unique_ptr<ctmsm> ctmsmPhos;
+        int deactivation = 1;
         /**
          * @param anglePatches angle between binding sites (patches) os MAPK molecules. The patches are
          * assumed to be located at anglePatches/2 and -anglePacthes/2 for the MAPK molecules. And
@@ -58,6 +57,9 @@ namespace msmrd {
          * @param MAPKpatch1/2 unit vector pointing to patch/binding site 1 or 2 of MAPK molecule in its initial
          * orientation (1,0,0,0).
          * @param ligandPatch same as above for the ligand (kinase or phosphotase) patch.
+         * @param deactivation: 1 means deactivation of K and P possible as soon as binding event happen. This
+         * is the default behavior. It can be set to 0 so disable this behavior. Maybe useful to
+         * parametrize MSMs
          */
 
         void integrateOne(int partIndex, std::vector<particle> &parts, double timestep) override;
@@ -71,6 +73,10 @@ namespace msmrd {
         integratorMAPK(double dt, long seed, std::string particlesbodytype,
                 double anglePatches, double reactivationRateK, double reactivationRateP, std::vector<int> mapKIndex,
                 std::vector<int> kinaseIndex,std::vector<int> phosIndex);
+
+        void disableDeactivation() {
+            deactivation = 0;
+        };
     };
 
 }

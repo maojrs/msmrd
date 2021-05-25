@@ -52,7 +52,8 @@ namespace msmrd {
                                                                             "phosIndex )")
                 .def(py::init<double &, long &, std::string &, double &, double &, double &, std::vector<int> &,
                         std::vector<int> &, std::vector<int> &>())
-                .def("integrate", &integratorMAPK::integrate);
+                .def("integrate", &integratorMAPK::integrate)
+                .def("disableDeactivation", &integratorMAPK::disableDeactivation);
 
         py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch",
                                                                               "overdamped Langevin integrator with "

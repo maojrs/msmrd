@@ -66,7 +66,8 @@ namespace msmrd {
                 // if binding occurred with an active ligand
                 if (bindingIndex > -1) {
                     if (parts[bindingIndex].state == 0) { // 0 equals active state
-                        parts[bindingIndex].state = 1; // set ligand particle to inactive state
+                        // set ligand particle to inactive state (only if deactivation is true)
+                        parts[bindingIndex].state = 1 * deactivation;
                         auto r1 = randg.uniformRange(0, 1);
                         if (bindingType == 1) {
                             if (not MAPKphosphorilated[i]) {
