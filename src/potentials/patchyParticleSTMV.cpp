@@ -20,7 +20,7 @@ namespace msmrd {
         sigma[1] = 2 * 1.358; //m2
         sigma[2] = 2 * 0.818; //m3
 
-        // Set radii of all patches:
+        // Set diameter of all patches:
         sigmaPatches = 2 * 0.4; //i1 to i5
 
         // Set strengths of potential parts
