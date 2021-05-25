@@ -48,9 +48,9 @@ namespace msmrd {
             traj = std::make_unique<patchyProteinTrajectory2>(particleList.size(), bufferSize);
             numcols = 9; //(time, positionx3, orientationx4, state)
         } else if (trajtype == "MAPK"){
-                outputDiscreteTraj = false;
-                traj = std::make_unique<MAPKtrajectory>(particleList.size(), bufferSize);
-                numcols = 10; //(time, positionx3, orientationx4, state, type)
+            outputDiscreteTraj = false;
+            traj = std::make_unique<MAPKtrajectory>(particleList.size(), bufferSize);
+            numcols = 10; //(time, positionx3, orientationx4, state, type)
         } else if (trajtype == "position"){
             traj = std::make_unique<trajectoryPosition>(particleList.size(), bufferSize);
             numcols = 4; //(time, positionx3)

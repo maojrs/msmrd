@@ -27,9 +27,9 @@ radialLowerBound = 1.25 #default values
 radialUpperBound = 2.25 #default values
 numSphericalSectionsPos = 6 #default values
 numSphericalSectionsOrientvec = 6 #default values
-discretizator = msmrd2.trajectories.MAPK(numParticles, bufferSize, anglePatches,
-                                         radialLowerBound, radialUpperBound,
-                                         numSphericalSectionsPos, numSphericalSectionsOrientvec)
+discretizator = msmrd2.trajectories.MAPK(numParticles, bufferSize, anglePatches)
+    # ,radialLowerBound, radialUpperBound,
+    #  numSphericalSectionsPos, numSphericalSectionsOrientvec)
 
 # Set boundary (important for discretizer)
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)

@@ -133,7 +133,8 @@ def randomParticleMSList(numparticles, boxsize, separationDistance, types, unbou
     return partlist
 
 
-def randomMAPKparticleList(numMAPKs, numKinases, numPhosphatases, boxsize, separationDistance, D, Drot, randomSeed = -1):
+def randomMAPKparticleList(numMAPKs, numKinases, numPhosphatases, boxsize, separationDistance, D, Drot,
+                           randomSeed = -1, defaultorientvector = np.array([0,0,1])):
     '''
     :param numMAPKS, numKinases, numPhosphatases: number of particles of everykind
     :param boxsize: size of simulation box, if scalar it assumes the three box edges are the same in all dimensions
@@ -141,6 +142,8 @@ def randomMAPKparticleList(numMAPKs, numKinases, numPhosphatases, boxsize, separ
     :param D and Drot: diffusion coefficients of particles.
     :param randomSeed seed for python random generator. Important to specify in parallel runs. Default value of -1
     will use the default seed.
+    :param defaultorientvector default orientation vector pointing to THE patch of kinase and/or phosphatase
+    molecules
     :return: particle list and indexes of particles corresponding to mapk, kinases and phophatases.
     Generates particle list with uniformly random position and orientation. It also enforces the particles don't
     overlap over a distance given by the relative distance cut off.
@@ -193,6 +196,9 @@ def randomMAPKparticleList(numMAPKs, numKinases, numPhosphatases, boxsize, separ
             ptype = 2
             phosIndex.append(i)
         part = msmrd2.particle(ptype, 0, D, Drot, position, orientation)
+        if ptype == 1 or ptype == 2:
+            rotOrientvector = msmrd2.tools.rotateVec(defaultorientvector, orientation)
+            part.setOrientVector(rotOrientvector)
         pyPartlist.append(part)
 
     partlist = msmrd2.integrators.particleList(pyPartlist)

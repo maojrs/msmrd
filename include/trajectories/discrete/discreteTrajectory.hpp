@@ -357,8 +357,8 @@ namespace msmrd {
                 state2 = static_cast<int>(trajectory[kk+8]);
             }
             if (NY > 9) {
-                type1 = static_cast<int>(trajectory[jj+8]);
-                type2 = static_cast<int>(trajectory[kk+8]);
+                type1 = static_cast<int>(trajectory[jj+9]);
+                type2 = static_cast<int>(trajectory[kk+9]);
             }
             auto dummyParticle1 = particle(type1, state1, 0, 0, position1, orientation1);
             auto dummyParticle2 = particle(type2, state2, 0, 0, position2, orientation2);

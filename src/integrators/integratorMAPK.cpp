@@ -43,6 +43,17 @@ namespace msmrd {
         assignState(partIndex, parts);
     }
 
+    void integratorMAPK::rotate(particle &part, vec3<double> torque, double dt0) {
+        vec3<double> dphi;
+        quaternion<double> dquat;
+        dphi = torque * dt0 * part.Drot / KbTemp + std::sqrt(2 * dt0 * part.Drot) * randg.normal3D(0, 1);
+        dquat = msmrdtools::axisangle2quaternion(dphi);
+        part.setNextOrientation(dquat * part.orientation);
+        // Updated orientation vector, useful with rodlike particles
+        vec3<double> neworientvector = msmrdtools::rotateVec(part.orientvector, dquat);
+        part.setNextOrientVector(neworientvector);
+    }
+
     void integratorMAPK::assignState(int partIndex, std::vector<particle> &parts) {
         double reactivationRate = 0;
         int stateMAPK;

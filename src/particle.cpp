@@ -102,6 +102,7 @@ namespace msmrd {
     void particle::setOrientationPyBind(std::vector<double> neworientation) {
         quaternion<double> quat(neworientation);
         orientation = quat;
+        nextOrientation = quat;
     }
 
 

@@ -178,9 +178,11 @@ namespace msmrd {
 
         // Exclusive for pybindings
 
-        void setPositionPyBind(std::vector<double> newposition) { position = newposition; }
+        void setPositionPyBind(std::vector<double> newposition) { position = newposition;
+                                                                nextPosition = newposition;}
 
-        void setOrientVectorPyBind(std::vector<double> neworientvector) { orientvector = neworientvector; }
+        void setOrientVectorPyBind(std::vector<double> neworientvector) { orientvector = neworientvector;
+                                                                        nextOrientvector = neworientvector;}
 
         void setOrientationPyBind(std::vector<double> neworientation);
 

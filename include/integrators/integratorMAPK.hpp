@@ -64,6 +64,8 @@ namespace msmrd {
 
         void integrateOne(int partIndex, std::vector<particle> &parts, double timestep) override;
 
+        void rotate(particle &part, vec3<double> torque, double dt) override;
+
         std::array<std::tuple<int,int>, 2> checkMAPKbindings(int partIndex, std::vector<particle> &parts);
 
         void assignState(int partIndex, std::vector<particle> &parts);

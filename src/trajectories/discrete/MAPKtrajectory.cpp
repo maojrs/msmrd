@@ -149,11 +149,14 @@ namespace msmrd {
         /* Calculate relative position taking into account periodic boundary measured
          * from i to j (gets you from i to j). */
         auto relativePosition = calculateRelativePosition(part1->position, part2->position);
-        /* Rotate relative position and orientVector to match the reference orientation of
-         * particle 1. (VERY IMPORTANT) */
+        /* Rotate relative orientVector and position to match the reference orientation of
+         * particle 1. (VERY IMPORTANT)*/
+        auto relativeOrientvector = msmrdtools::rotateVec(part2->orientvector, part1->orientation.conj());
+                //msmrdtools::rotateVecOffAxis(part2->orientvector,
+                //                                                 part1->orientation.conj(),
+                //                                                 -1 * relativePosition);
         relativePosition = msmrdtools::rotateVec(relativePosition, part1->orientation.conj());
-        auto relativeOrientvector = msmrdtools::rotateVecOffAxis(part2->orientvector,
-                part1->orientation.conj(), relativePosition);
+
 
         // Extract current state, save into sample and return sample
         if (relativePosition.norm() < rLowerBound) {

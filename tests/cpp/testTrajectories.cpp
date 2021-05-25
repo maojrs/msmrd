@@ -91,18 +91,28 @@ TEST_CASE("MAPK trajectory", "[MAPKtrajectory]") {
     std::array<vec3<double>, 2> orientVecs;
     orientVecs[0] = -1 * relPos[0]; //bound in patch1
     orientVecs[1] = -1 * relPos[1]; //bound in patch2
-    auto orientvecReference = vec3<double> {0.0, 0.0, 1.0}; // Default value in particle.cpp
+    auto orientvecReference = orientVecs[1]; //
+    //auto orientvecReference = vec3<double> {0.0, 0.0, 1.0}; // Default value in particle.cpp
     // Define MAPK trajectory
     MAPKtrajectory traj(2,1, anglePatches);
     // Check states calculated by sampleDiscreteState function match the states defined originally in setBoundStates()
-    for (int i=0; i<2; i++){
+    for (int i=0; i<1; i++){
+        auto axisAngle1 = vec3<double> {1, 0,M_PI/2};
+        auto o1 = msmrdtools::axisangle2quaternion(axisAngle1);
+        orientVecs[i] = msmrdtools::rotateVec(orientVecs[i], o1);
+        auto o2 = msmrdtools::recoverQuaternionFromOrientvector(orientvecReference, orientVecs[i]);
         auto p1 = vec3<double> {0.0, 0.0, 0.0};
-        auto p2 = vec3<double> {relPos[i]};
-        auto o1 = quaternion<double> {1.0, 0.0, 0.0, 0.0};
-        auto o2 = msmrdtools::recoverQuaternionFromOrientvector(orientvecReference,
-                orientVecs[i]);
+        auto p2 = msmrdtools::rotateVec(relPos[i], o1);
         particle part1(0,0,1., 1., p1, o1);
         particle part2(1, 0, 1., 1., p2, o2);
+        // Set orient vector since we chose not to use the reference one
+        auto rotOrientvector = msmrdtools::rotateVec(orientvecReference, o2);
+        part2.setOrientVector(rotOrientvector);
+        // Check unitary vectors remain (anti)parallel after rotations
+        REQUIRE((part2.orientvector + p2).norm() < 0.000001);
+        auto relativeOrientvector = msmrdtools::rotateVec(part2.orientvector, part1.orientation.conj());
+        REQUIRE((relativeOrientvector + relPos[i]).norm() < 0.000001);
+        // Check computed discrete state matches expected behavior
         auto discreteState = traj.sampleDiscreteState(part1,part2);
         REQUIRE(discreteState == i+1);
     }

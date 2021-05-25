@@ -27,7 +27,7 @@ anglePatches = np.pi/2
 reactivationRateK = 1.0
 reactivationRateP = 1.0
 minimumUnboundRadius = 1.25
-numSimulations = 500
+numSimulations = 4 #500
 
 # Simulation parameters
 timesteps = 3000000
@@ -49,7 +49,7 @@ patchesCoordinates2 = [ np.array([np.cos(-anglePatches/2), np.sin(-anglePatches/
 potentialPatchyProteinMAPK = patchyProteinMAPK(sigma, strength, patchesCoordinates1, patchesCoordinates2)
 
 # Define simulation boundaries (choose either spherical or box)
-boxsize = 5
+boxsize = 3
 boundaryType = 'periodic'
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
 
@@ -96,8 +96,9 @@ def runParallelSims(simnumber):
     # Define particle list
     seed = int(simnumber)
     random.seed(seed)
-    partlist, mapkIndex, kinaseIndex, phosIndex = particleTools.randomMAPKparticleList(numMAPKs,
-                        numKinases, numPhosphatases, boxsize, minimumUnboundRadius, D, Drot, seed)
+    defaultOrientvector = patchesCoordinates2[0]
+    partlist, mapkIndex, kinaseIndex, phosIndex = particleTools.randomMAPKparticleList(numMAPKs, numKinases,
+            numPhosphatases, boxsize, minimumUnboundRadius, D, Drot, seed, defaultOrientvector)
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
@@ -105,11 +106,12 @@ def runParallelSims(simnumber):
                                 mapkIndex, kinaseIndex, phosIndex)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPatchyProteinMAPK)
+    integrator.disableDeactivation()
 
     # Creates simulation
     sim = msmrd2.simulation(integrator)
 
-    # Output filename definition
+    # Output filename definitionconj
     filename = basefilename + "_{:04d}".format(simnumber)
 
     # Runs simulation
