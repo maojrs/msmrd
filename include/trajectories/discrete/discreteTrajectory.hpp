@@ -309,6 +309,8 @@ namespace msmrd {
         quaternion<double> orientation2;
         int state1 = 0;
         int state2 = 0;
+        int type1 = 0;
+        int type2 = 0;
 
         int prevDiscreteState = 0;
         int discreteState = 0;
@@ -354,8 +356,12 @@ namespace msmrd {
                 state1 = static_cast<int>(trajectory[jj+8]);
                 state2 = static_cast<int>(trajectory[kk+8]);
             }
-            auto dummyParticle1 = particle(0, state1, 0, 0, position1, orientation1);
-            auto dummyParticle2 = particle(0, state2, 0, 0, position2, orientation2);
+            if (NY > 9) {
+                type1 = static_cast<int>(trajectory[jj+8]);
+                type2 = static_cast<int>(trajectory[kk+8]);
+            }
+            auto dummyParticle1 = particle(type1, state1, 0, 0, position1, orientation1);
+            auto dummyParticle2 = particle(type2, state2, 0, 0, position2, orientation2);
             discreteState = this->sampleDiscreteState(dummyParticle1, dummyParticle2);
             // If sampleDiscreteState returned -1, return previous value (CoreMSM approach).
             if (discreteState == -1) {

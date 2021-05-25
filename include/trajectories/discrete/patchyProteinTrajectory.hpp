@@ -16,7 +16,9 @@ namespace msmrd {
      * discrete trajectory, each one specific for a given patchy protein application. They just need to specify
      * how to discretize the full trajectory by setting the bound states of the two particles.
      *
-     * Note sicretization used here should match the discretization of MSM/RD for consistent results.
+     * Note discretization used here should match the discretization of MSM/RD for consistent results. Also
+     * note that it assumes particle 1 is the one with 6 patches and particle 2 the one with one patch. This
+     * is a specific application. For general purposes see the discreteTrajectory class.
      */
 
      /* Patchy protein implementation with one unbound state (0) and 6 bound states (1,2,3,4,5,6) */

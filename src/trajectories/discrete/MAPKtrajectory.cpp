@@ -77,6 +77,23 @@ namespace msmrd {
         setBoundStates();
     };
 
+    // Sample from list of particles and store in trajectoryData
+    void MAPKtrajectory::sample(double time, std::vector<particle> &particleList) {
+        std::vector<double> sample(10);
+        for (int i = 0; i < particleList.size(); i++) {
+            sample[0] = time;
+            for (int k = 0; k < 3; k++) {
+                sample[k+1] = particleList[i].position[k];
+            }
+            for (int k = 0; k < 4; k++) {
+                sample[k+4] = particleList[i].orientation[k];
+            }
+            sample[8] = particleList[i].state;
+            sample[9] = particleList[i].type;
+            trajectoryData.push_back(sample);
+        }
+    };
+
 
 
     /* Sets bound states (metastable regions) of the MAPK implementation. The centers of the

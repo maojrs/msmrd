@@ -61,6 +61,8 @@ namespace msmrd {
                     int numSphericalSectionsPos, int numSphericalSectionsOrientvec,
                     double rLowerBound, double rUpperBound);
 
+            void sample(double time, std::vector<particle> &particleList) override;
+
             void setBoundStates();
 
             int sampleDiscreteState(particle partA, particle partB) override;

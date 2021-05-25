@@ -50,7 +50,7 @@ namespace msmrd {
         } else if (trajtype == "MAPK"){
                 outputDiscreteTraj = false;
                 traj = std::make_unique<MAPKtrajectory>(particleList.size(), bufferSize);
-                numcols = 9; //(time, positionx3, orientationx4, state)
+                numcols = 10; //(time, positionx3, orientationx4, state, type)
         } else if (trajtype == "position"){
             traj = std::make_unique<trajectoryPosition>(particleList.size(), bufferSize);
             numcols = 4; //(time, positionx3)
@@ -60,6 +60,9 @@ namespace msmrd {
         } else if (trajtype == "positionOrientationState") {
             traj = std::make_unique<trajectoryPositionOrientationState>(particleList.size(), bufferSize);
             numcols = 9; //(time, positionx3, orientationx4, state)
+        } else if (trajtype == "positionOrientationStateType") {
+            traj = std::make_unique<trajectoryPositionOrientationState>(particleList.size(), bufferSize);
+            numcols = 10; //(time, positionx3, orientationx4, state, type)
         } else { // Otherwise use trajectoryPositionOrientationState as default class
             traj = std::make_unique<trajectoryPositionOrientationState>(particleList.size(), bufferSize);
             numcols = 9; ////(time, positionx3, orientationx4, state)
@@ -154,8 +157,10 @@ namespace msmrd {
             traj->createChunkedH5file<double, 8>(filename, "msmrd_data", traj->getTrajectoryData());
         } else if (numcols == 9) {
             traj->createChunkedH5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
+        } else if (numcols == 10) {
+                traj->createChunkedH5file<double, 10>(filename, "msmrd_data", traj->getTrajectoryData());
         } else {
-            throw std::invalid_argument("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
+            throw std::invalid_argument("Numcols needs to be 4, 8, 9 or 10. Custom number of columns per row "
                                         "can be used but needs to be explicitly modified in "
                                         "simulation.cpp, write2H5file<numcols> ");
         }
@@ -175,8 +180,10 @@ namespace msmrd {
                 traj->writeChunk2H5file<double, 8>(filename, "msmrd_data", traj->getTrajectoryData());
             } else if (numcols == 9) {
                 traj->writeChunk2H5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
+            } else if (numcols == 10) {
+                traj->writeChunk2H5file<double, 10>(filename, "msmrd_data", traj->getTrajectoryData());
             } else {
-                throw std::invalid_argument("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
+                throw std::invalid_argument("Numcols needs to be 4, 8, 9 or 10. Custom number of columns per row "
                                             "can be used but needs to be explicitly modified in "
                                             "simulation.cpp, write2H5file<numcols> ");
             }
@@ -192,8 +199,10 @@ namespace msmrd {
                 traj->write2H5file<double, 8>(filename, "msmrd_data", traj->getTrajectoryData());
             } else if (numcols == 9) {
                 traj->write2H5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
+            } else if (numcols == 10) {
+                traj->write2H5file<double, 10>(filename, "msmrd_data", traj->getTrajectoryData());
             } else {
-                throw std::invalid_argument("Numcols needs to be 4, 8 or 9. Custom number of columns per row "
+                throw std::invalid_argument("Numcols needs to be 4, 8, 9 or 10. Custom number of columns per row "
                                             "can be used but needs to be explicitly modified in "
                                             "simulation.cpp, write2H5file<numcols> ");
             }
