@@ -229,4 +229,22 @@ namespace msmrdtools {
         return finalQuat;
     }
 
+    /* Given an orientation vector (2 degress of freedom) and its rotated configuration, calculate
+     * the quaternion corresponding to rotating orinetvector to rotatedOrientvector. Note there are many
+     * possible quaternions that do this. Only returns one possible one */
+    quaternion<double> recoverQuaternionFromOrientvector(vec3<double> orientvector,
+            vec3<double> rotatedOrientvector) {
+        // Normalize in case they are not already normalized
+        orientvector = orientvector/orientvector.norm();
+        rotatedOrientvector = rotatedOrientvector/rotatedOrientvector.norm();
+        // Calculate quaternion
+        auto crossprod = orientvector.cross(rotatedOrientvector);
+        auto cosTheta = rotatedOrientvector * orientvector;
+        auto sinTheta = crossprod.norm();
+        auto theta = std::atan2(sinTheta,cosTheta);
+        auto axis = crossprod/crossprod.norm();
+        auto axisangle = theta * axis;
+        return axisangle2quaternion(axisangle);
+    }
+
 }

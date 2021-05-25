@@ -7,6 +7,7 @@
 #include "trajectories/trajectoryPosition.hpp"
 #include "trajectories/trajectoryPositionOrientation.hpp"
 #include "trajectories/discrete/patchyProteinTrajectory.hpp"
+#include "trajectories/discrete/MAPKtrajectory.hpp"
 #include "integrators/overdampedLangevin.hpp"
 #include "simulation.hpp"
 #include "tools.hpp"
@@ -75,6 +76,33 @@ TEST_CASE("Patchy Protein trajectory", "[patchyProteinTrajectory]") {
         auto o2 = quaternion<double> {quatRotations[i]};
         particle part1(1., 1., p1, o1);
         particle part2(1., 1., p2, o2);
+        auto discreteState = traj.sampleDiscreteState(part1,part2);
+        REQUIRE(discreteState == i+1);
+    }
+}
+
+
+TEST_CASE("MAPK trajectory", "[MAPKtrajectory]") {
+    /* Define relative position vectors measured from particle 1, as in setBoundStates()*/
+    double anglePatches = M_PI/2;
+    std::array<vec3<double>, 2> relPos;
+    relPos[0] = {std::cos(anglePatches / 2.0), std::sin(anglePatches / 2.0), 0};
+    relPos[1] = {std::cos(-anglePatches / 2.0), std::sin(-anglePatches / 2.0), 0};
+    std::array<vec3<double>, 2> orientVecs;
+    orientVecs[0] = -1 * relPos[0]; //bound in patch1
+    orientVecs[1] = -1 * relPos[1]; //bound in patch2
+    auto orientvecReference = vec3<double> {0.0, 0.0, 1.0}; // Default value in particle.cpp
+    // Define MAPK trajectory
+    MAPKtrajectory traj(2,1, anglePatches);
+    // Check states calculated by sampleDiscreteState function match the states defined originally in setBoundStates()
+    for (int i=0; i<2; i++){
+        auto p1 = vec3<double> {0.0, 0.0, 0.0};
+        auto p2 = vec3<double> {relPos[i]};
+        auto o1 = quaternion<double> {1.0, 0.0, 0.0, 0.0};
+        auto o2 = msmrdtools::recoverQuaternionFromOrientvector(orientvecReference,
+                orientVecs[i]);
+        particle part1(0,0,1., 1., p1, o1);
+        particle part2(1, 0, 1., 1., p2, o2);
         auto discreteState = traj.sampleDiscreteState(part1,part2);
         REQUIRE(discreteState == i+1);
     }

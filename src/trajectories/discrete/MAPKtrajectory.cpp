@@ -89,7 +89,7 @@ namespace msmrd {
         /* Define relative position vectors from particle 1 at the origin. These two patches
          * point in the same direction as the two patches in the MAPK. */
         vec3<double> relPos1 = {std::cos(anglePatches / 2.0), std::sin(anglePatches / 2.0), 0};
-        vec3<double> relPos2 = {std::cos(anglePatches / 2.0), std::sin(-anglePatches / 2.0), 0};
+        vec3<double> relPos2 = {std::cos(-anglePatches / 2.0), std::sin(-anglePatches / 2.0), 0};
         /* Relative orientation vectors (assuming particle 1 --MAPK-- fixed) of particle 2 that
          * yield the bound states. */
         std::array<vec3<double>, 2> orientVecs;
@@ -135,7 +135,7 @@ namespace msmrd {
         /* Rotate relative position and orientVector to match the reference orientation of
          * particle 1. (VERY IMPORTANT) */
         relativePosition = msmrdtools::rotateVec(relativePosition, part1->orientation.conj());
-        auto relativeOrientvector = msmrdtools::rotateVecOffAxis(part1->orientvector,
+        auto relativeOrientvector = msmrdtools::rotateVecOffAxis(part2->orientvector,
                 part1->orientation.conj(), relativePosition);
 
         // Extract current state, save into sample and return sample

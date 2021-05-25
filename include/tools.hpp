@@ -91,5 +91,8 @@ namespace msmrdtools {
                                                   vec3<double>newOrigin, vec3<double>rotatedVec1,
                                                   vec3<double>rotatedVec2);
 
+    // Recovers quaternion from orientation vector
+    quaternion<double> recoverQuaternionFromOrientvector(vec3<double> orientvector,
+                                                         vec3<double> rotatedOrientvector);
 }
 
