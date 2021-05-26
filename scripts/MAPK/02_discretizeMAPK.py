@@ -1,5 +1,6 @@
 import msmrd2
 import msmrd2.tools.analysis as analysisTools
+import numpy as np
 
 # Given an MD simulation of patchyProteins, generate discrete trajectories, using patchyProtin discrete trajectory.
 
@@ -30,6 +31,7 @@ numSphericalSectionsOrientvec = 6 #default values
 discretizator = msmrd2.trajectories.MAPK(numParticles, bufferSize, anglePatches)
     # ,radialLowerBound, radialUpperBound,
     #  numSphericalSectionsPos, numSphericalSectionsOrientvec)
+discretizator.setTolerances(0.7,0.7)
 
 # Set boundary (important for discretizer)
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)

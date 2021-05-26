@@ -17,6 +17,13 @@ namespace msmrd {
  * assumes the MAPK particle is type0, the kinase type 1 and the phosphatase type 2, as in the MAPK
  * integrator.
  *
+ * Assumes the following coordinates for the patches in its default orientation:
+ * patchesCoordinates1 = [np.array([np.cos(anglePatches/2), np.sin(anglePatches/2), 0.]),
+ *                      np.array([np.cos(-anglePatches/2), np.sin(-anglePatches/2), 0.])]
+ * patchesCoordinates2 = [ np.array([np.cos(-anglePatches/2), np.sin(-anglePatches/2), 0.]) ]
+ * The first one for MAPK and the second one for the kinase and phosphatase. The orientvector
+ * of the kinase and the phosphatase should always be aligned with the patch.
+ *
  * Note discretization used here should match the discretization of MSM/RD for consistent results.
  *
  * Also note we are overriding virtual and nonvirtual parts of the parent class discreteTrajectory.

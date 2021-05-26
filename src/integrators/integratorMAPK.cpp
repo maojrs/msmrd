@@ -49,7 +49,7 @@ namespace msmrd {
         dphi = torque * dt0 * part.Drot / KbTemp + std::sqrt(2 * dt0 * part.Drot) * randg.normal3D(0, 1);
         dquat = msmrdtools::axisangle2quaternion(dphi);
         part.setNextOrientation(dquat * part.orientation);
-        // Updated orientation vector, useful with rodlike particles
+        // Update orientation vector
         vec3<double> neworientvector = msmrdtools::rotateVec(part.orientvector, dquat);
         part.setNextOrientVector(neworientvector);
     }

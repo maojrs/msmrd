@@ -96,7 +96,7 @@ TEST_CASE("MAPK trajectory", "[MAPKtrajectory]") {
     // Define MAPK trajectory
     MAPKtrajectory traj(2,1, anglePatches);
     // Check states calculated by sampleDiscreteState function match the states defined originally in setBoundStates()
-    for (int i=0; i<1; i++){
+    for (int i=0; i<2; i++){
         auto axisAngle1 = vec3<double> {1, 0,M_PI/2};
         auto o1 = msmrdtools::axisangle2quaternion(axisAngle1);
         orientVecs[i] = msmrdtools::rotateVec(orientVecs[i], o1);

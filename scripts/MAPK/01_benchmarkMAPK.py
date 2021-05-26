@@ -30,7 +30,7 @@ minimumUnboundRadius = 1.25
 numSimulations = 4 #500
 
 # Simulation parameters
-timesteps = 3000000
+timesteps = 3000000 #3000000
 bufferSize = 1024
 stride = 25
 outTxt = False
@@ -41,7 +41,7 @@ trajtype = "MAPK" # "trajectoryPositionOrientationState"
 # Define Patchy Protein MAPK potential parameters (This values are fixed and should match
 # those used to determine metastable states in potential and trajectory.)
 sigma = 1.0
-strength = 100 #65
+strength = 100 #100 #65
 angularStrength = 10 #2
 patchesCoordinates1 = [np.array([np.cos(anglePatches/2), np.sin(anglePatches/2), 0.]),
                        np.array([np.cos(-anglePatches/2), np.sin(-anglePatches/2), 0.])]
@@ -49,7 +49,7 @@ patchesCoordinates2 = [ np.array([np.cos(-anglePatches/2), np.sin(-anglePatches/
 potentialPatchyProteinMAPK = patchyProteinMAPK(sigma, strength, patchesCoordinates1, patchesCoordinates2)
 
 # Define simulation boundaries (choose either spherical or box)
-boxsize = 3
+boxsize = 2.5
 boundaryType = 'periodic'
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
 

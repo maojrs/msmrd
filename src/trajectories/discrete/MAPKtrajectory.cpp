@@ -105,21 +105,22 @@ namespace msmrd {
     void MAPKtrajectory::setBoundStates() {
         /* Define relative position vectors from particle 1 at the origin. These two patches
          * point in the same direction as the two patches in the MAPK. */
-        vec3<double> relPos1 = {std::cos(anglePatches / 2.0), std::sin(anglePatches / 2.0), 0};
-        vec3<double> relPos2 = {std::cos(-anglePatches / 2.0), std::sin(-anglePatches / 2.0), 0};
+        std::array<vec3<double>, 2> relPos;
+        relPos[0] = {std::cos(anglePatches / 2.0), std::sin(anglePatches / 2.0), 0};
+        relPos[1] = {std::cos(-anglePatches / 2.0), std::sin(-anglePatches / 2.0), 0};
         /* Relative orientation vectors (assuming particle 1 --MAPK-- fixed) of particle 2 that
          * yield the bound states. */
         std::array<vec3<double>, 2> orientVecs;
-        orientVecs[0] = -1 * relPos1; //bound in patch1
-        orientVecs[1] = -1 * relPos2; //bound in patch2
+        orientVecs[0] = -1 * relPos[0]; //bound in patch1
+        orientVecs[1] = -1 * relPos[1]; //bound in patch2
 
         /* Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
          * Note we define relativeOrientation as q2 * q1.conj(), so it matches the relative orientation from
          * particle 1 as used in trajectories/discrete/discreteTrajectory.hpp */
-        boundStates[0] = std::make_tuple(relPos1, orientVecs[0], 1); // kinase (type 1) in patch1
-        boundStates[1] = std::make_tuple(relPos2, orientVecs[1], 1); // kinase (type 1) in patch2
-        boundStates[2] = std::make_tuple(relPos1, orientVecs[0], 2); // phosph (type 2) in patch1
-        boundStates[3] = std::make_tuple(relPos2, orientVecs[1], 2); // phosph (type 2) in patch2
+        boundStates[0] = std::make_tuple(relPos[0], orientVecs[0], 1); // kinase (type 1) in patch1
+        boundStates[1] = std::make_tuple(relPos[1], orientVecs[1], 1); // kinase (type 1) in patch2
+        boundStates[2] = std::make_tuple(relPos[0], orientVecs[0], 2); // phosph (type 2) in patch1
+        boundStates[3] = std::make_tuple(relPos[1], orientVecs[1], 2); // phosph (type 2) in patch2
     }
 
     /* Main function to sample the discrete state of two particles. It returns the corresponding
@@ -161,7 +162,7 @@ namespace msmrd {
         // Extract current state, save into sample and return sample
         if (relativePosition.norm() < rLowerBound) {
             // Returns discrete state or -1 if it is not in any bound state
-            discreteState = getBoundState(relativePosition, relativeOrientvector, part2->type);
+            discreteState = getBoundState(relativePosition, relativeOrientvector,part2->type);
         }
             // Returns a transitions state if it is in the transition region
         else if (relativePosition.norm() < positionOrientvectorPart->relativeDistanceCutOff) {
@@ -180,12 +181,15 @@ namespace msmrd {
             auto relPosCenter = std::get<0>(boundStates[i]);
             auto relOrientvec = std::get<1>(boundStates[i]);
             auto ligType = std::get<2>(boundStates[i]);
-            if ( (relPosCenter - relativePosition).norm() <= tolerancePosition) {
-                if  ((relOrientvec - orientVector).norm() <= toleranceOrientation) {
+            // Make a drawing to understand if statement
+            auto offsetVector = relativePosition + 0.5 * orientVector - 0.5 * relPosCenter;
+            if ( offsetVector.norm() <= tolerancePosition) {
+            //if ( (relPosCenter - relativePosition).norm() <= tolerancePosition) {
+                //if  ((relOrientvec - orientVector).norm() <= toleranceOrientation) {
                     if (ligType == ligandType) {
                         return i + 1;
                     }
-                }
+                //}
             }
         }
         return -1;
