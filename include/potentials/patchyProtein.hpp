@@ -74,6 +74,8 @@ namespace msmrd{
 
         bool arePatchesActive() { return patchesActive; }
 
+        double getSigma() {return sigma; }
+
     };
 
 

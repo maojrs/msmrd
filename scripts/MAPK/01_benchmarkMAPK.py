@@ -12,27 +12,55 @@ import random
 import sys
 import os
 
-# Main parameters for particles and integrator
+## Units
+
+# ### Boltzman constant
+# - $k_B = 1.38064852 \times 10^{-23} \frac{m^2}{s^2} \frac{kg}{K} \left(= \frac{nm^2}{ns^2}\frac{kg}{K}\right)$.
+#
+# ### Basic units
+# - Length (l): nanometers (nm)
+# - Energy ($\epsilon$) : $k_B T = kg \frac{nm^2}{ns^2}$
+# - Mass (m): kilogram (kg)
+#
+# ### Derived units
+# - Time: $l\sqrt{m/\epsilon} = nm$
+# - Temperature: $\epsilon/k_B =$ Kelvin ($K$)
+# - Force: $\epsilon/l = kg \frac{nm}{ns^2}$
+#
+# ### Reduced quantities (dimensionless)
+# - Reduced pair potential: $U^* = U/\epsilon$
+# - Reduced distance: $r^* = r/l$
+# - Reduced density: $\rho^*=\rho l^3$
+# - Reduced Temperature: $T^* = k_B T/\epsilon$
+# - Reduced Pressure: $P^* = Pl^3/\epsilon$
+
+# Main parameters
 numMAPKs = 1
 numKinases = 1
 numPhosphatases = 0
 numparticles = numMAPKs + numKinases + numPhosphatases
-D = 1.0
-Drot = 1.0
+sigma = 5.0 #(nanometers) particles diameters
+boxsize = 15 #(nanometers) #2.3
+D = 1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s
+Drot = 1.6E-4 #(rad^2/ns) Note 1.6E-4 rad^2/ns = 1.6E5 rad^2/s
+kB = 1.38064852E-23 #(Boltzmann constant (nm^2/ns^2 * kg/K))
+Temp = 300 #(Kelvin)
 particleTypes = [0, 1, 2]
+
 # Main parameters for integrator
-dt = 0.00001
+dt = 0.1 #(nanoseconds)
 bodytype = 'rigidbody'
 anglePatches = np.pi/2
-reactivationRateK = 1.0
-reactivationRateP = 1.0
-minimumUnboundRadius = 1.25
+trel = 1000 # (nanoseconds) Note 1000 ns = 1 micro second. Can be varied up to 10 miliseconds
+reactivationRateK = np.log(2)/trel # not relevant for MSMRD parametrization
+reactivationRateP = np.log(2)/trel # not relevant for MSMRD parametrization
+minimumUnboundRadius = 1.25 * sigma
 numSimulations = 4 #500
 
 # Simulation parameters
-timesteps = 3000000 #3000000
+timesteps = 100000000 #(0.01 second) #3000000 #3000000
 bufferSize = 1024
-stride = 25
+stride = 500
 outTxt = False
 outH5 = True
 outChunked = True
@@ -40,16 +68,13 @@ trajtype = "MAPK" # "trajectoryPositionOrientationState"
 
 # Define Patchy Protein MAPK potential parameters (This values are fixed and should match
 # those used to determine metastable states in potential and trajectory.)
-sigma = 1.0
 strength = 100 #100 #65
-angularStrength = 10 #2
 patchesCoordinates1 = [np.array([np.cos(anglePatches/2), np.sin(anglePatches/2), 0.]),
                        np.array([np.cos(-anglePatches/2), np.sin(-anglePatches/2), 0.])]
 patchesCoordinates2 = [ np.array([np.cos(-anglePatches/2), np.sin(-anglePatches/2), 0.]) ]
 potentialPatchyProteinMAPK = patchyProteinMAPK(sigma, strength, patchesCoordinates1, patchesCoordinates2)
 
 # Define simulation boundaries (choose either spherical or box)
-boxsize = 2.5
 boundaryType = 'periodic'
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
 
@@ -103,9 +128,10 @@ def runParallelSims(simnumber):
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
     integrator = integratorMAPK(dt, seed, bodytype, anglePatches, reactivationRateK, reactivationRateP,
-                                mapkIndex, kinaseIndex, phosIndex)
+                                sigma, mapkIndex, kinaseIndex, phosIndex)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPatchyProteinMAPK)
+    integrator.setKbT(kB * Temp)
     integrator.disableDeactivation()
 
     # Creates simulation

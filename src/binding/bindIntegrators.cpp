@@ -50,8 +50,8 @@ namespace msmrd {
                                                                             "pointmix, rodmix or rigidbodymix), "
                                                                             "anglePatches, mapkIndex, kinaseIndex, "
                                                                             "phosIndex )")
-                .def(py::init<double &, long &, std::string &, double &, double &, double &, std::vector<int> &,
-                        std::vector<int> &, std::vector<int> &>())
+                .def(py::init<double &, long &, std::string &, double &, double &, double &, double &,
+                        std::vector<int> &, std::vector<int> &, std::vector<int> &>())
                 .def("integrate", &integratorMAPK::integrate)
                 .def("disableDeactivation", &integratorMAPK::disableDeactivation);
 

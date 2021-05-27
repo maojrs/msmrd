@@ -7,16 +7,16 @@
 namespace msmrd {
 
     integratorMAPK::integratorMAPK(double dt, long seed, std::string particlesbodytype, double anglePatches,
-                                   double reactivationRateK, double reactivationRateP, std::vector<int> mapkIndex,
-                                   std::vector<int> kinaseIndex, std::vector<int> phosIndex) :
+                                   double reactivationRateK, double reactivationRateP, double sigma,
+                                   std::vector<int> mapkIndex, std::vector<int> kinaseIndex, std::vector<int> phosIndex) :
                                    overdampedLangevin(dt, seed, particlesbodytype), anglePatches(anglePatches),
                                    reactivationRateK(reactivationRateK), reactivationRateP(reactivationRateP),
-                                   mapkIndex(mapkIndex), kinaseIndex(kinaseIndex), phosIndex(phosIndex) {
+                                   sigma(sigma), mapkIndex(mapkIndex), kinaseIndex(kinaseIndex), phosIndex(phosIndex) {
         // Define patches normals in terms of the anglePatches variable
         MAPKpatch1 = {std::cos(anglePatches/2.0),std::sin(anglePatches/2.0), 0.};
         MAPKpatch2 = {std::cos(-anglePatches/2.0),std::sin(-anglePatches/2.0), 0.};
         ligandPatch = {std::cos(-anglePatches/2.0),std::sin(-anglePatches/2.0), 0.};
-//        // Define Markov models for reactivation of kinase and phosphotase
+        // Define Markov models for reactivation of kinase and phosphotase
 //        int msmidKinase = 1;
 //        int msmidPhos = 2
 //        long seed = -1;
@@ -141,22 +141,22 @@ namespace msmrd {
             if (parts[i].type > 0) {
                 relPosition = calculateRelativePosition(particleMAPK->position, parts[i].position);
                 relPosition = msmrdtools::rotateVec(relPosition, particleMAPK->orientation.conj());
-                if ((MAPKpatch1 - relPosition).norm() <= toleranceBinding and not boundAt1) {
+                if ((sigma*MAPKpatch1 - relPosition).norm() <= toleranceBinding and not boundAt1) {
                     // Calculate vectors pointing to binding patches
                     auto rotatedMAPKpatch1 = msmrdtools::rotateVec(MAPKpatch1, particleMAPK->orientation);
                     auto rotatedLigandPatch = msmrdtools::rotateVec(ligandPatch, parts[i].orientation);
-                    if ((rotatedMAPKpatch1 + rotatedLigandPatch).norm() <= toleranceBindingOrientation){
+                    if ((sigma*rotatedMAPKpatch1 + sigma*rotatedLigandPatch).norm() <= toleranceBindingOrientation){
                         //BINDING
                         bindingIndexAt1 = i;
                         bindingTypeAt1 = parts[i].type;
                         boundAt1 = true;
                     }
                 }
-                else if ((MAPKpatch2 - relPosition).norm() <= toleranceBinding and not boundAt2) {
+                else if ((sigma*MAPKpatch2 - relPosition).norm() <= toleranceBinding and not boundAt2) {
                     // Calculate vectors pointing to binding patches
                     auto rotatedMAPKpatch2 = msmrdtools::rotateVec(MAPKpatch2, particleMAPK->orientation);
                     auto rotatedLigandPatch = msmrdtools::rotateVec(ligandPatch, parts[i].orientation);
-                    if ((rotatedMAPKpatch2 + rotatedLigandPatch).norm() <= toleranceBindingOrientation){
+                    if ((sigma*rotatedMAPKpatch2 + sigma*rotatedLigandPatch).norm() <= toleranceBindingOrientation){
                         //BINDING
                         bindingIndexAt2 = i;
                         bindingTypeAt2 = parts[i].type;

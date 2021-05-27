@@ -39,6 +39,7 @@ namespace msmrd {
         vec3<double> MAPKpatch1;
         vec3<double> MAPKpatch2;
         vec3<double> ligandPatch;
+        double sigma;
         int deactivation = 1;
         /**
          * @param anglePatches angle between binding sites (patches) os MAPK molecules. The patches are
@@ -73,8 +74,8 @@ namespace msmrd {
         void reactivationKorP(particle &part, double timestep);
     public:
         integratorMAPK(double dt, long seed, std::string particlesbodytype,
-                double anglePatches, double reactivationRateK, double reactivationRateP, std::vector<int> mapKIndex,
-                std::vector<int> kinaseIndex,std::vector<int> phosIndex);
+                double anglePatches, double reactivationRateK, double reactivationRateP, double sigma,
+                std::vector<int> mapKIndex, std::vector<int> kinaseIndex,std::vector<int> phosIndex);
 
         void disableDeactivation() {
             deactivation = 0;

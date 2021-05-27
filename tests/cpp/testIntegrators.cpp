@@ -377,6 +377,7 @@ TEST_CASE("Initialization of integratorMAPK class", "[integratorMAPK]") {
     double anglePatches = M_PI/2.0;
     double reactivationRateK = 500;
     double reactivationRateP = 500;
+    double sigma = 1;
     auto mapkIndex = std::vector<int>(1);
     mapkIndex[0] = 0; // index of MAPK particle (type 0)
     auto kinaseIndex = std::vector<int>(1);
@@ -384,11 +385,10 @@ TEST_CASE("Initialization of integratorMAPK class", "[integratorMAPK]") {
     auto phosIndex = std::vector<int>(1);
     phosIndex[0] = 2; // index of phosphotase particle (type 2)
     auto myIntegrator = integratorMAPK(dt, seed, bodytype, anglePatches, reactivationRateK, reactivationRateP,
-                                mapkIndex, kinaseIndex, phosIndex);
+                                sigma, mapkIndex, kinaseIndex, phosIndex);
     myIntegrator.setBoundary(&boundary);
 
     // Define MAPK potential (not required to test integrator but implemented for reference)
-    double sigma = 1.0;
     double strength = 60;
     auto patch1 = vec3<double>(std::cos(anglePatches/2.0), std::sin(anglePatches/2.0), 0.);
     auto patch2 = vec3<double>(std::cos(-anglePatches/2.0), std::sin(-anglePatches/2.0), 0.);
