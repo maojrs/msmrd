@@ -297,5 +297,27 @@ namespace msmrd {
         }
     }
 
+    // Sets parameters for attractive part of potential. In case defaults values need to be overriden.
+    void patchyProtein::setAttractivePotentialParameters(double epsilon, double a, double rstar) {
+        epsAttractive = epsilon;
+        aAttractive = a;
+        rstarAttractive = rstar;
+    }
+
+    // Sets parameters for repulsive part of potential. In case defaults values need to be overriden.
+    void patchyProtein::setRepulsivePotentialParameters(double epsilon, double a, double rstar) {
+        epsRepulsive = epsilon;
+        aRepulsive = a;
+        rstarRepulsive = rstar;
+    }
+
+    // Sets parameters for interaction between patches part of potential. In case defaults values need to be overriden.
+    void patchyProtein::setInteractingPatchesPotentialParameters(double epsilon, double a, double rstar,
+            int interactionIndex) {
+        epsPatches[interactionIndex] = epsilon;
+        aPatches[interactionIndex] = a;
+        rstarPatches[interactionIndex] = rstar;
+    }
+
 
 }

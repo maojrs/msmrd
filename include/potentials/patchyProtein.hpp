@@ -76,6 +76,12 @@ namespace msmrd{
 
         double getSigma() {return sigma; }
 
+        void setAttractivePotentialParameters(double epsilon, double a, double rstar);
+
+        void setRepulsivePotentialParameters(double epsilon, double a, double rstar);
+
+        void setInteractingPatchesPotentialParameters(double epsilon, double a, double rstar, int interactionIndex);
+
     };
 
 

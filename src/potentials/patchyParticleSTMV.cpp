@@ -299,4 +299,30 @@ namespace msmrd {
         return {position[0],position[1], position[2]};
     };
 
+    // Sets particle diameters (sigma). In case defaults values need to be overriden.
+    void patchyParticleSTMV::setParticlesDiameters(double sigmaM1, double sigmaM2, double sigmaM3, double sigmaOfPatches) {
+        sigma[0] = sigmaM1;
+        sigma[1] = sigmaM2;
+        sigma[2] = sigmaM3;
+        sigmaPatches = sigmaOfPatches;
+    };
+
+    // Sets parameters for repulsive part of potential. In case defaults values need to be overriden.
+    void patchyParticleSTMV::setRepulsivePotentialParameters(double epsilon, double a, double rstar) {
+        epsRepulsive = epsilon;
+        aRepulsive = a;
+        rstarRepulsive = rstar;
+    }
+
+    // Sets parameters for interaction between patches part of potential. In case defaults values need to be overriden.
+    void patchyParticleSTMV::setInteractingPatchesPotentialParameters(double epsilon, double a, double rstar,
+                                                                 int interactionIndex) {
+        epsPatches[interactionIndex] = epsilon;
+        aPatches[interactionIndex] = a;
+        rstarPatches[interactionIndex] = rstar;
+    }
+
+
+
+
 }

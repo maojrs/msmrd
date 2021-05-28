@@ -75,6 +75,12 @@ namespace msmrd {
 
         std::array<double, 3> getPartPosition(std::string particlePart, particle &part);
 
+        void setParticlesDiameters(double sigmaM1, double sigmaM2, double sigmaM3, double sigmaOfPatches);
+
+        void setRepulsivePotentialParameters(double epsilon, double a, double rstar);
+
+        void setInteractingPatchesPotentialParameters(double epsilon, double a, double rstar, int interactionIndex);
+
     };
 
 

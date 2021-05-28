@@ -67,14 +67,22 @@ namespace msmrd {
                                                       "particle potential for Satellite Tobacco"
                                                       "Mosaic virus (sigma, strength, angularStrength)")
                 .def(py::init<double &, double &>())
-                .def("getPartPosition", &patchyParticleSTMV::getPartPosition);
+                .def("getPartPosition", &patchyParticleSTMV::getPartPosition)
+                .def("setParticlesDiameters", &patchyParticleSTMV::setParticlesDiameters)
+                .def("setRepulsivePotentialParameters", &patchyParticleSTMV::setRepulsivePotentialParameters)
+                .def("setInteractingPatchesPotentialParameters",
+                     &patchyParticleSTMV::setInteractingPatchesPotentialParameters);
 
         py::class_<patchyProtein, pairPotential>(m, "patchyProtein",
                                                  "Patchy protein potential (sigma, strength, patches"
                                                  " coordinates A, patches coordinates B)")
                 .def(py::init<double &, double &,
                         std::vector<std::vector<double>> &,
-                        std::vector<std::vector<double>> &>());
+                        std::vector<std::vector<double>> &>())
+                .def("setAttractivePotentialParameters", &patchyProtein::setAttractivePotentialParameters)
+                .def("setRepulsivePotentialParameters", &patchyProtein::setRepulsivePotentialParameters)
+                .def("setInteractingPatchesPotentialParameters",
+                        &patchyProtein::setInteractingPatchesPotentialParameters);
 
 
         py::class_<patchyProteinMarkovSwitch, patchyProtein>(m, "patchyProteinMarkovSwitch",
