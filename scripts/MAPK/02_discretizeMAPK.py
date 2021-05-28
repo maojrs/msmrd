@@ -12,6 +12,7 @@ parameterDictionary = analysisTools.readParameters(parentDirectory + "parameters
 nfiles = parameterDictionary['numFiles']
 numParticles = parameterDictionary['numParticles']
 dt = parameterDictionary['dt']
+sigma = parameterDictionary['sigma']
 stride = parameterDictionary['stride']
 totalTimeSteps = parameterDictionary['timesteps']
 boxsize = parameterDictionary['boxsize']
@@ -24,14 +25,14 @@ fnamebase = parentDirectory + 'simMAPK_'
 bufferSize = effectivetimeSteps
 
 # Set trajectory discretizator
-radialLowerBound = 1.25 #default values
-radialUpperBound = 2.25 #default values
+radialLowerBound = sigma*1.25 #default values
+radialUpperBound = sigma*2.25 #default values
 numSphericalSectionsPos = 6 #default values
 numSphericalSectionsOrientvec = 6 #default values
-discretizator = msmrd2.trajectories.MAPK(numParticles, bufferSize, anglePatches)
-    # ,radialLowerBound, radialUpperBound,
-    #  numSphericalSectionsPos, numSphericalSectionsOrientvec)
-discretizator.setTolerances(0.7,0.7)
+discretizator = msmrd2.trajectories.MAPK(numParticles, bufferSize, anglePatches,
+                                         numSphericalSectionsPos, numSphericalSectionsOrientvec,
+                                         radialLowerBound, radialUpperBound)
+discretizator.setTolerances(sigma*0.7,sigma*0.7)
 
 # Set boundary (important for discretizer)
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)

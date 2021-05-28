@@ -40,7 +40,9 @@ namespace msmrd {
             rotate(parts[partIndex], torque, timestep);
         }
         reactivationKorP(parts[partIndex], timestep);
-        assignState(partIndex, parts);
+        if (MAPKactive) {
+            assignState(partIndex, parts);
+        }
     }
 
     void integratorMAPK::rotate(particle &part, vec3<double> torque, double dt0) {
@@ -77,8 +79,8 @@ namespace msmrd {
                 // if binding occurred with an active ligand
                 if (bindingIndex > -1) {
                     if (parts[bindingIndex].state == 0) { // 0 equals active state
-                        // set ligand particle to inactive state (only if deactivation is true)
-                        parts[bindingIndex].state = 1 * deactivation;
+                        // set ligand particle to inactive state
+                        parts[bindingIndex].state = 1;
                         auto r1 = randg.uniformRange(0, 1);
                         if (bindingType == 1) {
                             if (not MAPKphosphorilated[i]) {

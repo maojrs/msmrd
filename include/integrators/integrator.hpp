@@ -46,7 +46,8 @@ namespace msmrd {
 
 
         /**
-        * @param KbTemp = Boltzman constant times temperature
+        * @param KbTemp = Boltzman constant times temperature (default value assumed to be 1 to use
+        * reduced potential and force. Can be adjusted if neccesary.
         * @param dt time step
         * @param seed variable for random number generation (Note seed = -1 corresponds to random device)
         * @param particlesbodytype body type of particles to integrate. It determines rotation integrator behavior, can

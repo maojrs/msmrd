@@ -53,7 +53,7 @@ namespace msmrd {
                 .def(py::init<double &, long &, std::string &, double &, double &, double &, double &,
                         std::vector<int> &, std::vector<int> &, std::vector<int> &>())
                 .def("integrate", &integratorMAPK::integrate)
-                .def("disableDeactivation", &integratorMAPK::disableDeactivation);
+                .def("disableMAPK", &integratorMAPK::disableMAPK);
 
         py::class_<overdampedLangevinMarkovSwitch<ctmsm>, overdampedLangevin>(m, "overdampedLangevinMarkovSwitch",
                                                                               "overdamped Langevin integrator with "

@@ -29,6 +29,7 @@ import os
 #
 # ### Reduced quantities (dimensionless)
 # - Reduced pair potential: $U^* = U/\epsilon$
+# - Reduced force: $F^* = F l /\epsilon$
 # - Reduced distance: $r^* = r/l$
 # - Reduced density: $\rho^*=\rho l^3$
 # - Reduced Temperature: $T^* = k_B T/\epsilon$
@@ -45,7 +46,10 @@ D = 1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s
 Drot = 1.6E-4 #(rad^2/ns) Note 1.6E-4 rad^2/ns = 1.6E5 rad^2/s
 kB = 1.38064852E-23 #(Boltzmann constant (nm^2/ns^2 * kg/K))
 Temp = 300 #(Kelvin)
-kbT = 1 # We set KbT in the simulations to one, and we assume the force has an additional factor multiplied by kBTemp
+# For computations, we assume kBT=1, thus the true potential V must be: V=kBT U, where U is the potential computed
+# used in the computations. This means the plotted potential is on reduced units (not the distances though). The forces
+# can be computed in similar manner.
+kBT = 1
 particleTypes = [0, 1, 2]
 
 # Main parameters for integrator
@@ -56,10 +60,10 @@ trel = 1000 # (nanoseconds) Note 1000 ns = 1 micro second. Can be varied up to 1
 reactivationRateK = np.log(2)/trel # not relevant for MSMRD parametrization
 reactivationRateP = np.log(2)/trel # not relevant for MSMRD parametrization
 minimumUnboundRadius = 1.25 * sigma
-numSimulations = 4 #500
+numSimulations = 500 #500
 
 # Simulation parameters
-timesteps = 100000000 #(0.01 second) #3000000 #3000000
+timesteps = 100000000 #3000000 #3000000
 bufferSize = 1024
 stride = 500
 outTxt = False
@@ -69,7 +73,7 @@ trajtype = "MAPK" # "trajectoryPositionOrientationState"
 
 # Define Patchy Protein MAPK potential parameters (This values are fixed and should match
 # those used to determine metastable states in potential and trajectory.)
-strength = 100 #100 #65
+strength = 10 #100 #65
 patchesCoordinates1 = [np.array([np.cos(anglePatches/2), np.sin(anglePatches/2), 0.]),
                        np.array([np.cos(-anglePatches/2), np.sin(-anglePatches/2), 0.])]
 patchesCoordinates2 = [ np.array([np.cos(-anglePatches/2), np.sin(-anglePatches/2), 0.]) ]
@@ -107,9 +111,9 @@ except OSError as error:
 # Create parameter dictionary to write to parameters reference file
 parameterfilename = os.path.join(filedirectory, "parameters")
 parameterDictionary = {'numFiles' : numSimulations, 'numParticles' : numparticles, 'dt' : dt, 'bodytype' : bodytype,
-                       'D' : D, 'Drot' : Drot, 'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype,
+                       'D' : D, 'Drot' : Drot, 'sigma' : sigma, 'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype,
                        'boxsize' : boxsize, 'boundaryType' : boundaryType, 'potentialStrength' : strength,
-                       'potentialAngularStrength' : angularStrength, 'anglePatches' : anglePatches}
+                       'anglePatches' : anglePatches}
 analysisTools.writeParameters(parameterfilename, parameterDictionary)
 
 
@@ -132,8 +136,8 @@ def runParallelSims(simnumber):
                                 sigma, mapkIndex, kinaseIndex, phosIndex)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPatchyProteinMAPK)
-    integrator.setKbT(kB * Temp)
-    integrator.disableDeactivation()
+    integrator.setKbT(kBT)
+    integrator.disableMAPK()
 
     # Creates simulation
     sim = msmrd2.simulation(integrator)

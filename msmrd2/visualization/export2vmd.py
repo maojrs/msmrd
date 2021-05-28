@@ -593,31 +593,31 @@ def generateTCL_patchyProteinMAPK(numparticles = 3, outfname = "patchyProteinMAP
 
     # Define particle types
     # For main particle 0.35000
-    file.write('mol representation VDW 2.5 \n') #2.5 #2
+    file.write('mol representation VDW 2.2 \n') #2.5 #2
     file.write('mol selection name type_0 \n')
     file.write('mol color ColorID 31 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
     # For desphosphorilated MAPK patches
-    file.write('mol representation VDW 1.2 0.5 \n') #1
+    file.write('mol representation VDW 1.0 0.5 \n') #1.2
     file.write('mol selection name type_1 \n')
     file.write('mol color ColorID 6 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
     # For phosphorilated MAPK patches
-    file.write('mol representation VDW 1.2 0.5 \n') #1
+    file.write('mol representation VDW 1.0 0.5 \n') #1.2
     file.write('mol selection name type_2 \n')
     file.write('mol color ColorID 32 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
     # For kinase particles
-    file.write('mol representation VDW 2.5 0.5 \n') #1.7
+    file.write('mol representation VDW 2.2 0.5 \n') #1.7
     file.write('mol selection name type_3 \n')
     file.write('mol color ColorID 23 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
     # For phosphate particles
-    file.write('mol representation VDW 2.5 0.5 \n') #1.7
+    file.write('mol representation VDW 2.2 0.5 \n') #1.7
     file.write('mol selection name type_4 \n')
     file.write('mol color ColorID 2 \n')
     file.write('mol material AOShiny \n')

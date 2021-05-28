@@ -40,7 +40,7 @@ namespace msmrd {
         vec3<double> MAPKpatch2;
         vec3<double> ligandPatch;
         double sigma;
-        int deactivation = 1;
+        bool MAPKactive = true;
         /**
          * @param anglePatches angle between binding sites (patches) os MAPK molecules. The patches are
          * assumed to be located at anglePatches/2 and -anglePacthes/2 for the MAPK molecules. And
@@ -58,9 +58,9 @@ namespace msmrd {
          * @param MAPKpatch1/2 unit vector pointing to patch/binding site 1 or 2 of MAPK molecule in its initial
          * orientation (1,0,0,0).
          * @param ligandPatch same as above for the ligand (kinase or phosphotase) patch.
-         * @param deactivation: 1 means deactivation of K and P possible as soon as binding event happen. This
-         * is the default behavior. It can be set to 0 so disable this behavior. Maybe useful to
-         * parametrize MSMs
+         * @param MAPKactive: if false, disables K and P deactivation as soon as binding event happen as
+         * well as phosphorilation events for the MAPK molecule. True is the default behavior. It can be set
+         * to False to disable this behavior. Useful to parametrize MSMs
          */
 
         void integrateOne(int partIndex, std::vector<particle> &parts, double timestep) override;
@@ -77,8 +77,8 @@ namespace msmrd {
                 double anglePatches, double reactivationRateK, double reactivationRateP, double sigma,
                 std::vector<int> mapKIndex, std::vector<int> kinaseIndex,std::vector<int> phosIndex);
 
-        void disableDeactivation() {
-            deactivation = 0;
+        void disableMAPK() {
+            MAPKactive = false;
         };
     };
 
