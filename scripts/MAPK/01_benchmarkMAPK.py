@@ -45,6 +45,7 @@ D = 1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s
 Drot = 1.6E-4 #(rad^2/ns) Note 1.6E-4 rad^2/ns = 1.6E5 rad^2/s
 kB = 1.38064852E-23 #(Boltzmann constant (nm^2/ns^2 * kg/K))
 Temp = 300 #(Kelvin)
+kbT = 1 # We set KbT in the simulations to one, and we assume the force has an additional factor multiplied by kBTemp
 particleTypes = [0, 1, 2]
 
 # Main parameters for integrator
