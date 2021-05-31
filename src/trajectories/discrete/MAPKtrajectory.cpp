@@ -153,16 +153,13 @@ namespace msmrd {
         /* Rotate relative orientVector and position to match the reference orientation of
          * particle 1. (VERY IMPORTANT)*/
         auto relativeOrientvector = msmrdtools::rotateVec(part2->orientvector, part1->orientation.conj());
-                //msmrdtools::rotateVecOffAxis(part2->orientvector,
-                //                                                 part1->orientation.conj(),
-                //                                                 -1 * relativePosition);
         relativePosition = msmrdtools::rotateVec(relativePosition, part1->orientation.conj());
 
 
         // Extract current state, save into sample and return sample
         if (relativePosition.norm() < rLowerBound) {
             // Returns discrete state or -1 if it is not in any bound state
-            discreteState = getBoundState(relativePosition, relativeOrientvector,part2->type);
+            discreteState = getBoundState(relativePosition, relativeOrientvector, part2->type);
         }
             // Returns a transitions state if it is in the transition region
         else if (relativePosition.norm() < positionOrientvectorPart->relativeDistanceCutOff) {
@@ -182,7 +179,7 @@ namespace msmrd {
             auto relOrientvec = std::get<1>(boundStates[i]);
             auto ligType = std::get<2>(boundStates[i]);
             // Make a drawing to understand if statement
-            auto offsetVector = relativePosition + 0.5 * orientVector - 0.5 * relPosCenter;
+            auto offsetVector = relativePosition/relativePosition.norm() + 0.5 * orientVector - 0.5 * relPosCenter;
             if ( offsetVector.norm() <= tolerancePosition) {
             //if ( (relPosCenter - relativePosition).norm() <= tolerancePosition) {
                 //if  ((relOrientvec - orientVector).norm() <= toleranceOrientation) {

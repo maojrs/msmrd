@@ -15,12 +15,13 @@ benchmark_type = '_kinase' # '_phosphatase' # ''
 # Plot implied time scales
 plotImpliedTimescalesDraft = True
 plotImpliedTimescalesPaperVersion = False
+generateMSMs = False
 
 # Load parameters from parameters file (from original MD simulation)
 parentDirectory = '../../data/MAPK/benchmark' + benchmark_type + '/'
 MSMdirectory = '../../data/MAPK/MSMs/'
 parameterDictionary = analysisTools.readParameters(parentDirectory + "parameters")
-nfiles = parameterDictionary['numFiles']
+nfiles = 100 #parameterDictionary['numFiles']
 dt = parameterDictionary['dt']
 stride = parameterDictionary['stride']
 totalTimeSteps = parameterDictionary['timesteps']
@@ -69,22 +70,23 @@ else:
 print("\nStitched all trajectories!")
 
 
-# Loop over all desired lagtime to obatin MSMs
-for i, lagtime in enumerate(lagtimes):
-    print("Generating MSM ", i+1, "of ", len(lagtimes),  " at lagtime ", lagtime, end="\r")
+if generateMSMs:
+    # Loop over all desired lagtime to obatin MSMs
+    for i, lagtime in enumerate(lagtimes):
+        print("Generating MSM ", i+1, "of ", len(lagtimes),  " at lagtime ", lagtime, end="\r")
 
-    # Create MSM between transision states and bound states without stitching
-    mainmsm = pyemma.msm.estimate_markov_model(finalTrajs, lagtime, reversible=reversible)
-    # The active set keep track of the indexes used by pyemma and the ones used to describe the state in our model.
-    activeSet = mainmsm.active_set
+        # Create MSM between transision states and bound states without stitching
+        mainmsm = pyemma.msm.estimate_markov_model(finalTrajs, lagtime, reversible=reversible)
+        # The active set keep track of the indexes used by pyemma and the ones used to describe the state in our model.
+        activeSet = mainmsm.active_set
 
-    # Pickle MSM transition matrix and active set as a dictionary
-    MSM = {'transition_matrix' : mainmsm.transition_matrix, 'active_set': mainmsm.active_set}
-    pickle_out = open(MSMdirectory + "MSM_MAPK" + benchmark_type + "_t" + "{:.2E}".format(totalTimeSteps ) +
-                      "_s" + "{:d}".format(stride) + "_lagt" + "{:d}".format(lagtime) + ".pickle","wb")
-    pickle.dump(MSM, pickle_out)
-    pickle_out.close()
-print("\nGenerated all MSMs.")
+        # Pickle MSM transition matrix and active set as a dictionary
+        MSM = {'transition_matrix' : mainmsm.transition_matrix, 'active_set': mainmsm.active_set}
+        pickle_out = open(MSMdirectory + "MSM_MAPK" + benchmark_type + "_t" + "{:.2E}".format(totalTimeSteps ) +
+                          "_s" + "{:d}".format(stride) + "_lagt" + "{:d}".format(lagtime) + ".pickle","wb")
+        pickle.dump(MSM, pickle_out)
+        pickle_out.close()
+    print("\nGenerated all MSMs.")
 
 # Generate implied timescales plots (draft verision)
 if plotImpliedTimescalesDraft:

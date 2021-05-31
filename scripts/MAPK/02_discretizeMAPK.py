@@ -9,7 +9,7 @@ benchmark_type = '_kinase' # '_phosphatase' # ''
 # Load parameters from parameters file (from original MD simulation)
 parentDirectory = '../../data/MAPK/benchmark' + benchmark_type + '/'
 parameterDictionary = analysisTools.readParameters(parentDirectory + "parameters")
-nfiles = parameterDictionary['numFiles']
+nfiles = 2 #parameterDictionary['numFiles']
 numParticles = parameterDictionary['numParticles']
 dt = parameterDictionary['dt']
 sigma = parameterDictionary['sigma']
@@ -32,7 +32,7 @@ numSphericalSectionsOrientvec = 6 #default values
 discretizator = msmrd2.trajectories.MAPK(numParticles, bufferSize, anglePatches,
                                          numSphericalSectionsPos, numSphericalSectionsOrientvec,
                                          radialLowerBound, radialUpperBound)
-discretizator.setTolerances(sigma*0.7,sigma*0.7)
+discretizator.setTolerances(0.6,0.6)
 
 # Set boundary (important for discretizer)
 boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
