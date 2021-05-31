@@ -63,9 +63,9 @@ minimumUnboundRadius = 1.25 * sigma
 numSimulations = 500 #500
 
 # Simulation parameters
-timesteps = 100000000 #3000000 #3000000
+timesteps = 10000000 #3000000 #3000000
 bufferSize = 1024
-stride = 500
+stride = 50
 outTxt = False
 outH5 = True
 outChunked = True

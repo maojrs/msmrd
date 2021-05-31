@@ -51,6 +51,7 @@ set(SOURCES
         src/integrators/integratorMAPK.cpp
         src/integrators/langevin.cpp
         src/integrators/msmrdIntegrator.cpp
+        src/integrators/msmrdMAPKintegrator.cpp
         src/integrators/msmrdMultiParticleIntegrator.cpp
         src/integrators/msmrdPatchyProtein.cpp
         src/integrators/overdampedLangevin.cpp
@@ -113,6 +114,7 @@ set(PY_SOURCES
         include/integrators/integratorMAPK.hpp
         include/integrators/langevin.hpp
         include/integrators/msmrdIntegrator.hpp
+        include/integrators/msmrdMAPKintegrator.hpp
         include/integrators/msmrdMultiParticleIntegrator.hpp
         include/integrators/msmrdPatchyProtein.hpp
         include/integrators/overdampedLangevin.hpp

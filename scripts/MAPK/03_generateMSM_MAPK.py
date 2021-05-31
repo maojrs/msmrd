@@ -40,7 +40,7 @@ fnamebase = parentDirectory + 'simMAPK_'
 
 # Parameters for MSM generation
 numBoundStates = 4
-lagtimes = [100, 150, 175, 200, 250, 300] #[50, 75, 100, 150] # [75]
+lagtimes = [100, 150, 175, 200, 250, 300]  #[50, 75, 100, 150] # [75]
 reversible = False
 stitching = True
 
@@ -108,7 +108,7 @@ if plotImpliedTimescalesDraft:
 # Generate implied timescales plots (paper verision w/error bars)	
 if plotImpliedTimescalesPaperVersion:
     print("Generating implied timescales plots (paper version)")
-    maxlagtime = 300
+    maxlagtime = 2000
     its = pyemma.msm.its(finalTrajs, maxlagtime, reversible=reversible, errors='bayes')
     nits = 20
     fig, ax = plt.subplots(figsize=(10, 7))
