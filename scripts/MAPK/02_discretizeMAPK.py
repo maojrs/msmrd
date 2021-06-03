@@ -9,7 +9,7 @@ benchmark_type = '_kinase' # '_phosphatase' # ''
 # Load parameters from parameters file (from original MD simulation)
 parentDirectory = '../../data/MAPK/benchmark' + benchmark_type + '/'
 parameterDictionary = analysisTools.readParameters(parentDirectory + "parameters")
-nfiles = 2 #parameterDictionary['numFiles']
+nfiles = parameterDictionary['numFiles']
 numParticles = parameterDictionary['numParticles']
 dt = parameterDictionary['dt']
 sigma = parameterDictionary['sigma']
