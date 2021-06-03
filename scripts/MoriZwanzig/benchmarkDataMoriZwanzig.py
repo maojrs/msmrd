@@ -19,7 +19,7 @@ numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
 D = 0.1
 particlemass = 1.0
 separationDistance = 1.25 # minimum separation distance for initial condition
-numSimulations = 4 #500
+numSimulations = 250 #500
 
 # Main parameters for integrator
 dt = 0.005
@@ -36,9 +36,9 @@ rm = 1.0
 sigma = rm * 2**(-1/6)
 
 # Simulation parameters
-timesteps = 2000 #10000000 #3000000 #3000000
+timesteps = 2000000 #10000000 #3000000 #3000000
 bufferSize = 1024
-stride = 10
+stride = 25
 outTxt = True #False
 outH5 = False #True
 outChunked = False #True
@@ -111,11 +111,11 @@ def runParallelSims(simnumber):
     print("Simulation " + str(simnumber) + ", done.")
 
 # Runs several simulations in parallel
-#num_cores = multiprocessing.cpu_count()
-#pool = Pool(processes=num_cores)
-#iterator = [i for i in range(numSimulations)]
-#pool.map(partial(runParallelSims), iterator)
+num_cores = multiprocessing.cpu_count()
+pool = Pool(processes=num_cores)
+iterator = [i for i in range(numSimulations)]
+pool.map(partial(runParallelSims), iterator)
 
 # Run serial for debugging
-for i in range(1):
-    runParallelSims(i)
+#for i in range(1):
+#    runParallelSims(i)
