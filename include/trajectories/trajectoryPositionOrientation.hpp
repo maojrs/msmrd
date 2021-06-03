@@ -24,17 +24,31 @@ namespace msmrd{
         void printTime();
     };
 
+    class trajectoryPositionOrientationType : public trajectoryPositionOrientation {
+    public:
+        using trajectoryPositionOrientation::trajectoryPositionOrientation;
+
+        void sample(double time, std::vector<particle> &particleList) override;
+    };
+
 
     /**
      * Class to store trajectories with position, orientation and state
      */
     class trajectoryPositionOrientationState : public trajectoryPositionOrientation {
     public:
-
         using trajectoryPositionOrientation::trajectoryPositionOrientation;
 
         void sample(double time, std::vector<particle> &particleList) override;
 
+    };
+
+
+    class trajectoryPositionOrientationStateType : public trajectoryPositionOrientationState {
+    public:
+        using trajectoryPositionOrientationState::trajectoryPositionOrientationState;
+
+        void sample(double time, std::vector<particle> &particleList) override;
     };
 
 }

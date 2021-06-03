@@ -18,6 +18,11 @@ namespace msmrd {
                 .def("write2H5file", &trajectoryPosition::write2H5file<double, 4>)
                 .def("writeChunk2H5file", &trajectoryPosition::writeChunk2H5file<double, 4>);
 
+        py::class_<trajectoryPositionType, trajectoryPosition>(m, "trajectoryPositionType",
+                "position trajectory (#particles or #pairs of particles, approx size)")
+                .def(py::init<int &, int &>())
+                .def("write2H5file", &trajectoryPositionType::write2H5file<double, 5>)
+                .def("writeChunk2H5file", &trajectoryPositionType::writeChunk2H5file<double, 5>);
 
         py::class_<trajectoryPositionOrientation, trajectory>(m, "trajectoryPositionOrientation", "position and "
                                                                                                   "orientation trajectory "
@@ -27,6 +32,12 @@ namespace msmrd {
                 .def("write2H5file", &trajectoryPositionOrientation::write2H5file<double, 8>)
                 .def("writeChunk2H5file", &trajectoryPositionOrientation::writeChunk2H5file<double, 8>);
 
+        py::class_<trajectoryPositionOrientationType, trajectoryPositionOrientation>(m,
+                "trajectoryPositionOrientationType",
+                "position and orientation trajectory (#particles or #pairs of particles, approx size)")
+                .def(py::init<int &, int &>())
+                .def("write2H5file", &trajectoryPositionOrientationType::write2H5file<double, 9>)
+                .def("writeChunk2H5file", &trajectoryPositionOrientationType::writeChunk2H5file<double, 9>);
 
         py::class_<trajectoryPositionOrientationState, trajectoryPositionOrientation>(m,
                                                       "trajectoryPositionOrientationState", "position and "
@@ -36,6 +47,12 @@ namespace msmrd {
                 .def("write2H5file", &trajectoryPositionOrientation::write2H5file<double, 9>)
                 .def("writeChunk2H5file", &trajectoryPositionOrientation::writeChunk2H5file<double, 9>);
 
+        py::class_<trajectoryPositionOrientationStateType, trajectoryPositionOrientationState>(m,
+                "trajectoryPositionOrientationStateType", "position and orientation trajectory "
+                                                      "(#particles or #pairs of particles, approx size)")
+                .def(py::init<int &, int &>())
+                .def("write2H5file", &trajectoryPositionOrientationStateType::write2H5file<double, 10>)
+                .def("writeChunk2H5file", &trajectoryPositionOrientationStateType::writeChunk2H5file<double, 10>);
 
 
         /* Not defined as child class since parent class is a template with virtual fucntions, so need to

@@ -18,8 +18,8 @@ namespace msmrd {
         std::vector<double> sample(4);
         for (int i = 0; i < particleList.size(); i++) {
             sample[0] = time;
-            for (int k = 1; k < 4; k++) {
-                sample[k] = particleList[i].position[k];
+            for (int k = 0; k < 3; k++) {
+                sample[k+1] = particleList[i].position[k];
             }
             trajectoryData.push_back(sample);
         }
@@ -40,4 +40,19 @@ namespace msmrd {
             }
         }
     };
+
+
+    // Sample from list of particles and store in trajectoryData (for trajectoryPositionType)
+    void trajectoryPositionType::sample(double time, std::vector<particle> &particleList) {
+        std::vector<double> sample(5);
+        for (int i = 0; i < particleList.size(); i++) {
+            sample[0] = time;
+            for (int k = 0; k < 3; k++) {
+                sample[k+1] = particleList[i].position[k];
+            }
+            sample[4] = particleList[i].type;
+            trajectoryData.push_back(sample);
+        }
+    }
+
 }

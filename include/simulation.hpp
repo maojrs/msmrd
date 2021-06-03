@@ -8,7 +8,6 @@
 #include "particle.hpp"
 #include "integrators/integrator.hpp"
 #include "trajectories/trajectory.hpp"
-#include "trajectories/trajectory.hpp"
 #include "trajectories/trajectoryPosition.hpp"
 #include "trajectories/trajectoryPositionOrientation.hpp"
 #include "trajectories/discrete/patchyDimerTrajectory.hpp"

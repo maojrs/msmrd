@@ -60,6 +60,23 @@ namespace msmrd {
     };
 
 
+    // Sample from list of particles and store in trajectoryData (for trajectoryPositionOrientationType )
+    void trajectoryPositionOrientationType::sample(double time, std::vector<particle> &particleList) {
+        std::vector<double> sample(9);
+        for (int i = 0; i < particleList.size(); i++) {
+            sample[0] = time;
+            for (int k = 0; k < 3; k++) {
+                sample[k+1] = particleList[i].position[k];
+            }
+            for (int k = 0; k < 4; k++) {
+                sample[k+4] = particleList[i].orientation[k];
+            }
+            sample[8] = particleList[i].type;
+            trajectoryData.push_back(sample);
+        }
+    };
+
+
 
     /**
      *  Implementation of trajectory class to store trajectories with 3D position,
@@ -79,6 +96,23 @@ namespace msmrd {
                 sample[k+4] = particleList[i].orientation[k];
             }
             sample[8] = particleList[i].state;
+            trajectoryData.push_back(sample);
+        }
+    };
+
+    // Sample from list of particles and store in trajectoryData (for trajectoryPositionOrientationStateType )
+    void trajectoryPositionOrientationStateType::sample(double time, std::vector<particle> &particleList) {
+        std::vector<double> sample(10);
+        for (int i = 0; i < particleList.size(); i++) {
+            sample[0] = time;
+            for (int k = 0; k < 3; k++) {
+                sample[k+1] = particleList[i].position[k];
+            }
+            for (int k = 0; k < 4; k++) {
+                sample[k+4] = particleList[i].orientation[k];
+            }
+            sample[8] = particleList[i].state;
+            sample[9] = particleList[i].type;
             trajectoryData.push_back(sample);
         }
     };

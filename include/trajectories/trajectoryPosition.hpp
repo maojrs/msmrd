@@ -23,4 +23,11 @@ namespace msmrd{
 
     };
 
+    class trajectoryPositionType: public trajectoryPosition {
+    public:
+        using trajectoryPosition::trajectoryPosition;
+
+        void sample(double time, std::vector<particle> &particleList) override;
+    };
+
 }
