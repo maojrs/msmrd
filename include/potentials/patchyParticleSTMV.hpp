@@ -37,6 +37,7 @@ namespace msmrd {
     protected:
         std::vector<vec3<double>> structureCoordinates;
         std::vector<vec3<double>> patchesCoordinates;
+        std::array< std::tuple<vec3<double>, quaternion<double>>, 5> boundStates{};
 
         std::array<double, 3> sigma;
         double sigmaPatches;
@@ -67,6 +68,9 @@ namespace msmrd {
 
     public:
         patchyParticleSTMV(double strength, double angularStrength);
+
+        // Require to set bound states to customize potential (specially orientation dependence)
+        void setBoundStates();
 
         double evaluate(particle &part1, particle &part2) override;
 

@@ -10,6 +10,7 @@ namespace msmrd {
             :  strength(strength), angularStrength(angularStrength){
 
         setPotentialParameters();
+        setBoundStates();
     };
 
     /* Set potentials parameters for overall potential. Consists of isotropic repulsive part
@@ -55,6 +56,31 @@ namespace msmrd {
         patchesCoordinates[3] = vec3<double>(-1.348049652, 0.841422688, -0.057270532);
         patchesCoordinates[4] = vec3<double>(-1.003689633, 1.739415955, -0.562472092);
     }
+
+    void patchyParticleSTMV::setBoundStates(){
+        /* Define relative position vectors from particle 1 at the origin. */
+        std::array<vec3<double>, 5> relPos;
+        relPos[0] = { 1.82720032, -1.12924995, -2.91830006};
+        relPos[1] = -1.0 * relPos[0];
+        relPos[2] = {-1.49805002, -0.94934998,  2.48549995};
+        relPos[3] = -1.0 * relPos[2];
+        relPos[4] = {-4.42359982,  0.85875015,  1.34449997};
+        /* Relative orientations */
+        std::array<quaternion<double>, 6> quatRotations;
+        quatRotations[0] = {8.09015001e-01, 3.09015977e-01, 5.00003853e-01, 0};
+        quatRotations[1] = quatRotations[0].conj();
+        quatRotations[2] = {5.00001483e-01, 0, -8.09011317e-01, -3.09029459e-01};
+        quatRotations[3] = quatRotations[1].conj();
+        quatRotations[4] = {0, -3.09023885e-01, -8.09007093e-01, -5.00011762e-01};
+        /* Fill bound states with corresponding combinations of relative position vectors and quaternion orientations.
+         * Note we define relativeOrientation as q2 * q1.conj(), so it matches the relative orientation from
+         * particle 1 as used in trajectories/discrete/discreteTrajectory.hpp */
+        boundStates[0] = std::make_tuple(relPos[0], quatRotations[0]); // part1:i2, part2:i1
+        boundStates[1] = std::make_tuple(relPos[1], quatRotations[1]); // part1:i1, part2:i2
+        boundStates[2] = std::make_tuple(relPos[2], quatRotations[2]); // part1:i3, part2:i4
+        boundStates[3] = std::make_tuple(relPos[3], quatRotations[3]); // part1:i4, part2:i3
+        boundStates[4] = std::make_tuple(relPos[4], quatRotations[4]); // part1:i5, part2:i5
+    };
 
     double patchyParticleSTMV::evaluate(particle &part1, particle &part2) {
         double repulsivePotential = 0.0;
