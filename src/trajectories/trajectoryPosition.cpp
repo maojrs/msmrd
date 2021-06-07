@@ -50,7 +50,7 @@ namespace msmrd {
             for (int k = 0; k < 3; k++) {
                 sample[k+1] = particleList[i].position[k];
             }
-            sample[4] = particleList[i].type;
+            sample[4] = 1.0 * particleList[i].type;
             trajectoryData.push_back(sample);
         }
     }

@@ -49,9 +49,9 @@ namespace msmrd {
         void runNoutput(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
                         const std::string &filename, bool outputTxt, bool H5output, bool chunked);
 
-        void createChunkedH5files(int numcols, std::string filename);
+        void createChunkedH5files(std::string filename);
 
-        void write2H5file(int numcols, std::string filename, bool chunked); // Wrapper for traj.write2H5file
+        void write2H5file(std::string filename, bool chunked); // Wrapper for traj.write2H5file
 
     };
 

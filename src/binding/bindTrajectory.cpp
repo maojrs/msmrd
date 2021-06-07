@@ -149,8 +149,8 @@ namespace msmrd {
                 .def("getState", &MAPKtrajectory::sampleDiscreteState)
                 .def("discretizeTrajectory", &MAPKtrajectory::discretizeTrajectory)
                 .def("discretizeTrajectoryH5", &MAPKtrajectory::discretizeTrajectoryH5)
-                .def("write2H5file", &MAPKtrajectory::write2H5file<double, 8>)
-                .def("writeChunk2H5file", &MAPKtrajectory::writeChunk2H5file<double, 8>);
+                .def("write2H5file", &MAPKtrajectory::write2H5file<double, 10>)
+                .def("writeChunk2H5file", &MAPKtrajectory::writeChunk2H5file<double, 10>);
 
     }
 }

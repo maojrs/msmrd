@@ -71,7 +71,7 @@ namespace msmrd {
             for (int k = 0; k < 4; k++) {
                 sample[k+4] = particleList[i].orientation[k];
             }
-            sample[8] = particleList[i].type;
+            sample[8] = 1.0 * particleList[i].type;
             trajectoryData.push_back(sample);
         }
     };
@@ -95,7 +95,7 @@ namespace msmrd {
             for (int k = 0; k < 4; k++) {
                 sample[k+4] = particleList[i].orientation[k];
             }
-            sample[8] = particleList[i].state;
+            sample[8] = 1.0 * particleList[i].state;
             trajectoryData.push_back(sample);
         }
     };
@@ -111,8 +111,8 @@ namespace msmrd {
             for (int k = 0; k < 4; k++) {
                 sample[k+4] = particleList[i].orientation[k];
             }
-            sample[8] = particleList[i].state;
-            sample[9] = particleList[i].type;
+            sample[8] = 1.0 * particleList[i].state;
+            sample[9] = 1.0 * particleList[i].type;
             trajectoryData.push_back(sample);
         }
     };

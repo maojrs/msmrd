@@ -18,11 +18,11 @@ numBathParticles = 500
 numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
 D = 0.1
 particlemass = 1.0
-separationDistance = 1.25 # minimum separation distance for initial condition
+separationDistance = 2 # minimum separation distance for initial condition
 numSimulations = 250 #500
 
 # Main parameters for integrator
-dt = 0.005
+dt = 0.005 #0.005
 seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
@@ -36,12 +36,12 @@ rm = 1.0
 sigma = rm * 2**(-1/6)
 
 # Simulation parameters
-timesteps = 2000000 #10000000 #3000000 #3000000
+timesteps = 20000 #10000000 #3000000 #3000000
 bufferSize = 1024
 stride = 25
-outTxt = True #False
-outH5 = False #True
-outChunked = False #True
+outTxt = False
+outH5 = True
+outChunked = True
 trajtype = "positionType"
 
 
@@ -111,11 +111,11 @@ def runParallelSims(simnumber):
     print("Simulation " + str(simnumber) + ", done.")
 
 # Runs several simulations in parallel
-num_cores = multiprocessing.cpu_count()
-pool = Pool(processes=num_cores)
-iterator = [i for i in range(numSimulations)]
-pool.map(partial(runParallelSims), iterator)
+#num_cores = multiprocessing.cpu_count()
+#pool = Pool(processes=num_cores)
+#iterator = [i for i in range(numSimulations)]
+#pool.map(partial(runParallelSims), iterator)
 
 # Run serial for debugging
-#for i in range(1):
-#    runParallelSims(i)
+for i in range(numSimulations):
+    runParallelSims(i)

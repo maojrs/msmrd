@@ -20,7 +20,7 @@ namespace msmrd {
         bool active = true;
         int type = 0;
         double D;
-        double Drot;
+        double Drot = 0;
         vec3<double> position;
         vec3<double> orientvector;
         quaternion<double> orientation;
@@ -30,7 +30,7 @@ namespace msmrd {
         /* Next variables exclusive for Markovian switching behavior
          * (have default values if not initialized) */
         int state = 0;
-        int nextState;
+        int nextState = 0;
         double lagtime = 0;
         double timeCounter = 0;
         bool propagateTMSM = true;
