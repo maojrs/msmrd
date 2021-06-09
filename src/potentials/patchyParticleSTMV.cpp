@@ -26,21 +26,21 @@ namespace msmrd {
 
         // Set strengths of potential parts
         epsRepulsive = 1.0*strength;
-        epsPatchesList[0] = -0.50*strength;
-        epsPatchesList[1] = -1.50*strength;
-        epsPatchesList[2] = -1.50*strength;
+        epsPatchesList[0] = -1.0*strength; //-0.5*strength;
+        epsPatchesList[1] = -2.5*strength; //-5.0*strength;
+        epsPatchesList[2] = -1.5*strength; //-1.5*strength;
 
         // Set stiffness of potentials parts
         aRepulsive = 1.5;
-        aPatchesList[0] = 10.0; //40.0;
-        aPatchesList[1] = 10.0; //40.0;
-        aPatchesList[2] = 10.0; //40.0;
+        aPatchesList[0] = 7.0; //40.0;
+        aPatchesList[1] = 6.0; //40.0;
+        aPatchesList[2] = 5.0; //40.0;
 
         /* Set range parameter potentials parts  */
         rstarRepulsive = 0.75; // will be multiplied by corresponding sigma in implementation
-        rstarPatchesList[0] = 0.15 * sigmaPatches;
-        rstarPatchesList[1] = 0.15 * sigmaPatches;
-        rstarPatchesList[2] = 0.15 * sigmaPatches;
+        rstarPatchesList[0] = 0.3 * sigmaPatches;
+        rstarPatchesList[1] = 0.3 * sigmaPatches;
+        rstarPatchesList[2] = 0.3 * sigmaPatches;
 
         // Set coordinates of structure particles m1 to m3:
         structureCoordinates.resize(3);
@@ -48,11 +48,11 @@ namespace msmrd {
         structureCoordinates[1] = vec3<double>(0, 0, 0);
         structureCoordinates[2] = vec3<double>(-0.586991122, 1.460740195, 0);
 
-        // set coordinates of patches i1 to i5:
+        // set coordinates of patches i1 to i5: (note the 1.2 on scaling on i3, important for capsid stability)
         patchesCoordinates.resize(5);
         patchesCoordinates[0] = 1.0*vec3<double>(1.694500527, 0.674187053, -0.694570924);
         patchesCoordinates[1] = 1.0*vec3<double>(2.198599972, -0.207424062, -0.826036629);
-        patchesCoordinates[2] = 1.0*vec3<double>(-0.487943602, -0.924886815, -0.163915576);
+        patchesCoordinates[2] = 1.2*vec3<double>(-0.487943602, -0.924886815, -0.163915576);
         patchesCoordinates[3] = 1.0*vec3<double>(-1.348049652, 0.841422688, -0.057270532);
         patchesCoordinates[4] = 1.0*vec3<double>(-1.003689633, 1.739415955, -0.562472092);
     }
@@ -86,26 +86,70 @@ namespace msmrd {
         std::array<vec3<double>, 5> plane1;
         std::array<vec3<double>, 5> plane2;
         std::vector<vec3<double>> part2PatchesCoordinates(5);
+//        // Bound state 0
+//        auto vec_m1 = relPos[0] + msmrdtools::rotateVec(structureCoordinates[0], quatRotations[0]); // part2:m1
+//        plane1[0] = vec_m1 - structureCoordinates[0]; //last part is part1:m1
+//        plane2[0] = plane1[0].cross(vec_m1);
+//        // Bound state 1
+//        auto vec_m2 = relPos[1] + msmrdtools::rotateVec(structureCoordinates[0], quatRotations[1]); // part2:m1
+//        plane1[1] = vec_m2 - structureCoordinates[0]; //last part is part1:m1
+//        plane2[1] = plane1[1].cross(vec_m2);
+//        // Bound state 2
+//        auto vec_m3 = relPos[2] + msmrdtools::rotateVec(structureCoordinates[2], quatRotations[2]); // part2:m3
+//        plane1[2] = vec_m3 - structureCoordinates[2]; //last part is part1:m3
+//        plane2[2] = plane1[2].cross(vec_m3);
+//        // Bound state 3
+//        auto vec2_m2 = relPos[3] + msmrdtools::rotateVec(structureCoordinates[2], quatRotations[3]); // part2:m3
+//        plane1[3] = vec2_m2 - structureCoordinates[2]; //last part is part1:m3
+//        plane2[3] = plane1[3].cross(vec2_m2);
+//        // Bound state 4
+//        auto vec2_m3 = relPos[4] + msmrdtools::rotateVec(structureCoordinates[2], quatRotations[4]); // part2:m3
+//        plane1[4] = vec2_m3 - structureCoordinates[2]; //last part is part1:m3
+//        plane2[4] = plane1[4].cross(vec2_m3);
+
+        // Always use m1 to create refplanes
         // Bound state 0
-        auto vec_i1 = relPos[0] + msmrdtools::rotateVec(patchesCoordinates[0], quatRotations[0]); // part2:i1
-        plane1[0] = vec_i1 - patchesCoordinates[1];
-        plane2[0] = plane1[0].cross(vec_i1);
+        auto vec_m1 = relPos[0] + msmrdtools::rotateVec(structureCoordinates[0], quatRotations[0]); // part2:m1
+        plane1[0] = vec_m1 - structureCoordinates[0]; //last part is part1:m1
+        plane2[0] = plane1[0].cross(vec_m1);
         // Bound state 1
-        auto vec_i2 = relPos[1] + msmrdtools::rotateVec(patchesCoordinates[1], quatRotations[1]); // part2:i2
-        plane1[1] = vec_i2 - patchesCoordinates[0];
-        plane2[1] = plane1[1].cross(vec_i2);
+        vec_m1 = relPos[1] + msmrdtools::rotateVec(structureCoordinates[0], quatRotations[1]); // part2:m1
+        plane1[1] = vec_m1 - structureCoordinates[0]; //last part is part1:m1
+        plane2[1] = plane1[1].cross(vec_m1);
         // Bound state 2
-        auto vec_i4 = relPos[2] + msmrdtools::rotateVec(patchesCoordinates[3], quatRotations[2]); // part2:i4
-        plane1[2] = vec_i4 - patchesCoordinates[2];
-        plane2[2] = plane1[2].cross(vec_i4);
+        vec_m1 = relPos[2] + msmrdtools::rotateVec(structureCoordinates[0], quatRotations[2]); // part2:m3
+        plane1[2] = vec_m1 - structureCoordinates[0]; //last part is part1:m3
+        plane2[2] = plane1[2].cross(vec_m1);
         // Bound state 3
-        auto vec_i3 = relPos[3] + msmrdtools::rotateVec(patchesCoordinates[2], quatRotations[3]); // part2:i3
-        plane1[3] = vec_i3 - patchesCoordinates[3];
-        plane2[3] = plane1[3].cross(vec_i3);
+        vec_m1 = relPos[3] + msmrdtools::rotateVec(structureCoordinates[0], quatRotations[3]); // part2:m3
+        plane1[3] = vec_m1 - structureCoordinates[0]; //last part is part1:m3
+        plane2[3] = plane1[3].cross(vec_m1);
         // Bound state 4
-        auto vec_i5 = relPos[4] + msmrdtools::rotateVec(patchesCoordinates[4], quatRotations[4]); // part2:i5
-        plane1[4] = vec_i5 - patchesCoordinates[4];
-        plane2[4] = plane1[4].cross(vec_i5);
+        vec_m1 = relPos[4] + msmrdtools::rotateVec(structureCoordinates[0], quatRotations[4]); // part2:m3
+        plane1[4] = vec_m1 - structureCoordinates[0]; //last part is part1:m3
+        plane2[4] = plane1[4].cross(vec_m1);
+
+        // Bound state 0
+//        auto vec_i1 = relPos[0] + msmrdtools::rotateVec(patchesCoordinates[0], quatRotations[0]); // part2:i1
+//        plane1[0] = vec_i1 - patchesCoordinates[1];
+//        plane2[0] = plane1[0].cross(vec_i1);
+//        // Bound state 1
+//        auto vec_i2 = relPos[1] + msmrdtools::rotateVec(patchesCoordinates[1], quatRotations[1]); // part2:i2
+//        plane1[1] = vec_i2 - patchesCoordinates[0];
+//        plane2[1] = plane1[1].cross(vec_i2);
+//        // Bound state 2
+//        auto vec_i4 = relPos[2] + msmrdtools::rotateVec(patchesCoordinates[3], quatRotations[2]); // part2:i4
+//        plane1[2] = vec_i4 - patchesCoordinates[2];
+//        plane2[2] = plane1[2].cross(vec_i4);
+//        // Bound state 3
+//        auto vec_i3 = relPos[3] + msmrdtools::rotateVec(patchesCoordinates[2], quatRotations[3]); // part2:i3
+//        plane1[3] = vec_i3 - patchesCoordinates[3];
+//        plane2[3] = plane1[3].cross(vec_i3);
+//        // Bound state 4
+//        auto vec_i5 = relPos[4] + msmrdtools::rotateVec(patchesCoordinates[4], quatRotations[4]); // part2:i5
+//        plane1[4] = vec_i5 - patchesCoordinates[4];
+//        plane2[4] = plane1[4].cross(vec_i5);
+
         // Normalize and save reference planes
         for (int i=0; i<5; i++) {
             plane1[i] = plane1[i]/plane1[i].norm();
@@ -153,9 +197,9 @@ namespace msmrd {
         for (int i=0; i < patchesCoordinates.size(); i++) {
             auto patchVec1 = msmrdtools::rotateVec(patchesCoordinates[i], part1.orientation);
             auto patch1 = pos1virtual + 1.1 * patchVec1; // 1.1 factor to keep the bnding site slightly off the patch
-            for (int j=1; j < patchesCoordinates.size(); j++) {
+            for (int j=0; j < patchesCoordinates.size(); j++) {
                 auto patchVec2 = msmrdtools::rotateVec(patchesCoordinates[j], part2.orientation);
-                auto patch2 = part2.position + 1.1 * patchVec2;
+                auto patch2 = part2.position + 1.1 * patchVec2; // 1.1 factor to keep the bnding site slightly off the patch
                 auto relpatch = patch2 - patch1;
                 if ((i == 0 and j == 1) or (i == 1 and j == 0)) { // interaction type 1 (i1:i2)
                     patchesPotential += patchPotentialScaling * quadraticPotential(relpatch.norm(),
@@ -184,7 +228,7 @@ namespace msmrd {
             double cosSquared = (plane1 * refPlane1 + 1) * (plane1 * refPlane1 + 1);
             angularPotential += -(1.0 / 16.0) * angularStrength * cosSquared * cosSquared;
             // Potential to align plane2:
-            cosSquared = (plane2 * refPlane2 + 1) * (plane1 * refPlane2 + 1);
+            cosSquared = (plane2 * refPlane2 + 1) * (plane2 * refPlane2 + 1);
             angularPotential += -(1.0 / 16.0) * angularStrength * cosSquared * cosSquared;
         }
         return patchesPotential + angularPotential;
@@ -339,8 +383,8 @@ namespace msmrd {
             torque2 -= derivativeAngularPotential;
             // Torque to align plane2:
             cosSquared = (plane2 * refPlane2 + 1) * (plane2 * refPlane2 + 1);
-            cosThird = cosSquared * (plane2 * refPlane2 + 1);
-            derivativeAngularPotential = (angularStrength / 4.0) * cosThird * plane2.cross(refPlane2);
+            cosThird = cosSquared * cosSquared * cosSquared * (plane2 * refPlane2 + 1);
+            derivativeAngularPotential = ( angularStrength / 4.0) * cosThird * plane2.cross(refPlane2);
             torque1 += derivativeAngularPotential; // Plus sign since plane1 x plane2 defined torque in particle 1
             torque2 -= derivativeAngularPotential;
         }
@@ -405,7 +449,8 @@ namespace msmrd {
         std::vector<vec3<double>> part2PatchPositions;
         for(auto &patch : part2Patches) {
             auto relpos = part2.position - pos1virtual;
-            auto originPatch = relpos + msmrdtools::rotateVec(patch, part1.orientation.conj());
+            auto rotRelpos = msmrdtools::rotateVec (relpos, part1.orientation.conj());
+            auto originPatch = msmrdtools::rotateVec(relpos + patch, part1.orientation.conj()) - rotRelpos;
             part2PatchPositions.push_back(originPatch);
         }
 
@@ -453,8 +498,14 @@ namespace msmrd {
         }
 
         // Calculate planes to be aligned against reference planes
-        plane1 = part2PatchPositions[part2PatchIndex] - part1PatchPositions[part1PatchIndex];
-        plane2 = plane1.cross(part2PatchPositions[part2PatchIndex]);
+//        plane1 = part2PatchPositions[part2PatchIndex] - part1PatchPositions[part1PatchIndex];
+//        plane2 = plane1.cross(part2PatchPositions[part2PatchIndex]);
+
+        auto rotPart1M1 = part1.position + msmrdtools::rotateVec(structureCoordinates[0], part1.orientation);
+        auto rotPart2M1 = part2.position + msmrdtools::rotateVec(structureCoordinates[0], part2.orientation);
+        plane1 = rotPart2M1 - rotPart1M1;
+        plane2 = plane1.cross(rotPart2M1);
+
         plane1 = plane1/plane1.norm();
         plane2 = plane2/plane2.norm();
 
