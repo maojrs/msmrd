@@ -12,7 +12,7 @@ namespace msmrd {
      * It is based on patchy particles approach. The repulsive potential function avoids
      * overlapping of a complex shape made of three spherical parts (m1,m2,m3). The attraction
      * sites or patches are located around the surface of this three spheres and are denoted by
-     * i1 to i5. A brief description of the structur follows:
+     * i1 to i5. A brief description of the structure follows:
      * In its ground orientation (values in angstroms (10^(-10)m)):
      * m1 position: [18.15254758, 0, 0] radius: 8.56
      * m2 position: [0, 0, 0] radius: 13.58  **reference position**
@@ -24,7 +24,7 @@ namespace msmrd {
      * i5 position: [-10.03689633, 17.39415955, -5.62472092]
      * The radii of all patches is 4, but they produce no non-overlapping potential.
      * Note the implementation will be in nanometers (10^(-9)m)
-     * There are three possible type of interaction of two identical particles:
+     * There are three possible type of interaction between two identical particles:
      * interaction 1: i1:i2
      * interaction 2: i3:i4
      * interaction 5: i5:i5
@@ -38,33 +38,41 @@ namespace msmrd {
         std::vector<vec3<double>> structureCoordinates;
         std::vector<vec3<double>> patchesCoordinates;
         std::array< std::tuple<vec3<double>, quaternion<double>>, 5> boundStates{};
+        std::array< std::tuple<vec3<double>, vec3<double>>, 5> refPlanes{};
 
         std::array<double, 3> sigma;
         double sigmaPatches;
         double strength = 100.0;
         double angularStrength = 2.0;
         double patchPotentialScaling = 1.0;
+        double minimumR = 5.5; // (nm) chosen based on the values of i1 to i5.
+        double angularPotentialTolerance = 0.6;
 
         // Parameters for first and second type of interactions
         // Strength of potentials
         double epsRepulsive;
-        std::array<double, 3> epsPatches;
+        std::array<double, 3> epsPatchesList;
         // Stiffness of potentials
         double aRepulsive;
-        std::array<double, 3> aPatches;
+        std::array<double, 3> aPatchesList;
         // Range parameter of potentials
         double rstarRepulsive;
-        std::array<double, 3> rstarPatches;
+        std::array<double, 3> rstarPatchesList;
 
         double quadraticPotential(double r, double sig, double eps, double a, double rstar);
 
         double derivativeQuadraticPotential(double r, double sig, double eps, double a, double rstar);
+
+        virtual double evaluatePatchesPotential( particle &part1, particle &part2, vec3<double> &pos1virtual);
 
         std::array<vec3<double>, 4> forceTorquePatches(
                 particle &part1, particle &part2, const vec3<double> pos1virtual);
 
         std::array<vec3<double>, 4> forceTorqueStructure(
                 particle &part1, particle &part2, const vec3<double> pos1virtual);
+
+        std::tuple<vec3<double>, vec3<double>, int> calculatePlanes(particle &part1, particle &part2,
+                vec3<double> &pos1virtual);
 
     public:
         patchyParticleSTMV(double strength, double angularStrength);

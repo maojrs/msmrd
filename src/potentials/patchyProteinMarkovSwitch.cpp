@@ -186,9 +186,9 @@ namespace msmrd{
              * between the unitary vector of each plane */
             double cosSquared = (plane1 * plane2 + 1) * (plane1 * plane2 + 1);
             double cosSeventh = cosSquared * cosSquared * cosSquared * (plane1 * plane2 + 1);
-            auto derivativeAngluarPotential = 0.5*angularStrength*sigma*(8.0/256.0) * cosSeventh * plane1.cross(plane2);
-            torque1 += derivativeAngluarPotential; // Plus sign since plane1 x plane2 defined torque in particle 1
-            torque2 -= derivativeAngluarPotential;
+            auto derivativeAngularPotential = 0.5*angularStrength*sigma*(8.0/256.0) * cosSeventh * plane1.cross(plane2);
+            torque1 += derivativeAngularPotential; // Plus sign since plane1 x plane2 defined torque in particle 1
+            torque2 -= derivativeAngularPotential;
 
             return {force + force1, torque1, -1.0*force + force2, torque2};
         } else {

@@ -238,7 +238,8 @@ def generateTCL_patchyParticles(numparticles = 10, outfname = "patchyParticles",
     file.write('display rendermode GLSL \n')
     file.close()
 
-def generateTCL_patchyParticleSTMV(numparticles = 2, outfname = "patchyParticleSTMV", tclfname = "../../data/vmd/patchyParticleSTMV_2vmd.tcl"):
+def generateTCL_patchyParticleSTMV(numparticles = 2, outfname = "patchyParticleSTMV",
+                                   tclfname = "../../data/vmd/patchyParticleSTMV_2vmd.tcl"):
     file = open(tclfname, 'w')
     file.write('set name ' + outfname + '\n')
     file.write('mol load xyz ./$name.xyz  \n \n')
@@ -248,40 +249,40 @@ def generateTCL_patchyParticleSTMV(numparticles = 2, outfname = "patchyParticleS
 
     # Define particle types
     # For main particle (m1,m2 and m3)
-    file.write('mol representation VDW 0.856 0.5 \n')
+    file.write('mol representation VDW 0.7 0.5 \n') #0.856
     file.write('mol selection name type_0 \n')
     file.write('mol color ColorID 23 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
 
-    file.write('mol representation VDW 1.0 0.5 \n') #1.358
+    file.write('mol representation VDW 0.9 0.5 \n') #1.358
     file.write('mol selection name type_1 \n')
     file.write('mol color ColorID 23 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
 
-    file.write('mol representation VDW 0.818 0.5 \n')
+    file.write('mol representation VDW 0.7 0.5 \n') #0.818
     file.write('mol selection name type_2 \n')
     file.write('mol color ColorID 23 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
 
     # For patches i1 and i2
-    file.write('mol representation VDW 0.40000 0.5 \n')
+    file.write('mol representation VDW 0.30000 0.5 \n') #0.4
     file.write('mol selection name type_3 \n')
     file.write('mol color ColorID 3 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
 
     # For patches i3 and i4
-    file.write('mol representation VDW 0.40000 0.5 \n')
+    file.write('mol representation VDW 0.30000 0.5 \n') #0.4
     file.write('mol selection name type_4 \n')
     file.write('mol color ColorID 4 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
 
     # For patches i5
-    file.write('mol representation VDW 0.40000 0.5 \n')
+    file.write('mol representation VDW 0.30000 0.5 \n') #0.4
     file.write('mol selection name type_5 \n')
     file.write('mol color ColorID 5 \n')
     file.write('mol material AOShiny \n')

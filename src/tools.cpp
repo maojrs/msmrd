@@ -64,7 +64,7 @@ namespace msmrdtools {
     }
 
     // Rotates vector p by rotation represented by quaternion q around an axis
-    // off the origin that passes through point 'offAxisPoint'..
+    // that is off the origin and passes through point 'offAxisPoint'..
     vec3<double> rotateVecOffAxis(vec3<double> p, quaternion<double> q,vec3<double> offAxisPoint) {
         vec3<double> result;
         result = p - offAxisPoint;

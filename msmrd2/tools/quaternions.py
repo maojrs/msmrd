@@ -99,7 +99,7 @@ def quaternionAngleDistance(q1, q2):
 def rotateVecOffAxis(vect, rotQuat, offAxisPoint):
     '''
     Rotate vector (np array) or list of vectors (list of np arrays) using a quaternion (4d-nparray) around an axis
-    off the origin that passes through point 'offAxisPoint'.
+    that is off the origin and passes through point 'offAxisPoint'.
     '''
     newVec = vect - offAxisPoint
     newVec = rotateVec(newVec, rotQuat)
