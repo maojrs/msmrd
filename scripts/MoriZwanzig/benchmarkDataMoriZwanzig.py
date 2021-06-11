@@ -14,7 +14,7 @@ import sys
 import os
 
 # Main parameters
-numBathParticles = 500
+numBathParticles = 350 #500
 numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
 D = 0.1
 particlemass = 1.0

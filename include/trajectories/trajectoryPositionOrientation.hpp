@@ -29,6 +29,10 @@ namespace msmrd{
         using trajectoryPositionOrientation::trajectoryPositionOrientation;
 
         void sample(double time, std::vector<particle> &particleList) override;
+
+        // Empty function to be overwritten by child classes if neccesary
+        void sampleRelative(double time, std::vector<particle> &particleList) override {};
+
     };
 
 
@@ -49,6 +53,9 @@ namespace msmrd{
         using trajectoryPositionOrientationState::trajectoryPositionOrientationState;
 
         void sample(double time, std::vector<particle> &particleList) override;
+
+        // Empty function to be overwritten by child classes if neccesary
+        void sampleRelative(double time, std::vector<particle> &particleList) override {};
     };
 
 }

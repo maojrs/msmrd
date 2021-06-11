@@ -123,29 +123,20 @@ namespace msmrd {
     void trajectory::write2H5file(std::string filename, std::string datasetName, std::vector<std::vector<scalar>> localdata) {
         const H5std_string FILE_NAME = filename + ".h5";
         const H5std_string	DATASET_NAME = datasetName;
-        int datasize = static_cast<int>(localdata.size());
-
-
-        // Copies data into fixed size array , datafixed
-        double datafixed[datasize][NUMCOL];
-        for (int i = 0; i < datasize; i++) {
-            for (int j = 0; j < NUMCOL; j++) {
-                datafixed[i][j] = 1.0*localdata[i][j];
-            }
-        }
+        const size_t datasize = static_cast<size_t>(localdata.size());
 
         // Creates H5 file (overwrites previous existing one)
         H5File file(FILE_NAME, H5F_ACC_TRUNC);
 
         // Sets shape of data into dataspace
         hsize_t dims[2];               // dataset dimensions
-        dims[0] = localdata.size();
-        dims[1] = NUMCOL;
+        dims[0] = static_cast<hsize_t>(datasize);
+        dims[1] = static_cast<hsize_t>(NUMCOL);
         DataSpace dataspace(2, dims);
 
         // Creates dataset and write data into it
         DataSet dataset = file.createDataSet(DATASET_NAME, PredType::NATIVE_DOUBLE, dataspace);
-        dataset.write(datafixed, H5::PredType::NATIVE_DOUBLE);
+        dataset.write(localdata.data(), H5::PredType::NATIVE_DOUBLE);
 
     };
 
@@ -199,14 +190,6 @@ namespace msmrd {
         DataSpace dataspace;
         hsize_t dimsFile[RANK] = {0 ,0};
 
-        // Copies data into fixed size array , datafixed
-        double datafixed[chunckSize][NUMCOL];
-        for (int i = 0; i < chunckSize; i++) {
-            for (int j = 0; j < NUMCOL; j++) {
-                datafixed[i][j] = 1.0*localdata[i][j];
-            }
-        }
-
         // Open existing dataset
         file = H5File(FILE_NAME, H5F_ACC_RDWR);
         dataset = file.openDataSet(DATASET_NAME);
@@ -217,8 +200,8 @@ namespace msmrd {
 
         // Extend the dataset by a chunk (chunkSize, NUMCOL)
         hsize_t size[2];
-        size[0] = dimsFile[0] + chunckSize;
-        size[1] = NUMCOL;
+        size[0] = static_cast<hsize_t>(dimsFile[0] + chunckSize);
+        size[1] = static_cast<hsize_t>(NUMCOL);
         dataset.extend( size );
 
        // Select a hyperslab.
@@ -233,7 +216,7 @@ namespace msmrd {
         DataSpace mspaceChunk( RANK, dimsChunk );
 
         // Write the data to the hyperslab.
-        dataset.write( datafixed, PredType::NATIVE_DOUBLE, mspaceChunk, fspaceChunck );
+        dataset.write(localdata.data(), PredType::NATIVE_DOUBLE, mspaceChunk, fspaceChunck );
 
     }
 
