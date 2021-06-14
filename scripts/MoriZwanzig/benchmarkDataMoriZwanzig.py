@@ -14,7 +14,7 @@ import sys
 import os
 
 # Main parameters
-numBathParticles = 350 #500
+numBathParticles = 500 #500
 numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
 D = 0.1
 particlemass = 1.0
@@ -36,7 +36,7 @@ rm = 1.0
 sigma = rm * 2**(-1/6)
 
 # Simulation parameters
-timesteps = 20000 #10000000 #3000000 #3000000
+timesteps = 2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
 bufferSize = 1024
 stride = 25
 outTxt = False
@@ -116,6 +116,6 @@ def runParallelSims(simnumber):
 #iterator = [i for i in range(numSimulations)]
 #pool.map(partial(runParallelSims), iterator)
 
-# Run serial for debugging
+## Run serial for debugging
 for i in range(numSimulations):
     runParallelSims(i)
