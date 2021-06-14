@@ -10,6 +10,7 @@
 #include "trajectories/trajectory.hpp"
 #include "trajectories/trajectoryPosition.hpp"
 #include "trajectories/trajectoryPositionOrientation.hpp"
+#include "trajectories/trajectoryMoriZwanzig.hpp"
 #include "trajectories/discrete/patchyDimerTrajectory.hpp"
 #include "trajectories/discrete/patchyProteinTrajectory.hpp"
 #include "trajectories/discrete/MAPKtrajectory.hpp"

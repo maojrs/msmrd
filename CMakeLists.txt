@@ -49,6 +49,7 @@ set(SOURCES
         src/discretizations/spherePartition.cpp
         src/integrators/integrator.cpp
         src/integrators/integratorMAPK.cpp
+        src/integrators/integratorMoriZwanzig.cpp
         src/integrators/langevin.cpp
         src/integrators/msmrdIntegrator.cpp
         src/integrators/msmrdMAPKintegrator.cpp
@@ -74,6 +75,7 @@ set(SOURCES
         src/potentials/patchyProteinMarkovSwitch.cpp
         src/potentials/potentials.cpp
         src/trajectories/trajectory.cpp
+        src/trajectories/trajectoryMoriZwanzig.cpp
         src/trajectories/trajectoryPosition.cpp
         src/trajectories/trajectoryPositionOrientation.cpp
         src/trajectories/discrete/MAPKtrajectory.cpp
@@ -112,6 +114,7 @@ set(PY_SOURCES
         include/discretizations/spherePartition.hpp
         include/integrators/integrator.hpp
         include/integrators/integratorMAPK.hpp
+        include/integrators/integratorMoriZwanzig.hpp
         include/integrators/langevin.hpp
         include/integrators/msmrdIntegrator.hpp
         include/integrators/msmrdMAPKintegrator.hpp
@@ -137,6 +140,7 @@ set(PY_SOURCES
         include/potentials/patchyProteinMAPK.hpp
         include/potentials/patchyProteinMarkovSwitch.hpp
         include/trajectories/trajectory.hpp
+        include/trajectories/trajectoryMoriZwanzig.hpp
         include/trajectories/trajectoryPosition.hpp
         include/trajectories/trajectoryPositionOrientation.hpp
         include/trajectories/discrete/discreteTrajectory.hpp

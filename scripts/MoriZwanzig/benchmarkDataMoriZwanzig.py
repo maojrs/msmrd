@@ -1,7 +1,7 @@
 import numpy as np
 import msmrd2
 import msmrd2.visualization as msmrdvis
-from msmrd2.integrators import langevin
+from msmrd2.integrators import integratorMoriZwanzig
 from msmrd2.potentials import WCA
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
@@ -36,13 +36,13 @@ rm = 1.0
 sigma = rm * 2**(-1/6)
 
 # Simulation parameters
-timesteps = 100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
+timesteps = 10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
 bufferSize = 10 * 1024
-stride = 25
+stride = 1 #25
 outTxt = False
 outH5 = True
 outChunked = True
-trajtype = "moriZwanzig" # Only samples position of distinguished particle (type 1)
+trajtype = "moriZwanzig" # Only samples position of distinguished particle (type 1) + raux variables
 
 
 # Parent directory location
@@ -96,7 +96,7 @@ def runParallelSims(simnumber):
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
-    integrator = langevin(dt, seed, bodytype)
+    integrator = integratorMoriZwanzig(dt, seed, bodytype)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialWCA)
 

@@ -54,9 +54,9 @@ namespace msmrd {
         } else if (trajtype == "moriZwanzig"){
             outputDiscreteTraj = false;
             std::vector<int> distinguishedTypes{1}; // only samples particles with type 1
-            traj = std::make_unique<trajectoryPositionDistinguished>(particleList.size(), bufferSize,
+            traj = std::make_unique<trajectoryMoriZwanzig>(particleList.size(), bufferSize,
                     distinguishedTypes);
-            numcols = 5; //(time, positionx3, type)
+            numcols = 8; //(time, positionx3, type, raux(x3))
         } else if (trajtype == "position"){
             traj = std::make_unique<trajectoryPosition>(particleList.size(), bufferSize);
             numcols = 4; //(time, positionx3)

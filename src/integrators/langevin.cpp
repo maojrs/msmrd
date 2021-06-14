@@ -69,7 +69,8 @@ namespace msmrd {
     void langevin::integrateB(int partIndex, std::vector<particle> &parts, double dt) {
         vec3<double> force;
         force = 1.0 * forceField[partIndex];
-        auto newVel = parts[partIndex].nextVelocity + dt/2 * force;
+        auto mass = parts[partIndex].mass;
+        auto newVel = parts[partIndex].nextVelocity + dt/2 * force/mass;
         parts[partIndex].setNextVelocity(newVel);
     }
 
@@ -84,7 +85,7 @@ namespace msmrd {
         double eta = KbTemp / parts[partIndex].D; // friction coefficient
         double xi = std::sqrt(KbTemp*(1 - std::exp(-2*eta*dt)));
         auto mass = parts[partIndex].mass;
-        auto newVel = std::exp(-dt*eta) * parts[partIndex].nextVelocity + xi/mass * randg.normal3D(0, 1);
+        auto newVel = (std::exp(-dt*eta)/mass) * parts[partIndex].nextVelocity + xi/mass * randg.normal3D(0, 1);
         parts[partIndex].setNextVelocity(newVel);
     }
 
