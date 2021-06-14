@@ -55,6 +55,14 @@ namespace msmrd {
                 .def("writeChunk2H5file", &trajectoryPositionOrientationStateType::writeChunk2H5file<double, 10>);
 
 
+        py::class_<trajectoryPositionDistinguished, trajectoryPositionType>(m, "trajectoryPositionDistinguished",
+                                                               "position trajectory (#particles or #pairs of particles, "
+                                                               "approx size), distinguished types")
+                .def(py::init<int &, int &, std::vector<int> &>())
+                .def("write2H5file", &trajectoryPositionType::write2H5file<double, 5>)
+                .def("writeChunk2H5file", &trajectoryPositionType::writeChunk2H5file<double, 5>);
+
+
         /* Not defined as child class since parent class is a template with virtual fucntions, so need to
          * add all functions from parent classes manually (all the way to the original trajectory.hpp parent).
          * Also note sampleDiscreteState and getState are the same function. */

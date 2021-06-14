@@ -36,13 +36,13 @@ rm = 1.0
 sigma = rm * 2**(-1/6)
 
 # Simulation parameters
-timesteps = 2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
-bufferSize = 1024
+timesteps = 100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
+bufferSize = 10 * 1024
 stride = 25
 outTxt = False
 outH5 = True
 outChunked = True
-trajtype = "positionType"
+trajtype = "moriZwanzig" # Only samples position of distinguished particle (type 1)
 
 
 # Parent directory location
@@ -111,11 +111,11 @@ def runParallelSims(simnumber):
     print("Simulation " + str(simnumber) + ", done.")
 
 # Runs several simulations in parallel
-#num_cores = multiprocessing.cpu_count()
-#pool = Pool(processes=num_cores)
-#iterator = [i for i in range(numSimulations)]
-#pool.map(partial(runParallelSims), iterator)
+num_cores = multiprocessing.cpu_count() - 1
+pool = Pool(processes=num_cores)
+iterator = [i for i in range(numSimulations)]
+pool.map(partial(runParallelSims), iterator)
 
 ## Run serial for debugging
-for i in range(numSimulations):
-    runParallelSims(i)
+#for i in range(numSimulations):
+#    runParallelSims(i)

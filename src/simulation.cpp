@@ -51,6 +51,12 @@ namespace msmrd {
             outputDiscreteTraj = false;
             traj = std::make_unique<MAPKtrajectory>(particleList.size(), bufferSize);
             numcols = 10; //(time, positionx3, orientationx4, state, type)
+        } else if (trajtype == "moriZwanzig"){
+            outputDiscreteTraj = false;
+            std::vector<int> distinguishedTypes{1}; // only samples particles with type 1
+            traj = std::make_unique<trajectoryPositionDistinguished>(particleList.size(), bufferSize,
+                    distinguishedTypes);
+            numcols = 5; //(time, positionx3, type)
         } else if (trajtype == "position"){
             traj = std::make_unique<trajectoryPosition>(particleList.size(), bufferSize);
             numcols = 4; //(time, positionx3)
@@ -109,8 +115,8 @@ namespace msmrd {
                     createChunkedH5files(filename);
                 }
 
-                //Write to file on each time step
-                if (bufferCounter == bufferSize) {
+                //Write to file once buffer is full
+                if (bufferCounter * particleList.size() >= bufferSize) {
                     bufferCounter = 0;
                     write2H5file(filename, true);
                     traj->emptyBuffer();

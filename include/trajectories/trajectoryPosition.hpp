@@ -34,4 +34,19 @@ namespace msmrd{
 
     };
 
+    /*
+     * It just samples the position of distinguished particle(s) of a preselected
+     * type(s). Useful for some applications, where one only needs data of
+     * distinguished particle(s)
+     */
+    class trajectoryPositionDistinguished: public trajectoryPositionType {
+    protected:
+        std::vector<int> distinguishedTypes;
+    public:
+        trajectoryPositionDistinguished(unsigned long Nparticles, int bufferSize, std::vector<int> distinguishedTypes);
+
+        void sample(double time, std::vector<particle> &particleList) override;
+
+    };
+
 }
