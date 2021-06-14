@@ -51,7 +51,8 @@ namespace msmrd {
                                                         "particlesbodytype (point, rod, rigidbody, "
                                                         "pointmix, rodmix or rigidbodymix) )")
                 .def(py::init<double &, long &, std::string &>())
-                .def("integrate", &integratorMoriZwanzig::integrate);
+                .def("integrate", &integratorMoriZwanzig::integrate)
+                .def("setDistinguishedTypes", &integratorMoriZwanzig::setDistinguishedTypes);
 
         py::class_<integratorMAPK, overdampedLangevin>(m, "integratorMAPK", "integrator for MAPK (timestep, seed, "
                                                                             "particlesbodytype (point, rod, rigidbody, "

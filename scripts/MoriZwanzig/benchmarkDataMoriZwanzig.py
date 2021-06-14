@@ -37,12 +37,13 @@ sigma = rm * 2**(-1/6)
 
 # Simulation parameters
 timesteps = 10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
-bufferSize = 10 * 1024
+bufferSize = 100 * 1024
 stride = 1 #25
 outTxt = False
 outH5 = True
 outChunked = True
 trajtype = "moriZwanzig" # Only samples position of distinguished particle (type 1) + raux variables
+distinguishedTypes = [1]
 
 
 # Parent directory location
@@ -99,6 +100,7 @@ def runParallelSims(simnumber):
     integrator = integratorMoriZwanzig(dt, seed, bodytype)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialWCA)
+    integrator.setDistinguishedTypes(distinguishedTypes)
 
     # Creates simulation
     sim = msmrd2.simulation(integrator)

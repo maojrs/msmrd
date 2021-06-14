@@ -42,6 +42,9 @@ namespace msmrd{
     class trajectoryPositionDistinguished: public trajectoryPositionType {
     protected:
         std::vector<int> distinguishedTypes;
+        /**
+         * @distinguishedTypes vector of types that correspond to distinguished particle. Must match that of integrator.
+         */
     public:
         trajectoryPositionDistinguished(unsigned long Nparticles, int bufferSize, std::vector<int> distinguishedTypes);
 
