@@ -22,7 +22,7 @@ separationDistance = 2 # minimum separation distance for initial condition
 numSimulations = 250 #500
 
 # Main parameters for integrator
-dt = 0.005 #0.005
+dt = 0.0005 #0.005
 seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
@@ -36,9 +36,9 @@ rm = 1.0
 sigma = rm * 2**(-1/6)
 
 # Simulation parameters
-timesteps = 10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
+timesteps = 40000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
 bufferSize = 100 * 1024
-stride = 1 #25
+stride = 5 #25
 outTxt = False
 outH5 = True
 outChunked = True
@@ -94,6 +94,7 @@ def runParallelSims(simnumber):
 
     # Define potential
     potentialWCA = WCA(epsilon, sigma)
+    potentialWCA.setForceCapValue(100.0)
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)

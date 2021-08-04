@@ -45,6 +45,10 @@ namespace msmrd {
 
             force = vec3<double>(dVdx, dVdy, dVdz);
             torque = 0 * force;
+            // Apply force cap if active
+            if (forceCap  and force.norm() >= forceCapValue) {
+                    force = forceCapValue * force/force.norm();
+            }
             return {force, torque, -1 * force, torque};
         }
         return {force, torque, -1 * force, torque};

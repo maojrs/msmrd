@@ -30,7 +30,8 @@ namespace msmrd {
         py::class_<lennardJones, pairPotential>(m, "lennardJones", "Lennard-Jones potential "
                                                            "(epsilon, sigma)")
                 .def(py::init<double &, double &>())
-                .def(py::init<double &, double &, double &>());
+                .def(py::init<double &, double &, double &>())
+                .def("setForceCapValue", &lennardJones::setForceCapValue);
 
         py::class_<WCA, lennardJones>(m, "WCA", "WCA potential (epsilon, sigma)")
                 .def(py::init<double &, double &>());

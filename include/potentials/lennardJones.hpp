@@ -15,12 +15,16 @@ namespace msmrd {
         double epsilon;
         double sigma;
         double cutOff;
+        bool forceCap = false;
+        double forceCapValue = 0.0;
         double baseEnergy = 0.0;
 
         /**
          * @param epsilon depth of the potential well
          * @param sigma distance at which the potential is zero (a.k.a 'size of the particle')
-         * @param cutOff value after which potentil is zero, defaults to 3 * sigma if not specified
+         * @param cutOff value after which potential is zero, defaults to 3 * sigma if not specified
+         * @param forceCap establish a maximum possible value for the force regardless of potential
+         * @param forceCapValue maximum possible value of force (if forceCap = true)
          * @param baseEnergy translation of potential energy in y-axis. It defaults to zero, but it can
          * be modified by child classes, like the WCA.
          */
@@ -32,6 +36,11 @@ namespace msmrd {
 
         std::array<vec3<double>, 4>
         forceTorque(particle &part1, particle &part2) override;
+
+        void setForceCapValue(double forceCapVal) {
+            forceCap = true;
+            forceCapValue = forceCapVal;
+        }
     };
 
     class WCA : public lennardJones {
