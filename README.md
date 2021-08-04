@@ -7,6 +7,7 @@ This is the second version of the code written in c++ with python bindings and a
 
 All the figures in the paper ``Multiscale molecular kinetics by coupling Markov state models and reaction-diffusion dynamics`` by Mauricio J. del Razo, Manuel Dibak, Christof Schütte and Frank Noé were generated with this code, see the paper branch. The exact data used for the paper is available upon request to the authors.
 
+Note the old repository [(https://github.com/markovmodel/msmrd2)](https://github.com/markovmodel/msmrd2) contains the version published with the paper. The latest developments are pushed to this repository [(https://github.com/maojrs/msmrd2)](https://github.com/maojrs/msmrd2).
 
 ## Installation
 ```
