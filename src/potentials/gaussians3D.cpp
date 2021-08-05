@@ -29,6 +29,33 @@ namespace msmrd {
         }
     }
 
+    /* Alternative constructor to specify location of minimas and standard deviation explicitly. */
+    gaussians3D::gaussians3D(std::vector<std::vector<double>> minimaPositions,
+    std::vector<std::vector<double>> stdDeviations, double scalefactor) {
+        nminima = minimaPositions.size();
+        minimas.resize(nminima);
+        stddevs.resize(nminima);
+        if (nminima != stdDeviations.size()){
+            throw std::invalid_argument("Length of positions array should match standard deviations array");
+        }
+        for (int i = 0; i < nminima; i++) {
+            if(minimaPositions[i].size() != 3 or stdDeviations[i].size() != 3) {
+                throw std::invalid_argument("Positions should be three dimensional vectors");
+            }
+            minimas[i] = vec3<double>{minimaPositions[i][0], minimaPositions[i][1], minimaPositions[i][2]};
+            stddevs[i] = vec3<double>{stdDeviations[i][0], stdDeviations[i][1], stdDeviations[i][2]};
+        }
+    }
+
+    /* Alternative constructor to specify location of minimas and standard deviation explicitly, as well as
+     * the specific particle types on which the potential will act on. */
+    gaussians3D::gaussians3D(std::vector<std::vector<double>> minimaPositions,
+                             std::vector<std::vector<double>> stdDeviations,
+                             std::vector<int> particleTypes, double scalefactor): particleTypes(particleTypes) {
+
+        gaussians3D(minimaPositions, stdDeviations, scalefactor);
+    }
+
 
     // Returns value of potential at position x
     double gaussians3D::evaluate(particle &part) {
@@ -37,14 +64,17 @@ namespace msmrd {
         double gauss;
         double denom;
         vec3<double> m, sig;
-        for (int i = 0; i < nminima; i++) {
-            m = 1.0 * minimas[i];
-            sig = 1.0 * stddevs[i];
-            gauss = std::exp(-std::pow(x[0] - m[0], 2) / (2 * std::pow(sig[0], 2))
-                             - std::pow(x[1] - m[1], 2) / (2 * std::pow(sig[1], 2))
-                             - std::pow(x[2] - m[2], 2) / (2 * std::pow(sig[2], 2)));
-            denom = std::pow(2 * M_PI, 3.0 / 2.0) * sig[0] * sig[1] * sig[2];
-            output -= gauss / denom;
+        if (particleTypes.empty() or std::find(particleTypes.begin(),
+                particleTypes.end(), part.type) != particleTypes.end()) {
+            for (int i = 0; i < nminima; i++) {
+                m = 1.0 * minimas[i];
+                sig = 1.0 * stddevs[i];
+                gauss = std::exp(-std::pow(x[0] - m[0], 2) / (2 * std::pow(sig[0], 2))
+                                 - std::pow(x[1] - m[1], 2) / (2 * std::pow(sig[1], 2))
+                                 - std::pow(x[2] - m[2], 2) / (2 * std::pow(sig[2], 2)));
+                denom = std::pow(2 * M_PI, 3.0 / 2.0) * sig[0] * sig[1] * sig[2];
+                output -= gauss / denom;
+            }
         }
         return scalefactor * output;
     };
@@ -57,17 +87,20 @@ namespace msmrd {
         vec3<double> torque = vec3<double>(0, 0, 0);
         vec3<double> m, sig, grad;
         double gauss, denom;
-        for (int i = 0; i < nminima; i++) {
-            m = 1.0 * minimas[i];
-            sig = 1.0 * stddevs[i];
-            gauss = std::exp(-std::pow(x[0] - m[0], 2) / (2 * std::pow(sig[0], 2))
-                             - std::pow(x[1] - m[1], 2) / (2 * std::pow(sig[1], 2))
-                             - std::pow(x[2] - m[2], 2) / (2 * std::pow(sig[2], 2)));
-            denom = std::pow(2 * M_PI, 3.0 / 2.0) * sig[0] * sig[1] * sig[2];
-            grad[0] = -(2 * (x[0] - m[0]) / (2 * std::pow(sig[0], 2))) * gauss / denom;
-            grad[1] = -(2 * (x[1] - m[1]) / (2 * std::pow(sig[1], 2))) * gauss / denom;
-            grad[2] = -(2 * (x[2] - m[2]) / (2 * std::pow(sig[2], 2))) * gauss / denom;
-            force -= grad;
+        if (particleTypes.empty() or std::find(particleTypes.begin(),
+                                               particleTypes.end(), part.type) != particleTypes.end()) {
+            for (int i = 0; i < nminima; i++) {
+                m = 1.0 * minimas[i];
+                sig = 1.0 * stddevs[i];
+                gauss = std::exp(-std::pow(x[0] - m[0], 2) / (2 * std::pow(sig[0], 2))
+                                 - std::pow(x[1] - m[1], 2) / (2 * std::pow(sig[1], 2))
+                                 - std::pow(x[2] - m[2], 2) / (2 * std::pow(sig[2], 2)));
+                denom = std::pow(2 * M_PI, 3.0 / 2.0) * sig[0] * sig[1] * sig[2];
+                grad[0] = -(2 * (x[0] - m[0]) / (2 * std::pow(sig[0], 2))) * gauss / denom;
+                grad[1] = -(2 * (x[1] - m[1]) / (2 * std::pow(sig[1], 2))) * gauss / denom;
+                grad[2] = -(2 * (x[2] - m[2]) / (2 * std::pow(sig[2], 2))) * gauss / denom;
+                force -= scalefactor * grad;
+            }
         }
         return {force, torque};
     }

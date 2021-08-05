@@ -19,8 +19,13 @@ namespace msmrd {
      */
     void bindPotentials(py::module &m) {
         py::class_<gaussians3D, externalPotential >(m, "gaussians3D", "Gaussians-based potential (nminima, "
-                                                                        "maxrad, scalefactor, seed)")
-                .def(py::init<int &, double &, double &, long &>());
+                                                                        "maxrad, scalefactor, seed), alternative"
+                                                                        "constructors available.")
+                .def(py::init<int &, double &, double &, long &>())
+                .def(py::init<std::vector<std::vector<double>> &,
+                        std::vector<std::vector<double>>&, double &>())
+                .def(py::init<std::vector<std::vector<double>> &,
+                        std::vector<std::vector<double>>&, std::vector<int> &, double &>());
 
 
         py::class_<dipole, externalPotential>(m, "dipole", "dipole potential (scalefactor, "

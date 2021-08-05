@@ -7,7 +7,8 @@
 
 namespace msmrd {
     /**
-     * Class to store position only trajectories
+     * Class to store position only trajectories and auxiliary variable. Trajectory for implementation
+     * of the Mori-Zwanzig stochastic closure.
      */
     class trajectoryMoriZwanzig : public trajectoryPositionDistinguished {
     public:
