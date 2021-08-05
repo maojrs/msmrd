@@ -31,7 +31,7 @@ namespace msmrd {
 
     /* Alternative constructor to specify location of minimas and standard deviation explicitly. */
     gaussians3D::gaussians3D(std::vector<std::vector<double>> minimaPositions,
-    std::vector<std::vector<double>> stdDeviations, double scalefactor) {
+    std::vector<std::vector<double>> stdDeviations, double scalefactor) : scalefactor(scalefactor) {
         nminima = minimaPositions.size();
         minimas.resize(nminima);
         stddevs.resize(nminima);
@@ -40,7 +40,7 @@ namespace msmrd {
         }
         for (int i = 0; i < nminima; i++) {
             if(minimaPositions[i].size() != 3 or stdDeviations[i].size() != 3) {
-                throw std::invalid_argument("Positions should be three dimensional vectors");
+                throw std::invalid_argument("Positions and standard deviations should be three dimensional vectors");
             }
             minimas[i] = vec3<double>{minimaPositions[i][0], minimaPositions[i][1], minimaPositions[i][2]};
             stddevs[i] = vec3<double>{stdDeviations[i][0], stdDeviations[i][1], stdDeviations[i][2]};

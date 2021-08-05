@@ -109,7 +109,7 @@ def runParallelSims(simnumber):
     integrator = integratorMoriZwanzig(dt, seed, bodytype)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialWCA)
-    integrator.setExternalPotential(externalPotential)   
+    integrator.setExternalPotential(externalPotential)
     integrator.setDistinguishedTypes(distinguishedTypes)
 
     # Creates simulation
