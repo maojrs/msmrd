@@ -123,11 +123,11 @@ def runParallelSims(simnumber):
     print("Simulation " + str(simnumber) + ", done.")
 
 # Runs several simulations in parallel
-num_cores = multiprocessing.cpu_count() - 1
-pool = Pool(processes=num_cores)
-iterator = [i for i in range(numSimulations)]
-pool.map(partial(runParallelSims), iterator)
+#num_cores = multiprocessing.cpu_count() - 1
+#pool = Pool(processes=num_cores)
+#iterator = [i for i in range(numSimulations)]
+#pool.map(partial(runParallelSims), iterator)
 
-## Run serial for debugging
-#for i in range(numSimulations):
-#    runParallelSims(i)
+# Run serial for debugging
+for i in range(numSimulations):
+    runParallelSims(i)

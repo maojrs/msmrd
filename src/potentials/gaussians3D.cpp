@@ -51,9 +51,9 @@ namespace msmrd {
      * the specific particle types on which the potential will act on. */
     gaussians3D::gaussians3D(std::vector<std::vector<double>> minimaPositions,
                              std::vector<std::vector<double>> stdDeviations,
-                             std::vector<int> particleTypes, double scalefactor): particleTypes(particleTypes) {
-
-        gaussians3D(minimaPositions, stdDeviations, scalefactor);
+                             std::vector<int> partTypes, double scalefactor) :
+            gaussians3D(minimaPositions, stdDeviations, scalefactor)  {
+        particleTypes= partTypes;
     }
 
 
