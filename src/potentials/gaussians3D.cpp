@@ -99,7 +99,7 @@ namespace msmrd {
                 grad[0] = -(2 * (x[0] - m[0]) / (2 * std::pow(sig[0], 2))) * gauss / denom;
                 grad[1] = -(2 * (x[1] - m[1]) / (2 * std::pow(sig[1], 2))) * gauss / denom;
                 grad[2] = -(2 * (x[2] - m[2]) / (2 * std::pow(sig[2], 2))) * gauss / denom;
-                force -= scalefactor * grad;
+                force += scalefactor * grad;
             }
         }
         return {force, torque};

@@ -38,7 +38,7 @@ sigma = rm * 2**(-1/6)
 # Parameters for external potential (will only acts on distinguished particles (type 1))
 minimas = [np.array([0.,0.,0.])]
 stddevs = [np.array([5.,5.,5.])]
-scalefactor = 1
+scalefactor = 500000
 
 # Simulation parameters
 timesteps = 40000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
@@ -123,11 +123,11 @@ def runParallelSims(simnumber):
     print("Simulation " + str(simnumber) + ", done.")
 
 # Runs several simulations in parallel
-#num_cores = multiprocessing.cpu_count() - 1
-#pool = Pool(processes=num_cores)
-#iterator = [i for i in range(numSimulations)]
-#pool.map(partial(runParallelSims), iterator)
+num_cores = multiprocessing.cpu_count() - 1
+pool = Pool(processes=num_cores)
+iterator = [i for i in range(numSimulations)]
+pool.map(partial(runParallelSims), iterator)
 
-# Run serial for debugging
-for i in range(numSimulations):
-    runParallelSims(i)
+## Run serial for debugging
+#for i in range(numSimulations):
+#    runParallelSims(i)
