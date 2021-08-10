@@ -53,7 +53,7 @@ namespace msmrd {
                              std::vector<std::vector<double>> stdDeviations,
                              std::vector<int> partTypes, double scalefactor) :
             gaussians3D(minimaPositions, stdDeviations, scalefactor)  {
-        particleTypes= partTypes;
+        particleTypes = partTypes;
     }
 
 

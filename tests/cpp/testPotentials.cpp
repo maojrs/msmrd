@@ -4,11 +4,44 @@
 
 #include <catch2/catch.hpp>
 #include "randomgen.hpp"
+#include "potentials/gaussians3D.hpp"
 #include "potentials/gayBerne.hpp"
 #include "potentials/patchyParticle.hpp"
 #include "potentials/patchyProteinMarkovSwitch.hpp"
 
 using namespace msmrd;
+
+TEST_CASE("External Potentials (Gaussians3D))", "[potentials]") {
+    std::array<vec3<double>, 2> forctorq1;
+    std::array<vec3<double>, 2> forctorq2;
+
+    // Create Gaussian potential with one minima
+    std::vector<std::vector<double>> minimaPositions;
+    std::vector<std::vector<double>> stdDeviations;
+    std::vector<int> partTypes;
+    double scalefactor = 500;
+
+    minimaPositions.resize(1);
+    stdDeviations.resize(1);
+    minimaPositions[0] = std::vector<double>{0,0,0};
+    stdDeviations[0] = std::vector<double>{5,5,5};
+    partTypes = std::vector<int>{1};
+    auto potentialGauss = gaussians3D(minimaPositions, stdDeviations, partTypes, scalefactor);
+
+    // Create particle to feel potential (one is type one other one is not, potential should only act on type one)
+    vec3<double> pos = vec3<double>(3.,2.,1.);
+    vec3<double> theta = vec3<double>(0., 1., 0);
+    particle part1 = particle(1.0, 1.0, pos, theta);
+    particle part2 = particle(1.0, 1.0, pos, theta);
+    part1.setType(1);
+
+    // Test potentials
+    forctorq1 = potentialGauss.forceTorque(part1);
+    forctorq2 = potentialGauss.forceTorque(part2);
+    REQUIRE(forctorq1[0] != vec3<double>{0,0,0});
+    REQUIRE(forctorq2[0] == vec3<double>{0,0,0});
+}
+
 
 TEST_CASE("Pair Potentials consistency", "[potentials]") {
     std::array<vec3<double>, 4> forctorq1;
