@@ -65,6 +65,7 @@ set(SOURCES
         src/potentials/dipole.cpp
         src/potentials/gaussians3D.cpp
         src/potentials/gayBerne.cpp
+        src/potentials/harmonic.cpp
         src/potentials/harmonicRepulsion.cpp
         src/potentials/lennardJones.cpp
         src/potentials/patchyParticle.cpp
@@ -131,6 +132,7 @@ set(PY_SOURCES
         include/potentials/dipole.hpp
         include/potentials/gaussians3D.hpp
         include/potentials/gayBerne.hpp
+        include/potentials/harmonic.hpp
         include/potentials/harmonicRepulsion.hpp
         include/potentials/lennardJones.hpp
         include/potentials/patchyParticle.hpp

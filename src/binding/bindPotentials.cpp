@@ -3,6 +3,7 @@
 #include "potentials/dipole.hpp"
 #include "potentials/gaussians3D.hpp"
 #include "potentials/gayBerne.hpp"
+#include "potentials/harmonic.hpp"
 #include "potentials/harmonicRepulsion.hpp"
 #include "potentials/lennardJones.hpp"
 #include "potentials/patchyParticle.hpp"
@@ -18,6 +19,10 @@ namespace msmrd {
      * pyBinders for the c++ potentials classes (see bindInternal for the parent classes)
      */
     void bindPotentials(py::module &m) {
+        py::class_<dipole, externalPotential>(m, "dipole", "dipole potential (scalefactor, "
+                                                           "directionEField)")
+                .def(py::init<double &, std::vector<double> &>());
+
         py::class_<gaussians3D, externalPotential >(m, "gaussians3D", "Gaussians-based potential (nminima, "
                                                                         "maxrad, scalefactor, seed), alternative"
                                                                         "constructors available.")
@@ -27,10 +32,11 @@ namespace msmrd {
                 .def(py::init<std::vector<std::vector<double>> &,
                         std::vector<std::vector<double>>&, std::vector<int> &, double &>());
 
-
-        py::class_<dipole, externalPotential>(m, "dipole", "dipole potential (scalefactor, "
-                                                                         "directionEField)")
-                .def(py::init<double &, std::vector<double> &>());
+        py::class_<harmonic, externalPotential >(m, "harmonic", "Harmonic potential (minima, "
+                                                                      "konstants, scalefactor), alternative"
+                                                                      "constructors available.")
+                .def(py::init<std::vector<double> &,std::vector<double>&, double &>())
+                .def(py::init<std::vector<double> &,std::vector<double>&, std::vector<int> &, double &>());
 
         py::class_<lennardJones, pairPotential>(m, "lennardJones", "Lennard-Jones potential "
                                                            "(epsilon, sigma)")
