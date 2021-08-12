@@ -27,6 +27,7 @@ TEST_CASE("External Potentials (Gaussians3D))", "[potentials]") {
     stdDeviations[0] = std::vector<double>{5,5,5};
     partTypes = std::vector<int>{1};
     auto potentialGauss = gaussians3D(minimaPositions, stdDeviations, partTypes, scalefactor);
+    REQUIRE(potentialGauss.nminima == 1);
 
     // Create particle to feel potential (one is type one other one is not, potential should only act on type one)
     vec3<double> pos = vec3<double>(3.,2.,1.);
