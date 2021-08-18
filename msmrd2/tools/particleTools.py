@@ -61,7 +61,8 @@ def randomParticleList(numparticles, boxsize, separationDistance, D, Drot, rando
     partlist = msmrd2.integrators.particleList(pyPartlist)
     return partlist
 
-def randomLangevinParticleList(numparticles, boxsize, separationDistance, D, masses = 1, randomSeed = -1):
+def randomLangevinParticleList(numparticles, boxsize, separationDistance, D, masses = 1, randomSeed = -1,
+                               distinguishedParticleOrigin = False):
     '''
     :param numparticles: number of particles in list
     :param boxsize: size of simulation box, if scalar it assumes the three box edges are the same in all dimensions
@@ -101,9 +102,12 @@ def randomLangevinParticleList(numparticles, boxsize, separationDistance, D, mas
         numTrials = 0
         while overlap:
             numTrials = numTrials + 1
-            position = np.array([boxsize[0]*random.random()-0.5*boxsize[0],
-                                 boxsize[1]*random.random()-0.5*boxsize[1],
-                                 boxsize[2]*random.random()-0.5*boxsize[2]])
+            if (distinguishedParticleOrigin and i==0):
+                position = np.array([0.,0.,0.])
+            else:
+                position = np.array([boxsize[0]*random.random()-0.5*boxsize[0],
+                                     boxsize[1]*random.random()-0.5*boxsize[1],
+                                     boxsize[2]*random.random()-0.5*boxsize[2]])
             overlap = False
             for j in range(len(pyPartlist)):
                 if np.linalg.norm(position - pyPartlist[j].position) < separationDistance:

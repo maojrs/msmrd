@@ -23,7 +23,7 @@ import os
 # - Mass (m): kilogram (kg)
 #
 # ### Derived units
-# - Time: $l\sqrt{m/\epsilon} = nm$
+# - Time: $l\sqrt{m/\epsilon} = ns$
 # - Temperature: $\epsilon/k_B =$ Kelvin ($K$)
 # - Force: $\epsilon/l = kg \frac{nm}{ns^2}$
 #

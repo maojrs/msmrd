@@ -165,7 +165,9 @@ def generateTCL_gayBerne(numparticles = 10, outfname = "gayBerne", tclfname = ".
     file.write('display rendermode GLSL \n')
     file.close()
 
-def generateTCL_MoriZwanzig(numparticles = 1, outfname = "MoriZwanzig", tclfname = "../../data/vmd/out_2vmd.tcl"):
+def generateTCL_MoriZwanzig(numparticles = 1, outfname = "MoriZwanzig",
+                            tclfname = "../../data/vmd/out_2vmd.tcl", particleDiameter = 1.0):
+    particleRadius = 0.5 * particleDiameter
     file = open(tclfname, 'w')
     file.write('set name ' + outfname + '\n')
     file.write('mol load xyz ./$name.xyz  \n \n')
@@ -174,13 +176,13 @@ def generateTCL_MoriZwanzig(numparticles = 1, outfname = "MoriZwanzig", tclfname
     file.write('display resetview \n \n')
 
     # Define particle types (bath particles and distinguished particle, both spherical)
-    file.write('mol representation VDW 0.50000 0.5 \n')
+    file.write('mol representation VDW ' + str(particleRadius)  + ' 0.5 \n')
     file.write('mol selection name type_0 \n')
     file.write('mol color ColorID 15 \n')
     file.write('mol material AOShiny \n')
     file.write('mol addrep top \n \n')
 
-    file.write('mol representation VDW 0.7000 0.5 \n')
+    file.write('mol representation VDW ' + str(2*particleRadius) + ' 0.5 \n')
     file.write('mol selection name type_1 \n')
     file.write('mol color ColorID 31 \n')
     file.write('mol material AOShiny \n')

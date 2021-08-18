@@ -13,35 +13,64 @@ import random
 import sys
 import os
 
+## Units
+
+# ### Boltzman constant
+# - $k_B = 1.38064852 \times 10^{-23} \frac{m^2}{s^2} \frac{kg}{K} \left(= \frac{nm^2}{ns^2}\frac{kg}{K}\right)$.
+#
+# ### Basic units
+# - Length (l): nanometers (nm)
+# - Energy ($\epsilon$) : $k_B T = g/mol \frac{nm^2}{ns^2}$
+# - Mass (m): gram/mol (g/mol)
+#
+# ### Derived units
+# - Time: $l\sqrt{m/\epsilon} = ns$
+# - Temperature: $\epsilon/k_B =$ Kelvin ($K$)
+# - Force: $\epsilon/l = kg \frac{nm}{ns^2}$
+#
+# ### Reduced quantities (dimensionless)
+# - Reduced pair potential: $U^* = U/\epsilon$
+# - Reduced force: $F^* = F l /\epsilon$
+# - Reduced distance: $r^* = r/l$
+# - Reduced density: $\rho^*=\rho l^3$
+# - Reduced Temperature: $T^* = k_B T/\epsilon$
+# - Reduced Pressure: $P^* = Pl^3/\epsilon$
+# - Reduced friction: $\sigma^2/time$
+
 # Main parameters
 numBathParticles = 500 #500
 numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
-D = 0.1
-particlemass = 1.0
-separationDistance = 2 # minimum separation distance for initial condition
-numSimulations = 250 #500
+D = 1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s #0.1
+particlemass = 18.0 # (g/mol) approximately mass of water
+distinguishedParticleMass = 3 * particlemass # (kg)
+particleDiameter = 0.3 # (nm)
+separationDistance = 2 * particleDiameter # minimum separation distance for initial condition
+numSimulations = 500 #250 #500
+# For computations, we assume KbT=1, thus the force F must be: F=KbT f, where f is the force computed
+# from the potential. This means the plotted potential is on reduced units (not the distances though);
+KbT = 1
 
 # Main parameters for integrator
-dt = 0.0005 #0.005
+dt = 0.1 # (ns)
 seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
 # Define simulation boundaries (choose either spherical or box)
-boxsize = 25
+boxsize = 8 #(nm)
 boundaryType = 'periodic'
 
 # Parameters for WCA potential (rm=2^(1/6)sigma)
 epsilon = 1.0
-rm = 1.0
+rm = particleDiameter # (diameter in nm)
 sigma = rm * 2**(-1/6)
 
 # Parameters for external potential (will only acts on distinguished particles (type 1))
 minima = np.array([0.,0.,0.])
-kconstant = np.array([0.1,0.1,0.1])
+kconstant = np.array([0.05,0.05,0.05])
 scalefactor = 1
 
 # Simulation parameters
-timesteps = 40000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
+timesteps = 50000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
 bufferSize = 100 * 1024
 stride = 5 #25
 outTxt = False
@@ -90,9 +119,10 @@ def runParallelSims(simnumber):
     seed = int(simnumber)
     random.seed(seed)
     partlist = particleTools.randomLangevinParticleList(numparticles, boxsize, separationDistance, D,
-                                                        particlemass, seed)
+                                                        particlemass, seed, distinguishedParticleOrigin=True)
     # Set distinguished particle (default type is zero)
     partlist[0].setType(1)
+    partlist[0].setMass(distinguishedParticleMass)
 
     # Define boundary
     boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
@@ -111,6 +141,7 @@ def runParallelSims(simnumber):
     integrator.setPairPotential(potentialWCA)
     integrator.setExternalPotential(externalPotential)
     integrator.setDistinguishedTypes(distinguishedTypes)
+    integrator.setKbT(KbT)
 
     # Creates simulation
     sim = msmrd2.simulation(integrator)
