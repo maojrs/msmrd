@@ -104,7 +104,8 @@ except OSError as error:
 # Create parameter dictionary to write to parameters reference file
 parameterfilename = os.path.join(filedirectory, "parameters")
 parameterDictionary = {'numFiles' : numSimulations, 'numParticles' : numparticles, 'dt' : dt, 'bodytype' : bodytype,
-                       'D' : D, 'sigma' : sigma, 'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype,
+                       'D' : D, 'sigma' : sigma, 'KbT' : KbT, 'mass' : distinguishedParticleMass, 
+                       'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype,
                        'boxsize' : boxsize, 'boundaryType' : boundaryType}
 analysisTools.writeParameters(parameterfilename, parameterDictionary)
 
@@ -119,7 +120,7 @@ def runParallelSims(simnumber):
     seed = int(simnumber)
     random.seed(seed)
     partlist = particleTools.randomLangevinParticleList(numparticles, boxsize, separationDistance, D,
-                                                        particlemass, seed, distinguishedParticleOrigin=True)
+                                                        particlemass, seed, distinguishedParticleOrigin=False)
     # Set distinguished particle (default type is zero)
     partlist[0].setType(1)
     partlist[0].setMass(distinguishedParticleMass)
