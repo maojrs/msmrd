@@ -85,6 +85,13 @@ namespace msmrd {
             traj->setBoundary(integ.getBoundary());
         }
 
+        /* Equilibration step (run system for equilibrationStates timsteps) in case it is needed
+         * to equilibrate the sytsem before the main simulation. The default value is zero
+         * equilibration steps, so one needs to set the equilibrationSteps first, see setEquilibrationSteps. */
+        if (equilibrationSteps != 0) {
+            runEquilibration(particleList);
+        }
+
         /* Main simulation loop. Simulation method depends on output method. If H5 and chunked outputs are chosen
          * the data will be dumped into file everytime the buffer is full and erased from memory. If data is not,
          * chunked, it can be written directyl from memory into a H5 file or a text file, the data is not erased
@@ -152,6 +159,14 @@ namespace msmrd {
             if (outputDiscreteTraj) {
                 traj->write2file<int>(filename + "_discrete", traj->getDiscreteTrajectoryData());
             }
+        }
+    }
+
+    // Runs integrator for equilibrationSteps, timesteps to equilibarte the system
+    void simulation::runEquilibration(std::vector<particle> &particleList) {
+        // Main simulation loop (integration and writing to file)
+        for (int tstep=0; tstep < equilibrationSteps; tstep++) {
+            integ.integrate(particleList);
         }
     }
 

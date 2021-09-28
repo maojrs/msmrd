@@ -23,6 +23,7 @@ namespace msmrd {
         std::unique_ptr<trajectory> traj;
         int numcols = 4;
         bool outputDiscreteTraj = false;
+        int equilibrationSteps = 0;
         /**
          * @param integ Integrator to be used for simulation, works for any integrator since they are all
          * childs from abstract class.
@@ -42,6 +43,10 @@ namespace msmrd {
                  const std::string &filename, bool outputTxt, bool outputH5, bool outputChunked,
                  std::string trajtype);
 
+        void setEquilibrationSteps(int eqSteps) {
+            equilibrationSteps = eqSteps;
+        }
+
     private:
 
         void runNoutputChunks(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
@@ -49,6 +54,8 @@ namespace msmrd {
 
         void runNoutput(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
                         const std::string &filename, bool outputTxt, bool H5output, bool chunked);
+
+        void runEquilibration(std::vector<particle> &particleList);
 
         void createChunkedH5files(std::string filename);
 
