@@ -45,7 +45,7 @@ particlemass = 18.0 # (g/mol) approximately mass of water
 distinguishedParticleMass = 3 * particlemass # (kg)
 particleDiameter = 0.3 # (nm)
 separationDistance = 2 * particleDiameter # minimum separation distance for initial condition
-numSimulations = 2500 #250 #500
+numSimulations = 1 #250 #500
 # For computations, we assume KbT=1, thus the force F must be: F=KbT f, where f is the force computed
 # from the potential. This means the plotted potential is on reduced units (not the distances though);
 KbT = 1
@@ -70,15 +70,16 @@ kconstant = np.array([0.3,0.3,0.3]) #np.array([0.05,0.05,0.05])
 scalefactor = 1
 
 # Simulation parameters
-timesteps = 10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
+tfinal = 100000
+timesteps = int(tfinal/dt) 
 bufferSize = 100 * 1024
-stride = 5 #25
+stride = 1
 outTxt = False
 outH5 = True
 outChunked = True
 trajtype = "moriZwanzig" # Only samples position of distinguished particle (type 1) + raux variables
 distinguishedTypes = [1]
-equilibrationSteps = 5000
+equilibrationSteps = 0
 
 
 # Parent directory location
@@ -92,12 +93,12 @@ except OSError as error:
     proceed = True
 
 # Create folder for benchmark data        
-foldername = "benchmark"
+foldername = "benchmark_onetrajectory"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
 except OSError as error:
-    print("Folder MoriZwanzig/benchmark already exists. Previous data files might be overwritten. Continue, y/n?")
+    print("Folder MoriZwanzig/" + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
     proceed = input()
     if proceed != 'y':
         sys.exit()
@@ -121,7 +122,7 @@ def runParallelSims(simnumber):
     seed = int(simnumber)
     random.seed(seed)
     partlist = particleTools.randomLangevinParticleList(numparticles, boxsize, separationDistance, D,
-                                                        particlemass, seed, distinguishedParticleOrigin=False)
+                                                        particlemass, seed, distinguishedParticleOrigin=True)
     # Set distinguished particle (default type is zero)
     partlist[0].setType(1)
     partlist[0].setMass(distinguishedParticleMass)
