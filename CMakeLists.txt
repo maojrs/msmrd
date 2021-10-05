@@ -79,6 +79,7 @@ set(SOURCES
         src/trajectories/trajectoryMoriZwanzig.cpp
         src/trajectories/trajectoryPosition.cpp
         src/trajectories/trajectoryPositionOrientation.cpp
+        src/trajectories/trajectoryPositionVelocity.cpp
         src/trajectories/discrete/MAPKtrajectory.cpp
         src/trajectories/discrete/patchyDimerTrajectory.cpp
         src/trajectories/discrete/patchyProteinTrajectory.cpp
@@ -145,6 +146,7 @@ set(PY_SOURCES
         include/trajectories/trajectoryMoriZwanzig.hpp
         include/trajectories/trajectoryPosition.hpp
         include/trajectories/trajectoryPositionOrientation.hpp
+        include/trajectories/trajectoryPositionVelocity.hpp
         include/trajectories/discrete/discreteTrajectory.hpp
         include/trajectories/discrete/MAPKtrajectory.hpp
         include/trajectories/discrete/patchyDimerTrajectory.hpp

@@ -51,18 +51,30 @@ namespace msmrd {
             outputDiscreteTraj = false;
             traj = std::make_unique<MAPKtrajectory>(particleList.size(), bufferSize);
             numcols = 10; //(time, positionx3, orientationx4, state, type)
-        } else if (trajtype == "moriZwanzig"){
+        } else if (trajtype == "moriZwanzig") {
             outputDiscreteTraj = false;
             std::vector<int> distinguishedTypes{1}; // only samples particles with type 1
             traj = std::make_unique<trajectoryMoriZwanzig>(particleList.size(), bufferSize,
-                    distinguishedTypes);
+                                                           distinguishedTypes);
             numcols = 8; //(time, positionx3, type, raux(x3))
+        } else if (trajtype == "moriZwanzigVelocity"){
+                outputDiscreteTraj = false;
+                std::vector<int> distinguishedTypes{1}; // only samples particles with type 1
+                traj = std::make_unique<trajectoryMoriZwanzigVelocity>(particleList.size(), bufferSize,
+                                                               distinguishedTypes);
+                numcols = 11; //(time, positionx3, velocityx3, type, raux(x3))
         } else if (trajtype == "position"){
             traj = std::make_unique<trajectoryPosition>(particleList.size(), bufferSize);
             numcols = 4; //(time, positionx3)
         } else if (trajtype == "positionType"){
             traj = std::make_unique<trajectoryPositionType>(particleList.size(), bufferSize);
             numcols = 5; //(time, positionx3, type)
+        } else if (trajtype == "positionVelocity"){
+            traj = std::make_unique<trajectoryPositionVelocity>(particleList.size(), bufferSize);
+            numcols = 7; //(time, positionx3, velocityx3)
+        } else if (trajtype == "positionVelocityType"){
+            traj = std::make_unique<trajectoryPositionVelocityType>(particleList.size(), bufferSize);
+            numcols = 8; //(time, positionx3, velocityx3, type)
         } else if (trajtype == "positionOrientation") {
             traj = std::make_unique<trajectoryPositionOrientation>(particleList.size(), bufferSize);
             numcols = 8; //(time, positionx3, orientationx4)
@@ -192,8 +204,10 @@ namespace msmrd {
             traj->createChunkedH5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
         } else if (numcols == 10) {
             traj->createChunkedH5file<double, 10>(filename, "msmrd_data", traj->getTrajectoryData());
+        } else if (numcols == 11) {
+            traj->createChunkedH5file<double, 11>(filename, "msmrd_data", traj->getTrajectoryData());
         } else {
-            throw std::invalid_argument("Numcols needs to be an interger in the interval [4,10]. Custom number of columns per row "
+            throw std::invalid_argument("Numcols needs to be an interger in the interval [4,11]. Custom number of columns per row "
                                         "can be used but needs to be explicitly modified in "
                                         "simulation.cpp, write2H5file<numcols> ");
         }
@@ -221,8 +235,10 @@ namespace msmrd {
                 traj->writeChunk2H5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
             } else if (numcols == 10) {
                 traj->writeChunk2H5file<double, 10>(filename, "msmrd_data", traj->getTrajectoryData());
+            } else if (numcols == 11) {
+                traj->writeChunk2H5file<double, 11>(filename, "msmrd_data", traj->getTrajectoryData());
             } else {
-                throw std::invalid_argument("Numcols needs to be an interger in the interval [4,10]. Custom number of columns per row "
+                throw std::invalid_argument("Numcols needs to be an interger in the interval [4,11]. Custom number of columns per row "
                                             "can be used but needs to be explicitly modified in "
                                             "simulation.cpp, write2H5file<numcols> ");
             }
@@ -246,8 +262,10 @@ namespace msmrd {
                 traj->write2H5file<double, 9>(filename, "msmrd_data", traj->getTrajectoryData());
             } else if (numcols == 10) {
                 traj->write2H5file<double, 10>(filename, "msmrd_data", traj->getTrajectoryData());
+            } else if (numcols == 11) {
+                traj->write2H5file<double, 11>(filename, "msmrd_data", traj->getTrajectoryData());
             } else {
-                throw std::invalid_argument("Numcols needs to be an interger in the interval [4,10]. Custom number of columns per row "
+                throw std::invalid_argument("Numcols needs to be an interger in the interval [4,11]. Custom number of columns per row "
                                             "can be used but needs to be explicitly modified in "
                                             "simulation.cpp, write2H5file<numcols> ");
             }

@@ -70,14 +70,14 @@ kconstant = np.array([0.3,0.3,0.3]) #np.array([0.05,0.05,0.05])
 scalefactor = 1
 
 # Simulation parameters
-tfinal = 100000
+tfinal = 100000 #100000
 timesteps = int(tfinal/dt) 
 bufferSize = 100 * 1024
-stride = 1
+stride = 5
 outTxt = False
 outH5 = True
 outChunked = True
-trajtype = "moriZwanzig" # Only samples position of distinguished particle (type 1) + raux variables
+trajtype = "moriZwanzigVelocity" # Only samples position of distinguished particle (type 1) + raux variables
 distinguishedTypes = [1]
 equilibrationSteps = 0
 

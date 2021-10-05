@@ -4,6 +4,7 @@
 
 #pragma once
 #include "trajectoryPosition.hpp"
+#include "trajectoryPositionVelocity.hpp"
 
 namespace msmrd {
     /**
@@ -13,6 +14,14 @@ namespace msmrd {
     class trajectoryMoriZwanzig : public trajectoryPositionDistinguished {
     public:
         using trajectoryPositionDistinguished::trajectoryPositionDistinguished;
+
+        void sample(double time, std::vector<particle> &particleList) override;
+
+    };
+
+    class trajectoryMoriZwanzigVelocity : public trajectoryPositionVelocityDistinguished {
+    public:
+        using trajectoryPositionVelocityDistinguished::trajectoryPositionVelocityDistinguished;
 
         void sample(double time, std::vector<particle> &particleList) override;
 
