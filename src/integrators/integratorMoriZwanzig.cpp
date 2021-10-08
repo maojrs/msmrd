@@ -57,7 +57,7 @@ namespace msmrd {
             integrateB(i, parts, dt);
         }
 
-        // Load auxiliary variables into distinguished particle before eupdating velocities
+        // Load auxiliary variables into distinguished particle before updating velocities
         loadAuxiliaryValues(parts);
 
         // Update velocity based on parts[i].nextVelocity
