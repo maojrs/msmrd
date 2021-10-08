@@ -30,8 +30,10 @@ namespace msmrd {
 
         py::class_<langevin, integrator>(m, "langevin", "Langevin integrator (timestep, seed, "
                                                         "particlesbodytype (point, rod, rigidbody, "
-                                                        "pointmix, rodmix or rigidbodymix) )")
+                                                        "pointmix, rodmix or rigidbodymix), integratorScheme"
+                                                        "(BAOAB default) )")
                 .def(py::init<double &, long &, std::string &>())
+                .def(py::init<double &, long &, std::string &, std::string &>())
                 .def("integrate", &langevin::integrate);
 
         py::class_<overdampedLangevinSelective, overdampedLangevin>(m, "overdampedLangevinSelective", "overdamped "

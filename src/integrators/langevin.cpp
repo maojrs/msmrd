@@ -11,10 +11,21 @@ namespace msmrd {
      * @param seed random generator seed (Note seed = -1 corresponds to random device)
      * @param rotation boolean to indicate if rotational degrees of freedom should be integrated
      */
+    langevin::langevin(double dt, long seed, std::string particlesbodytype, std::string integratorScheme)
+            : integrator(dt, seed, particlesbodytype), integratorScheme(integratorScheme) {
+        rotation = false;
+        velocityIntegration = true;
+        if (particlesbodytype != "point") {
+            throw std::invalid_argument("Langevin integrator only implemented for point particles "
+                                        "(no rotation allowed)");
+        }
+    }
+
     langevin::langevin(double dt, long seed, std::string particlesbodytype)
             : integrator(dt, seed, particlesbodytype) {
         rotation = false;
         velocityIntegration = true;
+        integratorScheme = "BAOAB";
         if (particlesbodytype != "point") {
             throw std::invalid_argument("Langevin integrator only implemented for point particles "
                                         "(no rotation allowed)");
@@ -32,17 +43,61 @@ namespace msmrd {
             firstRun = false;
         }
 
-        /* Integrate BAOA part and save next positions/orientations in parts[i].next. As integrateB,A and O
-         * functions are used recursively they act on the nextPosition and nextVelocity variable. Note final
-         * position already obtained at the end of this loop. */
+        /* As integrateB,A and O functions are used recursively, they act on the nextPosition and nextVelocity
+        * variable, so we need to set nextVariables equal to current ones. */
         for (int i = 0; i < parts.size(); i++) {
             parts[i].setNextPosition(parts[i].position);
             parts[i].setNextVelocity(parts[i].velocity);
-            integrateB(i, parts, dt);
-            integrateA(i, parts, dt);
-            integrateO(i, parts, dt);
-            integrateA(i, parts, dt);
         }
+
+        // Integrates one time step of the chosen integrator, default BAOAB
+        if (integratorScheme == "ABOBA") {
+            integrateABOBA(parts, dt);
+        } else {
+            integrateBAOAB(parts, dt);
+        }
+
+        // Updates time
+        clock += dt;
+    }
+
+    // Integrates velocity half a time step given potential or force term
+    void langevin::integrateB(std::vector<particle> &parts, double deltat) {
+        vec3<double> force;
+        for (int i = 0; i < parts.size(); i++) {
+            force = 1.0 * forceField[i];
+            auto mass = parts[i].mass;
+            auto newVel = parts[i].nextVelocity + deltat * force / mass;
+            parts[i].setNextVelocity(newVel);
+        }
+    }
+
+    // Integrates position half a time step given velocity term
+    void langevin::integrateA(std::vector<particle> &parts, double deltat) {
+        for (int i = 0; i < parts.size(); i++) {
+            auto newPos = parts[i].nextPosition + deltat * parts[i].nextVelocity;
+            parts[i].setNextPosition(newPos);
+        }
+    }
+
+    // Integrates velocity full time step given friction and noise term
+    void langevin::integrateO(std::vector<particle> &parts, double deltat) {
+        for (int i = 0; i < parts.size(); i++) {
+            auto eta = KbTemp / parts[i].D; // friction coefficient
+            auto mass = parts[i].mass;
+            auto xi = std::sqrt(KbTemp * mass * (1 - std::exp(-2 * eta * deltat / mass))) / mass;
+            auto newVel = std::exp(-deltat * eta / mass) * parts[i].nextVelocity + xi * randg.normal3D(0, 1);
+            parts[i].setNextVelocity(newVel);
+        }
+    }
+
+    void langevin::integrateBAOAB(std::vector<particle> &parts, double timestep) {
+        /* Integrate BAOA part and save next positions/orientations in parts[i].next. Note final
+         * position already obtained at the end of these integrations. */
+        integrateB(parts, dt/2.0);
+        integrateA(parts, dt/2.0);
+        integrateO(parts, dt);
+        integrateA(parts, dt/2.0);
 
         // Enforce boundary; sets new positions into parts[i].nextPosition (only if particle is active)
         enforceBoundary(parts);
@@ -54,40 +109,38 @@ namespace msmrd {
         calculateForceTorqueFields(parts);
 
         // Integrate final B part with newly calculated force to obtain final velocities
-        for (int i = 0; i < parts.size(); i++) {
-            integrateB(i, parts, dt);
-        }
+        integrateB(parts, dt/2.0);
 
         // Update velocity based on parts[i].nextVelocity
         updateVelocities(parts);
+    };
 
-        // Updates time
-        clock += dt;
-    }
+    void langevin::integrateABOBA(std::vector<particle> &parts, double timestep) {
 
-    // Integrates velocity half a time step given potential or force term
-    void langevin::integrateB(int partIndex, std::vector<particle> &parts, double dt) {
-        vec3<double> force;
-        force = 1.0 * forceField[partIndex];
-        auto mass = parts[partIndex].mass;
-        auto newVel = parts[partIndex].nextVelocity + dt/2 * force/mass;
-        parts[partIndex].setNextVelocity(newVel);
-    }
+        integrateA(parts, dt/2.0);
 
-    // Integrates position half a time step given velocity term
-    void langevin::integrateA(int partIndex, std::vector<particle> &parts, double dt) {
-        auto newPos = parts[partIndex].nextPosition + dt/2 * parts[partIndex].nextVelocity;
-        parts[partIndex].setNextPosition(newPos);
-    }
+        // Update particlesposition to recalculate force for next step "B"
+        updatePositionOrientation(parts);
 
-    // Integrates velocity full time step given friction and noise term
-    void langevin::integrateO(int partIndex, std::vector<particle> &parts, double dt) {
-        double eta = KbTemp / parts[partIndex].D; // friction coefficient
-        auto mass = parts[partIndex].mass;
-        double xi = std::sqrt(KbTemp * mass * (1 - std::exp(-2*eta*dt/mass)))/mass;
-        auto newVel = std::exp(-dt*eta/mass) * parts[partIndex].nextVelocity + xi * randg.normal3D(0, 1);
-        parts[partIndex].setNextVelocity(newVel);
-    }
+        // Calculate force field
+        calculateForceTorqueFields(parts);
+
+        integrateB(parts, dt/2.0);
+        integrateO(parts, dt);
+        integrateB(parts, dt/2.0);
+        integrateA(parts, dt/2.0);
+
+        // Enforce boundary; sets new positions into parts[i].nextPosition (only if particle is active)
+        enforceBoundary(parts);
+
+        // Update particlesposition to recalculate force for last scheme step "B"
+        updatePositionOrientation(parts);
+
+        // Update velocity based on parts[i].nextVelocity
+        updateVelocities(parts);
+    };
+
+
 
 
 

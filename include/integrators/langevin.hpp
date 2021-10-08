@@ -19,11 +19,15 @@ namespace msmrd {
          * @param keeps track of first run, where double calculation of force field is required.
          */
 
-        void integrateB(int partIndex, std::vector<particle> &parts, double timestep);
+        void integrateB(std::vector<particle> &parts, double timestep);
 
-        void integrateA(int partIndex, std::vector<particle> &parts, double timestep);
+        void integrateA(std::vector<particle> &parts, double timestep);
 
-        void integrateO(int partIndex, std::vector<particle> &parts, double timestep);
+        void integrateO(std::vector<particle> &parts, double timestep);
+
+        void integrateBAOAB(std::vector<particle> &parts, double timestep);
+
+        void integrateABOBA(std::vector<particle> &parts, double timestep);
 
         // Override empty functions (need to change integrate implementation approach for Langevin integrators)
 
@@ -34,7 +38,11 @@ namespace msmrd {
         void rotate(particle &part, vec3<double> torque, double dt) override {};
 
     public:
+        std::string integratorScheme;
+
         langevin(double dt, long seed, std::string particlesbodytype);
+
+        langevin(double dt, long seed, std::string particlesbodytype, std::string integratorScheme);
 
         void integrate(std::vector<particle> &parts) override;
 

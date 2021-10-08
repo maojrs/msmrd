@@ -10,7 +10,8 @@
 namespace msmrd {
     /**
      * Integrator class for integratorMoriZwanzig. It is essentially the same as the langevin integrator, but
-     * it stores specific values into the raux variable of the particle class for further analysis.
+     * it stores specific values into the raux variable of the particle class for further analysis. It is also
+     * only implemented for the ABOBA since it is ideal to extract the raux variables.
      *
      * It assumes the distinguished particle is the one with index0 (type 1).
      */
@@ -20,10 +21,10 @@ namespace msmrd {
         /**
          * @distinguishedTypes vector of types that correspond to distinguished particle. Must match that of trajectory.
          */
+        void loadAuxiliaryValues(std::vector<particle> &parts, std::vector<vec3<double>> externalForce);
 
-        void loadAuxiliaryValues(std::vector<particle> &parts);
     public:
-        using langevin::langevin;
+        integratorMoriZwanzig(double dt, long seed, std::string particlesbodytype);
 
         void integrate(std::vector<particle> &parts) override;
 
