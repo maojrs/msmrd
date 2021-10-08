@@ -51,7 +51,7 @@ numSimulations = 2500 #250 #500
 KbT = 1
 
 # Main parameters for integrator
-dt = 0.2 # (ns)
+dt = 0.1 # (ns)
 seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
@@ -76,7 +76,7 @@ stride = 5 #25
 outTxt = False
 outH5 = True
 outChunked = True
-trajtype = "moriZwanzig" # Only samples position of distinguished particle (type 1) + raux variables
+trajtype = "moriZwanzig" # Only samples position of distinguished particle (type 1) + raux variables (saves space)
 distinguishedTypes = [1]
 equilibrationSteps = 5000
 

@@ -77,7 +77,7 @@ stride = 5
 outTxt = False
 outH5 = True
 outChunked = True
-trajtype = "moriZwanzigVelocity" # Only samples position of distinguished particle (type 1) + raux variables
+trajtype = "moriZwanzigVelocity" # Samples position and velocity of distinguished particle (type 1) + raux variables
 distinguishedTypes = [1]
 equilibrationSteps = 0
 
