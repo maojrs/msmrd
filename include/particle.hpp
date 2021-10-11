@@ -48,6 +48,7 @@ namespace msmrd {
         vec3<double> velocity = vec3<double>();
         vec3<double> nextVelocity = vec3<double>();
         vec3<double> raux = vec3<double>();
+        vec3<double> raux2 = vec3<double>();
         double mass = 0.0;
         /**
          * @param pid ID of the particle (can be the index in a particle list if it is part of particle list.)
@@ -101,6 +102,7 @@ namespace msmrd {
          * @param nextVelocity saves next velocity for integrator to update
          * @param mass saves the mass of the particle
          * @param raux auxiliary variable to store auxiliary vuables for different applcations
+         * @param raux2 auxiliary variable to store auxiliary vuables for different applcations
          */
 
         // Constructors: receive input from vec3/quaternion or std::vector and numpy arrays (through pybind)

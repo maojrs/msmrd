@@ -21,9 +21,9 @@ namespace msmrd {
         /**
          * @distinguishedTypes vector of types that correspond to distinguished particle. Must match that of trajectory.
          */
-        void loadAuxiliaryValues(std::vector<particle> &parts, std::vector<vec3<double>> externalForce);
+        void loadAuxiliaryValues(std::vector<particle> &parts, std::vector<vec3<double>> pairsForces);
 
-        void loadAuxiliaryValuesAlt(std::vector<particle> &parts, std::vector<vec3<double>> internalForce);
+        void integrateO(std::vector<particle> &parts, double timestep);
 
     public:
         integratorMoriZwanzig(double dt, long seed, std::string particlesbodytype);

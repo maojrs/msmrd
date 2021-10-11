@@ -10,32 +10,35 @@ namespace msmrd {
     langevin(dt, seed, particlesbodytype, "ABOAB") {};
 
 
-    /* Loads auxiliary variable into raux. In this case this correspond to the potential and noise term,
-     * which can be calculated as M(dV) + gamma V_i dt .*/
-    void integratorMoriZwanzig::loadAuxiliaryValues(std::vector<particle> &parts,
-            std::vector<vec3<double>> externalForce) {
-        for (int i = 0; i < parts.size(); i++) {
-            // If particle type corresponds to one of the distinguished particles, sample its value
-            if (std::find(distinguishedTypes.begin(), distinguishedTypes.end(),
-                          parts[i].type) != distinguishedTypes.end()) {
-                double eta = KbTemp / parts[i].D;
-                auto momentumDiff = parts[i].mass * (parts[i].nextVelocity - parts[i].velocity);
-                auto raux = momentumDiff + eta * parts[i].velocity * dt + externalForce[i]*dt;
-                parts[i].raux = raux;
-            }
-        }
-    };
+//    /* Loads auxiliary variable into raux. In this case this correspond to the potential and noise term,
+//     * which can be calculated as M(dV) + gamma V_i dt .*/
+//    void integratorMoriZwanzig::loadAuxiliaryValues(std::vector<particle> &parts,
+//            std::vector<vec3<double>> externalForce) {
+//        for (int i = 0; i < parts.size(); i++) {
+//            // If particle type corresponds to one of the distinguished particles, sample its value
+//            if (std::find(distinguishedTypes.begin(), distinguishedTypes.end(),
+//                          parts[i].type) != distinguishedTypes.end()) {
+//                double eta = KbTemp / parts[i].D;
+//                auto momentumDiff = parts[i].mass * (parts[i].nextVelocity - parts[i].velocity);
+//                auto raux = momentumDiff + eta * parts[i].velocity * dt + externalForce[i]*dt;
+//                parts[i].raux = raux;
+//            }
+//        }
+//    };
 
     /* Loads auxiliary variable into raux. In this case this correspond to the potential and noise term,
  * which can be calculated as M(dV) + gamma V_i dt .*/
-    void integratorMoriZwanzig::loadAuxiliaryValuesAlt(std::vector<particle> &parts,
-                                                    std::vector<vec3<double>> internalForce) {
+    void integratorMoriZwanzig::loadAuxiliaryValues(std::vector<particle> &parts,
+                                                    std::vector<vec3<double>> pairsForces) {
         for (int i = 0; i < parts.size(); i++) {
             // If particle type corresponds to one of the distinguished particles, sample its value
             if (std::find(distinguishedTypes.begin(), distinguishedTypes.end(),
                           parts[i].type) != distinguishedTypes.end()) {
-                auto raux = internalForce[i]*dt;
-                parts[i].raux = raux;
+                auto eta = KbTemp / parts[i].D;
+                auto mass = parts[i].mass;
+                auto interactionTerm = pairsForces[i]*dt/(2*mass) * (1 + std::exp(-dt * eta / mass));
+                auto noiseTerm = parts[i].raux2;
+                parts[i].raux = interactionTerm + noiseTerm;
             }
         }
     };
@@ -63,19 +66,6 @@ namespace msmrd {
         // Update particlesposition to recalculate force for next step "B"
         updatePositionOrientation(parts);
 
-//        /* Explicit calculation of force torque fields. Required to extract value of external potential
-//         * for raux variables. */
-//        if (externalPotentialActive) {
-//            calculateExternalForceTorques(parts, N);
-//        }
-//
-//        // Save external potential in temporary variable
-//        auto externalForce = forceField;
-//
-//        if (pairPotentialActive) {
-//            calculatePairsForceTorques(parts, N);
-//        }
-
         /* Explicit calculation of force torque fields. Required to extract value of external potential
          * for raux variables. */
         if (externalPotentialActive) {
@@ -90,21 +80,19 @@ namespace msmrd {
         }
 
         // Save external potential in temporary variable
-        auto internalForce = forceField;
-        for (int i = 0; i < internalForce.size(); i++) {
-            internalForce[i] = internalForce[i] - externalForce[i];
+        std::vector<vec3<double>>  pairsForces;
+        pairsForces.resize(N);
+        for (int i = 0; i < pairsForces.size(); i++) {
+            pairsForces[i] = forceField[i] - externalForce[i];
         }
-
-        // Load auxiliary variables into distinguished particle before updating velocities
-        loadAuxiliaryValuesAlt(parts, internalForce);
 
         integrateB(parts, dt/2.0);
         integrateO(parts, dt);
         integrateB(parts, dt/2.0);
         integrateA(parts, dt/2.0);
 
-//        // Load auxiliary variables into distinguished particle before updating velocities
-//        loadAuxiliaryValues(parts, externalForce);
+        // Load auxiliary variables into distinguished particle before updating velocities
+        loadAuxiliaryValues(parts, pairsForces);
 
         // Enforce boundary; sets new positions into parts[i].nextPosition (only if particle is active)
         enforceBoundary(parts);
@@ -118,5 +106,20 @@ namespace msmrd {
         // Updates time
         clock += dt;
     };
+
+
+    /* Integrates velocity full time step given friction and noise term, svaes noise term in raux2 variable.
+     * Specialized version of the one implemented in the langevin integrator. */
+    void integratorMoriZwanzig::integrateO(std::vector<particle> &parts, double deltat) {
+        for (int i = 0; i < parts.size(); i++) {
+            auto eta = KbTemp / parts[i].D; // friction coefficient
+            auto mass = parts[i].mass;
+            auto xi = std::sqrt(KbTemp * mass * (1 - std::exp(-2 * eta * deltat / mass))) / mass;
+            auto noiseTerm = xi * randg.normal3D(0, 1);
+            auto newVel = std::exp(-deltat * eta / mass) * parts[i].nextVelocity + noiseTerm;
+            parts[i].setNextVelocity(newVel);
+            parts[i].raux2 = noiseTerm;
+        }
+    }
 
 }
