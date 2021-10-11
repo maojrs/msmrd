@@ -78,18 +78,25 @@ namespace msmrd {
 
         /* Explicit calculation of force torque fields. Required to extract value of external potential
          * for raux variables. */
+        if (externalPotentialActive) {
+            calculateExternalForceTorques(parts, N);
+        }
+
+        // Save external potential in temporary variable
+        auto externalForce = forceField;
+
         if (pairPotentialActive) {
             calculatePairsForceTorques(parts, N);
         }
 
         // Save external potential in temporary variable
         auto internalForce = forceField;
+        for (int i = 0; i < internalForce.size(); i++) {
+            internalForce[i] = internalForce[i] - externalForce[i];
+        }
+
         // Load auxiliary variables into distinguished particle before updating velocities
         loadAuxiliaryValuesAlt(parts, internalForce);
-
-        if (externalPotentialActive) {
-            calculateExternalForceTorques(parts, N);
-        }
 
         integrateB(parts, dt/2.0);
         integrateO(parts, dt);

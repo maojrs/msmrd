@@ -175,7 +175,7 @@ namespace msmrd {
     }
 
 
-    /* Calculate external forces and torques due to interactiion with an external potential and save it into
+    /* Calculate external forces and torques due to interaction with an external potential and save it into
      * forceField and torqueField. Note different bodytypes require different fucntion calls */
     template <typename PARTICLE>
     void integrator::calculateExternalForceTorques(std::vector<PARTICLE> &parts, int numParticles) {
