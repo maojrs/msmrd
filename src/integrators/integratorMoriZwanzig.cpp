@@ -63,6 +63,9 @@ namespace msmrd {
 
         integrateA(parts, dt/2.0);
 
+        // Enforce boundary; sets new positions into parts[i].nextPosition (only if particle is active)
+        enforceBoundary(parts);
+
         // Update particlesposition to recalculate force for next step "B"
         updatePositionOrientation(parts);
 

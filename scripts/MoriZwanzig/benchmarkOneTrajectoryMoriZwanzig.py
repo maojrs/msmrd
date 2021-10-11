@@ -51,7 +51,7 @@ numSimulations = 1 #250 #500
 KbT = 1
 
 # Main parameters for integrator
-dt = 0.1 # (ns)
+dt = 0.05 # (ns)
 seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
