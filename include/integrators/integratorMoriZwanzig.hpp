@@ -23,6 +23,8 @@ namespace msmrd {
          */
         void loadAuxiliaryValues(std::vector<particle> &parts, std::vector<vec3<double>> externalForce);
 
+        void loadAuxiliaryValuesAlt(std::vector<particle> &parts, std::vector<vec3<double>> internalForce);
+
     public:
         integratorMoriZwanzig(double dt, long seed, std::string particlesbodytype);
 

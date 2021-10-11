@@ -26,6 +26,20 @@ namespace msmrd {
         }
     };
 
+    /* Loads auxiliary variable into raux. In this case this correspond to the potential and noise term,
+ * which can be calculated as M(dV) + gamma V_i dt .*/
+    void integratorMoriZwanzig::loadAuxiliaryValuesAlt(std::vector<particle> &parts,
+                                                    std::vector<vec3<double>> internalForce) {
+        for (int i = 0; i < parts.size(); i++) {
+            // If particle type corresponds to one of the distinguished particles, sample its value
+            if (std::find(distinguishedTypes.begin(), distinguishedTypes.end(),
+                          parts[i].type) != distinguishedTypes.end()) {
+                auto raux = internalForce[i]*dt;
+                parts[i].raux = raux;
+            }
+        }
+    };
+
     void integratorMoriZwanzig::integrate(std::vector<particle> &parts) {
         vec3<double> force;
         vec3<double> torque;
@@ -49,17 +63,32 @@ namespace msmrd {
         // Update particlesposition to recalculate force for next step "B"
         updatePositionOrientation(parts);
 
-        /* Explicit calculattion of force torque fields. Required to extract value of external potential
+//        /* Explicit calculation of force torque fields. Required to extract value of external potential
+//         * for raux variables. */
+//        if (externalPotentialActive) {
+//            calculateExternalForceTorques(parts, N);
+//        }
+//
+//        // Save external potential in temporary variable
+//        auto externalForce = forceField;
+//
+//        if (pairPotentialActive) {
+//            calculatePairsForceTorques(parts, N);
+//        }
+
+        /* Explicit calculation of force torque fields. Required to extract value of external potential
          * for raux variables. */
-        if (externalPotentialActive) {
-            calculateExternalForceTorques(parts, N);
+        if (pairPotentialActive) {
+            calculatePairsForceTorques(parts, N);
         }
 
         // Save external potential in temporary variable
-        auto externalForce = forceField;
+        auto internalForce = forceField;
+        // Load auxiliary variables into distinguished particle before updating velocities
+        loadAuxiliaryValuesAlt(parts, internalForce);
 
-        if (pairPotentialActive) {
-            calculatePairsForceTorques(parts, N);
+        if (externalPotentialActive) {
+            calculateExternalForceTorques(parts, N);
         }
 
         integrateB(parts, dt/2.0);
@@ -67,8 +96,8 @@ namespace msmrd {
         integrateB(parts, dt/2.0);
         integrateA(parts, dt/2.0);
 
-        // Load auxiliary variables into distinguished particle before updating velocities
-        loadAuxiliaryValues(parts, externalForce);
+//        // Load auxiliary variables into distinguished particle before updating velocities
+//        loadAuxiliaryValues(parts, externalForce);
 
         // Enforce boundary; sets new positions into parts[i].nextPosition (only if particle is active)
         enforceBoundary(parts);
