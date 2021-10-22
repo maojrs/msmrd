@@ -45,13 +45,13 @@ particlemass = 18.0 # (g/mol) approximately mass of water
 distinguishedParticleMass = 3 * particlemass # (kg)
 particleDiameter = 0.3 # (nm)
 separationDistance = 2 * particleDiameter # minimum separation distance for initial condition
-numSimulations = 1 #250 #500
+numSimulations = 100 #250 #500
 # For computations, we assume KbT=1, thus the force F must be: F=KbT f, where f is the force computed
 # from the potential. This means the plotted potential is on reduced units (not the distances though);
 KbT = 1
 
 # Main parameters for integrator
-dt = 0.05 # (ns)
+dt = 0.0005 # (ns)
 seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
@@ -70,7 +70,7 @@ kconstant = np.array([0.3,0.3,0.3]) #np.array([0.05,0.05,0.05])
 scalefactor = 1
 
 # Simulation parameters
-tfinal = 100000 #100000
+tfinal = 100 #10000 #100000
 timesteps = int(tfinal/dt) 
 bufferSize = 100 * 1024
 stride = 5
@@ -79,7 +79,7 @@ outH5 = True
 outChunked = True
 trajtype = "moriZwanzigVelocity" # Samples position and velocity of distinguished particle (type 1) + raux variables
 distinguishedTypes = [1]
-equilibrationSteps = 0
+equilibrationSteps = 2000
 
 
 # Parent directory location

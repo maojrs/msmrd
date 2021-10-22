@@ -117,7 +117,7 @@ namespace msmrd {
         for (int i = 0; i < parts.size(); i++) {
             auto eta = KbTemp / parts[i].D; // friction coefficient
             auto mass = parts[i].mass;
-            auto xi = std::sqrt(KbTemp * mass * (1 - std::exp(-2 * eta * deltat / mass))) / mass;
+            auto xi = std::sqrt((KbTemp/mass) * (1 - std::exp(-2 * eta * deltat / mass)));
             auto noiseTerm = xi * randg.normal3D(0, 1);
             auto newVel = std::exp(-deltat * eta / mass) * parts[i].nextVelocity + noiseTerm;
             parts[i].setNextVelocity(newVel);
