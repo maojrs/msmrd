@@ -38,9 +38,9 @@ import os
 # - Reduced friction: $\sigma^2/time$
 
 # Main parameters
-numBathParticles = 300 #500 #500
+numBathParticles = 500 #500 #500
 numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
-D = 2.0E-3 #1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s #0.1
+D = 3.0E-2 #1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s #0.1
 particlemass = 18.0 # (g/mol) approximately mass of water
 distinguishedParticleMass = 3 * particlemass # (kg)
 particleDiameter = 0.3 # (nm)
@@ -51,7 +51,7 @@ numSimulations = 100 #250 #500
 KbT = 1
 
 # Main parameters for integrator
-dt = 0.001 #0.0005 # (ns)
+dt = 0.001 #0.001 #0.0005 # (ns)
 seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
@@ -70,16 +70,16 @@ kconstant = np.array([0.3,0.3,0.3]) #np.array([0.05,0.05,0.05])
 scalefactor = 1
 
 # Simulation parameters
-tfinal = 1000 #100 #10000 #100000
+tfinal = 10000 #100 #10000 #100000
 timesteps = int(tfinal/dt) 
 bufferSize = 100 * 1024
-stride = 50 #5
+stride = 150 #50 #5
 outTxt = False
 outH5 = True
 outChunked = True
 trajtype = "moriZwanzigVelocity" # Samples position and velocity of distinguished particle (type 1) + raux variables
 distinguishedTypes = [1]
-equilibrationSteps = 10000
+equilibrationSteps = 20000
 
 
 # Parent directory location
