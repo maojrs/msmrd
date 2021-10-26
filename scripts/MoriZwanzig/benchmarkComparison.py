@@ -93,7 +93,7 @@ except OSError as error:
     proceed = True
 
 # Create folder for benchmark data        
-foldername = "benchmark_onetrajectory"
+foldername = "benchmarkComparison"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
