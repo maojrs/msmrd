@@ -51,7 +51,7 @@ numSimulations = 100 #250 #500
 KbT = 1
 
 # Main parameters for integrator
-dt = 0.001 #0.001 #0.0005 # (ns)
+dt = 0.005 #0.001 #0.0005 # (ns)
 seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
@@ -73,13 +73,13 @@ scalefactor = 1
 tfinal = 10000 #100 #10000 #100000
 timesteps = int(tfinal/dt) 
 bufferSize = 100 * 1024
-stride = 150 #50 #5
+stride = 50 #50 #5
 outTxt = False
 outH5 = True
 outChunked = True
 trajtype = "moriZwanzigVelocity" # Samples position and velocity of distinguished particle (type 1) + raux variables
 distinguishedTypes = [1]
-equilibrationSteps = 20000
+equilibrationSteps = 10000
 
 
 # Parent directory location
