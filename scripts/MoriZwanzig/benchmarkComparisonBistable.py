@@ -94,7 +94,7 @@ except OSError as error:
     proceed = True
 
 # Create folder for benchmark data        
-foldername = "benchmarkComparisonHarmonic"
+foldername = "bistable/benchmarkComparison"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
