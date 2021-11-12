@@ -83,7 +83,7 @@ equilibrationSteps = 10000
 
 
 # Parent directory location
-parentDirectory = "../../data/MoriZwanzig/"
+parentDirectory = "../../data/MoriZwanzig/harmonic/"
 
 # Create folder for data
 try:
@@ -93,7 +93,7 @@ except OSError as error:
     proceed = True
 
 # Create folder for benchmark data        
-foldername = "harmonic/benchmarkComparison"
+foldername = "benchmarkComparison"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
