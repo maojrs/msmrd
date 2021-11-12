@@ -97,7 +97,7 @@ filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
 except OSError as error:
-    print("Folder MoriZwanzig/benchmark already exists. Previous data files might be overwritten. Continue, y/n?")
+    print("Folder MoriZwanzig/" + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
     proceed = input()
     if proceed != 'y':
         sys.exit()
