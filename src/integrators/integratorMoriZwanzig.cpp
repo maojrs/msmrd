@@ -7,27 +7,10 @@
 namespace msmrd {
 
     integratorMoriZwanzig::integratorMoriZwanzig(double dt, long seed, std::string particlesbodytype) :
-    langevin(dt, seed, particlesbodytype, "ABOAB") {};
-
-
-//    /* Loads auxiliary variable into raux. In this case this correspond to the potential and noise term,
-//     * which can be calculated as M(dV) + gamma V_i dt .*/
-//    void integratorMoriZwanzig::loadAuxiliaryValues(std::vector<particle> &parts,
-//            std::vector<vec3<double>> externalForce) {
-//        for (int i = 0; i < parts.size(); i++) {
-//            // If particle type corresponds to one of the distinguished particles, sample its value
-//            if (std::find(distinguishedTypes.begin(), distinguishedTypes.end(),
-//                          parts[i].type) != distinguishedTypes.end()) {
-//                double eta = KbTemp / parts[i].D;
-//                auto momentumDiff = parts[i].mass * (parts[i].nextVelocity - parts[i].velocity);
-//                auto raux = momentumDiff + eta * parts[i].velocity * dt + externalForce[i]*dt;
-//                parts[i].raux = raux;
-//            }
-//        }
-//    };
+    langevin(dt, seed, particlesbodytype, "modifiedABOBA") {};
 
     /* Loads auxiliary variable into raux. In this case this correspond to the potential and noise term,
- * which can be calculated as M(dV) + gamma V_i dt .*/
+     * which can be calculated as M(dV) + gamma V_i dt .*/
     void integratorMoriZwanzig::loadAuxiliaryValues(std::vector<particle> &parts,
                                                     std::vector<vec3<double>> pairsForces) {
         for (int i = 0; i < parts.size(); i++) {

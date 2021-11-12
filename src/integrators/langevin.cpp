@@ -53,8 +53,10 @@ namespace msmrd {
         // Integrates one time step of the chosen integrator, default BAOAB
         if (integratorScheme == "ABOBA") {
             integrateABOBA(parts, dt);
-        } else {
+        } else if (integratorScheme == "BAOAB") {
             integrateBAOAB(parts, dt);
+        } else {
+            throw std::invalid_argument("Integration scheme chosen not implemented in integrate function.");
         }
 
         // Updates time
