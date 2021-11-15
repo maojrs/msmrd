@@ -73,7 +73,7 @@ namespace msmrd {
                                  - std::pow(x[1] - m[1], 2) / (2 * std::pow(sig[1], 2))
                                  - std::pow(x[2] - m[2], 2) / (2 * std::pow(sig[2], 2)));
                 denom = std::pow(2 * M_PI, 3.0 / 2.0) * sig[0] * sig[1] * sig[2];
-                output -= gauss / denom;
+                output = -gauss / denom;
             }
         }
         return scalefactor * output;
