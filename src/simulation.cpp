@@ -30,10 +30,6 @@ namespace msmrd {
                                         "change to output with H5 in chunks and turn off txt ouput.");
         }
 
-        /* Set distinguished typer for distinguished trajectories (1 by default). This means distinguished trajectories
-         * will only sample particles of type 1 */
-        std::vector<int> distinguishedTypes{1};
-
         // Choose correct child class of trajectory given the current type of particles
         if (trajtype == "patchyDimer") {
             outputDiscreteTraj = false;

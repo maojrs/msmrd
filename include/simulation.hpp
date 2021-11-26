@@ -23,6 +23,7 @@ namespace msmrd {
         integrator &integ;
         std::unique_ptr<trajectory> traj;
         std::unique_ptr<trajectory> trajEnergyTemp;
+        std::vector<int> distinguishedTypes{1};
         int numcols = 4;
         bool outputDiscreteTraj = false;
         bool outputEnergyTemperature = false;
@@ -34,6 +35,8 @@ namespace msmrd {
          * child classes of trajectory class.
          * @param trajEnergyTemp smart pointer to trjaectory class for energt and temperature. Only available for
          * Langevin simulations and only used if outputEnergyTemperature = true.
+         * @param distinguishedTypes Set distinguished types for distinguished trajectories (1 by default).
+         * This means distinguished trajectories will only sample particles of type 1
          * @param numcols Number of columns in each row of data to be written into HD5 file. It can be 4 or 8.
          * A custom value can also be used, but it has to be explicitly written in the template
          * function write2H5file<rowdim> before compiling.
@@ -56,6 +59,11 @@ namespace msmrd {
 
         void setOutputEnergyTemperature(bool value) {
             outputEnergyTemperature = value;
+        }
+
+        void setDistinguishedTypes(std::vector<int> distTypes) {
+            distinguishedTypes.resize(distTypes.size());
+            distinguishedTypes = distTypes;
         }
 
     private:

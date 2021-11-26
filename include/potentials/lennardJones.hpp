@@ -17,6 +17,7 @@ namespace msmrd {
         double cutOff;
         bool forceCap = false;
         double forceCapValue = 0.0;
+        double potentialCap = 0.0;
         double baseEnergy = 0.0;
 
         /**
@@ -37,10 +38,7 @@ namespace msmrd {
         std::array<vec3<double>, 4>
         forceTorque(particle &part1, particle &part2) override;
 
-        void setForceCapValue(double forceCapVal) {
-            forceCap = true;
-            forceCapValue = forceCapVal;
-        }
+        void setForceCapValue(double forceCapVal);
     };
 
     class WCA : public lennardJones {
