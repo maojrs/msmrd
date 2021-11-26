@@ -10,6 +10,7 @@ void bindSimulation(py::module &m) {
         py::class_<simulation>(m, "simulation")
                 .def(py::init<integrator &>())
                 .def("setEquilibrationSteps", &simulation::setEquilibrationSteps)
+                .def("setOutputEnergyTemperature", &simulation::setOutputEnergyTemperature)
                 .def("run", &simulation::run);
         }
 }
