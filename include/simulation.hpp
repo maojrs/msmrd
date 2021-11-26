@@ -54,6 +54,10 @@ namespace msmrd {
             equilibrationSteps = eqSteps;
         }
 
+        void setOutputEnergyTemperature(bool value) {
+            outputEnergyTemperature = value;
+        }
+
     private:
 
         void runNoutputChunks(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,

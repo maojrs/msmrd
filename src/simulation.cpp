@@ -267,7 +267,7 @@ namespace msmrd {
             } else if (numcols == 11) {
                 traj->writeChunk2H5file<double, 11>(filename, "msmrd_data", traj->getTrajectoryData());
             } else {
-                throw std::invalid_argument("Numcols needs to be an interger in the interval [4,11]. Custom number of columns per row "
+                throw std::invalid_argument("Numcols needs to be an integer in the interval [4,11]. Custom number of columns per row "
                                             "can be used but needs to be explicitly modified in "
                                             "simulation.cpp, write2H5file<numcols> ");
             }
@@ -298,7 +298,7 @@ namespace msmrd {
             } else if (numcols == 11) {
                 traj->write2H5file<double, 11>(filename, "msmrd_data", traj->getTrajectoryData());
             } else {
-                throw std::invalid_argument("Numcols needs to be an interger in the interval [4,11]. Custom number of columns per row "
+                throw std::invalid_argument("Numcols needs to be an integer in the interval [4,11]. Custom number of columns per row "
                                             "can be used but needs to be explicitly modified in "
                                             "simulation.cpp, write2H5file<numcols> ");
             }

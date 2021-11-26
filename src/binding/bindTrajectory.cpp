@@ -1,4 +1,5 @@
 #include "binding.hpp"
+#include "trajectories/trajectoryEnergyTemperature.hpp"
 #include "trajectories/trajectoryPosition.hpp"
 #include "trajectories/trajectoryPositionOrientation.hpp"
 #include "trajectories/trajectoryPositionVelocity.hpp"
@@ -12,6 +13,12 @@ namespace msmrd {
      * pyBinders for the c++ trajectories classes
      */
     void bindTrajectories(py::module &m) {
+
+        py::class_<trajectoryEnergyTemperature, trajectory>(m, "trajectoryEnergyTemperature", "energy temperature trajectory"
+                                                                                              "(approx size)")
+                .def(py::init<int &>())
+                .def("write2H5file", &trajectoryEnergyTemperature::write2H5file<double, 3>)
+                .def("writeChunk2H5file", &trajectoryEnergyTemperature::writeChunk2H5file<double, 3>);
 
         py::class_<trajectoryPosition, trajectory>(m, "trajectoryPosition", "position trajectory (#particles or "
                                                                             "#pairs of particles, approx size)")
