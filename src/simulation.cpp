@@ -120,9 +120,9 @@ namespace msmrd {
          * chunked, it can be written directyl from memory into a H5 file or a text file, the data is not erased
          * from memory. */
         if (outputH5 && outputChunked) {
-            runNoutputChunks(particleList, Nsteps, stride, bufferSize, filename, outputChunked);
+            runNoutputChunks(particleList, Nsteps, stride, bufferSize, filename);
         } else {
-            runNoutput(particleList, Nsteps, stride, bufferSize, filename, outputTxt, outputH5, outputChunked);
+            runNoutput(particleList, Nsteps, stride, bufferSize, filename, outputTxt, outputH5);
         }
 
     }
@@ -130,9 +130,9 @@ namespace msmrd {
 
     // Runs simulation while outputing chunked data into H5 file and freeing up memory
     void simulation::runNoutputChunks(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
-                                      const std::string &filename, bool chunked){
+                                      const std::string &filename){
         int bufferCounter = 0;
-
+        bool chunked = true;
         // Main simulation loop (integration and writing to file)
         for (int tstep=0; tstep < Nsteps; tstep++) {
             if (tstep % stride == 0) {
@@ -151,7 +151,7 @@ namespace msmrd {
                 //Write to file once buffer is full
                 if (bufferCounter * particleList.size() >= bufferSize) {
                     bufferCounter = 0;
-                    write2H5file(filename, true);
+                    write2H5file(filename, chunked);
                     traj->emptyBuffer();
                     if (outputEnergyTemperature) {
                         trajEnergyTemp->emptyBuffer();
@@ -163,7 +163,7 @@ namespace msmrd {
 
         // Empty remaining data in buffer into H5 file
         if (bufferCounter > 0) {
-            write2H5file(filename, true);
+            write2H5file(filename, chunked);
             traj->emptyBuffer();
             if (outputEnergyTemperature) {
                 trajEnergyTemp->emptyBuffer();
@@ -173,7 +173,8 @@ namespace msmrd {
 
     // Runs simulation, when done outputs data into H5 file , text file or both. Memory is not freed up.
     void simulation::runNoutput(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
-                                const std::string &filename, bool outputTxt, bool outputH5, bool chunked){
+                                const std::string &filename, bool outputTxt, bool outputH5){
+        bool chunked = false;
         // Main simulation loop (integration and writing to file)
         for (int tstep=0; tstep < Nsteps; tstep++) {
             if (tstep % stride == 0) {

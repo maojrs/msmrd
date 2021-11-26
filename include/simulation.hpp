@@ -61,10 +61,10 @@ namespace msmrd {
     private:
 
         void runNoutputChunks(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
-                              const std::string &filename, bool chunked);
+                              const std::string &filename);
 
         void runNoutput(std::vector<particle> &particleList, int Nsteps, int stride, int bufferSize,
-                        const std::string &filename, bool outputTxt, bool H5output, bool chunked);
+                        const std::string &filename, bool outputTxt, bool H5output);
 
         void runEquilibration(std::vector<particle> &particleList);
 
