@@ -31,6 +31,9 @@ namespace msmrd {
             auto force = forceTorque(part1, part2);
             forceNorm = force[0].norm();
             rr -= drr;
+            if (rr < 0) {
+                break;
+            }
         }
         potentialCap = evaluate(part1, part2);
     }
@@ -43,7 +46,11 @@ namespace msmrd {
         if (r <= cutOff) {
             auto term0 = std::pow((sigma/r),6);
             auto term1 = std::pow(term0,2);
-            return 4 * epsilon * (term1 - term0) + baseEnergy;
+            auto resultingPotential = 4 * epsilon * (term1 - term0) + baseEnergy;
+            if (forceCap and resultingPotential >= potentialCap){
+                resultingPotential = 1.0 * potentialCap;
+            }
+            return resultingPotential;
         } else {
             return 0;
         }
