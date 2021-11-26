@@ -33,6 +33,18 @@ namespace msmrd {
         domainBoundary = bndry;
     }
 
+    // Set smart pointer to external potential
+    void trajectory::setExternalPotential(externalPotential *potential) {
+        externalPotentialActive = true;
+        externalPot = potential;
+    }
+
+    // Set smart pointer to pairs potential
+    void trajectory::setPairPotential(pairPotential *potential) {
+        pairPotentialActive = true;
+        pairPot = potential;
+    }
+
     // Calculates relative position using boundary information loaded into trajectory class (position2 - position1)
     vec3<double> trajectory::calculateRelativePosition(vec3<double> position1, vec3<double> position2) {
         if (boundaryActive and domainBoundary->getBoundaryType() == "periodic") {

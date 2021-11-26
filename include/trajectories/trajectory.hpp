@@ -9,9 +9,11 @@
 #include <fstream>
 #include <iterator>
 #include<iostream>
+#include <memory>
 //#include <H5f90i.h>
 #include "H5Cpp.h"
 #include "boundaries/boundary.hpp"
+#include "potentials/potentials.hpp"
 #include "particle.hpp"
 
 
@@ -33,7 +35,11 @@ namespace msmrd {
         std::vector<std::vector<double>> trajectoryData = {};
         std::vector<std::vector<int>> discreteTrajectoryData = {};
         boundary *domainBoundary;
+        externalPotential *externalPot;
+        pairPotential *pairPot;
         bool boundaryActive = false;
+        bool externalPotentialActive = false;
+        bool pairPotentialActive = false;
     public:
         unsigned long Nparticles;
         int bufferSize;
@@ -52,7 +58,13 @@ namespace msmrd {
          * of states given by integers). Therefore, defined as a vector of integers.
          * @param *domainBoundary pointer to the boundary object to be used. Useful to compute trajectories
          * in periodic domains. It mus point to the same boundary as the integrator.
-         * @param boundaryActive true is boundary is active in the system.
+         * @param externalPot pointer to external potential, in case it needs it to evaluate an
+         * observable of a trajectory (used by energyTemperature trajectory)
+         * @param pairPot pointer to pair potential, in case it needs it to evaluate an
+         * observable of a trajectory (used by energyTemperature trajectory)
+         * @param boundaryActive true if boundary is active in the system.
+         * @param externalPotentialActive true if external potential is required to evaluate a given trajectory
+         * @param pairPotentialActive true if pair potential is required to evaluate a given trajectory
          */
 
         trajectory(unsigned long Nparticles, int bufferSize);
@@ -60,6 +72,10 @@ namespace msmrd {
         void emptyBuffer();
 
         void setBoundary(boundary *bndry);
+
+        void setExternalPotential(externalPotential *potential);
+
+        void setPairPotential(pairPotential *potential);
 
         // Virtual functions to sample from list of particles, store in trajectoryData, and empty data buffer
 

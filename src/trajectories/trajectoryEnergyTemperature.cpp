@@ -13,19 +13,6 @@ namespace msmrd {
         trajectoryData.reserve(bufferSize);
     }
 
-    // Set smart pointer to external potential
-    void trajectoryEnergyTemperature::setExternalPotential(externalPotential *potential) {
-        externalPotentialActive = true;
-        auto externalPot(potential);
-    }
-
-    // Set smart pointer to pairs potential
-    void trajectoryEnergyTemperature::setPairPotential(pairPotential *potential) {
-        pairPotentialActive = true;
-        auto pairPot(potential);
-    }
-
-
     // Sample from list of particles and store in trajectoryData
     void trajectoryEnergyTemperature::sample(double time, std::vector<particle> &particleList) {
         std::vector<double> sample(3);

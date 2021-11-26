@@ -13,20 +13,8 @@ namespace msmrd {
      */
     class trajectoryEnergyTemperature : public trajectory {
     public:
-        bool externalPotentialActive = false;
-        bool pairPotentialActive = false;
-
-        // External potentials pointers (externalPot)
-        std::shared_ptr<externalPotential> externalPot;
-
-        // Pair potentials pointers (pairPot)
-        std::shared_ptr<pairPotential> pairPot;
 
         trajectoryEnergyTemperature(int bufferSize);
-
-        void setExternalPotential(externalPotential *potential);
-
-        void setPairPotential(pairPotential *potential);
 
         void sample(double time, std::vector<particle> &particleList) override;
 

@@ -97,6 +97,17 @@ namespace msmrd {
             traj->setBoundary(integ.getBoundary());
         }
 
+        // Set energy temperature trajectory
+        if (outputEnergyTemperature) {
+            trajEnergyTemp = std::make_unique<trajectoryEnergyTemperature>(bufferSize);
+            if (integ.isExternalPotentialActive()) {
+                trajEnergyTemp->setExternalPotential(integ.getExternalPotential());
+            }
+            if (integ.isPairPotentialActive()) {
+                trajEnergyTemp->setPairPotential(integ.getPairPotential());
+            }
+        }
+
         /* Equilibration step (run system for equilibrationStates timsteps) in case it is needed
          * to equilibrate the sytsem before the main simulation. The default value is zero
          * equilibration steps, so one needs to set the equilibrationSteps first, see setEquilibrationSteps. */
@@ -130,6 +141,9 @@ namespace msmrd {
                 if (outputDiscreteTraj) {
                     traj->sampleDiscreteTrajectory(integ.clock, particleList);
                 }
+                if (outputEnergyTemperature) {
+                    trajEnergyTemp->sample(integ.clock, particleList);
+                }
                 if (tstep == 0) {
                     createChunkedH5files(filename);
                 }
@@ -139,6 +153,9 @@ namespace msmrd {
                     bufferCounter = 0;
                     write2H5file(filename, true);
                     traj->emptyBuffer();
+                    if (outputEnergyTemperature) {
+                        trajEnergyTemp->emptyBuffer();
+                    }
                 }
             }
             integ.integrate(particleList);
@@ -148,6 +165,9 @@ namespace msmrd {
         if (bufferCounter > 0) {
             write2H5file(filename, true);
             traj->emptyBuffer();
+            if (outputEnergyTemperature) {
+                trajEnergyTemp->emptyBuffer();
+            }
         }
     }
 
@@ -189,6 +209,11 @@ namespace msmrd {
             traj->createChunkedH5file<int, 1>(filename + "_discrete", "msmrd_discrete_data",
                                               traj->getDiscreteTrajectoryData());
         }
+        // Create H5 files to refill energy temperature trajectory by chunks
+        if (outputEnergyTemperature) {
+            trajEnergyTemp->createChunkedH5file<double, 3>(filename + "_energytemp", "msmrd_energytemp_data",
+                                              trajEnergyTemp->getTrajectoryData());
+        }
         // Create H5 files to refill trajectory by chunks
         if (numcols == 4) {
             traj->createChunkedH5file<double, 4>(filename, "msmrd_data", traj->getTrajectoryData());
@@ -220,6 +245,10 @@ namespace msmrd {
             if (outputDiscreteTraj) {
                 traj->writeChunk2H5file<int, 1>(filename + "_discrete", "msmrd_discrete_data", traj->getDiscreteTrajectoryData());
             }
+            // Write energy temperature chunked
+            if (outputEnergyTemperature) {
+                trajEnergyTemp->writeChunk2H5file<double, 3>(filename + "_energytemp", "msmrd_energytemp_data", trajEnergyTemp->getTrajectoryData());
+            }
             // Write the continuous trajectory chunked
             if (numcols == 4) {
                 traj->writeChunk2H5file<double, 4>(filename, "msmrd_data", traj->getTrajectoryData());
@@ -246,6 +275,10 @@ namespace msmrd {
             // Write discrete trajectory
             if (outputDiscreteTraj) {
                 traj->write2H5file<int, 1>(filename + "_discrete", "msmrd_discrete_data", traj->getDiscreteTrajectoryData());
+            }
+            // Write energy temperature
+            if (outputEnergyTemperature) {
+                trajEnergyTemp->write2H5file<double, 3>(filename + "_energytemp", "msmrd_energytemp_data", trajEnergyTemp->getTrajectoryData());
             }
             // Write the continuous trajectory
             if (numcols == 4) {

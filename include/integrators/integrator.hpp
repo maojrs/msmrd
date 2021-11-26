@@ -134,7 +134,15 @@ namespace msmrd {
 
         bool isBoundaryActive() { return boundaryActive; }
 
+        bool isExternalPotentialActive() { return externalPotentialActive; }
+
+        bool isPairPotentialActive() { return pairPotentialActive; }
+
         boundary* getBoundary() { return domainBoundary; }
+
+        externalPotential* getExternalPotential() {return externalPot; }
+
+        pairPotential* getPairPotential() {return pairPot; }
 
     };
 

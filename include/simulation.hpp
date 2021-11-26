@@ -8,6 +8,7 @@
 #include "particle.hpp"
 #include "integrators/integrator.hpp"
 #include "trajectories/trajectory.hpp"
+#include "trajectories/trajectoryEnergyTemperature.hpp"
 #include "trajectories/trajectoryPosition.hpp"
 #include "trajectories/trajectoryPositionOrientation.hpp"
 #include "trajectories/trajectoryMoriZwanzig.hpp"
@@ -21,19 +22,25 @@ namespace msmrd {
     public:
         integrator &integ;
         std::unique_ptr<trajectory> traj;
+        std::unique_ptr<trajectory> trajEnergyTemp;
         int numcols = 4;
         bool outputDiscreteTraj = false;
+        bool outputEnergyTemperature = false;
         int equilibrationSteps = 0;
         /**
          * @param integ Integrator to be used for simulation, works for any integrator since they are all
          * childs from abstract class.
          * @param traj smart pointer to trajectory class. The class will be initializaed into one of the
          * child classes of trajectory class.
+         * @param trajEnergyTemp smart pointer to trjaectory class for energt and temperature. Only available for
+         * Langevin simulations and only used if outputEnergyTemperature = true.
          * @param numcols Number of columns in each row of data to be written into HD5 file. It can be 4 or 8.
          * A custom value can also be used, but it has to be explicitly written in the template
          * function write2H5file<rowdim> before compiling.
          * @param outputDiscreteTraj if true, outputs discrete trajectory. Only available for certain
          * trajectory classes.
+         * @param outputEnergyTemperature only valid for Langevin trajectories, if true outputs energy and
+         * instant temperature of system at every time step in a different file.
          */
 
 
