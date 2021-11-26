@@ -30,6 +30,10 @@ namespace msmrd {
                                         "change to output with H5 in chunks and turn off txt ouput.");
         }
 
+        /* Set distinguished typer for distinguished trajectories (1 by default). This means distinguished trajectories
+         * will only sample particles of type 1 */
+        std::vector<int> distinguishedTypes{1};
+
         // Choose correct child class of trajectory given the current type of particles
         if (trajtype == "patchyDimer") {
             outputDiscreteTraj = false;
@@ -53,27 +57,33 @@ namespace msmrd {
             numcols = 10; //(time, positionx3, orientationx4, state, type)
         } else if (trajtype == "moriZwanzig") {
             outputDiscreteTraj = false;
-            std::vector<int> distinguishedTypes{1}; // only samples particles with type 1
             traj = std::make_unique<trajectoryMoriZwanzig>(particleList.size(), bufferSize,
                                                            distinguishedTypes);
             numcols = 8; //(time, positionx3, type, raux(x3))
         } else if (trajtype == "moriZwanzigVelocity"){
                 outputDiscreteTraj = false;
-                std::vector<int> distinguishedTypes{1}; // only samples particles with type 1
                 traj = std::make_unique<trajectoryMoriZwanzigVelocity>(particleList.size(), bufferSize,
                                                                distinguishedTypes);
                 numcols = 11; //(time, positionx3, velocityx3, type, raux(x3))
         } else if (trajtype == "position"){
             traj = std::make_unique<trajectoryPosition>(particleList.size(), bufferSize);
             numcols = 4; //(time, positionx3)
-        } else if (trajtype == "positionType"){
+        }  else if (trajtype == "positionType"){
             traj = std::make_unique<trajectoryPositionType>(particleList.size(), bufferSize);
+            numcols = 5; //(time, positionx3, type)
+        } else if (trajtype == "positionDistinguished"){
+            traj = std::make_unique<trajectoryPositionDistinguished>(particleList.size(), bufferSize,
+                                                                     distinguishedTypes);
             numcols = 5; //(time, positionx3, type)
         } else if (trajtype == "positionVelocity"){
             traj = std::make_unique<trajectoryPositionVelocity>(particleList.size(), bufferSize);
             numcols = 7; //(time, positionx3, velocityx3)
         } else if (trajtype == "positionVelocityType"){
             traj = std::make_unique<trajectoryPositionVelocityType>(particleList.size(), bufferSize);
+            numcols = 8; //(time, positionx3, velocityx3, type)
+        } else if (trajtype == "positionVelocityDistinguished"){
+            traj = std::make_unique<trajectoryPositionVelocityDistinguished>(particleList.size(), bufferSize,
+                                                                    distinguishedTypes);
             numcols = 8; //(time, positionx3, velocityx3, type)
         } else if (trajtype == "positionOrientation") {
             traj = std::make_unique<trajectoryPositionOrientation>(particleList.size(), bufferSize);

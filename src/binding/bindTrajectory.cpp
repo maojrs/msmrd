@@ -32,6 +32,14 @@ namespace msmrd {
                 .def("write2H5file", &trajectoryPositionType::write2H5file<double, 5>)
                 .def("writeChunk2H5file", &trajectoryPositionType::writeChunk2H5file<double, 5>);
 
+        py::class_<trajectoryPositionDistinguished, trajectoryPositionType>(m, "trajectoryPositionDistinguished",
+                                                               "position trajectory for distinguished particle "
+                                                               "(#particles or #pairs of particles, approx size, "
+                                                               "distinguihed types)")
+                .def(py::init<int &, int &, std::vector<int> &>())
+                .def("write2H5file", &trajectoryPositionDistinguished::write2H5file<double, 5>)
+                .def("writeChunk2H5file", &trajectoryPositionDistinguished::writeChunk2H5file<double, 5>);
+
         py::class_<trajectoryPositionOrientation, trajectory>(m, "trajectoryPositionOrientation", "position and "
                                                                                                   "orientation trajectory "
                                                                                                   "(#particles or #pairs "
@@ -78,16 +86,9 @@ namespace msmrd {
                 .def("write2H5file", &trajectoryPositionVelocityType::write2H5file<double, 8>)
                 .def("writeChunk2H5file", &trajectoryPositionVelocityType::writeChunk2H5file<double, 8>);
 
-        py::class_<trajectoryPositionDistinguished, trajectoryPositionType>(m, "trajectoryPositionDistinguished",
-                                                               "position type trajectory (#particles or #pairs of particles, "
-                                                               "approx size), distinguished types")
-                .def(py::init<int &, int &, std::vector<int> &>())
-                .def("write2H5file", &trajectoryPositionDistinguished::write2H5file<double, 5>)
-                .def("writeChunk2H5file", &trajectoryPositionDistinguished::writeChunk2H5file<double, 5>);
-
-        py::class_<trajectoryPositionVelocityDistinguished, trajectoryPositionVelocityType>(m, "trajectoryPositionVelocityDistinguished",
-                                                                            "position, velocity and type trajectory (#particles or #pairs of particles, "
-                                                                            "approx size), distinguished types")
+        py::class_<trajectoryPositionVelocityDistinguished, trajectoryPositionVelocityType>(m, "trajectoryPositionVelocityDistinguished", "position, "
+                                                                                               "and velocity trajectory for distinguished"
+                                                                                               "particles, approx size, distinguished types)")
                 .def(py::init<int &, int &, std::vector<int> &>())
                 .def("write2H5file", &trajectoryPositionVelocityDistinguished::write2H5file<double, 8>)
                 .def("writeChunk2H5file", &trajectoryPositionVelocityDistinguished::writeChunk2H5file<double, 8>);
