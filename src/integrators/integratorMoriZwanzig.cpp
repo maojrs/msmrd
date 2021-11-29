@@ -97,8 +97,8 @@ namespace msmrd {
     /* Integrates velocity full time step given friction and noise term, svaes noise term in raux2 variable.
      * Specialized version of the one implemented in the langevin integrator. */
     void integratorMoriZwanzig::integrateO(std::vector<particle> &parts, double deltat) {
+        auto eta = frictionCoefficient;
         for (int i = 0; i < parts.size(); i++) {
-            auto eta = frictionCoefficient;
             auto mass = parts[i].mass;
             auto xi = std::sqrt((KbTemp/mass) * (1 - std::exp(-2 * eta * deltat / mass)));
             auto noiseTerm = xi * randg.normal3D(0, 1);

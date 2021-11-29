@@ -87,8 +87,8 @@ namespace msmrd {
 
     // Integrates velocity full time step given friction and noise term
     void langevin::integrateO(std::vector<particle> &parts, double deltat) {
+        auto eta = frictionCoefficient;
         for (int i = 0; i < parts.size(); i++) {
-            auto eta = frictionCoefficient; //KbTemp / parts[i].D; // friction coefficient
             auto mass = parts[i].mass;
             auto xi = std::sqrt(KbTemp * mass * (1 - std::exp(-2 * eta * deltat / mass))) / mass;
             auto newVel = std::exp(-deltat * eta / mass) * parts[i].nextVelocity + xi * randg.normal3D(0, 1);
