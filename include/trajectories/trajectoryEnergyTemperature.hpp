@@ -9,7 +9,8 @@
 namespace msmrd {
     /**
      * Class to store energy and instant temperature of a particles in a given simulation. The potentials should be
-     * set to be exactly the same ones used by the integrator.
+     * set to be exactly the same ones used by the integrator. It stores, time, kinetic energy, potential energy,
+     * total energy and instant temperature.
      */
     class trajectoryEnergyTemperature : public trajectory {
     public:

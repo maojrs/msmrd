@@ -33,7 +33,7 @@ namespace msmrd {
          * childs from abstract class.
          * @param traj smart pointer to trajectory class. The class will be initializaed into one of the
          * child classes of trajectory class.
-         * @param trajEnergyTemp smart pointer to trjaectory class for energt and temperature. Only available for
+         * @param trajEnergyTemp smart pointer to trjaectory class for energy and temperature. Only available for
          * Langevin simulations and only used if outputEnergyTemperature = true.
          * @param distinguishedTypes Set distinguished types for distinguished trajectories (1 by default).
          * This means distinguished trajectories will only sample particles of type 1

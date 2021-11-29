@@ -16,7 +16,6 @@ namespace msmrd {
         cutOff(cutOff) {}
 
     void lennardJones::setForceCapValue(double forceCapVal) {
-        forceCap = true;
         forceCapValue = forceCapVal;
         // Calculate potential cap
         double rr =  cutOff;
@@ -27,15 +26,16 @@ namespace msmrd {
         particle part1 = particle(0, 0, 0, 0, position, orientation);
         particle part2 = particle(0, 0, 0, 0, position, orientation);
         while (forceNorm <= forceCapValue) {
-            part2.position = vec3<double>{rr, 0, 0};
+            part2.setPosition(vec3<double>{rr, 0, 0});
             auto force = forceTorque(part1, part2);
             forceNorm = force[0].norm();
-            rr -= drr;
+            rr = rr - drr;
             if (rr < 0) {
                 break;
             }
         }
-        potentialCap = evaluate(part1, part2);
+        potentialCapValue = 1.0 * evaluate(part1, part2);
+        forceCap = true;
     }
 
     double lennardJones::evaluate(particle &part1, particle &part2) {
@@ -47,8 +47,8 @@ namespace msmrd {
             auto term0 = std::pow((sigma/r),6);
             auto term1 = std::pow(term0,2);
             auto resultingPotential = 4 * epsilon * (term1 - term0) + baseEnergy;
-            if (forceCap and resultingPotential >= potentialCap){
-                resultingPotential = 1.0 * potentialCap;
+            if (forceCap and resultingPotential >= potentialCapValue){
+                resultingPotential = 1.0 * potentialCapValue;
             }
             return resultingPotential;
         } else {

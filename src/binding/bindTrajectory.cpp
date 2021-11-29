@@ -17,8 +17,8 @@ namespace msmrd {
         py::class_<trajectoryEnergyTemperature, trajectory>(m, "trajectoryEnergyTemperature", "energy temperature trajectory"
                                                                                               "(approx size)")
                 .def(py::init<int &>())
-                .def("write2H5file", &trajectoryEnergyTemperature::write2H5file<double, 3>)
-                .def("writeChunk2H5file", &trajectoryEnergyTemperature::writeChunk2H5file<double, 3>);
+                .def("write2H5file", &trajectoryEnergyTemperature::write2H5file<double, 5>)
+                .def("writeChunk2H5file", &trajectoryEnergyTemperature::writeChunk2H5file<double, 5>);
 
         py::class_<trajectoryPosition, trajectory>(m, "trajectoryPosition", "position trajectory (#particles or "
                                                                             "#pairs of particles, approx size)")

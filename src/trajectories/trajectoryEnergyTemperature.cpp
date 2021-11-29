@@ -15,7 +15,7 @@ namespace msmrd {
 
     // Sample from list of particles and store in trajectoryData
     void trajectoryEnergyTemperature::sample(double time, std::vector<particle> &particleList) {
-        std::vector<double> sample(3);
+        std::vector<double> sample(5);
         double kineticEnergy = 0;
         double potentialEnergy = 0;
         double instantTemperature = 0;
@@ -41,8 +41,10 @@ namespace msmrd {
             }
         }
         sample[0] = time;
-        sample[1] = kineticEnergy + potentialEnergy;
-        sample[2] = instantTemperature;
+        sample[1] = kineticEnergy;
+        sample[2] = potentialEnergy;
+        sample[3] = kineticEnergy + potentialEnergy;
+        sample[4] = instantTemperature;
         trajectoryData.push_back(sample);
     }
 

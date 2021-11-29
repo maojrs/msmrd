@@ -218,7 +218,7 @@ namespace msmrd {
         }
         // Create H5 files to refill energy temperature trajectory by chunks
         if (outputEnergyTemperature) {
-            trajEnergyTemp->createChunkedH5file<double, 3>(filename + "_energytemp", "msmrd_energytemp_data",
+            trajEnergyTemp->createChunkedH5file<double, 5>(filename + "_energytemp", "msmrd_energytemp_data",
                                               trajEnergyTemp->getTrajectoryData());
         }
         // Create H5 files to refill trajectory by chunks
@@ -254,7 +254,7 @@ namespace msmrd {
             }
             // Write energy temperature chunked
             if (outputEnergyTemperature) {
-                trajEnergyTemp->writeChunk2H5file<double, 3>(filename + "_energytemp", "msmrd_energytemp_data", trajEnergyTemp->getTrajectoryData());
+                trajEnergyTemp->writeChunk2H5file<double, 5>(filename + "_energytemp", "msmrd_energytemp_data", trajEnergyTemp->getTrajectoryData());
             }
             // Write the continuous trajectory chunked
             if (numcols == 4) {
@@ -285,7 +285,7 @@ namespace msmrd {
             }
             // Write energy temperature
             if (outputEnergyTemperature) {
-                trajEnergyTemp->write2H5file<double, 3>(filename + "_energytemp", "msmrd_energytemp_data", trajEnergyTemp->getTrajectoryData());
+                trajEnergyTemp->write2H5file<double, 5>(filename + "_energytemp", "msmrd_energytemp_data", trajEnergyTemp->getTrajectoryData());
             }
             // Write the continuous trajectory
             if (numcols == 4) {

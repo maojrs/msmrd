@@ -17,7 +17,7 @@ namespace msmrd {
         double cutOff;
         bool forceCap = false;
         double forceCapValue = 0.0;
-        double potentialCap = 0.0;
+        double potentialCapValue = 0.0;
         double baseEnergy = 0.0;
 
         /**
@@ -26,6 +26,7 @@ namespace msmrd {
          * @param cutOff value after which potential is zero, defaults to 3 * sigma if not specified
          * @param forceCap establish a maximum possible value for the force regardless of potential
          * @param forceCapValue maximum possible value of force (if forceCap = true)
+         * @param potentialCapValue maximum possible value of potential (if forceCap = true)
          * @param baseEnergy translation of potential energy in y-axis. It defaults to zero, but it can
          * be modified by child classes, like the WCA.
          */
@@ -39,6 +40,10 @@ namespace msmrd {
         forceTorque(particle &part1, particle &part2) override;
 
         void setForceCapValue(double forceCapVal);
+
+        double getPotentialCapValue() { return potentialCapValue; }
+
+        double getForceCapValue() { return forceCapValue; }
     };
 
     class WCA : public lennardJones {

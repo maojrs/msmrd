@@ -42,7 +42,10 @@ namespace msmrd {
                                                            "(epsilon, sigma)")
                 .def(py::init<double &, double &>())
                 .def(py::init<double &, double &, double &>())
-                .def("setForceCapValue", &lennardJones::setForceCapValue);
+                .def("setForceCapValue", &lennardJones::setForceCapValue)
+                .def("getPotentialCapValue", &lennardJones::getPotentialCapValue)
+                .def("getForceCapValue", &lennardJones::getForceCapValue);
+
 
         py::class_<WCA, lennardJones>(m, "WCA", "WCA potential (epsilon, sigma)")
                 .def(py::init<double &, double &>());
