@@ -9,14 +9,19 @@
 
 namespace msmrd {
     /**
-     * Over-damped Langevin integrator declaration. Note the initial velocity will be zero for all particles. Note
-     * the integration uses the BAOAB integration scheme found in Leimkuhler's book.
+     * Langevin integrator declaration. The initial velocity will be zero for all particles, unless
+     * explicitly given. The integration uses the BAOAB or ABOBA integration schemes found in Leimkuhler's book.
+     * Note the langevin type integratos don't use the diffusion coefficient of the particle but the friction
+     * coefficient.
      */
     class langevin : public integrator {
     protected:
         bool firstRun = true;
+        double frictionCoefficient;
         /**
-         * @param keeps track of first run, where double calculation of force field is required.
+         * @param firstRun keeps track of first run, where double calculation of force field is required.
+         * @param frictionCoefficient value of friction Coefficient for Langevin simulation, assumes the same
+         * value for all particles. It must have units of mass/time
          */
 
         void integrateB(std::vector<particle> &parts, double timestep);
@@ -40,9 +45,10 @@ namespace msmrd {
     public:
         std::string integratorScheme;
 
-        langevin(double dt, long seed, std::string particlesbodytype);
+        langevin(double dt, long seed, std::string particlesbodytype, double frictionCoefficient);
 
-        langevin(double dt, long seed, std::string particlesbodytype, std::string integratorScheme);
+        langevin(double dt, long seed, std::string particlesbodytype, double frictionCoefficient,
+                std::string integratorScheme);
 
         void integrate(std::vector<particle> &parts) override;
 

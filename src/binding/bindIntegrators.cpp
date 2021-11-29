@@ -30,10 +30,10 @@ namespace msmrd {
 
         py::class_<langevin, integrator>(m, "langevin", "Langevin integrator (timestep, seed, "
                                                         "particlesbodytype (point, rod, rigidbody, "
-                                                        "pointmix, rodmix or rigidbodymix), integratorScheme"
-                                                        "(BAOAB default) )")
-                .def(py::init<double &, long &, std::string &>())
-                .def(py::init<double &, long &, std::string &, std::string &>())
+                                                        "pointmix, rodmix or rigidbodymix), frictionCoefficient,"
+                                                        "integratorScheme (BAOAB default) )")
+                .def(py::init<double &, long &, std::string &, double &>())
+                .def(py::init<double &, long &, std::string &, double &, std::string &>())
                 .def("integrate", &langevin::integrate);
 
         py::class_<overdampedLangevinSelective, overdampedLangevin>(m, "overdampedLangevinSelective", "overdamped "
@@ -52,7 +52,7 @@ namespace msmrd {
                                                         "for MoriZwanzig application (timestep, seed, "
                                                         "particlesbodytype (point, rod, rigidbody, "
                                                         "pointmix, rodmix or rigidbodymix) )")
-                .def(py::init<double &, long &, std::string &>())
+                .def(py::init<double &, long &, std::string &, double &>())
                 .def("integrate", &integratorMoriZwanzig::integrate)
                 .def("setDistinguishedTypes", &integratorMoriZwanzig::setDistinguishedTypes);
 

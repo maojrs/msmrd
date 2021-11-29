@@ -11,21 +11,24 @@ namespace msmrd {
      * @param seed random generator seed (Note seed = -1 corresponds to random device)
      * @param rotation boolean to indicate if rotational degrees of freedom should be integrated
      */
-    langevin::langevin(double dt, long seed, std::string particlesbodytype, std::string integratorScheme)
-            : integrator(dt, seed, particlesbodytype), integratorScheme(integratorScheme) {
+
+    langevin::langevin(double dt, long seed, std::string particlesbodytype, double frictionCoefficient)
+            : integrator(dt, seed, particlesbodytype), frictionCoefficient(frictionCoefficient) {
         rotation = false;
         velocityIntegration = true;
+        integratorScheme = "BAOAB";
         if (particlesbodytype != "point") {
             throw std::invalid_argument("Langevin integrator only implemented for point particles "
                                         "(no rotation allowed)");
         }
     }
 
-    langevin::langevin(double dt, long seed, std::string particlesbodytype)
-            : integrator(dt, seed, particlesbodytype) {
+    langevin::langevin(double dt, long seed, std::string particlesbodytype, double frictionCoefficient,
+            std::string integratorScheme)
+            : integrator(dt, seed, particlesbodytype), frictionCoefficient(frictionCoefficient),
+            integratorScheme(integratorScheme) {
         rotation = false;
         velocityIntegration = true;
-        integratorScheme = "BAOAB";
         if (particlesbodytype != "point") {
             throw std::invalid_argument("Langevin integrator only implemented for point particles "
                                         "(no rotation allowed)");
@@ -85,7 +88,7 @@ namespace msmrd {
     // Integrates velocity full time step given friction and noise term
     void langevin::integrateO(std::vector<particle> &parts, double deltat) {
         for (int i = 0; i < parts.size(); i++) {
-            auto eta = KbTemp / parts[i].D; // friction coefficient
+            auto eta = frictionCoefficient; //KbTemp / parts[i].D; // friction coefficient
             auto mass = parts[i].mass;
             auto xi = std::sqrt(KbTemp * mass * (1 - std::exp(-2 * eta * deltat / mass))) / mass;
             auto newVel = std::exp(-deltat * eta / mass) * parts[i].nextVelocity + xi * randg.normal3D(0, 1);
