@@ -48,9 +48,9 @@ set(SOURCES
         src/discretizations/quaternionPartition.cpp
         src/discretizations/spherePartition.cpp
         src/integrators/integrator.cpp
+        src/integrators/integratorLangevin.cpp
         src/integrators/integratorMAPK.cpp
         src/integrators/integratorMoriZwanzig.cpp
-        src/integrators/integratorLangevin.cpp
         src/integrators/msmrdIntegrator.cpp
         src/integrators/msmrdMAPKintegrator.cpp
         src/integrators/msmrdMultiParticleIntegrator.cpp
@@ -116,9 +116,9 @@ set(PY_SOURCES
         include/discretizations/quaternionPartition.hpp
         include/discretizations/spherePartition.hpp
         include/integrators/integrator.hpp
+        include/integrators/integratorLangevin.hpp
         include/integrators/integratorMAPK.hpp
         include/integrators/integratorMoriZwanzig.hpp
-        include/integrators/integratorLangevin.hpp
         include/integrators/msmrdIntegrator.hpp
         include/integrators/msmrdMAPKintegrator.hpp
         include/integrators/msmrdMultiParticleIntegrator.hpp
