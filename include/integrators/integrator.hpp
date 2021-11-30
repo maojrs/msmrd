@@ -24,7 +24,6 @@ namespace msmrd {
         long seed;
         std::string particlesbodytype;
         bool rotation = false;
-        bool velocityIntegration = false;
         randomgen randg = randomgen();
 
 
@@ -96,9 +95,6 @@ namespace msmrd {
 
         template< typename PARTICLE >
         void updatePositionOrientation(std::vector<PARTICLE> &parts);
-
-        template< typename PARTICLE >
-        void updateVelocities(std::vector<PARTICLE> &parts);
 
         template< typename PARTICLE >
         void enforceBoundary(std::vector<PARTICLE> &parts);
@@ -227,20 +223,6 @@ namespace msmrd {
                 parts[i].updatePosition();
                 if (rotation) {
                     parts[i].updateOrientation();
-                }
-            }
-        }
-    }
-
-    /* Update velocities (sets calculated next velocity
-     * calculated by integrator and boundary as current velocity). Only
-     * updated if particle is active and if velocityIntegration is active. */
-    template <typename PARTICLE>
-    void integrator::updateVelocities(std::vector<PARTICLE> &parts) {
-        if (velocityIntegration) {
-            for (int i = 0; i < parts.size(); i++) {
-                if (parts[i].isActive()) {
-                    parts[i].updateVelocity();
                 }
             }
         }

@@ -2,33 +2,20 @@
 // Created by maojrs on 4/19/21.
 //
 
-#include "integrators/langevin.hpp"
+#include "integrators/integratorLangevin.hpp"
 
 namespace msmrd {
     /**
-     * Implementation of Lanegvin dynamics integrator class
+     * Implementation of Lanegvin dynamics integrator virtual class
      * @param dt time step
      * @param seed random generator seed (Note seed = -1 corresponds to random device)
      * @param rotation boolean to indicate if rotational degrees of freedom should be integrated
+     * @param frictionCoefficient friction coefficient in Langevin equation in units of mass/time.
      */
 
-    langevin::langevin(double dt, long seed, std::string particlesbodytype, double frictionCoefficient)
+    integratorLangevin::integratorLangevin(double dt, long seed, std::string particlesbodytype, double frictionCoefficient)
             : integrator(dt, seed, particlesbodytype), frictionCoefficient(frictionCoefficient) {
         rotation = false;
-        velocityIntegration = true;
-        integratorScheme = "BAOAB";
-        if (particlesbodytype != "point") {
-            throw std::invalid_argument("Langevin integrator only implemented for point particles "
-                                        "(no rotation allowed)");
-        }
-    }
-
-    langevin::langevin(double dt, long seed, std::string particlesbodytype, double frictionCoefficient,
-            std::string integratorScheme)
-            : integrator(dt, seed, particlesbodytype), frictionCoefficient(frictionCoefficient),
-            integratorScheme(integratorScheme) {
-        rotation = false;
-        velocityIntegration = true;
         if (particlesbodytype != "point") {
             throw std::invalid_argument("Langevin integrator only implemented for point particles "
                                         "(no rotation allowed)");
@@ -36,7 +23,7 @@ namespace msmrd {
     }
 
     // Integrate list of particles (need to override in case of MS particles)
-    void langevin::integrate(std::vector<particle> &parts) {
+    void integratorLangevin::integrate(std::vector<particle> &parts) {
         vec3<double> force;
         vec3<double> torque;
 
@@ -54,20 +41,14 @@ namespace msmrd {
         }
 
         // Integrates one time step of the chosen integrator, default BAOAB
-        if (integratorScheme == "ABOBA") {
-            integrateABOBA(parts, dt);
-        } else if (integratorScheme == "BAOAB") {
-            integrateBAOAB(parts, dt);
-        } else {
-            throw std::invalid_argument("Integration scheme chosen not implemented in integrate function.");
-        }
+        integrateOneTimestep(parts, dt);
 
         // Updates time
         clock += dt;
     }
 
-    // Integrates velocity half a time step given potential or force term
-    void langevin::integrateB(std::vector<particle> &parts, double deltat) {
+    // Integrates velocityfor deltat given potential or force term
+    void integratorLangevin::integrateB(std::vector<particle> &parts, double deltat) {
         vec3<double> force;
         for (int i = 0; i < parts.size(); i++) {
             force = 1.0 * forceField[i];
@@ -77,16 +58,16 @@ namespace msmrd {
         }
     }
 
-    // Integrates position half a time step given velocity term
-    void langevin::integrateA(std::vector<particle> &parts, double deltat) {
+    // Integrates position for deltat time step given velocity term
+    void integratorLangevin::integrateA(std::vector<particle> &parts, double deltat) {
         for (int i = 0; i < parts.size(); i++) {
             auto newPos = parts[i].nextPosition + deltat * parts[i].nextVelocity;
             parts[i].setNextPosition(newPos);
         }
     }
 
-    // Integrates velocity full time step given friction and noise term
-    void langevin::integrateO(std::vector<particle> &parts, double deltat) {
+    // Integrates velocity for timstep delta t given friction and noise term
+    void integratorLangevin::integrateO(std::vector<particle> &parts, double deltat) {
         auto eta = frictionCoefficient;
         for (int i = 0; i < parts.size(); i++) {
             auto mass = parts[i].mass;
@@ -96,13 +77,38 @@ namespace msmrd {
         }
     }
 
-    void langevin::integrateBAOAB(std::vector<particle> &parts, double timestep) {
+
+    /*
+     * Implementation of different Langevin integrators using different schemes, eahc in a different class
+     */
+
+    void langevinSemImplicitEuler::integrateOneTimestep(std::vector<particle> &parts, double deltat) {
+        // Calculate force field
+        calculateForceTorqueFields(parts);
+
+        /* Integrate OBA part and save next positions/orientations in parts[i].next. Corresponds to semi-implicit
+         * Euler method. */
+        integrateO(parts, deltat);
+        integrateB(parts, deltat);
+        integrateA(parts, deltat);
+
+        // Enforce boundary; sets new positions into parts[i].nextPosition (only if particle is active)
+        enforceBoundary(parts);
+
+        // Update particlesposition to recalculate force for last scheme step "B"
+        updatePositionOrientation(parts);
+
+        // Update velocity based on parts[i].nextVelocity
+        updateVelocities(parts);
+    };
+
+    void langevinBAOAB::integrateOneTimestep(std::vector<particle> &parts, double deltat) {
         /* Integrate BAOA part and save next positions/orientations in parts[i].next. Note final
          * position already obtained at the end of these integrations. */
-        integrateB(parts, dt/2.0);
-        integrateA(parts, dt/2.0);
-        integrateO(parts, dt);
-        integrateA(parts, dt/2.0);
+        integrateB(parts, deltat/2.0);
+        integrateA(parts, deltat/2.0);
+        integrateO(parts, deltat);
+        integrateA(parts, deltat/2.0);
 
         // Enforce boundary; sets new positions into parts[i].nextPosition (only if particle is active)
         enforceBoundary(parts);
@@ -114,13 +120,13 @@ namespace msmrd {
         calculateForceTorqueFields(parts);
 
         // Integrate final B part with newly calculated force to obtain final velocities
-        integrateB(parts, dt/2.0);
+        integrateB(parts, deltat/2.0);
 
         // Update velocity based on parts[i].nextVelocity
         updateVelocities(parts);
     };
 
-    void langevin::integrateABOBA(std::vector<particle> &parts, double timestep) {
+    void langevinABOBA::integrateOneTimestep(std::vector<particle> &parts, double timestep) {
 
         integrateA(parts, dt/2.0);
 

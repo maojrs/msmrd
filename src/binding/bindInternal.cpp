@@ -4,6 +4,7 @@
 #include "binding.hpp"
 #include "boundaries/boundary.hpp"
 #include "integrators/integrator.hpp"
+#include "integrators/integratorLangevin.hpp"
 #include "markovModels/markovModel.hpp"
 #include "potentials/potentials.hpp"
 #include "trajectories/trajectory.hpp"
@@ -29,6 +30,16 @@ namespace msmrd {
                 .def("setBoundary", &integrator::setBoundary)
                 .def("setExternalPotential", &integrator::setExternalPotential)
                 .def("setPairPotential", &integrator::setPairPotential);
+
+        /* Bind Langevin integrators parent class*/
+        pybind11::class_<integratorLangevin>(m, "integratorLangevin")
+                .def_property_readonly("clock", &integratorLangevin::getClock)
+                .def("setClock", &integratorLangevin::setClock)
+                .def("resetClock", &integratorLangevin::resetClock)
+                .def("setKbT", &integratorLangevin::setKbT)
+                .def("setBoundary", &integratorLangevin::setBoundary)
+                .def("setExternalPotential", &integratorLangevin::setExternalPotential)
+                .def("setPairPotential", &integratorLangevin::setPairPotential);
 
         /* Bind Markov models parent class*/
         pybind11::class_<markovModel>(m, "markovModel")

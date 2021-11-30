@@ -7,7 +7,7 @@
 namespace msmrd {
 
     integratorMoriZwanzig::integratorMoriZwanzig(double dt, long seed, std::string particlesbodytype, double frictionCoefficient) :
-    langevin(dt, seed, particlesbodytype, frictionCoefficient, "modifiedABOBA") {};
+    langevinABOBA(dt, seed, particlesbodytype, frictionCoefficient) {};
 
     /* Loads auxiliary variable into raux. In this case this correspond to the potential and noise term,
      * which can be calculated as M(dV) + gamma V_i dt .*/
@@ -95,7 +95,7 @@ namespace msmrd {
 
 
     /* Integrates velocity full time step given friction and noise term, svaes noise term in raux2 variable.
-     * Specialized version of the one implemented in the langevin integrator. */
+     * Specialized version of the one implemented in the integratorLangevin integrator. */
     void integratorMoriZwanzig::integrateO(std::vector<particle> &parts, double deltat) {
         auto eta = frictionCoefficient;
         for (int i = 0; i < parts.size(); i++) {

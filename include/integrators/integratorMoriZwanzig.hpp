@@ -3,19 +3,19 @@
 //
 
 #pragma once
-#include "integrators/langevin.hpp"
+#include "integrators/integratorLangevin.hpp"
 #include "particle.hpp"
 #include "potentials/potentials.hpp"
 
 namespace msmrd {
     /**
-     * Integrator class for integratorMoriZwanzig. It is essentially the same as the langevin integrator, but
+     * Integrator class for integratorMoriZwanzig. It is essentially the same as the integratorLangevin integrator, but
      * it stores specific values into the raux variable of the particle class for further analysis. It is also
      * only implemented for the ABOBA since it is ideal to extract the raux variables.
      *
      * It assumes the distinguished particle is the one with index0 (type 1).
      */
-    class integratorMoriZwanzig : public langevin {
+    class integratorMoriZwanzig : public langevinABOBA {
     protected:
         std::vector<int> distinguishedTypes{1};
         /**
