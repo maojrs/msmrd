@@ -21,7 +21,7 @@ namespace msmrd {
         double instantTemperature = 0;
         // Calculate kinetic energy
         for (int i = 0; i < particleList.size(); i++) {
-            kineticEnergy += 0.5 * particleList[i].mass * particleList[i].velocity.normSquared()/2.0;
+            kineticEnergy += 0.5 * particleList[i].mass * particleList[i].velocity.normSquared();
         }
 
         // Calculate instant temperature (assuming Kb=1)
