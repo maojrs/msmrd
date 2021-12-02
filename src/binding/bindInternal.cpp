@@ -32,7 +32,7 @@ namespace msmrd {
                 .def("setPairPotential", &integrator::setPairPotential);
 
         /* Bind Langevin integrators parent class*/
-        pybind11::class_<integratorLangevin>(m, "integratorLangevin")
+        pybind11::class_<integratorLangevin, integrator>(m, "integratorLangevin")
                 .def_property_readonly("clock", &integratorLangevin::getClock)
                 .def("setClock", &integratorLangevin::setClock)
                 .def("resetClock", &integratorLangevin::resetClock)
