@@ -69,7 +69,7 @@ namespace msmrd {
      * Declaration of different Langevin integrators using different schemes, each in a different class
      */
 
-    class langevinSemImplicitEuler : public integratorLangevin {
+    class langevinSemiImplicitEuler : public integratorLangevin {
     public:
         using integratorLangevin::integratorLangevin;
 

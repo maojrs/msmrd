@@ -22,12 +22,12 @@ namespace msmrd {
      * pyBinders for the c++ integrators classes
      */
     void bindIntegrators(py::module &m) {
-        py::class_<langevinSemImplicitEuler, integratorLangevin>(m, "langevinSemImplicitEuler", "Langevin Semi-implicit Euler "
+        py::class_<langevinSemiImplicitEuler, integratorLangevin>(m, "langevinSemiImplicitEuler", "Langevin Semi-implicit Euler "
                                                                          "integrator (timestep, seed, "
                                                                           "particlesbodytype (point, rod, rigidbody, "
                                                                           "pointmix, rodmix or rigidbodymix), frictionCoefficient,")
                 .def(py::init<double &, long &, std::string &, double &>())
-                .def("integrate", &langevinSemImplicitEuler::integrate);
+                .def("integrate", &langevinSemiImplicitEuler::integrate);
 
         py::class_<langevinBAOAB, integratorLangevin>(m, "langevinBAOAB", "Langevin BAOAB integrator (timestep, seed, "
                                                         "particlesbodytype (point, rod, rigidbody, "

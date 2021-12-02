@@ -82,7 +82,7 @@ namespace msmrd {
      * Implementation of different Langevin integrators using different schemes, eahc in a different class
      */
 
-    void langevinSemImplicitEuler::integrateOneTimestep(std::vector<particle> &parts, double deltat) {
+    void langevinSemiImplicitEuler::integrateOneTimestep(std::vector<particle> &parts, double deltat) {
         // Calculate force field
         calculateForceTorqueFields(parts);
 

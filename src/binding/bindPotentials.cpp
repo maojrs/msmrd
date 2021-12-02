@@ -43,7 +43,8 @@ namespace msmrd {
                 .def(py::init<double &, double &>())
                 .def(py::init<double &, double &, double &>())
                 .def("setForceCapValue", &lennardJones::setForceCapValue)
-                .def("getPotentialCapValue", &lennardJones::getPotentialCapValue)
+                .def("setPotentialCutOff", &lennardJones::setPotentialCutOff)
+                .def("getPotentialCutOff", &lennardJones::getPotentialCutOff)
                 .def("getForceCapValue", &lennardJones::getForceCapValue);
 
 
