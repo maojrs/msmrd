@@ -40,7 +40,8 @@ import os
 # Main parameters
 numBathParticles = 500 #500 #500
 numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
-D = 3.0E-2 #1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s #0.1
+# D = 3.0E-2 #1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s #0.1
+Gamma = 3.0 #30 # Friction coefficient (units of KbT/D = mass over time (gram/mol)/ns)
 particlemass = 18.0 # (g/mol) approximately mass of water
 distinguishedParticleMass = 3 * particlemass # (kg)
 particleDiameter = 0.3 # (nm)
@@ -51,7 +52,7 @@ numSimulations = 100 #250 #500
 KbT = 1
 
 # Main parameters for integrator
-dt = 0.005 #0.001 #0.0005 # (ns)
+dt = 0.05 #0.005 #0.001 #0.0005 # (ns)
 seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
@@ -122,7 +123,7 @@ def runParallelSims(simnumber):
     # Define particle list
     seed = int(simnumber)
     random.seed(seed)
-    partlist = particleTools.randomLangevinParticleList(numparticles, boxsize, separationDistance, D,
+    partlist = particleTools.randomLangevinParticleList(numparticles, boxsize, separationDistance, 0.0,
                                                         particlemass, seed, distinguishedParticleOrigin=True)
     # Set distinguished particle (default type is zero)
     partlist[0].setType(1)
@@ -140,7 +141,7 @@ def runParallelSims(simnumber):
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
-    integrator = integratorMoriZwanzig(dt, seed, bodytype)
+    integrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialWCA)
     integrator.setExternalPotential(externalPotential)
