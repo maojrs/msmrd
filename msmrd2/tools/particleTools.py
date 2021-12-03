@@ -61,13 +61,12 @@ def randomParticleList(numparticles, boxsize, separationDistance, D, Drot, rando
     partlist = msmrd2.integrators.particleList(pyPartlist)
     return partlist
 
-def randomLangevinParticleList(numparticles, boxsize, separationDistance, D, masses = 1, randomSeed = -1,
+def randomLangevinParticleList(numparticles, boxsize, separationDistance, masses = 1, randomSeed = -1,
                                distinguishedParticleOrigin = False):
     '''
     :param numparticles: number of particles in list
     :param boxsize: size of simulation box, if scalar it assumes the three box edges are the same in all dimensions
     :param separationDistance: separation distance between particle to avoid overlapping
-    :param D: diffusion coefficients of particles.
     :param masses of particles (float or list of floats)
     :param randomSeed seed for python random generator. Important to specify in parallel runs. Default value of -1
     will use the default seed.
@@ -117,7 +116,7 @@ def randomLangevinParticleList(numparticles, boxsize, separationDistance, D, mas
                 warnings.warn("Cannot easily set nonoverlapping particles with current setup. Check boxsize, "
                               "number of particles and separation distance.")
 
-        part = msmrd2.particle(D, position, velocity, masses[i])
+        part = msmrd2.particle(position, velocity, masses[i])
         part.setID(i)
         pyPartlist.append(part)
 

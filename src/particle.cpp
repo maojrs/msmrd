@@ -58,10 +58,9 @@ namespace msmrd {
     /* Constructors of particles for Langevin integrator: receive input from vec3/quaternion or std::vector and
      * numpy arrays (through pybind) */
 
-    particle::particle(double D, vec3<double> position, vec3<double> velocity, double mass)
-            : D(D), position(position), velocity(velocity), mass(mass) {
+    particle::particle(vec3<double> position, vec3<double> velocity, double mass)
+            : position(position), velocity(velocity), mass(mass) {
         type = 0;
-        Drot = 0;
         orientation = quaternion<double>(1,0,0,0);
         orientvector = vec3<double>(0., 0., 1.);
         orientvector = msmrdtools::rotateVec(orientvector, orientation);
@@ -71,10 +70,9 @@ namespace msmrd {
         nextOrientvector = 1.0 * orientvector;
     };
 
-    particle::particle(double D, std::vector<double> &position, std::vector<double> &velocity, double mass)
-            : D(D), position(position), velocity(velocity), mass(mass) {
+    particle::particle(std::vector<double> &position, std::vector<double> &velocity, double mass)
+            : position(position), velocity(velocity), mass(mass) {
         type = 0;
-        Drot = 0;
         orientation = quaternion<double>(1,0,0,0);
         orientvector = vec3<double>(0., 0., 1.);
         orientvector = msmrdtools::rotateVec(orientvector, orientation);

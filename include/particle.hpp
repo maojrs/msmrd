@@ -19,7 +19,7 @@ namespace msmrd {
         int pid = 0;
         bool active = true;
         int type = 0;
-        double D;
+        double D = 0;
         double Drot = 0;
         vec3<double> position;
         vec3<double> orientvector;
@@ -118,10 +118,10 @@ namespace msmrd {
         particle(int type, int state, double D, double Drot, std::vector<double> &position,
                  std::vector<double> &orientation);
 
-        // Constructors of particle for Langevin integrators.
-        particle(double D, vec3<double> position, vec3<double> velocity, double mass);
+        // Constructors of particle for Langevin integrators (diffusion coeffs not defined).
+        particle(vec3<double> position, vec3<double> velocity, double mass);
 
-        particle(double D, std::vector<double> &position, std::vector<double> &velocity, double mass);
+        particle(std::vector<double> &position, std::vector<double> &velocity, double mass);
 
 
         /* The functions below of the particle class are used by c++ and python,

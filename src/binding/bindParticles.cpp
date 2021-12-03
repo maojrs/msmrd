@@ -16,7 +16,7 @@ namespace msmrd {
                                             "for MArkovian switch behavior")
                 .def(py::init<double &, double &, std::vector<double> &, std::vector<double> &>())
                 .def(py::init<int &, int &, double &, double &, std::vector<double> &, std::vector<double> &>())
-                .def(py::init<double &, std::vector<double> &, std::vector<double> &, double &>())
+                .def(py::init<std::vector<double> &, std::vector<double> &, double &>())
                 .def_property_readonly("ID", &particle::getID)
                 .def_property_readonly("D", &particle::getD)
                 .def_property_readonly("Drot", &particle::getDrot)
