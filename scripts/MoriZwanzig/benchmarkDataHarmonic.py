@@ -121,7 +121,7 @@ def runParallelSims(simnumber):
     # Define particle list
     seed = int(simnumber)
     random.seed(seed)
-    partlist = particleTools.randomLangevinParticleList(numparticles, boxsize, separationDistance, 0.0,
+    partlist = particleTools.randomLangevinParticleList(numparticles, boxsize, separationDistance, 
                                                         particlemass, seed, distinguishedParticleOrigin=False)
     # Set distinguished particle (default type is zero)
     partlist[0].setType(1)
