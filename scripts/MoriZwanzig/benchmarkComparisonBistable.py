@@ -41,7 +41,7 @@ import os
 numBathParticles = 500 #500 #500
 numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
 # D = 3.0E-2 #1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s #0.1
-Gamma = 3.0 #30 # Friction coefficient (units of KbT/D = mass over time (gram/mol)/ns)
+Gamma = 0.3 #30 # Friction coefficient (units of KbT/D = mass over time (gram/mol)/ns)
 particlemass = 18.0 # (g/mol) approximately mass of water
 distinguishedParticleMass = 3 * particlemass # (kg)
 particleDiameter = 0.3 # (nm)
@@ -75,7 +75,7 @@ scalefactor = 75
 tfinal = 10000 #100 #10000 #100000
 timesteps = int(tfinal/dt) 
 bufferSize = 100 * 1024
-stride = 50 #50 #5
+stride = 1 #50 #5
 outTxt = False
 outH5 = True
 outChunked = True

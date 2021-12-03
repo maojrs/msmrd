@@ -41,7 +41,7 @@ import os
 numBathParticles = 500 #500 #500
 numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
 # D = 3.0E-2 #1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s #0.1
-Gamma = 30 # Friction coefficient (units of KbT/D = mass over time (gram/mol)/ns)
+Gamma = 0.3 #30 # Friction coefficient (units of KbT/D = mass over time (gram/mol)/ns)
 particlemass = 18.0 # (g/mol) approximately mass of water
 distinguishedParticleMass = 3 * particlemass # (kg)
 particleDiameter = 0.3 # (nm)
@@ -52,7 +52,7 @@ numSimulations = 2500 #250 #500
 KbT = 1
 
 # Main parameters for integrator
-dt = 0.005 #0.001 #0.0005 #0.05 # (ns)
+dt = 0.05 #0.001 #0.0005 #0.05 # (ns)
 seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
@@ -73,7 +73,7 @@ scalefactor = 1
 # Simulation parameters
 timesteps = 10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
 bufferSize = 100 * 1024
-stride = 5 #25
+stride = 1 #5 #25
 outTxt = False
 outH5 = True
 outChunked = True
