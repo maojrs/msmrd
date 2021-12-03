@@ -69,7 +69,7 @@ sigma = rm * 2**(-1/6)
 minimas = np.array([[-1.5,0,0], [1.5,0,0]])
 sigma = 1
 standardDevs = np.array([[sigma, sigma, sigma], [sigma, sigma, sigma]])
-scalefactor = 15
+scalefactor = 75
 
 # Simulation parameters
 timesteps = 10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
