@@ -6,8 +6,8 @@
 
 namespace msmrd {
 
-    integratorMoriZwanzig::integratorMoriZwanzig(double dt, long seed, std::string particlesbodytype, double frictionCoefficient) :
-    langevinABOBA(dt, seed, particlesbodytype, frictionCoefficient) {};
+    integratorMoriZwanzig::integratorMoriZwanzig(double dt, long seed, std::string particlesbodytype, double Gamma) :
+    langevinABOBA(dt, seed, particlesbodytype, Gamma) {};
 
     /* Loads auxiliary variable into raux. In this case this correspond to the potential and noise term,
      * which can be calculated as M(dV) + gamma V_i dt .*/
@@ -17,9 +17,8 @@ namespace msmrd {
             // If particle type corresponds to one of the distinguished particles, sample its value
             if (std::find(distinguishedTypes.begin(), distinguishedTypes.end(),
                           parts[i].type) != distinguishedTypes.end()) {
-                auto eta = KbTemp / parts[i].D;
                 auto mass = parts[i].mass;
-                auto interactionTerm = pairsForces[i]*dt/(2*mass) * (1 + std::exp(-dt * eta / mass));
+                auto interactionTerm = pairsForces[i]*dt/(2*mass) * (1 + std::exp(-dt * Gamma / mass));
                 auto noiseTerm = parts[i].raux2;
                 parts[i].raux = interactionTerm + noiseTerm;
             }
@@ -97,12 +96,11 @@ namespace msmrd {
     /* Integrates velocity full time step given friction and noise term, svaes noise term in raux2 variable.
      * Specialized version of the one implemented in the integratorLangevin integrator. */
     void integratorMoriZwanzig::integrateO(std::vector<particle> &parts, double deltat) {
-        auto eta = frictionCoefficient;
         for (int i = 0; i < parts.size(); i++) {
             auto mass = parts[i].mass;
-            auto xi = std::sqrt((KbTemp/mass) * (1 - std::exp(-2 * eta * deltat / mass)));
+            auto xi = std::sqrt((KbTemp/mass) * (1 - std::exp(-2 * Gamma * deltat / mass)));
             auto noiseTerm = xi * randg.normal3D(0, 1);
-            auto newVel = std::exp(-deltat * eta / mass) * parts[i].nextVelocity + noiseTerm;
+            auto newVel = std::exp(-deltat * Gamma / mass) * parts[i].nextVelocity + noiseTerm;
             parts[i].setNextVelocity(newVel);
             parts[i].raux2 = noiseTerm;
         }

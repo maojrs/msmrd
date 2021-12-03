@@ -26,7 +26,7 @@ namespace msmrd {
         void integrateO(std::vector<particle> &parts, double timestep);
 
     public:
-        integratorMoriZwanzig(double dt, long seed, std::string particlesbodytype, double frictionCoefficient);
+        integratorMoriZwanzig(double dt, long seed, std::string particlesbodytype, double Gamma);
 
         void integrate(std::vector<particle> &parts) override;
 

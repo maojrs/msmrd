@@ -19,10 +19,10 @@ namespace msmrd {
     class integratorLangevin : public integrator {
     protected:
         bool firstRun = true;
-        double frictionCoefficient;
+        double Gamma;
         /**
          * @param firstRun keeps track of first run, where double calculation of force field is required.
-         * @param frictionCoefficient value of friction Coefficient for Langevin simulation, assumes the same
+         * @param Gamma value of friction Coefficient for Langevin simulation, assumes the same
          * value for all particles. It must have units of mass/time
          */
 
@@ -46,7 +46,7 @@ namespace msmrd {
         void rotate(particle &part, vec3<double> torque, double dt) override {};
 
     public:
-        integratorLangevin(double dt, long seed, std::string particlesbodytype, double frictionCoefficient);
+        integratorLangevin(double dt, long seed, std::string particlesbodytype, double Gamma);
 
         void integrate(std::vector<particle> &parts) override;
 

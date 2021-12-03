@@ -13,8 +13,8 @@ namespace msmrd {
      * @param frictionCoefficient friction coefficient in Langevin equation in units of mass/time.
      */
 
-    integratorLangevin::integratorLangevin(double dt, long seed, std::string particlesbodytype, double frictionCoefficient)
-            : integrator(dt, seed, particlesbodytype), frictionCoefficient(frictionCoefficient) {
+    integratorLangevin::integratorLangevin(double dt, long seed, std::string particlesbodytype, double Gamma)
+            : integrator(dt, seed, particlesbodytype), Gamma(Gamma) {
         rotation = false;
         if (particlesbodytype != "point") {
             throw std::invalid_argument("Langevin integrator only implemented for point particles "
@@ -68,11 +68,10 @@ namespace msmrd {
 
     // Integrates velocity for timstep delta t given friction and noise term
     void integratorLangevin::integrateO(std::vector<particle> &parts, double deltat) {
-        auto eta = frictionCoefficient;
         for (int i = 0; i < parts.size(); i++) {
             auto mass = parts[i].mass;
-            auto xi = std::sqrt(KbTemp * mass * (1 - std::exp(-2 * eta * deltat / mass))) / mass;
-            auto newVel = std::exp(-deltat * eta / mass) * parts[i].nextVelocity + xi * randg.normal3D(0, 1);
+            auto xi = std::sqrt(KbTemp * mass * (1 - std::exp(-2 * Gamma * deltat / mass))) / mass;
+            auto newVel = std::exp(-deltat * Gamma / mass) * parts[i].nextVelocity + xi * randg.normal3D(0, 1);
             parts[i].setNextVelocity(newVel);
         }
     }
