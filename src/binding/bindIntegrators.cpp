@@ -62,7 +62,7 @@ namespace msmrd {
         py::class_<integratorMoriZwanzig, integratorLangevin>(m, "integratorMoriZwanzig", "Specialized Langevin integrator "
                                                         "for MoriZwanzig application (timestep, seed, "
                                                         "particlesbodytype (point, rod, rigidbody, "
-                                                        "pointmix, rodmix or rigidbodymix) )")
+                                                        "pointmix, rodmix or rigidbodymix), Gamma(friction coeff) )")
                 .def(py::init<double &, long &, std::string &, double &>())
                 .def("integrate", &integratorMoriZwanzig::integrate)
                 .def("setDistinguishedTypes", &integratorMoriZwanzig::setDistinguishedTypes);

@@ -10,7 +10,7 @@ namespace msmrd {
     langevinABOBA(dt, seed, particlesbodytype, Gamma) {};
 
     /* Loads auxiliary variable into raux. In this case this correspond to the potential and noise term,
-     * which can be calculated as M(dV) + gamma V_i dt .*/
+     * which can be calculated as M(dV) + Gamma V_i dt .*/
     void integratorMoriZwanzig::loadAuxiliaryValues(std::vector<particle> &parts,
                                                     std::vector<vec3<double>> pairsForces) {
         for (int i = 0; i < parts.size(); i++) {
@@ -98,7 +98,7 @@ namespace msmrd {
     void integratorMoriZwanzig::integrateO(std::vector<particle> &parts, double deltat) {
         for (int i = 0; i < parts.size(); i++) {
             auto mass = parts[i].mass;
-            auto xi = std::sqrt((KbTemp/mass) * (1 - std::exp(-2 * Gamma * deltat / mass)));
+            auto xi = std::sqrt(KbTemp * mass * (1 - std::exp(-2 * Gamma * deltat / mass))) / mass;
             auto noiseTerm = xi * randg.normal3D(0, 1);
             auto newVel = std::exp(-deltat * Gamma / mass) * parts[i].nextVelocity + noiseTerm;
             parts[i].setNextVelocity(newVel);

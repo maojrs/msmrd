@@ -47,7 +47,7 @@ namespace msmrd {
         clock += dt;
     }
 
-    // Integrates velocityfor deltat given potential or force term
+    // Integrates velocity for deltat given potential or force term
     void integratorLangevin::integrateB(std::vector<particle> &parts, double deltat) {
         vec3<double> force;
         for (int i = 0; i < parts.size(); i++) {
