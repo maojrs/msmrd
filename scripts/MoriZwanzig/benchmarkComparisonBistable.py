@@ -2,7 +2,7 @@ import numpy as np
 import msmrd2
 import msmrd2.visualization as msmrdvis
 from msmrd2.integrators import integratorMoriZwanzig
-from msmrd2.potentials import WCA, gaussians3D
+from msmrd2.potentials import WCA, bistable
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
 
