@@ -2,7 +2,7 @@ import numpy as np
 import msmrd2
 import msmrd2.visualization as msmrdvis
 from msmrd2.integrators import integratorMoriZwanzig
-from msmrd2.potentials import WCA, gaussians3D
+from msmrd2.potentials import WCA, bistable
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
 
@@ -66,13 +66,12 @@ rm = particleDiameter # (diameter in nm)
 sigma = rm * 2**(-1/6)
 
 # Parameters for external potential (will only acts on distinguished particles (type 1))
-minimas = np.array([[-1.5,0,0], [1.5,0,0]])
-sigma = 1
-standardDevs = np.array([[sigma, sigma, sigma], [sigma, sigma, sigma]])
-scalefactor = 75
+minimaDist = 1.5
+kconstants = np.array([3.0, 10.0, 10.0])
+scalefactor = 1
 
 # Simulation parameters
-timesteps = 10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
+timesteps = 2000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
 bufferSize = 100 * 1024
 stride = 1 #25
 outTxt = False
@@ -136,7 +135,7 @@ def runParallelSims(simnumber):
     potentialWCA.setForceCapValue(100.0)
 
     # Define external potential
-    externalPotential = gaussians3D(minimas, standardDevs, distinguishedTypes, scalefactor)
+    externalPotential = bistable(minimaDist, kconstants, distinguishedTypes, scalefactor)
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
