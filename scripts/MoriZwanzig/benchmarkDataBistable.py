@@ -71,7 +71,7 @@ kconstants = np.array([3.0, 10.0, 10.0])
 scalefactor = 1
 
 # Simulation parameters
-timesteps = 2000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
+timesteps = 10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
 bufferSize = 100 * 1024
 stride = 1 #25
 outTxt = False
