@@ -62,6 +62,7 @@ set(SOURCES
         src/markovModels/discreteTimeMarkovModel.cpp
         src/markovModels/markovModel.cpp
         src/markovModels/msmrdMarkovModel.cpp
+        src/potentials/bistable.cpp
         src/potentials/dipole.cpp
         src/potentials/gaussians3D.cpp
         src/potentials/gayBerne.cpp
@@ -131,6 +132,7 @@ set(PY_SOURCES
         include/markovModels/markovModel.hpp
         include/markovModels/msmrdMarkovModel.hpp
         include/potentials/potentials.hpp
+        include/potentials/bistable.hpp
         include/potentials/dipole.hpp
         include/potentials/gaussians3D.hpp
         include/potentials/gayBerne.hpp

@@ -1,5 +1,6 @@
 #include "binding.hpp"
 #include "potentials/potentials.hpp"
+#include "potentials/bistable.hpp"
 #include "potentials/dipole.hpp"
 #include "potentials/gaussians3D.hpp"
 #include "potentials/gayBerne.hpp"
@@ -37,6 +38,12 @@ namespace msmrd {
                                                                       "constructors available.")
                 .def(py::init<std::vector<double> &,std::vector<double>&, double &>())
                 .def(py::init<std::vector<double> &,std::vector<double>&, std::vector<int> &, double &>());
+
+        py::class_<bistable, externalPotential >(m, "bistable", "Bistable potential (minimaDist, "
+                                                                "konstants, scalefactor), alternative"
+                                                                "constructors available.")
+                .def(py::init<double &,std::vector<double>&, double &>())
+                .def(py::init<double &,std::vector<double>&, std::vector<int> &, double &>());
 
         py::class_<lennardJones, pairPotential>(m, "lennardJones", "Lennard-Jones potential "
                                                            "(epsilon, sigma)")
