@@ -7,6 +7,7 @@
 #include "potentials/harmonic.hpp"
 #include "potentials/harmonicRepulsion.hpp"
 #include "potentials/lennardJones.hpp"
+#include "potentials/pairBistable.hpp"
 #include "potentials/patchyParticle.hpp"
 #include "potentials/patchyParticleAngular.hpp"
 #include "potentials/patchyParticleSTMV.hpp"
@@ -54,6 +55,10 @@ namespace msmrd {
                 .def("getPotentialCutOff", &lennardJones::getPotentialCutOff)
                 .def("getForceCapValue", &lennardJones::getForceCapValue);
 
+        py::class_<pairBistable, pairPotential>(m, "pairBistable", "pairBistable potential "
+                                                                   "(x0, rad, scalefactor)")
+                .def(py::init<double &, double &, double &>())
+                .def(py::init<double &, double &, std::vector<int> &, double &>());
 
         py::class_<WCA, lennardJones>(m, "WCA", "WCA potential (epsilon, sigma)")
                 .def(py::init<double &, double &>());

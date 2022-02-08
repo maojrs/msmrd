@@ -69,6 +69,7 @@ set(SOURCES
         src/potentials/harmonic.cpp
         src/potentials/harmonicRepulsion.cpp
         src/potentials/lennardJones.cpp
+        src/potentials/pairBistable.cpp
         src/potentials/patchyParticle.cpp
         src/potentials/patchyParticleAngular.cpp
         src/potentials/patchyParticleSTMV.cpp
@@ -139,6 +140,7 @@ set(PY_SOURCES
         include/potentials/harmonic.hpp
         include/potentials/harmonicRepulsion.hpp
         include/potentials/lennardJones.hpp
+        include/potentials/pairBistable.hpp
         include/potentials/patchyParticle.hpp
         include/potentials/patchyParticleAngular.hpp
         include/potentials/patchyParticleSTMV.hpp
