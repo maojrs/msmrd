@@ -1,8 +1,7 @@
 import numpy as np
 import msmrd2
-import msmrd2.visualization as msmrdvis
 from msmrd2.integrators import integratorMoriZwanzig
-from msmrd2.potentials import WCA, bistable
+from msmrd2.potentials import WCA
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
 
@@ -65,14 +64,9 @@ epsilon = 1.0
 rm = particleDiameter # (diameter in nm)
 sigma = rm * 2**(-1/6)
 
-# Parameters for external potential (will only acts on distinguished particles (type 1))
-minimaDist = 1.5
-kconstants = np.array([1.0, 1.0, 1.0])
-scalefactor = 1
-
 # Simulation parameters
 tfinal = 10000 #100 #10000 #100000
-timesteps = int(tfinal/dt) 
+timesteps = int(tfinal/dt)
 bufferSize = 100 * 1024
 stride = 1 #50 #5
 outTxt = False
@@ -93,7 +87,7 @@ except OSError as error:
     print("Folder MoriZwanzig already exists.")
     proceed = True
 
-# Create folder for benchmark data        
+# Create folder for benchmark data
 foldername = "benchmarkComparison"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
@@ -135,15 +129,11 @@ def runParallelSims(simnumber):
     potentialWCA = WCA(epsilon, sigma)
     potentialWCA.setForceCapValue(100.0)
 
-    # Define external potential
-    externalPotential = bistable(minimaDist, kconstants, distinguishedTypes, scalefactor)
-
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
     integrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialWCA)
-    integrator.setExternalPotential(externalPotential)
     integrator.setDistinguishedTypes(distinguishedTypes)
     integrator.setKbT(KbT)
 

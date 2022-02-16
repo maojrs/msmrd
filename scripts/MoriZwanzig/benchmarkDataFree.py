@@ -1,8 +1,7 @@
 import numpy as np
 import msmrd2
-import msmrd2.visualization as msmrdvis
 from msmrd2.integrators import integratorMoriZwanzig
-from msmrd2.potentials import WCA, bistable
+from msmrd2.potentials import WCA
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
 
@@ -46,13 +45,13 @@ particlemass = 18.0 # (g/mol) approximately mass of water
 distinguishedParticleMass = 3 * particlemass # (kg)
 particleDiameter = 0.3 # (nm)
 separationDistance = 2 * particleDiameter # minimum separation distance for initial condition
-numSimulations = 100 #250 #500
+numSimulations = 2500 #250 #500
 # For computations, we assume KbT=1, thus the force F must be: F=KbT f, where f is the force computed
 # from the potential. This means the plotted potential is on reduced units (not the distances though);
 KbT = 1
 
 # Main parameters for integrator
-dt = 0.05 #0.005 #0.001 #0.0005 # (ns)
+dt = 0.05 #0.001 #0.0005 #0.05 # (ns)
 seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
@@ -65,26 +64,20 @@ epsilon = 1.0
 rm = particleDiameter # (diameter in nm)
 sigma = rm * 2**(-1/6)
 
-# Parameters for external potential (will only acts on distinguished particles (type 1))
-minimaDist = 1.5
-kconstants = np.array([1.0, 1.0, 1.0])
-scalefactor = 1
-
 # Simulation parameters
-tfinal = 10000 #100 #10000 #100000
-timesteps = int(tfinal/dt) 
+timesteps = 10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
 bufferSize = 100 * 1024
-stride = 1 #50 #5
+stride = 1 #25
 outTxt = False
 outH5 = True
 outChunked = True
-trajtype = "moriZwanzigVelocity" # Samples position and velocity of distinguished particle (type 1) + raux variables
+trajtype = "moriZwanzigVelocity" # Samples position & velocity of distinguished particle, its type (1) + raux variables
 distinguishedTypes = [1]
-equilibrationSteps = 10000
+equilibrationSteps = 5000
 
 
 # Parent directory location
-parentDirectory = "../../data/MoriZwanzig/bistable/"
+parentDirectory = "../../data/MoriZwanzig/free/"
 
 # Create folder for data
 try:
@@ -93,13 +86,13 @@ except OSError as error:
     print("Folder MoriZwanzig already exists.")
     proceed = True
 
-# Create folder for benchmark data        
-foldername = "benchmarkComparison"
+# Create folder for benchmark data
+foldername = "benchmark"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
 except OSError as error:
-    print("Folder MoriZwanzig/" + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
+    print("Folder MoriZwanzig/free/" + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
     proceed = input()
     if proceed != 'y':
         sys.exit()
@@ -123,7 +116,7 @@ def runParallelSims(simnumber):
     seed = int(simnumber)
     random.seed(seed)
     partlist = particleTools.randomLangevinParticleList(numparticles, boxsize, separationDistance,
-                                                        particlemass, seed, distinguishedParticleOrigin=True)
+                                                        particlemass, seed, distinguishedParticleOrigin=False)
     # Set distinguished particle (default type is zero)
     partlist[0].setType(1)
     partlist[0].setMass(distinguishedParticleMass)
@@ -135,15 +128,11 @@ def runParallelSims(simnumber):
     potentialWCA = WCA(epsilon, sigma)
     potentialWCA.setForceCapValue(100.0)
 
-    # Define external potential
-    externalPotential = bistable(minimaDist, kconstants, distinguishedTypes, scalefactor)
-
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
     integrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialWCA)
-    integrator.setExternalPotential(externalPotential)
     integrator.setDistinguishedTypes(distinguishedTypes)
     integrator.setKbT(KbT)
 
@@ -163,7 +152,3 @@ num_cores = multiprocessing.cpu_count() - 1
 pool = Pool(processes=num_cores)
 iterator = [i for i in range(numSimulations)]
 pool.map(partial(runParallelSims), iterator)
-
-## Run serial for debugging
-#for i in range(numSimulations):
-#    runParallelSims(i)

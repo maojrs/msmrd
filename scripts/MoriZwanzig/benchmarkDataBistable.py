@@ -67,7 +67,7 @@ sigma = rm * 2**(-1/6)
 
 # Parameters for external potential (will only acts on distinguished particles (type 1))
 minimaDist = 1.5
-kconstants = np.array([3.0, 10.0, 10.0])
+kconstants = np.array([1.0, 1.0, 1.0])
 scalefactor = 1
 
 # Simulation parameters
