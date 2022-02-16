@@ -83,7 +83,7 @@ parentDirectory = "../../data/MoriZwanzig/free/"
 try:
     os.mkdir(parentDirectory)
 except OSError as error:
-    print("Folder MoriZwanzig already exists.")
+    print("Folder MoriZwanzig/free/ already exists.")
     proceed = True
 
 # Create folder for benchmark data
