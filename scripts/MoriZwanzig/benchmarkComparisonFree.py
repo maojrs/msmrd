@@ -78,13 +78,15 @@ equilibrationSteps = 10000
 
 
 # Parent directory location
-parentDirectory = "../../data/MoriZwanzig/free/"
+#parentDirectory = "../../data/MoriZwanzig/free/"
+parentDirectory = os.environ['DATA'] + 'stochasticClosure/free/'
+
 
 # Create folder for data
 try:
     os.mkdir(parentDirectory)
 except OSError as error:
-    print("Folder MoriZwanzig/free/ already exists.")
+    print("Folder stochasticClosure/free/ already exists.")
     proceed = True
 
 # Create folder for benchmark data
@@ -93,7 +95,7 @@ filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
 except OSError as error:
-    print("Folder MoriZwanzig/free/" + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
+    print("Folder stochasticClosure/free/" + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
     proceed = input()
     if proceed != 'y':
         sys.exit()

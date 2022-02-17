@@ -83,17 +83,16 @@ outH5 = True
 outChunked = True
 trajtype = "moriZwanzigVelocity" # Samples position and velocity of distinguished particle (type 1) + raux variables
 distinguishedTypes = [1]
-equilibrationSteps = 10000
-
 
 # Parent directory location
-parentDirectory = "../../data/MoriZwanzig/bistable/"
+#parentDirectory = "../../data/MoriZwanzig/bistable/"
+parentDirectory = os.environ['DATA'] + 'stochasticClosure/bistable/'
 
 # Create folder for data
 try:
     os.mkdir(parentDirectory)
 except OSError as error:
-    print("Folder MoriZwanzig/bistable/ already exists.")
+    print("Folder stochasticClosure/bistable/ already exists.")
     proceed = True
 
 # Create folder for benchmark data
@@ -102,7 +101,7 @@ filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
 except OSError as error:
-    print("Folder MoriZwanzig/bistable/" + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
+    print("Folder stochasticClosure/bistable/" + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
     proceed = input()
     if proceed != 'y':
         sys.exit()
@@ -112,7 +111,7 @@ parameterfilename = os.path.join(filedirectory, "parameters")
 parameterDictionary = {'numFiles' : numSimulations, 'numParticles' : numparticles, 'dt' : dt, 'bodytype' : bodytype,
                        'Gamma' : Gamma, 'sigma' : sigma, 'KbT' : KbT, 'mass' : distinguishedParticleMass,
                        'timesteps' : timesteps, 'stride' : stride, 'trajtype' : trajtype,
-                       'boxsize' : boxsize, 'boundaryType' : boundaryType, 'equilibrationSteps' : equilibrationSteps}
+                       'boxsize' : boxsize, 'boundaryType' : boundaryType}
 analysisTools.writeParameters(parameterfilename, parameterDictionary)
 
 
