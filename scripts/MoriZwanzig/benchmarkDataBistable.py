@@ -69,10 +69,10 @@ sigma = rm * 2**(-1/6)
 # potential of the form ax^4 - bx^2 + c y^2 + d z^2
 xminima = 2.5
 a = 0.025
-b = 2 * a * xminima^2
+b = 2 * a * xminima**2
 c = 1 * b
 d = 1 * b
-parameters = [a, b, c, d]
+potentialParams = [a, b, c, d]
 scalefactor = 1
 
 # Simulation parameters
@@ -141,7 +141,7 @@ def runParallelSims(simnumber):
     potentialWCA.setForceCapValue(100.0)
 
     # Define external potential
-    externalPotential = bistable2(parameters, distinguishedTypes, scalefactor)
+    externalPotential = bistable2(potentialParams, distinguishedTypes, scalefactor)
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)

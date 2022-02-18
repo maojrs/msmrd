@@ -1,7 +1,7 @@
 import numpy as np
 import msmrd2
 from msmrd2.integrators import integratorMoriZwanzig
-from msmrd2.potentials import WCA, bistable
+from msmrd2.potentials import WCA, bistable2
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
 import multiprocessing
@@ -64,8 +64,13 @@ rm = particleDiameter # (diameter in nm)
 sigma = rm * 2**(-1/6)
 
 # Parameters for external potential (will only acts on distinguished particles (type 1))
-minimaDist = 1.5
-kconstants = np.array([1.0, 1.0, 1.0])
+# potential of the form ax^4 - bx^2 + c y^2 + d z^2
+xminima = 2.5
+a = 0.025
+b = 2 * a * xminima**2
+c = 1 * b
+d = 1 * b
+potentialParams = [a, b, c, d]
 scalefactor = 1
 
 # Parameters for FPT calculations
@@ -141,7 +146,7 @@ def runParallelSims(simnumber):
     potentialWCA.setForceCapValue(100.0)
 
     # Define external potential
-    externalPotential = bistable(minimaDist, kconstants, distinguishedTypes, scalefactor)
+    externalPotential = bistable2(potentialParams, distinguishedTypes, scalefactor)
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
