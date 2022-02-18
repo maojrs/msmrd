@@ -46,6 +46,12 @@ namespace msmrd {
                 .def(py::init<double &,std::vector<double>&, double &>())
                 .def(py::init<double &,std::vector<double>&, std::vector<int> &, double &>());
 
+        py::class_<bistable2, externalPotential >(m, "bistable2", "Bistable potential 2 (parameters, "
+                                                                "scalefactor), alternative"
+                                                                "bistable potential.")
+                .def(py::init<std::vector<double>&, double &>())
+                .def(py::init<std::vector<double>&, std::vector<int> &, double &>());
+
         py::class_<lennardJones, pairPotential>(m, "lennardJones", "Lennard-Jones potential "
                                                            "(epsilon, sigma)")
                 .def(py::init<double &, double &>())

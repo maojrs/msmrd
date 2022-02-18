@@ -176,8 +176,8 @@ def multiprocessingHandler():
     trajNumList = list(range(numSimulations))
     with open(filename, 'w') as file:
         for index, result in enumerate(pool.imap(runParallelSims, trajNumList)):
-            result, time = result
-            if result == 'success':
+            status, time = result
+            if status == 'success':
                 file.write(str(time) + '\n')
                 print("Simulation " + str(index) + ", done. Success!")
             else:
