@@ -98,7 +98,7 @@ namespace msmrd {
     void integratorMoriZwanzig::integrateO(std::vector<particle> &parts, double deltat) {
         for (int i = 0; i < parts.size(); i++) {
             auto mass = parts[i].mass;
-            auto xi = std::sqrt(KbTemp * mass * (1 - std::exp(-2 * Gamma * deltat / mass))) / mass;
+            auto xi = std::sqrt((KbTemp/mass) * (1 - std::exp(-2 * Gamma * deltat / mass)));
             auto noiseTerm = xi * randg.normal3D(0, 1);
             auto newVel = std::exp(-deltat * Gamma / mass) * parts[i].nextVelocity + noiseTerm;
             parts[i].setNextVelocity(newVel);
