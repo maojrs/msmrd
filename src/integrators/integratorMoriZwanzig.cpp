@@ -55,6 +55,11 @@ namespace msmrd {
          * for raux variables. */
         if (externalPotentialActive) {
             calculateExternalForceTorques(parts, N);
+        } else {
+            for (int i = 0; i < N; i++) {
+                forceField[i] = vec3<double> (0,0,0);
+                torqueField[i] = vec3<double> (0,0,0);
+            }
         }
 
         // Save external potential in temporary variable
