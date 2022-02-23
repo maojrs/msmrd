@@ -127,7 +127,7 @@ def runParallelSims(simnumber):
 
     print('Particle collocation of simulation ' + str(simnumber) + ' done.')
 
-# Set distinguished particle (default type is zero)
+    # Set distinguished particle (default type is zero)
     partlist[0].setType(1)
     partlist[0].setMass(distinguishedParticleMass)
 
