@@ -2,7 +2,7 @@ import numpy as np
 import msmrd2
 import msmrd2.visualization as msmrdvis
 from msmrd2.integrators import integratorMoriZwanzig
-from msmrd2.potentials import WCA, bistable2
+from msmrd2.potentials import WCA, bistable
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
 
@@ -44,7 +44,7 @@ numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
 Gamma = 0.3 #30 # Friction coefficient (units of KbT/D = mass over time (gram/mol)/ns)
 particlemass = 18.0 # (g/mol) approximately mass of water
 distinguishedParticleMass = 3 * particlemass # (kg)
-particleDiameter = 0.3 # (nm)
+particleDiameter = 0.4 #0.3 # (nm) if 0.4nm spherical volume = water molecule volume approx
 separationDistance = 2 * particleDiameter # minimum separation distance for initial condition
 numSimulations = 2500 #250 #500
 # For computations, we assume KbT=1, thus the force F must be: F=KbT f, where f is the force computed
@@ -66,13 +66,8 @@ rm = particleDiameter # (diameter in nm)
 sigma = rm * 2**(-1/6)
 
 # Parameters for external potential (will only acts on distinguished particles (type 1))
-# potential of the form ax^4 - bx^2 + c y^2 + d z^2
-xminima = 2.5
-a = 0.025
-b = 2 * a * xminima**2
-c = 1 * b
-d = 1 * b
-potentialParams = [a, b, c, d]
+minimaDist = 1.5
+kconstants = np.array([1.0, 1.0, 1.0])
 scalefactor = 1
 
 # Simulation parameters
@@ -141,7 +136,7 @@ def runParallelSims(simnumber):
     potentialWCA.setForceCapValue(100.0)
 
     # Define external potential
-    externalPotential = bistable2(potentialParams, distinguishedTypes, scalefactor)
+    externalPotential = bistable(minimaDist, kconstants, distinguishedTypes, scalefactor)
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)

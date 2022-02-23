@@ -15,7 +15,7 @@ namespace msmrd {
     bistable::bistable(double minimaDist, std::vector<double> kconstants_in, double scalefactor)
             : minimaDist(minimaDist), scalefactor(scalefactor) {
         if (kconstants_in.size() !=3 ){
-            throw std::invalid_argument("Kconstants should be three-dimensional arrays");
+            throw std::invalid_argument("Kconstants should be a three-dimensional array");
         }
         kconstants = vec3<double>{kconstants_in[0], kconstants_in[1], kconstants_in[2]};
     }
@@ -71,15 +71,14 @@ namespace msmrd {
     bistable2::bistable2(std::vector<double> parameters_in, double scalefactor)
             : scalefactor(scalefactor) {
         if (parameters_in.size() !=4 ){
-            throw std::invalid_argument("Parameters should be a four-dimensional arrays");
+            throw std::invalid_argument("Parameters should be a four-dimensional array");
         }
         parameters = parameters_in;
     }
 
     /* Alternative constructor to specify location of minimas and standard deviation explicitly, as well as
      * the specific particle types on which the potential will act on. */
-    bistable2::bistable2(std::vector<double> parameters_in,
-                       std::vector<int> partTypes, double scalefactor) :
+    bistable2::bistable2(std::vector<double> parameters_in, std::vector<int> partTypes, double scalefactor) :
             bistable2(parameters_in, scalefactor)  {
         particleTypes = partTypes;
     }
