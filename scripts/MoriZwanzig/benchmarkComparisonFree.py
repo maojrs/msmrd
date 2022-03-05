@@ -37,14 +37,14 @@ import os
 # - Reduced friction: $\sigma^2/time$
 
 # Main parameters
-numBathParticles = 4000 #500 #500
+numBathParticles = 500 #500 #500
 numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
 # D = 3.0E-2 #1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s #0.1
 Gamma = 0.3 #30 # Friction coefficient (units of KbT/D = mass over time (gram/mol)/ns)
 particlemass = 18.0 # (g/mol) approximately mass of water
 distinguishedParticleMass = 3 * particlemass # (kg)
-particleDiameter = 0.4 # (nm)
-separationDistance = 2 * particleDiameter # minimum separation distance for initial condition
+particleDiameter = 0.5 # (nm)
+separationDistance = 1 * particleDiameter # minimum separation distance for initial condition
 numSimulations = 100 #250 #500
 # For computations, we assume KbT=1, thus the force F must be: F=KbT f, where f is the force computed
 # from the potential. This means the plotted potential is on reduced units (not the distances though);
@@ -56,7 +56,7 @@ seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
 # Define simulation boundaries (choose either spherical or box)
-boxsize = 8 #(nm)
+boxsize = 5 #(nm)
 boundaryType = 'periodic'
 
 # Parameters for WCA potential (rm=2^(1/6)sigma)

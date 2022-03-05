@@ -44,8 +44,8 @@ numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
 Gamma = 0.3 #30 # Friction coefficient (units of KbT/D = mass over time (gram/mol)/ns)
 particlemass = 18.0 # (g/mol) approximately mass of water
 distinguishedParticleMass = 3 * particlemass # (kg)
-particleDiameter = 0.3 # (nm)
-separationDistance = 2 * particleDiameter # minimum separation distance for initial condition
+particleDiameter = 0.5 # (nm)
+separationDistance = 1 * particleDiameter # minimum separation distance for initial condition
 numSimulations = 2500 #250 #500
 # For computations, we assume KbT=1, thus the force F must be: F=KbT f, where f is the force computed
 # from the potential. This means the plotted potential is on reduced units (not the distances though);
@@ -57,7 +57,7 @@ seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
 # Define simulation boundaries (choose either spherical or box)
-boxsize = 8 #(nm)
+boxsize = 5 #(nm)
 boundaryType = 'periodic'
 
 # Parameters for WCA potential (rm=2^(1/6)sigma)
