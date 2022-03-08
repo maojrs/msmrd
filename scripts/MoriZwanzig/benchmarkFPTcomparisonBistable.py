@@ -119,7 +119,7 @@ analysisTools.writeParameters(parameterfilename, parameterDictionary)
 basefilename = os.path.join(filedirectory, "simMoriZwanzig")
 
 # Create empty files to save the data in parallel algorithm
-filename = filedirectory  + '/simMoriZwanzigFPTs_' + str(numSimulations) + '.xyz'
+filename = filedirectory  + '/simMoriZwanzigFPTs_box' + str(boxsize) + '_nsims' + str(numSimulations) + '.xyz'
 
 # Simulation wrapper for parallel runs
 def runParallelSims(simnumber):

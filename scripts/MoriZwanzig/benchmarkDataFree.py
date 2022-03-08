@@ -88,7 +88,7 @@ except OSError as error:
     proceed = True
 
 # Create folder for benchmark data
-foldername = "benchmark"
+foldername = "benchmark_box" + str(boxsize)
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
