@@ -85,23 +85,23 @@ equilibrationSteps = 10000
 
 # Parent directory location
 #parentDirectory = "../../data/MoriZwanzig/harmonic/"
-parentDirectory = os.environ['DATA'] + 'stochasticClosure/harmonic/'
+parentDirectory = os.environ['DATA'] + 'stochasticClosure/harmonic/boxsize' + str(boxsize) + '/'
 
 
 # Create folder for data
 try:
     os.mkdir(parentDirectory)
 except OSError as error:
-    print("Folder stochasticClosure/harmonic/ already exists.")
+    print("Folder " + parentDirectory + " already exists.")
     proceed = True
 
 # Create folder for benchmark data        
-foldername = "benchmarkComparison_box" + str(boxsize)
+foldername = "benchmarkComparison"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
 except OSError as error:
-    print("Folder stochasticClosure/harmonic/" + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
+    print("Folder " + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
     proceed = input()
     if proceed != 'y':
         sys.exit()
