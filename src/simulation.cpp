@@ -61,9 +61,9 @@ namespace msmrd {
             traj = std::make_unique<trajectoryMoriZwanzigVelocity>(particleList.size(), bufferSize,
                                                                    distinguishedTypes);
             numcols = 11; //(time, positionx3, velocityx3, type, raux(x3))
-        } else if (trajtype == "moriZwanzigVelocity"){
+        } else if (trajtype == "moriZwanzigVelocity2"){
                 outputDiscreteTraj = false;
-                traj = std::make_unique<trajectoryMoriZwanzigVelocity>(particleList.size(), bufferSize,
+                traj = std::make_unique<trajectoryMoriZwanzigVelocity2>(particleList.size(), bufferSize,
                                                                        distinguishedTypes);
                 numcols = 14; //(time, positionx3, velocityx3, type, raux(x3), raux2(x3))
         } else if (trajtype == "position"){

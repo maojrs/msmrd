@@ -111,4 +111,24 @@ namespace msmrd {
         }
     }
 
+
+    /*
+     * Class implementations for integratorMoriZwanzig2, alternative version.
+     */
+    /* Loads auxiliary variable into raux. In this case this correspond to the potential and noise term,
+     * which can be calculated as M(dV) + Gamma V_i dt .*/
+    void integratorMoriZwanzig2::loadAuxiliaryValues(std::vector<particle> &parts,
+                                                    std::vector<vec3<double>> pairsForces) {
+        for (int i = 0; i < parts.size(); i++) {
+            // If particle type corresponds to one of the distinguished particles, sample its value
+            if (std::find(distinguishedTypes.begin(), distinguishedTypes.end(),
+                          parts[i].type) != distinguishedTypes.end()) {
+                auto mass = parts[i].mass;
+                auto interactionTerm = pairsForces[i]*dt/(2*mass) * (1 + std::exp(-dt * Gamma / mass));
+                parts[i].raux = interactionTerm;
+                // Noise term (parts[i].raux2) loaded on integrateO.
+            }
+        }
+    };
+
 }

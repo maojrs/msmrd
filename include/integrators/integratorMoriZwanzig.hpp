@@ -21,9 +21,9 @@ namespace msmrd {
         /**
          * @distinguishedTypes vector of types that correspond to distinguished particle. Must match that of trajectory.
          */
-        void loadAuxiliaryValues(std::vector<particle> &parts, std::vector<vec3<double>> pairsForces);
+        virtual void loadAuxiliaryValues(std::vector<particle> &parts, std::vector<vec3<double>> pairsForces);
 
-        void integrateO(std::vector<particle> &parts, double timestep);
+        virtual void integrateO(std::vector<particle> &parts, double timestep);
 
     public:
         integratorMoriZwanzig(double dt, long seed, std::string particlesbodytype, double Gamma);
@@ -35,5 +35,23 @@ namespace msmrd {
 
 
 
+    };
+
+    /*
+     * Same as integratorMoriZwanzig, but it splits the value originally store in raux to a part stored in raux and
+     * another part stored in raux2.
+     */
+    class integratorMoriZwanzig2 : public integratorMoriZwanzig {
+    protected:
+        std::vector<int> distinguishedTypes{1};
+        /**
+         * @distinguishedTypes vector of types that correspond to distinguished particle. Must match that of trajectory.
+         */
+        void loadAuxiliaryValues(std::vector<particle> &parts, std::vector<vec3<double>> pairsForces) override;
+
+        void integrateO(std::vector<particle> &parts, double timestep) override;
+
+    public:
+        using integratorMoriZwanzig::integratorMoriZwanzig;
     };
 }

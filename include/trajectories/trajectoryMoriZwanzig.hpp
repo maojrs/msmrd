@@ -19,7 +19,21 @@ namespace msmrd {
 
     };
 
+    /*
+     * Same as trajectoryMoriZwanzig but including velocity
+     */
     class trajectoryMoriZwanzigVelocity : public trajectoryPositionVelocityDistinguished {
+    public:
+        using trajectoryPositionVelocityDistinguished::trajectoryPositionVelocityDistinguished;
+
+        void sample(double time, std::vector<particle> &particleList) override;
+
+    };
+
+    /*
+     * Same as trajectoryMoriZwanzigVelocity but including an additional aux variable (two aux variables total)
+     */
+    class trajectoryMoriZwanzigVelocity2 : public trajectoryPositionVelocityDistinguished {
     public:
         using trajectoryPositionVelocityDistinguished::trajectoryPositionVelocityDistinguished;
 
