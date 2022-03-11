@@ -47,7 +47,7 @@ namespace msmrd {
 
 
     void trajectoryMoriZwanzigVelocity2::sample(double time, std::vector<particle> &particleList) {
-        std::vector<double> sample(11);
+        std::vector<double> sample(14);
         for (int i = 0; i < particleList.size(); i++) {
             // If particle type corresponds to one of the distinguished particles, sample its value
             if (std::find(distinguishedTypes.begin(), distinguishedTypes.end(),

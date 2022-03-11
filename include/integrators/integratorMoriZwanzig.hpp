@@ -43,9 +43,7 @@ namespace msmrd {
      */
     class integratorMoriZwanzig2 : public integratorMoriZwanzig {
     protected:
-        /**
-         * @distinguishedTypes vector of types that correspond to distinguished particle. Must match that of trajectory.
-         */
+
         void loadAuxiliaryValues(std::vector<particle> &parts, std::vector<vec3<double>> pairsForces) override;
 
     public:
