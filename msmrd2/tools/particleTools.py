@@ -124,6 +124,72 @@ def randomLangevinParticleList(numparticles, boxsize, separationDistance, masses
     return partlist
 
 
+def randomLangevinParticleListTwoDistinguished(numparticles, boxsize, separationDistance,
+                                               masses = 1, randomSeed = -1, x0 = 1):
+    '''
+    :param numparticles: number of particles in list
+    :param boxsize: size of simulation box, if scalar it assumes the three box edges are the same in all dimensions
+    :param separationDistance: separation distance between particle to avoid overlapping
+    :param masses of particles (float or list of floats)
+    :param randomSeed seed for python random generator. Important to specify in parallel runs. Default value of -1
+    will use the default seed.
+    :param x0 separation between dimer particles (index 0 and 1)
+    :return:
+    Generates particle list with uniformly random position and zero velocity. It also enforces
+    the particles don't overlap over a distance given by the relative distance cut off. The first two
+    particles are assumed to be distinguished, such that they are coupled through a bistable potential
+    (a dimer). The dimer has minimas at relative distance x0 and x0+2rad.
+    '''
+    if isinstance(masses, float):
+        masses = [masses]*numparticles
+
+    if len(masses) != numparticles:
+        warnings.warn("Length of masses array need to match the number of particles")
+
+    velocity = np.array([0,0,0])
+    # Set numpy seed if provided (important when running parallel processes, otherwise not required)
+    if randomSeed != -1:
+        random.seed(randomSeed) #better than np.random for parallel seeding
+
+    # Warning in case of not ideal parameters.
+    if separationDistance > boxsize:
+        warnings.warn("The separation distance between particles should be much smaller than the "
+                      "boxsize. Otherwise risk of infinite loop.")
+
+    # Transform boxsize to vector if neccesarry.
+    if np.isscalar(boxsize):
+        boxsize = np.array([boxsize, boxsize, boxsize])
+
+    # Create non-overlapping particle list
+    pyPartlist = []
+    for i in range(numparticles):
+        overlap = True
+        numTrials = 0
+        while overlap:
+            numTrials = numTrials + 1
+            if (i==0 or i==1):
+                position = np.array([i*x0 ,0.,0.])
+            else:
+                position = np.array([boxsize[0]*random.random()-0.5*boxsize[0],
+                                     boxsize[1]*random.random()-0.5*boxsize[1],
+                                     boxsize[2]*random.random()-0.5*boxsize[2]])
+            overlap = False
+            for j in range(len(pyPartlist)):
+                if np.linalg.norm(position - pyPartlist[j].position) < separationDistance:
+                    overlap = True
+                    continue
+            if numTrials >= 100000:
+                warnings.warn("Cannot easily set nonoverlapping particles with current setup. Check boxsize, "
+                              "number of particles and separation distance.")
+
+        part = msmrd2.particle(position, velocity, masses[i])
+        part.setID(i)
+        pyPartlist.append(part)
+
+    partlist = msmrd2.integrators.particleList(pyPartlist)
+    return partlist
+
+
 def randomParticleMSList(numparticles, boxsize, separationDistance, types, unboundMSMs, randomSeed = -1):
     '''
     :param numparticles: number of particles in list
