@@ -21,6 +21,14 @@ namespace msmrd {
      * pyBinders for the c++ potentials classes (see bindInternal for the parent classes)
      */
     void bindPotentials(py::module &m) {
+        pybind11::class_<combinedPairPotential, pairPotential>(m, "combinedPairPotential")
+                .def(py::init<>())
+                .def("addPotential", &combinedPairPotential::addPotential);
+        
+        pybind11::class_<combinedExternalPotential, externalPotential>(m, "combinedExternalPotential")
+                .def(py::init<>())
+                .def("addPotential", &combinedExternalPotential::addPotential);
+
         py::class_<dipole, externalPotential>(m, "dipole", "dipole potential (scalefactor, "
                                                            "directionEField)")
                 .def(py::init<double &, std::vector<double> &>());
