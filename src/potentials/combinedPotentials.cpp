@@ -34,7 +34,6 @@ namespace msmrd {
 
     void combinedExternalPotential::addPotential(externalPotential *externalPotentialPtr) {
         potentials.push_back(std::move(std::shared_ptr<externalPotential>(externalPotentialPtr)));
-        externalPotentialPtr;
     }
 
     double combinedExternalPotential::evaluate(particle &part1) {
