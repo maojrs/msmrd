@@ -9,7 +9,7 @@ namespace msmrd {
      */
 
     void combinedPairPotential::addPotential(pairPotential *pairPotentialPtr) {
-        potentials.push_back(std::move(std::shared_ptr<pairPotential>(pairPotentialPtr)));
+        potentials.push_back(pairPotentialPtr);
     }
 
     double combinedPairPotential::evaluate(particle &part1, particle &part2) {
@@ -33,7 +33,7 @@ namespace msmrd {
 
 
     void combinedExternalPotential::addPotential(externalPotential *externalPotentialPtr) {
-        potentials.push_back(std::move(std::shared_ptr<externalPotential>(externalPotentialPtr)));
+        potentials.push_back(externalPotentialPtr);
     }
 
     double combinedExternalPotential::evaluate(particle &part1) {

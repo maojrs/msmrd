@@ -12,7 +12,7 @@ namespace msmrd {
      */
     class combinedPairPotential : public pairPotential{
     public:
-        std::vector<std::shared_ptr<pairPotential>> potentials;
+        std::vector<pairPotential*> potentials;
         /*
          * @param pairPotentials, tuple of pointers to pairPotentials. The evaluate and forceTorque
          * functions call all the potentials in the tuple to evaluate the functions.
@@ -33,7 +33,7 @@ namespace msmrd {
     */
     class combinedExternalPotential : public externalPotential{
     public:
-        std::vector<std::shared_ptr<externalPotential>> potentials;
+        std::vector<externalPotential*> potentials;
         /*
          * @param pairPotentials, tuple of pointers to pairPotentials. The evaluate and forceTorque
          * functions call all the potentials in the tuple to evaluate the functions.
