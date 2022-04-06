@@ -2,6 +2,7 @@
 // Created by maojrs on 8/14/18.
 //
 #pragma once
+#include <memory>
 #include "particle.hpp"
 #include "randomgen.hpp"
 #include "quaternion.hpp"
@@ -66,6 +67,49 @@ namespace msmrd {
 
         std::array<vec3<double>, 2> relativePositionComplete(vec3<double> p1, vec3<double> p2);
 
+    };
+
+
+    /**
+     * Class to combine several pair potentials into one. Potentials need to be added with the addPotential
+     * function.
+     */
+     class combinedPairPotential : public pairPotential{
+     public:
+         std::vector<std::shared_ptr<pairPotential>> potentials;
+         /*
+          * @param pairPotentials, tuple of pointers to pairPotentials. The evaluate and forceTorque
+          * functions call all the potentials in the tuple to evaluate the functions.
+          */
+
+         using pairPotential::pairPotential;
+
+         void addPotential(std::shared_ptr<pairPotential> pairPotentialPtr);
+
+         double evaluate(particle &part1, particle &part2) override;
+
+         std::array<vec3<double>, 4> forceTorque(particle &part1, particle &part2) override;
+     };
+
+    /**
+    * Class to combine several external potentials into one. Potentials need to be added with the
+     * addPotential function.
+    */
+    class combinedExternalPotential : public externalPotential{
+    public:
+        std::vector<std::shared_ptr<externalPotential>> potentials;
+        /*
+         * @param pairPotentials, tuple of pointers to pairPotentials. The evaluate and forceTorque
+         * functions call all the potentials in the tuple to evaluate the functions.
+         */
+
+        using externalPotential::externalPotential;
+
+        void addPotential(std::shared_ptr<externalPotential> externalPotentialPtr);
+
+        double evaluate(particle &part) override;
+
+        std::array<vec3<double>, 2> forceTorque(particle &part) override;
     };
 
 
