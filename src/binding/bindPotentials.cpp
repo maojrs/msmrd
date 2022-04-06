@@ -1,6 +1,7 @@
 #include "binding.hpp"
 #include "potentials/potentials.hpp"
 #include "potentials/bistable.hpp"
+#include "potentials/combinedPotentials.hpp"
 #include "potentials/dipole.hpp"
 #include "potentials/gaussians3D.hpp"
 #include "potentials/gayBerne.hpp"
@@ -24,7 +25,7 @@ namespace msmrd {
         pybind11::class_<combinedPairPotential, pairPotential>(m, "combinedPairPotential")
                 .def(py::init<>())
                 .def("addPotential", &combinedPairPotential::addPotential);
-        
+
         pybind11::class_<combinedExternalPotential, externalPotential>(m, "combinedExternalPotential")
                 .def(py::init<>())
                 .def("addPotential", &combinedExternalPotential::addPotential);
