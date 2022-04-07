@@ -145,7 +145,7 @@ def runParallelSims(simnumber):
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
     integrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma)
     integrator.setBoundary(boxBoundary)
-    integrator.setPairPotential(potentialWCA)
+    integrator.setAuxPairPotential(potentialWCA)  # Aux so it can be saved into aux variable
     integrator.setExternalPotential(externalPotential)
     integrator.setDistinguishedTypes(distinguishedTypes)
     integrator.setKbT(KbT)
