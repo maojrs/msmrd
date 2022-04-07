@@ -142,11 +142,11 @@ def runParallelSims(simnumber):
     potentialWCA.setForceCapValue(100.0)
     potentialPairBistable = pairBistable(x0, rad, distinguishedTypes, scalefactor)
 
-# Integrator definition
+    # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
     integrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma)
     integrator.setBoundary(boxBoundary)
-    integrator.setPairPotential(pairBistable)
+    integrator.setPairPotential(potentialPairBistable)
     integrator.setAuxPairPotential(potentialWCA)
     integrator.setDistinguishedTypes(distinguishedTypes)
     integrator.setKbT(KbT)
