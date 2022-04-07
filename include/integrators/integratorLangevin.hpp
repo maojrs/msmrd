@@ -28,11 +28,11 @@ namespace msmrd {
 
         virtual void integrateOneTimestep(std::vector<particle> &parts, double timestep) = 0;
 
-        void integrateB(std::vector<particle> &parts, double timestep);
+        virtual void integrateB(std::vector<particle> &parts, double timestep);
 
-        void integrateA(std::vector<particle> &parts, double timestep);
+        virtual void integrateA(std::vector<particle> &parts, double timestep);
 
-        void integrateO(std::vector<particle> &parts, double timestep);
+        virtual void integrateO(std::vector<particle> &parts, double timestep);
 
         template< typename PARTICLE >
         void updateVelocities(std::vector<PARTICLE> &parts);

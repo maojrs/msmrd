@@ -23,12 +23,14 @@ namespace msmrd {
          */
         virtual void loadAuxiliaryValues(std::vector<particle> &parts, std::vector<vec3<double>> pairsForces);
 
-        virtual void integrateO(std::vector<particle> &parts, double timestep);
+        void integrateO(std::vector<particle> &parts, double timestep) override;
 
     public:
         integratorMoriZwanzig(double dt, long seed, std::string particlesbodytype, double Gamma);
 
-        void integrate(std::vector<particle> &parts) override;
+        //void integrate(std::vector<particle> &parts) override;
+
+        void integrateOneTimestep(std::vector<particle> &parts, double timestep) override;
 
         void setDistinguishedTypes(std::vector<int> newDistinguishedTypes) {
             distinguishedTypes = newDistinguishedTypes; }

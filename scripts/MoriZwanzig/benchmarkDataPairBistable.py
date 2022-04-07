@@ -1,7 +1,7 @@
 import numpy as np
 import msmrd2
 from msmrd2.integrators import integratorMoriZwanzig
-from msmrd2.potentials import combinedPairPotential, WCA, pairBistable
+from msmrd2.potentials import WCA, pairBistable
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
 
@@ -136,19 +136,18 @@ def runParallelSims(simnumber):
     # Define boundary
     boxBoundary = msmrd2.box(boxsize, boxsize, boxsize, boundaryType)
 
-    # Define pair potentials
+    # Define pair potential (potentialWCA will be set as aux potnetial because we want to store its data
+    # separately for our coarse-graining method).
     potentialWCA = WCA(epsilon, sigma)
     potentialWCA.setForceCapValue(100.0)
     potentialPairBistable = pairBistable(x0, rad, distinguishedTypes, scalefactor)
-    combinedPotential = combinedPairPotential()
-    combinedPotential.addPotential(potentialWCA)
-    combinedPotential.addPotential(potentialPairBistable)
 
 # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
     integrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma)
     integrator.setBoundary(boxBoundary)
-    integrator.setPairPotential(combinedPotential)
+    integrator.setPairPotential(pairBistable)
+    integrator.setAuxPairPotential(potentialWCA)
     integrator.setDistinguishedTypes(distinguishedTypes)
     integrator.setKbT(KbT)
 

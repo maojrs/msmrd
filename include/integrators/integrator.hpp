@@ -100,7 +100,13 @@ namespace msmrd {
         void calculateExternalForceTorques(std::vector<PARTICLE> &parts, int numParticles);
 
         template< typename PARTICLE >
+        void calculateExternalForceTorquesAux(std::vector<PARTICLE> &parts, int numParticles);
+
+        template< typename PARTICLE >
         void calculatePairsForceTorques(std::vector<PARTICLE> &parts, int numParticles);
+
+        template< typename PARTICLE >
+        void calculatePairsForceTorquesAux(std::vector<PARTICLE> &parts, int numParticles);
 
         // Other functions used by most integrators, so defined here as template functions
 
@@ -184,20 +190,26 @@ namespace msmrd {
             }
         }
 
-        /* Add forces and torques due to external potential from all particles to fields,
-         * initialize to zero if there is no external potential. */
+        /* Initialize main fields to zero */
+        for (int i = 0; i < N; i++) {
+            forceField[i] = vec3<double> (0,0,0);
+            torqueField[i] = vec3<double> (0,0,0);
+        }
+
+        /* Add forces and torques due to external potential from all particles to fields */
         if (externalPotentialActive) {
             calculateExternalForceTorques(parts, N);
-        } else {
-            for (int i = 0; i < N; i++) {
-                forceField[i] = vec3<double> (0,0,0);
-                torqueField[i] = vec3<double> (0,0,0);
-            }
+        }
+        if (auxExternalPotentialActive){
+            calculateExternalForceTorquesAux(parts,N);
         }
 
         // Add forces and torques coming from pair interactions.
         if (pairPotentialActive) {
             calculatePairsForceTorques(parts, N);
+        }
+        if (auxPairPotentialActive) {
+            calculatePairsForceTorquesAux(parts, N);
         }
     }
 
@@ -209,17 +221,23 @@ namespace msmrd {
         std::array<vec3<double>, 2> forctorq;
         for (int i = 0; i < numParticles; i++) {
             forctorq = externalPot->forceTorque(parts[i]);
-            forceField[i] = 1.0 * forctorq[0];
-            torqueField[i] = 1.0 * forctorq[1];
+            forceField[i] += 1.0 * forctorq[0];
+            torqueField[i] += 1.0 * forctorq[1];
         }
-        if (auxExternalPotentialActive) {
-            for (int i = 0; i < numParticles; i++) {
-                forctorq = auxExternalPot->forceTorque(parts[i]);
-                auxForceField[i] = 1.0 * forctorq[0];
-                auxTorqueField[i] = 1.0 * forctorq[1];
-                forceField[i] += 1.0 * forctorq[0];
-                torqueField[i] += 1.0 * forctorq[1];
-            }
+    };
+
+    /* Same as above for auxiliary external potential. The auxiliary fields save only the forces
+     * due to the auxiliary potentials, while the main fields save the net force due to all potentials,
+     * aux and normals ones. */
+    template <typename PARTICLE>
+    void integrator::calculateExternalForceTorquesAux(std::vector<PARTICLE> &parts, int numParticles) {
+        std::array<vec3<double>, 2> forctorq;
+        for (int i = 0; i < numParticles; i++) {
+            forctorq = auxExternalPot->forceTorque(parts[i]);
+            auxForceField[i] = 1.0 * forctorq[0];
+            auxTorqueField[i] = 1.0 * forctorq[1];
+            forceField[i] += 1.0 * forctorq[0];
+            torqueField[i] += 1.0 * forctorq[1];
         }
     };
 
@@ -242,19 +260,28 @@ namespace msmrd {
                 torqueField[j] += 1.0*forctorq[3];
             }
         }
-        if (auxPairPotentialActive) {
-            for (int i = 0; i < numParticles; i++) {
-                for (int j = i + 1; j < numParticles; j++) {
-                    forctorq = auxPairPot->forceTorque(parts[i], parts[j]);
-                    auxForceField[i] = 1.0*forctorq[0];
-                    auxTorqueField[i] = 1.0*forctorq[1];
-                    auxForceField[j] = 1.0*forctorq[2];
-                    auxTorqueField[j] = 1.0*forctorq[3];
-                    forceField[i] += 1.0*forctorq[0];
-                    torqueField[i] += 1.0*forctorq[1];
-                    forceField[j] += 1.0*forctorq[2];
-                    torqueField[j] += 1.0*forctorq[3];
-                }
+    }
+
+    /* Calculate pairs forces and torques due to interaction with other particles and sums it into
+     * forceField and torqueField. The auxiliary fields save only the forces
+     * due to the auxiliary potentials, while the main fields save the net force due to all potentials,
+     * aux and normals ones.  */
+    template <typename PARTICLE>
+    void integrator::calculatePairsForceTorquesAux(std::vector<PARTICLE> &parts, int numParticles) {
+        unsigned int N = static_cast<int>(parts.size());
+        std::array<vec3<double>, 4> forctorq;
+        // Calculate the forces and torque for each possible interaction
+        for (int i = 0; i < numParticles; i++) {
+            for (int j = i + 1; j < numParticles; j++) {
+                forctorq = auxPairPot->forceTorque(parts[i], parts[j]);
+                auxForceField[i] = 1.0*forctorq[0];
+                auxTorqueField[i] = 1.0*forctorq[1];
+                auxForceField[j] = 1.0*forctorq[2];
+                auxTorqueField[j] = 1.0*forctorq[3];
+                forceField[i] += 1.0*forctorq[0];
+                torqueField[i] += 1.0*forctorq[1];
+                forceField[j] += 1.0*forctorq[2];
+                torqueField[j] += 1.0*forctorq[3];
             }
         }
     }
