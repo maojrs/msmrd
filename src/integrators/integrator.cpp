@@ -95,6 +95,20 @@ namespace msmrd {
         }
     }
 
+    /* Same as above but for auxiliary potentials */
+    void integrator::setAuxExternalPotential(externalPotential *pot) {
+        auxExternalPotentialActive = true;
+        auxExternalPot = pot;
+    }
+
+    void integrator::setAuxPairPotential(pairPotential *pot) {
+        auxPairPotentialActive = true;
+        auxPairPot = pot;
+        if (boundaryActive) {
+            auxPairPot->setBoundary( domainBoundary );
+        }
+    }
+
 }
 
 

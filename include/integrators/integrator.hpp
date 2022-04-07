@@ -29,19 +29,25 @@ namespace msmrd {
 
         std::vector<vec3<double>> forceField;
         std::vector<vec3<double>> torqueField;
+        std::vector<vec3<double>> auxForceField;
+        std::vector<vec3<double>> auxTorqueField;
 
         bool boundaryActive = false;
         bool externalPotentialActive = false;
         bool pairPotentialActive = false;
+        bool auxExternalPotentialActive = false;
+        bool auxPairPotentialActive = false;
 
         // Boundary pointer (set default boundary (inactive), i.e. no boundary)
         boundary *domainBoundary;
 
         // External potentials pointers (externalPot)
         externalPotential *externalPot;
+        externalPotential *auxExternalPot;
 
         // Pair potentials pointers (pairPot)
         pairPotential *pairPot;
+        pairPotential *auxPairPot;
 
 
         /**
@@ -59,15 +65,20 @@ namespace msmrd {
         *
         * @param forceField stores force experienced by each particle at a given time
         * @param torqueField stores torque experienced by each particle at a given time
+        * @param aux*Field stores force/torque experienced by each particle only due to
+        * aux potentials. Not used to integrate dynamics, only for storage purposes
         *
         * @param boundaryActive indicates if a boundary conditions is active
         * @param externalPotActive indicates if external potential has been set
         * @param pairPotActive indicates if potential potential has been set
+        * @param aux*PotActive same for auxiliary potentials
 
         * @param *domainBoundary pointer to the boundary object to be used.
         * Note all following potentials default to zero and not every integrator will make use of all this potentials
         * @param *externalPot pointer to external potential
         * @param *pairPot pointer to pair potential between two particles
+        * @param *aux*Pot same for aux potentials, which are used to have an additional potential
+        * that is calculated separately. Useful for coarse-raining methods
         * @param clock keeps track of global time
         */
 
@@ -118,6 +129,10 @@ namespace msmrd {
 
         void setPairPotential(pairPotential *pot);
 
+        void setAuxExternalPotential(externalPotential *pot);
+
+        void setAuxPairPotential(pairPotential *pot);
+
         void setKbT(double kbt) { KbTemp = kbt; }
 
         double getClock() const { return clock; }
@@ -140,6 +155,10 @@ namespace msmrd {
 
         pairPotential* getPairPotential() {return pairPot; }
 
+        externalPotential* getAuxExternalPotential() {return auxExternalPot; }
+
+        pairPotential* getAuxPairPotential() {return auxPairPot; }
+
     };
 
 
@@ -159,6 +178,10 @@ namespace msmrd {
         if (static_cast<int>(forceField.size()) != N) {
             forceField.resize(N);
             torqueField.resize(N);
+            if (auxExternalPotentialActive or auxPairPotentialActive) {
+                auxForceField.resize(N);
+                auxTorqueField.resize(N);
+            }
         }
 
         /* Add forces and torques due to external potential from all particles to fields,
@@ -189,6 +212,15 @@ namespace msmrd {
             forceField[i] = 1.0 * forctorq[0];
             torqueField[i] = 1.0 * forctorq[1];
         }
+        if (auxExternalPotentialActive) {
+            for (int i = 0; i < numParticles; i++) {
+                forctorq = auxExternalPot->forceTorque(parts[i]);
+                auxForceField[i] = 1.0 * forctorq[0];
+                auxTorqueField[i] = 1.0 * forctorq[1];
+                forceField[i] += 1.0 * forctorq[0];
+                torqueField[i] += 1.0 * forctorq[1];
+            }
+        }
     };
 
     /* Calculate pairs forces and torques due to interaction with other particles and sums it into
@@ -208,6 +240,21 @@ namespace msmrd {
                 torqueField[i] += 1.0*forctorq[1];
                 forceField[j] += 1.0*forctorq[2];
                 torqueField[j] += 1.0*forctorq[3];
+            }
+        }
+        if (auxPairPotentialActive) {
+            for (int i = 0; i < numParticles; i++) {
+                for (int j = i + 1; j < numParticles; j++) {
+                    forctorq = auxPairPot->forceTorque(parts[i], parts[j]);
+                    auxForceField[i] = 1.0*forctorq[0];
+                    auxTorqueField[i] = 1.0*forctorq[1];
+                    auxForceField[j] = 1.0*forctorq[2];
+                    auxTorqueField[j] = 1.0*forctorq[3];
+                    forceField[i] += 1.0*forctorq[0];
+                    torqueField[i] += 1.0*forctorq[1];
+                    forceField[j] += 1.0*forctorq[2];
+                    torqueField[j] += 1.0*forctorq[3];
+                }
             }
         }
     }
