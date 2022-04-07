@@ -29,7 +29,9 @@ namespace msmrd {
                 .def("setKbT", &integrator::setKbT)
                 .def("setBoundary", &integrator::setBoundary)
                 .def("setExternalPotential", &integrator::setExternalPotential)
-                .def("setPairPotential", &integrator::setPairPotential);
+                .def("setPairPotential", &integrator::setPairPotential)
+                .def("setAuxExternalPotential", &integrator::setAuxExternalPotential)
+                .def("setAuxPairPotential", &integrator::setAuxPairPotential);
 
         /* Bind Langevin integrators parent class*/
         pybind11::class_<integratorLangevin, integrator>(m, "integratorLangevin")
@@ -39,7 +41,9 @@ namespace msmrd {
                 .def("setKbT", &integratorLangevin::setKbT)
                 .def("setBoundary", &integratorLangevin::setBoundary)
                 .def("setExternalPotential", &integratorLangevin::setExternalPotential)
-                .def("setPairPotential", &integratorLangevin::setPairPotential);
+                .def("setPairPotential", &integratorLangevin::setPairPotential)
+                .def("setAuxExternalPotential", &integrator::setAuxExternalPotential)
+                .def("setAuxPairPotential", &integrator::setAuxPairPotential);
 
         /* Bind Markov models parent class*/
         pybind11::class_<markovModel>(m, "markovModel")
