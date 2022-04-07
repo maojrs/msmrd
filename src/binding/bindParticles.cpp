@@ -43,6 +43,10 @@ namespace msmrd {
                 .def_property_readonly("nextVelocity", [](const particle &part) {
                     return vec2numpy(3, part.nextVelocity);
                 })
+                .def_property_readonly("raux", [](const particle &part) {
+                    return vec2numpy(3, part.raux);})
+                .def_property_readonly("raux2", [](const particle &part) {
+                    return vec2numpy(3, part.raux2);})
                 .def_property_readonly("state", &particle::getState)
                 .def_property_readonly("lagtime", &particle::getLagtime)
                 .def_property_readonly("isMSMactive", &particle::isMSMactive)
