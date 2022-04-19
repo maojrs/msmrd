@@ -63,11 +63,12 @@ boundaryType = 'periodic'
 epsilon = 1.0
 rm = particleDiameter # (diameter in nm)
 sigma = rm * 2**(-1/6)
+excludeParticleTypesPairs = [1] # Two particles of this same type wll not interact with each other.
 
 # Parameters for pair bistable potential (will only act on distinguished particles (type 1))
-x0 = -1 # location of first minima
-rad = 1 # half the distance between minimas
-scalefactor = 1
+x0 = 1.0*particleDiameter # location of first minima
+rad = 1.0*particleDiameter # half the distance between minimas
+scalefactor = 2
 
 # Simulation parameters
 timesteps = 10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
@@ -138,7 +139,7 @@ def runParallelSims(simnumber):
 
     # Define pair potential (potentialWCA will be set as aux potnetial because we want to store its data
     # separately for our coarse-graining method).
-    potentialWCA = WCA(epsilon, sigma)
+    potentialWCA = WCA(epsilon, sigma, excludeParticleTypesPairs)
     potentialWCA.setForceCapValue(100.0)
     potentialPairBistable = pairBistable(x0, rad, distinguishedTypes, scalefactor)
 
