@@ -83,7 +83,7 @@ equilibrationSteps = 5000
 
 # Parent directory location
 #parentDirectory = "../../data/MoriZwanzig/bistable/"
-parentDirectory = os.environ['DATA'] + 'stochasticClosure/pairBistable/boxsize' + str(boxsize) + '/'
+parentDirectory = os.environ['DATA'] + 'stochasticClosure/dimer/boxsize' + str(boxsize) + '/'
 
 # Create folder for data
 try:
