@@ -15,6 +15,12 @@ namespace msmrd {
     lennardJones::lennardJones(double epsilon, double sigma, double cutOff) : epsilon(epsilon), sigma(sigma),
         cutOff(cutOff) {}
 
+    lennardJones::lennardJones(double epsilon, double sigma,  std::vector<int> exclParticleTypesPairs)
+            : epsilon(epsilon), sigma(sigma)    {
+        cutOff = 3 * sigma;
+        excludeParticleTypesPairs = exclParticleTypesPairs;
+    }
+
     /* Set maximum value of force. If potnetial yields larger force, uses this value. Also calculates
      * the corresponding value at which the potential is cut off. */
     void lennardJones::setForceCapValue(double forceCapVal) {
@@ -65,17 +71,25 @@ namespace msmrd {
         //vec3<double> pos1virtual = relPos[0]; // virtual pos1 if periodic boundary; otherwise pos1.
         vec3<double> rvec = relPos[1]; //part2.position - part1.position if non-periodic boundary;
         double r = rvec.norm();
+        double resultingPotential = 0;
+        auto activeParticles = true;
         if (r <= cutOff) {
-            auto term0 = std::pow((sigma/r),6);
-            auto term1 = std::pow(term0,2);
-            auto resultingPotential = 4 * epsilon * (term1 - term0) + baseEnergy;
-            if (forceCap and resultingPotential >= potentialCutOff){
-                resultingPotential = -forceCapValue * (r - rcritical) + potentialCutOff;
+            if (std::find(excludeParticleTypesPairs.begin(),
+                          excludeParticleTypesPairs.end(), part1.type) == excludeParticleTypesPairs.end() and
+                std::find(excludeParticleTypesPairs.begin(),
+                          excludeParticleTypesPairs.end(), part2.type) == excludeParticleTypesPairs.end()) {
+                activeParticles = false;
             }
-            return resultingPotential;
-        } else {
-            return 0;
+            if (activeParticles) {
+                auto term0 = std::pow((sigma / r), 6);
+                auto term1 = std::pow(term0, 2);
+                resultingPotential = 4 * epsilon * (term1 - term0) + baseEnergy;
+                if (forceCap and resultingPotential >= potentialCutOff) {
+                    resultingPotential = -forceCapValue * (r - rcritical) + potentialCutOff;
+                }
+            }
         }
+        return resultingPotential;
     }
 
     std::array<vec3<double>, 4> lennardJones::forceTorque(particle &part1, particle &part2) {
@@ -85,20 +99,29 @@ namespace msmrd {
         double r = rvec.norm();
         vec3<double> force = vec3<double>();
         vec3<double> torque = vec3<double>();
+        auto activeParticles = true;
         if (r <= cutOff) {
-            double term0 = std::pow((sigma / r), 6);
-            double dVdr = (24 * epsilon / r) * (term0 - 2 * std::pow(term0, 2));
-            double dVdx = dVdr * rvec[0] / r;
-            double dVdy = dVdr * rvec[1] / r;
-            double dVdz = dVdr * rvec[2] / r;
-
-            force = vec3<double>(dVdx, dVdy, dVdz);
-            torque = 0 * force;
-            // Apply force cap if active
-            if (forceCap and force.norm() >= forceCapValue) {
-                    force = forceCapValue * force/force.norm();
+            if (std::find(excludeParticleTypesPairs.begin(),
+                          excludeParticleTypesPairs.end(), part1.type) == excludeParticleTypesPairs.end() and
+                std::find(excludeParticleTypesPairs.begin(),
+                          excludeParticleTypesPairs.end(), part2.type) == excludeParticleTypesPairs.end()) {
+                activeParticles = false;
             }
-            return {force, torque, -1 * force, torque};
+            if (activeParticles) {
+                double term0 = std::pow((sigma / r), 6);
+                double dVdr = (24 * epsilon / r) * (term0 - 2 * std::pow(term0, 2));
+                double dVdx = dVdr * rvec[0] / r;
+                double dVdy = dVdr * rvec[1] / r;
+                double dVdz = dVdr * rvec[2] / r;
+
+                force = vec3<double>(dVdx, dVdy, dVdz);
+                torque = 0 * force;
+                // Apply force cap if active
+                if (forceCap and force.norm() >= forceCapValue) {
+                    force = forceCapValue * force / force.norm();
+                }
+                return {force, torque, -1 * force, torque};
+            }
         }
         return {force, torque, -1 * force, torque};
     }
@@ -108,6 +131,12 @@ namespace msmrd {
      * Class implementation for WCA pair potential
      */
     WCA::WCA(double epsilon, double sigma) : lennardJones(epsilon,sigma) {
+        cutOff = std::pow(2,1.0/6.0) * sigma;
+        baseEnergy = 1 * epsilon;
+    }
+
+    WCA::WCA(double epsilon, double sigma, std::vector<int> exclParticleTypesPairs)
+            :lennardJones(epsilon,sigma,exclParticleTypesPairs) {
         cutOff = std::pow(2,1.0/6.0) * sigma;
         baseEnergy = 1 * epsilon;
     }

@@ -65,6 +65,7 @@ namespace msmrd {
                                                            "(epsilon, sigma)")
                 .def(py::init<double &, double &>())
                 .def(py::init<double &, double &, double &>())
+                .def(py::init<double &, double &, std::vector<int> &>())
                 .def("setForceCapValue", &lennardJones::setForceCapValue)
                 .def("setPotentialCutOff", &lennardJones::setPotentialCutOff)
                 .def("getPotentialCutOff", &lennardJones::getPotentialCutOff)
@@ -76,7 +77,8 @@ namespace msmrd {
                 .def(py::init<double &, double &, std::vector<int> &, double &>());
 
         py::class_<WCA, lennardJones>(m, "WCA", "WCA potential (epsilon, sigma)")
-                .def(py::init<double &, double &>());
+                .def(py::init<double &, double &>())
+                .def(py::init<double &, double &, std::vector<int> &>());
 
         py::class_<harmonicRepulsion, pairPotential>(m, "HarmonicRepulsion", "Harmonic repulsion potential "
                                                                    "(k, range)")

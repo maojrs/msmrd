@@ -20,6 +20,7 @@ namespace msmrd {
         double potentialCutOff = 0.0;
         double rcritical = 0;
         double baseEnergy = 0.0;
+        std::vector<int> excludeParticleTypesPairs;
 
         /**
          * @param epsilon depth of the potential well
@@ -32,10 +33,14 @@ namespace msmrd {
          * @param rcritical r value at which the LJ potential is cutoff (only if forceCap = true)
          * @param baseEnergy translation of potential energy in y-axis. It defaults to zero, but it can
          * be modified by child classes, like the WCA.
+         * @param excludeParticleTypesPairs if set, the pair particles of this type (both the same), will
+         * be excluded from the interaction.
          */
         lennardJones(double epsilon, double sigma);
 
         lennardJones(double epsilon, double sigma, double cutOff);
+
+        lennardJones(double epsilon, double sigma, std::vector<int> exclParticleTypesPairs);
 
         double evaluate(particle &part1, particle &part2) override;
 
@@ -54,6 +59,9 @@ namespace msmrd {
     class WCA : public lennardJones {
     public:
         WCA(double epsilon, double sigma);
+
+        WCA(double epsilon, double sigma, std::vector<int> exclParticleTypesPairs);
+
     };
 
 }

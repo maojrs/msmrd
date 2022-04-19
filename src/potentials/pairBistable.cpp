@@ -51,6 +51,7 @@ namespace msmrd {
             double dVdy = dVdr * rvec[1] / r;
             double dVdz = dVdr * rvec[2] / r;
             force = vec3<double>(dVdx, dVdy, dVdz);
+            force = scalefactor * force;
         }
         return {force, torque, -1.0*force, -1.0*torque};
     }
