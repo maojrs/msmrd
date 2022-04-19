@@ -123,8 +123,8 @@ def runParallelSims(simnumber):
     # Define particle list
     seed = int(simnumber)
     random.seed(seed)
-    partlist = particleTools.randomLangevinParticleList(numparticles, boxsize, separationDistance,
-                                                        particlemass, seed, distinguishedParticleOrigin=True)
+    partlist = particleTools.randomLangevinParticleListTwoDistinguished(numparticles, boxsize, separationDistance,
+                                                        particlemass, seed, x0)
 
     print('Particle collocation of simulation ' + str(simnumber) + ' done.')
 

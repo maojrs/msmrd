@@ -39,7 +39,7 @@ import os
 
 # Main parameters
 numBathParticles = 500 #500 #500
-numparticles = 1 + numBathParticles #Added distinguished particle (index 0)
+numparticles = 2 + numBathParticles #Added distinguished particle (index 0)
 # D = 3.0E-2 #1.0E-3 #(nm^2/ns) Note 1.0E-3 nm^2/ns = 1 micrometer^2/s #0.1
 Gamma = 0.3 #30 # Friction coefficient (units of KbT/D = mass over time (gram/mol)/ns)
 particlemass = 18.0 # (g/mol) approximately mass of water
