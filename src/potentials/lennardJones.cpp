@@ -102,9 +102,9 @@ namespace msmrd {
         auto activeParticles = true;
         if (r <= cutOff) {
             if (std::find(excludeParticleTypesPairs.begin(),
-                          excludeParticleTypesPairs.end(), part1.type) == excludeParticleTypesPairs.end() and
+                          excludeParticleTypesPairs.end(), part1.type) != excludeParticleTypesPairs.end() and
                 std::find(excludeParticleTypesPairs.begin(),
-                          excludeParticleTypesPairs.end(), part2.type) == excludeParticleTypesPairs.end()) {
+                          excludeParticleTypesPairs.end(), part2.type) != excludeParticleTypesPairs.end()) {
                 activeParticles = false;
             }
             if (activeParticles) {
