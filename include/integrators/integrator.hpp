@@ -157,6 +157,14 @@ namespace msmrd {
 
         boundary* getBoundary() { return domainBoundary; }
 
+        std::vector<vec3<double>> getForceField() { return forceField; }
+
+        std::vector<vec3<double>> getTorqueField() { return torqueField; }
+
+        std::vector<vec3<double>> getAuxForceField() { return auxForceField; }
+
+        std::vector<vec3<double>> getAuxTorqueField() { return auxTorqueField; }
+
         externalPotential* getExternalPotential() {return externalPot; }
 
         pairPotential* getPairPotential() {return pairPot; }

@@ -6,7 +6,9 @@
 #include "integrators/msmrdIntegrator.hpp"
 #include "integrators/msmrdMultiParticleIntegrator.hpp"
 #include "integrators/integratorMAPK.hpp"
+#include "integrators/integratorLangevin.hpp"
 #include "potentials/patchyProteinMAPK.hpp"
+#include "potentials/lennardJones.hpp"
 #include "boundaries/box.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
 #include "markovModels/msmrdMarkovModel.hpp"
@@ -414,4 +416,44 @@ TEST_CASE("Initialization of integratorMAPK class", "[integratorMAPK]") {
 //            WARN("The particle 2 timeCounter is: " << plist[1].timeCounter << " " << plist[1].state);
 //        }
 //    }
+}
+
+TEST_CASE("Langevin integrators with aux potentials", "[integratorLangevin]") {
+    int numparticles = 2;
+    double boxsize = 8;
+    double mass = 1.0;
+    double Gamma = 0.3;
+    auto particleDiameter = 0.5;
+    auto bodytype = "point";
+    long seed = -1;
+
+    // Create particle list
+    auto position1 = vec3<double>{0.0, 0.0, 0.0};
+    auto position2 = vec3<double>{0.5*particleDiameter, 0.0, 0.0};
+    auto velocity = vec3<double>{0.0, 0.0, 0.0};
+    particle part1 = particle(position1, velocity, mass);
+    particle part2 = particle(position2, velocity, mass);
+    auto plist = std::vector<particle>{part1, part2};
+
+    // Define boundary
+    auto boxBoundary = box(boxsize, boxsize, boxsize, "periodic");
+
+    // Define WCA potential
+    auto epsilon = 1.0;
+    auto rm = particleDiameter;
+    auto sigma = rm * std::pow(2,-1.0/6.0);
+    auto myPotential = WCA(epsilon, sigma);
+
+
+    // Define and set up integrator
+    double dt = 0.05;
+    auto myIntegrator = langevinABOBA(dt, seed, bodytype, Gamma);
+    myIntegrator.setBoundary(&boxBoundary);
+    myIntegrator.setAuxPairPotential(&myPotential);
+    REQUIRE((myIntegrator.getForceField()).size() == 0);
+    myIntegrator.integrate(plist);
+    REQUIRE((myIntegrator.getForceField()).size() == 2);
+    auto fField0 = myIntegrator.getForceField();
+    myIntegrator.integrate(plist);
+    REQUIRE(myIntegrator.getForceField() != fField0);
 }

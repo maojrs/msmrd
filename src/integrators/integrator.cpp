@@ -75,6 +75,9 @@ namespace msmrd {
         if (pairPotentialActive) {
             pairPot->setBoundary(bndry);
         }
+        if (auxPairPotentialActive) {
+            auxPairPot->setBoundary(bndry);
+        }
     }
 
 
