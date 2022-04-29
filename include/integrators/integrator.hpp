@@ -202,6 +202,10 @@ namespace msmrd {
         for (int i = 0; i < N; i++) {
             forceField[i] = vec3<double> (0,0,0);
             torqueField[i] = vec3<double> (0,0,0);
+            if (auxExternalPotentialActive or auxPairPotentialActive) {
+                auxForceField[i] = vec3<double> (0,0,0);
+                auxTorqueField[i] = vec3<double> (0,0,0);
+            }
         }
 
         /* Add forces and torques due to external potential from all particles to fields */

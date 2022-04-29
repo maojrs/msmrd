@@ -57,7 +57,7 @@ seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
 # Define simulation boundaries (choose either spherical or box)
-boxsize = 5 #(nm)
+boxsize = 8 #5 #(nm)
 boundaryType = 'periodic'
 
 # Parameters for WCA potential (rm=2^(1/6)sigma)
