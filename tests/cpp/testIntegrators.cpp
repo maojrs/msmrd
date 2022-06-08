@@ -7,8 +7,10 @@
 #include "integrators/msmrdMultiParticleIntegrator.hpp"
 #include "integrators/integratorMAPK.hpp"
 #include "integrators/integratorLangevin.hpp"
+#include "integrators/integratorMoriZwanzig.hpp"
 #include "potentials/patchyProteinMAPK.hpp"
 #include "potentials/lennardJones.hpp"
+#include "potentials/harmonic.hpp"
 #include "boundaries/box.hpp"
 #include "discretizations/positionOrientationPartition.hpp"
 #include "markovModels/msmrdMarkovModel.hpp"
@@ -450,10 +452,79 @@ TEST_CASE("Langevin integrators with aux potentials", "[integratorLangevin]") {
     auto myIntegrator = langevinABOBA(dt, seed, bodytype, Gamma);
     myIntegrator.setBoundary(&boxBoundary);
     myIntegrator.setAuxPairPotential(&myPotential);
+
+//    // Consistency check for force field and aux variables
+//    REQUIRE((myIntegrator.getForceField()).size() == 0);
+//    REQUIRE((myIntegrator.getAuxForceField()).size() == 0);
+//    myIntegrator.integrate(plist);
+//    REQUIRE((myIntegrator.getForceField()).size() == 2);
+//    REQUIRE((myIntegrator.getAuxForceField()).size() == 2);
+//    auto fField0 = myIntegrator.getForceField();
+//    auto auxfField0 = myIntegrator.getAuxForceField();
+//    myIntegrator.integrate(plist);
+//    REQUIRE(myIntegrator.getForceField() != fField0);
+//    REQUIRE(myIntegrator.getAuxForceField() != auxfField0);
+
+}
+
+
+TEST_CASE("Mori Zwanzig integrators to check loading of aux varables", "[integratorMoriZwanzig]") {
+    int numparticles = 2;
+    double boxsize = 8;
+    double mass = 1.0;
+    double Gamma = 0.3;
+    auto particleDiameter = 0.5;
+    auto bodytype = "point";
+    long seed = -1;
+
+    // Create particle list
+    auto position1 = vec3<double>{-0.45*particleDiameter, 0.0, 0.0};
+    auto position2 = vec3<double>{0.45*particleDiameter, 0.0, 0.0};
+    auto velocity = vec3<double>{0.0, 0.0, 0.0};
+    particle part1 = particle(position1, velocity, mass);
+    particle part2 = particle(position2, velocity, mass);
+    part1.setType(1);
+    auto plist = std::vector<particle>{part1, part2};
+
+    // Define boundary
+    auto boxBoundary = box(boxsize, boxsize, boxsize, "periodic");
+
+    // Define WCA potential
+    auto epsilon = 1.0;
+    auto rm = particleDiameter;
+    auto sigma = rm * std::pow(2,-1.0/6.0);
+    auto myPotential = WCA(epsilon, sigma);
+
+    // Define external potential
+    std::vector<double> minima = {0.,0.,0.};
+    std::vector<double> kconstant = {0.3,0.3,0.3};
+    double scalefactor = 1;
+    auto externalPotential = harmonic(minima, kconstant, scalefactor);
+
+
+    // Define and set up integrator
+    double dt = 0.05;
+    std::vector<int> distinguishedTypes = {1};
+    auto myIntegrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma);
+    myIntegrator.setBoundary(&boxBoundary);
+    myIntegrator.setExternalPotential(&externalPotential);
+    myIntegrator.setAuxPairPotential(&myPotential);
+    myIntegrator.setDistinguishedTypes(distinguishedTypes);
+
+
+    // Consistency check for force field and aux variables
     REQUIRE((myIntegrator.getForceField()).size() == 0);
+    REQUIRE((myIntegrator.getAuxForceField()).size() == 0);
     myIntegrator.integrate(plist);
     REQUIRE((myIntegrator.getForceField()).size() == 2);
-    auto fField0 = myIntegrator.getForceField();
-    myIntegrator.integrate(plist);
-    REQUIRE(myIntegrator.getForceField() != fField0);
+    REQUIRE((myIntegrator.getAuxForceField()).size() == 2);
+    for (int i = 0; i < 2; i++) {
+        REQUIRE(myIntegrator.getAuxForceField()[i] != vec3<double>());
+        REQUIRE(myIntegrator.getForceField()[i] != vec3<double>());
+        REQUIRE(myIntegrator.getForceField()[i] != myIntegrator.getAuxForceField()[i]);
+    }
+    REQUIRE(plist[0].raux != vec3<double>(0,0,0));
+    REQUIRE(plist[0].raux2 != vec3<double>(0,0,0));
+    REQUIRE(plist[1].raux == vec3<double>(0,0,0)); // not distinguished type
+    REQUIRE(plist[1].raux2 != vec3<double>(0,0,0));
 }

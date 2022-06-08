@@ -246,8 +246,8 @@ namespace msmrd {
         std::array<vec3<double>, 2> forctorq;
         for (int i = 0; i < numParticles; i++) {
             forctorq = auxExternalPot->forceTorque(parts[i]);
-            auxForceField[i] = 1.0 * forctorq[0];
-            auxTorqueField[i] = 1.0 * forctorq[1];
+            auxForceField[i] += 1.0 * forctorq[0];
+            auxTorqueField[i] += 1.0 * forctorq[1];
             forceField[i] += 1.0 * forctorq[0];
             torqueField[i] += 1.0 * forctorq[1];
         }
@@ -260,7 +260,6 @@ namespace msmrd {
      * and the force and torque exerted on particle2 (in that order), from their mutual interaction. */
     template <typename PARTICLE>
     void integrator::calculatePairsForceTorques(std::vector<PARTICLE> &parts, int numParticles) {
-        unsigned int N = static_cast<int>(parts.size());
         std::array<vec3<double>, 4> forctorq;
         // Calculate the forces and torque for each possible interaction
         for (int i = 0; i < numParticles; i++) {
@@ -280,16 +279,15 @@ namespace msmrd {
      * aux and normals ones.  */
     template <typename PARTICLE>
     void integrator::calculatePairsForceTorquesAux(std::vector<PARTICLE> &parts, int numParticles) {
-        unsigned int N = static_cast<int>(parts.size());
         std::array<vec3<double>, 4> forctorq;
         // Calculate the forces and torque for each possible interaction
         for (int i = 0; i < numParticles; i++) {
             for (int j = i + 1; j < numParticles; j++) {
                 forctorq = auxPairPot->forceTorque(parts[i], parts[j]);
-                auxForceField[i] = 1.0*forctorq[0];
-                auxTorqueField[i] = 1.0*forctorq[1];
-                auxForceField[j] = 1.0*forctorq[2];
-                auxTorqueField[j] = 1.0*forctorq[3];
+                auxForceField[i] +=  1.0*forctorq[0];
+                auxTorqueField[i] += 1.0*forctorq[1];
+                auxForceField[j] += 1.0*forctorq[2];
+                auxTorqueField[j] += 1.0*forctorq[3];
                 forceField[i] += 1.0*forctorq[0];
                 torqueField[i] += 1.0*forctorq[1];
                 forceField[j] += 1.0*forctorq[2];
