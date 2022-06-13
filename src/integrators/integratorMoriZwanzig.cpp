@@ -97,7 +97,6 @@ namespace msmrd {
 //        clock += dt;
 //    };
 
-
     void integratorMoriZwanzig::integrateOneTimestep(std::vector<particle> &parts, double timestep) {
 
         integrateA(parts, dt/2.0);

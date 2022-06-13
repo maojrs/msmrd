@@ -26,6 +26,8 @@ namespace msmrd {
         clock = 0;
         forceField.resize(0);
         torqueField.resize(0);
+        auxForceField.resize(0);
+        auxTorqueField.resize(0);
         if (particlesbodytype != "point") {
             rotation = true;
         }

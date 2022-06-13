@@ -57,7 +57,7 @@ seed = -1 # Seed = -1 used random device as seed
 bodytype = 'point'
 
 # Define simulation boundaries (choose either spherical or box)
-boxsize = 5 #(nm)
+boxsize = 8 #5 #(nm)
 boundaryType = 'periodic'
 
 # Parameters for WCA potential (rm=2^(1/6)sigma)
@@ -144,7 +144,8 @@ def runParallelSims(simnumber):
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
     integrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma)
     integrator.setBoundary(boxBoundary)
-    integrator.setAuxPairPotential(potentialWCA) # Aux so it can be saved into aux variable
+    integrator.setAuxPairPotential(potentialWCA) # Aux so it can be easily saved into aux variable
+    #integrator.setPairPotential(potentialWCA)
     integrator.setExternalPotential(externalPotential)
     integrator.setDistinguishedTypes(distinguishedTypes)
     integrator.setKbT(KbT)
