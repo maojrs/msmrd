@@ -86,7 +86,7 @@ distinguishedTypes = [1]
 
 # Parent directory location
 #parentDirectory = "../../data/MoriZwanzig/bistable/"
-parentDirectory = os.environ['DATA'] + 'stochasticClosure/bistable/'
+parentDirectory = os.environ['DATA'] + 'stochasticClosure/bistable/boxsize' + str(boxsize) + '/'
 
 # Create folder for data
 try:
@@ -101,7 +101,7 @@ filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
 except OSError as error:
-    print("Folder stochasticClosure/bistable/" + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
+    print("Folder stochasticClosure/bistable/boxsize" + str(boxsize) + "/" + foldername + " already exists. Previous data files might be overwritten. Continue, y/n?")
     proceed = input()
     if proceed != 'y':
         sys.exit()
@@ -130,6 +130,8 @@ def runParallelSims(simnumber):
     partlist = particleTools.randomLangevinParticleList(numparticles, boxsize, separationDistance,
                                                         particlemass, seed, distinguishedParticleOrigin=True)
     # Set distinguished particle (default type is zero)
+    partlist[0].setPosition(initialPosition)
+    partlist[0].setVelocity(np.array([0.,0.,0.]))
     partlist[0].setType(1)
     partlist[0].setMass(distinguishedParticleMass)
 
