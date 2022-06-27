@@ -190,6 +190,9 @@ namespace msmrd {
 
         void setOrientationPyBind(std::vector<double> neworientation);
 
+        void setVelocityPyBind(std::vector<double> newvelocity) { velocity = newvelocity;
+            nextVelocity = newvelocity;}
+
         // For Markovian switching behavior
 
         void setState(int newstate);

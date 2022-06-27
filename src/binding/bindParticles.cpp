@@ -75,7 +75,7 @@ namespace msmrd {
                 .def("setMSMoff", &particle::setMSMoff)
                 .def("setMSMon", &particle::setMSMon)
                 .def("setActivePatchList", &particle::setActivePatchList)
-                .def("setVelocity", &particle::setVelocity)
+                .def("setVelocity", &particle::setVelocityPyBind)
                 .def("setMass", &particle::setMass);
 
 
