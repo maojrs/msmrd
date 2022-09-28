@@ -97,6 +97,19 @@ namespace msmrd {
         velocity = 1.0 * nextVelocity;
     };
 
+    void particle::updatePositionIndex(int index) {
+        position[index] = 1.0 * nextPosition[index];
+    };
+
+    void particle::updateOrientationIndex(int index) {
+        orientvector[index] = 1 * nextOrientvector[index];
+        orientation[index] = 1 * nextOrientation[index];
+    };
+
+    void particle::updateVelocityIndex(int index) {
+        velocity[index] = 1.0 * nextVelocity[index];
+    };
+
     void particle::setOrientationPyBind(std::vector<double> neworientation) {
         quaternion<double> quat(neworientation);
         orientation = quat;
