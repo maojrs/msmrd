@@ -67,27 +67,27 @@ public:
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     quaternion &operator+=(arithmetic a) {
-        std::transform(data.begin(), data.end(), data.begin(), std::bind1st(std::plus<scalar>(), a));
+        std::transform(data.begin(), data.end(), data.begin(), [a](auto b) { return a + b; });
         return *this;
     }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     quaternion &operator-=(arithmetic a) {
-        std::transform(data.begin(), data.end(), data.begin(), std::bind2nd(std::minus<scalar>(), a));
+        std::transform(data.begin(), data.end(), data.begin(), [a](auto b) { return b - a; });
         return *this;
     }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     quaternion &operator*=(arithmetic a) {
-        std::transform(data.begin(), data.end(), data.begin(), std::bind1st(std::multiplies<scalar>(), a));
+        std::transform(data.begin(), data.end(), data.begin(), [a](auto b) { return a * b; });
         return *this;
-    }
+    };
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     quaternion &operator/=(arithmetic a) {
-        std::transform(data.begin(), data.end(), data.begin(), std::bind2nd(std::divides<scalar>(), a));
+        std::transform(data.begin(), data.end(), data.begin(), [a](auto b) { return b / a; });
         return *this;
-    }
+    };
 
     scalar norm() const {
         return std::sqrt(normSquared());

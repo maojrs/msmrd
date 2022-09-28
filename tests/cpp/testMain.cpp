@@ -14,6 +14,7 @@
 using namespace msmrd;
 
 TEST_CASE("Basic vector arithmetic", "[vectors]") {
+    vec3<double> v0({5.,2.,3});
     vec3<double> v1({1.,2.,3});
     vec3<double> v2({3.,1.,2});
     vec3<double> v3({4.,3.,5});
@@ -22,6 +23,8 @@ TEST_CASE("Basic vector arithmetic", "[vectors]") {
     REQUIRE( v1*v2 == 11);
     REQUIRE( 5*v1 == v1*5);
     REQUIRE( 2*v1 == v4 );
+    v1[0] = 5.0;
+    REQUIRE(v1 == v0);
 }
 
 TEST_CASE("Basic quaternion arithmetic", "[quaternions]") {

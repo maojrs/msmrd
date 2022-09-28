@@ -216,6 +216,12 @@ namespace msmrd {
 
         void updateVelocity();
 
+        void updatePositionIndex(int index);
+
+        void updateOrientationIndex(int index);
+
+        void updateVelocityIndex(int index);
+
         void activate() { active = true; }
 
         void deactivate() { active = false; }
