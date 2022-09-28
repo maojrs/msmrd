@@ -51,4 +51,27 @@ namespace msmrd {
     public:
         using integratorMoriZwanzig::integratorMoriZwanzig;
     };
+
+    /*
+ * Same as integratorMoriZwanzig, but it splits the value originally store in raux to a part stored in raux and
+ * another part stored in raux2.
+ */
+    class integratorMoriZwanzigConstrained1D : public integratorMoriZwanzig {
+    protected:
+
+        int index1D = 0;
+
+        void loadAuxiliaryValues(std::vector<particle> &parts, std::vector<vec3<double>> pairsForces) override;
+
+    public:
+        using integratorMoriZwanzig::integratorMoriZwanzig;
+
+        void integrateOneTimestep(std::vector<particle> &parts, double timestep) override;
+
+        void updatePositionOrientation1D(std::vector<particle> &parts);
+
+        void updateVelocities1D(std::vector<particle> &parts);
+
+
+    };
 }
