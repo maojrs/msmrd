@@ -49,27 +49,27 @@ public:
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     vec3 &operator+=(arithmetic a) {
-        std::transform(data.begin(), data.end(), data.begin(), std::bind1st(std::plus<scalar>(), a));
+        std::transform(data.begin(), data.end(), data.begin(), [a](auto b) { return a + b; });
         return *this;
     }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     vec3 &operator-=(arithmetic a) {
-        std::transform(data.begin(), data.end(), data.begin(), std::bind2nd(std::minus<scalar>(), a));
+        std::transform(data.begin(), data.end(), data.begin(), [a](auto b) { return b - a; });
         return *this;
     }
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     vec3 &operator*=(arithmetic a) {
-        std::transform(data.begin(), data.end(), data.begin(), std::bind1st(std::multiplies<scalar>(), a));
+        std::transform(data.begin(), data.end(), data.begin(), [a](auto b) { return a * b; });
         return *this;
-    }
+    };
 
     template<typename arithmetic, typename detail::is_arithmetic_type<arithmetic> = 0>
     vec3 &operator/=(arithmetic a) {
-        std::transform(data.begin(), data.end(), data.begin(), std::bind2nd(std::divides<scalar>(), a));
+        std::transform(data.begin(), data.end(), data.begin(), [a](auto b) { return b / a; });
         return *this;
-    }
+    };
 
     vec3 cross(const vec3 &other) const {
         return {
@@ -117,17 +117,6 @@ public:
     bool operator!=(const vec3 &rhs) const {
         return data != rhs.data;
     }
-
-//    bool almostEquals(const vec3 &rhs) const {
-//        bool result {true};
-//        for(std::uint8_t i = 0; i < 3; ++i) {
-//            const auto fp1 = fp::FloatingPoint<float>(data[i]);
-//            const auto fp2 = fp::FloatingPoint<float>(rhs.data[i]);
-//            auto x = fp::FloatingPoint<float>::DistanceBetweenSignAndMagnitudeNumbers(fp1.bits(), fp2.bits());
-//            result &= fp1.AlmostEquals(fp2);
-//        }
-//        return result;
-//    }
 
     friend std::ostream &operator<<(std::ostream &os, const vec3 &vec) {
         os << "(" << vec[0] << ", " << vec[1] << ", " << vec[2] << ")";
@@ -197,5 +186,6 @@ public:
         lhs *= rhs;
         return lhs;
     }
+
 
 };
