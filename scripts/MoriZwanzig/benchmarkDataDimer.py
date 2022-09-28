@@ -1,6 +1,7 @@
 import numpy as np
 import msmrd2
-from msmrd2.integrators import integratorMoriZwanzig
+# from msmrd2.integrators import integratorMoriZwanzig
+from msmrd2.integrators import integratorMoriZwanzigConstrained1D
 from msmrd2.potentials import WCA, pairBistable
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
@@ -145,7 +146,7 @@ def runParallelSims(simnumber):
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
-    integrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma)
+    integrator = integratorMoriZwanzigConstrained1D(dt, seed, bodytype, Gamma)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPairBistable)
     integrator.setAuxPairPotential(potentialWCA)
