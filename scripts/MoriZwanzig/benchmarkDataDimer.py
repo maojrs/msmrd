@@ -85,7 +85,7 @@ equilibrationSteps = 5000
 
 # Parent directory location
 #parentDirectory = "../../data/MoriZwanzig/bistable/"
-parentDirectory = os.environ['DATA'] + 'stochasticClosure/dimer/boxsize' + str(boxsize) + '/'
+parentDirectory = os.environ['DATA'] + 'stochasticClosure/dimer1D/boxsize' + str(boxsize) + '/'
 
 # Create folder for data
 try:
@@ -146,6 +146,7 @@ def runParallelSims(simnumber):
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
+    #integrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma)
     integrator = integratorMoriZwanzigConstrained1D(dt, seed, bodytype, Gamma)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPairBistable)
