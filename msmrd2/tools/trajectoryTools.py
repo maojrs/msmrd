@@ -146,3 +146,16 @@ def stitchTrajs(slicedDtrajs, minlength = 1000):
                 break;
         stitchedTrajs.append(traj)   
     return stitchedTrajs
+
+
+def relativePosition(pos1, pos2, boundaryType, boxsize):
+    if not isinstance(boxsize, (list, tuple, np.ndarray)):
+        boxsize = [boxsize]*len(pos1)
+    p1periodic = 1.0 * pos1
+    if (boundaryType == "periodic" and boxsize != None):
+        for i in range(3):
+            if (pos2[i] - pos1[i]) > 0.5 * boxsize[i]:
+                p1periodic[i] += boxsize[i]
+            if (pos2[i] - pos1[i]) < -0.5 * boxsize[i]:
+                p1periodic[i] -= boxsize[i]
+    return pos2 - p1periodic
