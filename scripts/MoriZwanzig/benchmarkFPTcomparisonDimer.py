@@ -162,7 +162,6 @@ def runParallelSims(simnumber):
     integrator.setDistinguishedTypes(distinguishedTypes)
     integrator.setKbT(KbT)
 
-    # WORKING HEEEREEEEEEEE WIPPPP
     # Calculates the first passage times for a given bound state. Each trajectory is integrated until
     # a bound state is reached. The output in the files is the elapsed time.
     unbound = True
