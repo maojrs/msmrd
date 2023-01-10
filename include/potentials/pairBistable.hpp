@@ -45,7 +45,7 @@ namespace msmrd {
         double x0;
         double rad;
         double scalefactor;
-        double a = 2.0;
+        double a = 1.0;
         std::vector<int> particleTypes;
 
         /**
