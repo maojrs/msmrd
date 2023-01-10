@@ -76,6 +76,11 @@ namespace msmrd {
                 .def(py::init<double &, double &, double &>())
                 .def(py::init<double &, double &, std::vector<int> &, double &>());
 
+        py::class_<pairBistableBias, pairPotential>(m, "pairBistableBias", "pairBistable potential with bias "
+                                                                   "(x0, rad, scalefactor)")
+                .def(py::init<double &, double &, double &>())
+                .def(py::init<double &, double &, std::vector<int> &, double &>());
+
         py::class_<WCA, lennardJones>(m, "WCA", "WCA potential (epsilon, sigma)")
                 .def(py::init<double &, double &>())
                 .def(py::init<double &, double &, std::vector<int> &>());
