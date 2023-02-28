@@ -34,8 +34,19 @@ namespace msmrd {
 
         void setDistinguishedTypes(std::vector<int> newDistinguishedTypes) {
             distinguishedTypes = newDistinguishedTypes; }
+    };
 
+    /*
+    * Same as Mori-Zwanzig, but assumes deterministic system (zero noise).
+    */
+    class integratorMoriZwanzigDeterministic : public integratorMoriZwanzig {
+    protected:
+        void loadAuxiliaryValues(std::vector<particle> &parts, std::vector<vec3<double>> pairsForces) override;
 
+        void integrateO(std::vector<particle> &parts, double timestep) override;
+
+    public:
+        using integratorMoriZwanzig::integratorMoriZwanzig;
 
     };
 
