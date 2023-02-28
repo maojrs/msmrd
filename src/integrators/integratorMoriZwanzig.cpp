@@ -68,6 +68,36 @@ namespace msmrd {
 
 
     /*
+     * Class implementations for integratorMoriZwanzigDeterministic
+     */
+
+    /* Loads auxiliary variable into raux. In this case this correspond to the potential term,
+     * which can be calculated as M(dV) + Gamma V_i dt .*/
+    void integratorMoriZwanzigDeterministic::loadAuxiliaryValues(std::vector<particle> &parts,
+                                                    std::vector<vec3<double>> auxForces) {
+        for (int i = 0; i < parts.size(); i++) {
+            // If particle type corresponds to one of the distinguished particles, sample its value
+            if (std::find(distinguishedTypes.begin(), distinguishedTypes.end(),
+                          parts[i].type) != distinguishedTypes.end()) {
+                auto mass = parts[i].mass;
+                auto interactionTerm = auxForces[i]*dt/(2*mass) * (1 + std::exp(-dt * Gamma / mass));
+                parts[i].raux = interactionTerm;
+            }
+        }
+    };
+
+    /* Integrates velocity full time step given friction and noise term, saves noise term in raux2 variable.
+     * Specialized version of the one implemented in the integratorLangevin integrator. */
+    void integratorMoriZwanzigDeterministic::integrateO(std::vector<particle> &parts, double deltat) {
+        for (int i = 0; i < parts.size(); i++) {
+            auto mass = parts[i].mass;
+            auto newVel = std::exp(-deltat * Gamma / mass) * parts[i].nextVelocity;
+            parts[i].setNextVelocity(newVel);
+        }
+    }
+
+
+    /*
      * Class implementations for integratorMoriZwanzig2, alternative version.
      */
 
@@ -89,7 +119,7 @@ namespace msmrd {
 
 
     /*
-     * Class implementations for integratorMoriZwanzig2, alternative version.
+     * Integrates Mori Zwanzig constraining the dimer in the x-axis
      */
 
     /* Loads auxiliary variable into raux as in original function, but only saves the index-component. */
@@ -109,8 +139,7 @@ namespace msmrd {
         }
     };
 
-    /* Integrates Mori Zwanzig constraining the dimer in the x-axis
-     */
+
     void integratorMoriZwanzigConstrained1D::integrateOneTimestep(std::vector<particle> &parts, double timestep) {
 
         integrateA(parts, dt/2.0);
