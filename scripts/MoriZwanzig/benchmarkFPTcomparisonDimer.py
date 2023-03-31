@@ -1,7 +1,7 @@
 import numpy as np
 import msmrd2
 from msmrd2.integrators import integratorMoriZwanzig
-from msmrd2.potentials import combinedPairPotential, WCA, pairBistable
+from msmrd2.potentials import combinedPairPotential, WCA, pairBistableBias
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
 import msmrd2.tools.trajectoryTools as trajectoryTools
@@ -151,7 +151,7 @@ def runParallelSims(simnumber):
     # Define potentials
     potentialWCA = WCA(epsilon, sigma, excludeParticleTypesPairs)
     potentialWCA.setForceCapValue(100.0)
-    potentialPairBistable = pairBistable(x0, rad, distinguishedTypes, scalefactor)
+    potentialPairBistable = pairBistableBias(x0, rad, distinguishedTypes, scalefactor)
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
