@@ -1,9 +1,9 @@
 import numpy as np
 import msmrd2
 import msmrd2.visualization as msmrdvis
-#from msmrd2.integrators import integratorMoriZwanzig
-from msmrd2.integrators import integratorMoriZwanzigConstrained1D
-from msmrd2.potentials import combinedPairPotential, WCA, pairBistable
+from msmrd2.integrators import integratorMoriZwanzig
+#from msmrd2.integrators import integratorMoriZwanzigConstrained1D
+from msmrd2.potentials import combinedPairPotential, WCA, pairBistableBias
 import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
 
@@ -88,7 +88,7 @@ equilibrationSteps = 10000
 
 # Parent directory location
 #parentDirectory = "../../data/MoriZwanzig/bistable/"
-parentDirectory = os.environ['DATA'] + 'stochasticClosure/dimer1D/boxsize' + str(boxsize) + '/'
+parentDirectory = os.environ['DATA'] + 'stochasticClosure/dimer/boxsize' + str(boxsize) + '/'
 
 # Create folder for data
 try:
@@ -98,7 +98,7 @@ except OSError as error:
     proceed = True
 
 # Create folder for benchmark data
-foldername = "benchmarkComparison"
+foldername = "benchmarkComparisonBias"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
@@ -143,12 +143,12 @@ def runParallelSims(simnumber):
     # Define pair potential
     potentialWCA = WCA(epsilon, sigma, excludeParticleTypesPairs)
     potentialWCA.setForceCapValue(100.0)
-    potentialPairBistable = pairBistable(x0, rad, distinguishedTypes, scalefactor)
+    potentialPairBistable = pairBistableBias(x0, rad, distinguishedTypes, scalefactor)
 
     # Integrator definition
     seed = int(-1*simnumber) # random seed (negative and different for every simulation, good for parallelization)
-    #integrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma)
-    integrator = integratorMoriZwanzigConstrained1D(dt, seed, bodytype, Gamma)
+    integrator = integratorMoriZwanzig(dt, seed, bodytype, Gamma)
+    #integrator = integratorMoriZwanzigConstrained1D(dt, seed, bodytype, Gamma)
     integrator.setBoundary(boxBoundary)
     integrator.setPairPotential(potentialPairBistable)
     integrator.setAuxPairPotential(potentialWCA)  # Aux so it can be saved into aux variable

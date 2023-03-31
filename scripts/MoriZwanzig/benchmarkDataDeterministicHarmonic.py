@@ -81,7 +81,7 @@ outH5 = True
 outChunked = True
 trajtype = "moriZwanzigVelocity" # Samples position & velocity of distinguished particle, its type (1) + raux variables
 distinguishedTypes = [1]
-equilibrationSteps = 5000
+equilibrationSteps = 10000
 
 
 # Parent directory location
