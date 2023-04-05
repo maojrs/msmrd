@@ -81,7 +81,7 @@ if transitionType == 'CO':
 else:
     initialSeparation = 2*rad # Either first minima: x0 or second minima: 2*rad
     finalSeparation = 1*x0 # Either first minima: x0 or second minima: 2*rad
-minimaThreshold = 1.9*rad
+minimaThreshold =  0.05 #1.9*rad
 
 # Simulation parameters
 tfinal = 10000 #100 #10000 #100000
@@ -170,7 +170,7 @@ def runParallelSims(simnumber):
         relativePosition = trajectoryTools.relativePosition(partlist[0].position, partlist[1].position,
                                                             boundaryType, boxsize)
         relDistance = np.linalg.norm(relativePosition)
-        if np.abs(relDistance - initialSeparation) >= minimaThreshold:
+        if np.abs(relDistance - finalSeparation) <= minimaThreshold:
             unbound = False
             return 'success', integrator.clock
         elif integrator.clock >= 10000.0:
