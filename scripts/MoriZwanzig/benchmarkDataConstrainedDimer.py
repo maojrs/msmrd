@@ -84,7 +84,7 @@ equilibrationSteps = 5000
 
 # Parent directory location
 #parentDirectory = "../../data/MoriZwanzig/bistable/"
-parentDirectory = os.environ['DATA'] + 'stochasticClosure/dimer/boxsize' + str(boxsize) + '/'
+parentDirectory = os.environ['DATA'] + 'stochasticClosure/dimer1D/boxsize' + str(boxsize) + '/'
 
 # Create folder for data
 try:
@@ -94,7 +94,7 @@ except OSError as error:
     proceed = True
 
 # Create folder for benchmark data
-foldername = "benchmarkBias"
+foldername = "benchmark"
 filedirectory =  os.path.join(parentDirectory, foldername)
 try:
     os.mkdir(filedirectory)
