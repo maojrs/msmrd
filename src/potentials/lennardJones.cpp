@@ -67,7 +67,7 @@ namespace msmrd {
     }
 
     double lennardJones::evaluate(particle &part1, particle &part2) {
-        std::array<vec3<double>, 2> relPos = relativePositionComplete(part1.position, part2.position);
+        std::array<vec3<double>, 2> relPos = relativePositionComplete(part2.position, part1.position);
         //vec3<double> pos1virtual = relPos[0]; // virtual pos1 if periodic boundary; otherwise pos1.
         vec3<double> rvec = relPos[1]; //part2.position - part1.position if non-periodic boundary;
         double r = rvec.norm();
@@ -93,7 +93,7 @@ namespace msmrd {
     }
 
     std::array<vec3<double>, 4> lennardJones::forceTorque(particle &part1, particle &part2) {
-        std::array<vec3<double>, 2> relPos = relativePositionComplete(part1.position, part2.position);
+        std::array<vec3<double>, 2> relPos = relativePositionComplete(part2.position, part1.position);
         //vec3<double> pos1virtual = relPos[0]; // virtual pos1 if periodic boundary; otherwise pos1.
         vec3<double> rvec = relPos[1]; //part2.position - part1.position if non-periodic boundary;
         double r = rvec.norm();
@@ -114,7 +114,7 @@ namespace msmrd {
                 double dVdy = dVdr * rvec[1] / r;
                 double dVdz = dVdr * rvec[2] / r;
 
-                force = vec3<double>(dVdx, dVdy, dVdz);
+                force = vec3<double>(-1.0*dVdx, -1.0*dVdy, -1.0*dVdz);
                 torque = 0 * force;
                 // Apply force cap if active
                 if (forceCap and force.norm() >= forceCapValue) {

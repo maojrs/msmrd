@@ -44,7 +44,7 @@ namespace msmrd {
             activeParticles = true;
         }
         if (particleTypes.empty() or activeParticles) {
-            vec3<double> rvec = relativePosition(part1.position, part2.position);
+            vec3<double> rvec = relativePosition(part2.position, part1.position);
             double r = rvec.norm();
             double arg = (r - (x0 + rad))/rad;
             double dVdr = 4.0 * (1 - std::pow(arg,2)) * arg /rad;
@@ -96,7 +96,7 @@ namespace msmrd {
             activeParticles = true;
         }
         if (particleTypes.empty() or activeParticles) {
-            vec3<double> rvec = relativePosition(part1.position, part2.position);
+            vec3<double> rvec = relativePosition(part2.position, part1.position);
             double r = rvec.norm();
             double arg = (r - (x0 + rad))/rad;
             double dVdr = 4.0 * (1 - std::pow(arg,2)) * arg /rad - a/r;
