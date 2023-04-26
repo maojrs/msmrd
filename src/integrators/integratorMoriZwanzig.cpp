@@ -145,7 +145,7 @@ namespace msmrd {
         integrateA(parts, dt/2.0);
 
         // Update particlesposition to recalculate force for next step "B"
-        updatePositionOrientation(parts);
+        updatePositionOrientation1D(parts);
 
         // Calculate force field
         calculateForceTorqueFields(parts);
