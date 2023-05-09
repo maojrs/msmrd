@@ -6,7 +6,6 @@ import msmrd2.tools.particleTools as particleTools
 import msmrd2.tools.analysis as analysisTools
 import msmrd2.tools.trajectoryTools as trajectoryTools
 
-
 import multiprocessing
 from multiprocessing import Pool
 from functools import partial

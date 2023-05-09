@@ -68,10 +68,11 @@ excludeParticleTypesPairs = [1] # Two particles of this same type wll not intera
 # Parameters for pair bistable potential (will only act on distinguished particles (type 1))
 x0 = 1.0*particleDiameter # location of first minima
 rad = 1.0*particleDiameter # half the distance between minimas
+x1 = x0 + 2.0*rad # location of second minima
 scalefactor = 2
 
 # Simulation parameters
-timesteps = 10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
+timesteps = 20000 #10000 #100000 #2000 #100000 #250000 #20000 #10000000 #3000000 #3000000 #2000
 bufferSize = 100 * 1024
 stride = 1 #25
 outTxt = False
@@ -122,8 +123,9 @@ def runParallelSims(simnumber):
     # Define particle list
     seed = int(simnumber)
     random.seed(seed)
+    dimerSepartionDistance = np.random.choice([x0,x1])
     partlist = particleTools.randomLangevinParticleListTwoDistinguished(numparticles, boxsize, separationDistance,
-                                                                        particlemass, seed, x0)
+                                                                        particlemass, seed, dimerSepartionDistance)
 
     print('Particle collocation of simulation ' + str(simnumber) + ' done.')
 
