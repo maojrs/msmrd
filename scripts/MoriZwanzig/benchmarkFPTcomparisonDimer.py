@@ -77,9 +77,9 @@ scalefactor = 2
 transitionType = 'CO' # CO or OC, closed to open or open to closed
 if transitionType == 'CO':
     initialSeparation = 1*x0 # Either first minima: x0 or second minima: 2*rad
-    finalSeparation = 2*rad # Either first minima: x0 or second minima: 2*rad
+    finalSeparation = x0 + 2.0*rad # Either first minima: x0 or second minima: 2*rad
 else:
-    initialSeparation = 2*rad # Either first minima: x0 or second minima: 2*rad
+    initialSeparation = x0 + 2.0*rad # Either first minima: x0 or second minima: 2*rad
     finalSeparation = 1*x0 # Either first minima: x0 or second minima: 2*rad
 minimaThreshold =  0.05 #1.9*rad
 
